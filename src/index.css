@@ -1,0 +1,266 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;500;600;700&display=swap');
+
+/* Pilgrim Heart warm design system */
+
+@layer base {
+  :root {
+    --background: 35 30% 95%;
+    --foreground: 20 40% 20%;
+
+    --card: 35 25% 92%;
+    --card-foreground: 20 40% 20%;
+
+    --popover: 30 25% 90%;
+    --popover-foreground: 20 40% 20%;
+
+    --primary: 14 100% 4%;
+    --primary-foreground: 35 30% 95%;
+
+    --secondary: 35 20% 88%;
+    --secondary-foreground: 20 40% 25%;
+
+    --muted: 35 18% 85%;
+    --muted-foreground: 20 20% 45%;
+
+    --accent: 30 50% 45%;
+    --accent-foreground: 35 30% 95%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 20% 80%;
+    --input: 35 18% 88%;
+    --ring: 30 50% 45%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 30 25% 90%;
+    --sidebar-foreground: 20 40% 20%;
+    --sidebar-primary: 20 45% 32%;
+    --sidebar-primary-foreground: 35 30% 95%;
+    --sidebar-accent: 35 18% 85%;
+    --sidebar-accent-foreground: 20 40% 20%;
+    --sidebar-border: 30 20% 80%;
+    --sidebar-ring: 30 50% 45%;
+
+    /* Custom tokens */
+    --gold: 30 50% 45%;
+    --gold-light: 35 55% 60%;
+    --gold-dark: 14 100% 4%;
+    --brown: 14 100% 4%;
+    --brown-light: 14 80% 15%;
+    --brown-dark: 14 100% 2%;
+    --cream: 35 30% 95%;
+    --cream-dark: 35 25% 88%;
+    --warm-gray: 25 15% 55%;
+    
+    --gradient-warm: linear-gradient(180deg, hsl(14 100% 4%) 0%, hsl(14 80% 12%) 50%, hsl(20 50% 25%) 100%);
+    --gradient-warm-subtle: linear-gradient(180deg, hsl(35 30% 95%) 0%, hsl(32 28% 90%) 50%, hsl(30 25% 85%) 100%);
+    --gradient-brown: linear-gradient(135deg, hsl(14 100% 4%) 0%, hsl(14 80% 12%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(35 25% 94%) 0%, hsl(32 22% 88%) 100%);
+  }
+
+  .dark {
+    --background: 20 30% 10%;
+    --foreground: 35 25% 90%;
+    --card: 20 28% 14%;
+    --card-foreground: 35 25% 90%;
+    --popover: 20 28% 14%;
+    --popover-foreground: 35 25% 90%;
+    --primary: 30 50% 55%;
+    --primary-foreground: 20 30% 10%;
+    --secondary: 20 25% 20%;
+    --secondary-foreground: 35 25% 90%;
+    --muted: 20 22% 18%;
+    --muted-foreground: 35 20% 55%;
+    --accent: 30 50% 50%;
+    --accent-foreground: 35 25% 90%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 20 22% 22%;
+    --input: 20 22% 18%;
+    --ring: 30 50% 55%;
+    --sidebar-background: 20 28% 12%;
+    --sidebar-foreground: 35 25% 90%;
+    --sidebar-primary: 30 50% 55%;
+    --sidebar-primary-foreground: 20 30% 10%;
+    --sidebar-accent: 20 25% 20%;
+    --sidebar-accent-foreground: 35 25% 90%;
+    --sidebar-border: 20 22% 22%;
+    --sidebar-ring: 30 50% 55%;
+    
+    --gold: 30 50% 55%;
+    --gold-light: 35 55% 65%;
+    --gold-dark: 14 100% 4%;
+    --brown: 14 100% 4%;
+    --brown-light: 14 80% 15%;
+    --brown-dark: 14 100% 2%;
+    --cream: 35 25% 90%;
+    --cream-dark: 35 20% 80%;
+    --warm-gray: 25 15% 50%;
+    
+    --gradient-warm: linear-gradient(180deg, hsl(14 100% 4%) 0%, hsl(14 80% 10%) 50%, hsl(14 60% 18%) 100%);
+    --gradient-warm-subtle: linear-gradient(180deg, hsl(20 30% 10%) 0%, hsl(22 28% 14%) 50%, hsl(25 25% 18%) 100%);
+    --gradient-brown: linear-gradient(135deg, hsl(14 100% 4%) 0%, hsl(14 80% 10%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(20 28% 16%) 0%, hsl(20 25% 12%) 100%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: var(--gradient-warm-subtle);
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant', serif;
+    font-weight: 300;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .font-display {
+    font-family: 'Cormorant', serif;
+    font-weight: 300;
+  }
+  
+  .font-body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  }
+
+  .gradient-warm {
+    background: var(--gradient-warm);
+  }
+
+  .gradient-warm-subtle {
+    background: var(--gradient-warm-subtle);
+  }
+
+  .gradient-brown {
+    background: var(--gradient-brown);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .glass-brown {
+    background: linear-gradient(135deg, hsl(14 100% 4% / 0.85) 0%, hsl(14 80% 10% / 0.9) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  .text-brown {
+    color: hsl(var(--brown));
+  }
+
+  .bg-brown {
+    background-color: hsl(var(--brown));
+  }
+
+  /* Button shake animation */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px); }
+  }
+
+  @keyframes gentle-shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-1px) rotate(-0.5deg); }
+    75% { transform: translateX(1px) rotate(0.5deg); }
+  }
+
+  .animate-shake {
+    animation: gentle-shake 2s ease-in-out infinite;
+  }
+
+  .animate-shake-hover:hover {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  /* Button fill animation */
+  .btn-fill {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: color 0.4s ease;
+  }
+
+  .btn-fill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(135deg, hsl(14 100% 3%) 0%, hsl(14 80% 10%) 100%);
+    transition: width 0.4s ease;
+    z-index: -1;
+  }
+
+  .btn-fill:hover::before {
+    width: 100%;
+  }
+
+  .btn-fill:hover {
+    color: hsl(35 30% 95%);
+  }
+
+  /* Marquee animation */
+  .animate-marquee {
+    animation: marquee 20s linear infinite;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+
+  .number-glow {
+    text-shadow: 0 0 20px hsl(30 50% 45% / 0.3), 0 0 40px hsl(30 50% 45% / 0.15);
+  }
+
+  .warm-pattern {
+    background-image: 
+      radial-gradient(circle at 20% 50%, hsl(14 100% 4% / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsl(14 100% 4% / 0.02) 0%, transparent 40%),
+      radial-gradient(circle at 40% 80%, hsl(14 100% 4% / 0.02) 0%, transparent 40%);
+  }
+}

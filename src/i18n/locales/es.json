@@ -1,0 +1,479 @@
+{
+  "nav": {
+    "analyses": "Análisis",
+    "calendar": "Calendario",
+    "products": "Productos",
+    "support": "Soporte"
+  },
+  "hero": {
+    "title": "Life C⚙D",
+    "description1": "Life C⚙D es un sistema de navegación vital que muestra dónde una persona ha perdido el control de su vida y cómo recuperarlo.",
+    "description2": "Aquí analizamos preguntas específicas: relaciones, dinero, elección del camino de vida, conflictos internos.",
+    "description3": "En palabras simples: te ayudamos a entender por qué las cosas suceden como suceden y qué puedes hacer después. Aquí obtendrás un análisis completo de tu situación y un plan de acción.",
+    "welcome": "¡Bienvenido!",
+    "bookConsultation": "Reservar una consulta"
+  },
+  "marquee": {
+    "transformation": "Transformación",
+    "meaning": "Significado",
+    "harmony": "Armonía"
+  },
+  "calculator": {
+    "title": "Tu viaje comienza aquí ❤️",
+    "selectMethodology": "Selecciona el método de cálculo",
+    "yourName": "Tu nombre",
+    "namePlaceholder": "Ingresa tu nombre",
+    "birthDate": "Fecha de nacimiento",
+    "day": "Día",
+    "month": "Mes",
+    "year": "Año",
+    "forecastMonthYear": "Mes y año de pronóstico",
+    "forecastYear": "Año de pronóstico",
+    "calculateMonth": "Calcular pronóstico mensual",
+    "calculateYear": "Calcular pronóstico anual",
+    "calculatePurpose": "Descubre tu propósito",
+    "calculateAncestral": "Descubre programas ancestrales",
+    "calculate": "Calcular"
+  },
+  "methodology": {
+    "methodology1": "Método 1",
+    "methodology2": "Método 2",
+    "arcana22": "22 Arcanos",
+    "classic": "Clásico",
+    "arcanaDescription": "Sistema extendido con 22 arcanos",
+    "classicDescription": "Numerología clásica con números 1-9",
+    "moreAccurate": "Más preciso",
+    "features": {
+      "purpose": "Propósito",
+      "compatibility": "Compatibilidad",
+      "forecasts": "Pronósticos",
+      "lifePeriods": "Períodos de vida",
+      "mindNumber": "Número de la Mente",
+      "actionNumber": "Número de Acción",
+      "realizationNumber": "Número de Realización",
+      "outcomeNumber": "Número del Resultado"
+    }
+  },
+  "methods": {
+    "purpose": "Propósito",
+    "purposeDesc": "Profesiones y talentos por fecha de nacimiento",
+    "compatibility": "Compatibilidad",
+    "compatibilityDesc": "Análisis de relaciones de pareja",
+    "yearForecast": "Pronóstico Anual",
+    "yearForecastDesc": "Pronóstico completo del año",
+    "monthForecast": "Pronóstico Mensual",
+    "monthForecastDesc": "Cálculo de energías del mes actual",
+    "dayForecast": "Pronóstico Diario",
+    "dayForecastDesc": "Energías y tareas diarias",
+    "ancestral": "Programas Ancestrales",
+    "ancestralDesc": "Análisis del karma ancestral",
+    "fullAnalysis": "Análisis Completo",
+    "fullAnalysisDesc": "4 números principales de tu destino",
+    "soon": "Próximamente"
+  },
+  "analysisTypes": {
+    "fullAnalysis": "Análisis Completo",
+    "fullAnalysisDesc": "Descripción de tus cualidades dadas y camino de vida. Análisis de matriz y recomendaciones principales.",
+    "contractEnergy": "Energía del Contrato",
+    "contractEnergyDesc": "Compatibilidad de pareja con contratos (matrimonio, negocios, otros documentos) o una fecha específica.",
+    "monthForecast": "Pronóstico Mensual",
+    "monthForecastDesc": "Descubre las energías del próximo mes y obtén recomendaciones para lograr tus objetivos.",
+    "yearForecast": "Pronóstico Anual",
+    "yearForecastDesc": "Pronóstico anual completo con desglose mensual y períodos clave para decisiones importantes.",
+    "nameEnergy": "Energía del Nombre",
+    "nameEnergyDesc": "Comprueba la energía del nombre de tu producto o empresa. ¡Elige el mejor nombre!",
+    "financialCode": "Código Financiero",
+    "financialCodeDesc": "Descubre tu potencial financiero y las mejores formas de ganar según tu fecha de nacimiento.",
+    "professional": "Profesional",
+    "basic": "Básico",
+    "soon": "Pronto"
+  },
+  "results": {
+    "newCalculation": "Nuevo cálculo",
+    "birthDate": "Fecha de nacimiento",
+    "detailedAnalysis": "Análisis detallado",
+    "wantDeeperAnalysis": "¿Quieres un análisis más profundo?",
+    "tryMethodology2": "Prueba el Método 2 — un sistema extendido con 22 arcanos para un análisis más preciso de tu personalidad y propósito.",
+    "tryMethodology2Btn": "Probar Método 2",
+    "consultSpecialist": "Consultar a un especialista",
+    "yourCalculation": "Tu cálculo numerológico",
+    "methodology1Classic": "Método 2 — numerología clásica (números 1-9)",
+    "planet": "Planeta",
+    "luckyDay": "Día de suerte",
+    "stone": "Piedra",
+    "color": "Color",
+    "positiveQualities": "Cualidades positivas",
+    "negativeQualities": "Cualidades negativas",
+    "karmicTask": "Tarea kármica",
+    "suitableProfessions": "Profesiones adecuadas",
+    "mindNumber": "Número de la Mente",
+    "actionNumber": "Número de Acción",
+    "realizationNumber": "Número de Realización",
+    "outcomeNumber": "Número del Resultado"
+  },
+  "matrix": {
+    "personalMatrix": "Matriz Personal",
+    "yourMatrix": "Tu matriz personal",
+    "position": "Posición",
+    "positionMeaning": "Significado de la posición",
+    "description": "Descripción",
+    "reversedMeaning": "Significado invertido",
+    "yearForecast": "Pronóstico anual",
+    "suitableProfessions": "Profesiones adecuadas",
+    "mirror": "Espejo",
+    "reversed": "Invertido",
+    "successCode": "Código del Éxito",
+    "successCodeDesc": "Las posiciones 4, 5, 7 y 12 forman tu código del éxito",
+    "lifePeriods": "Períodos de Vida",
+    "mirrorArcana": "Arcanos Espejo",
+    "mirrorArcanaDesc": "Estas son tus fortalezas — energías que ya has dominado",
+    "reversedArcana": "Arcanos Invertidos",
+    "reversedArcanaDesc": "Estas son áreas de crecimiento — aspectos que necesitan trabajo"
+  },
+  "forecast": {
+    "yearForecast": "Pronóstico Anual",
+    "monthForecast": "Pronóstico Mensual",
+    "forYear": "para {{year}}",
+    "forMonth": "para {{month}} {{year}}",
+    "yearArcana": "Arcano del Año",
+    "monthArcana": "Arcano del Mes",
+    "monthlyForecast": "Pronóstico Mensual",
+    "recommendations": "Recomendaciones",
+    "months": {
+      "january": "Enero",
+      "february": "Febrero",
+      "march": "Marzo",
+      "april": "Abril",
+      "may": "Mayo",
+      "june": "Junio",
+      "july": "Julio",
+      "august": "Agosto",
+      "september": "Septiembre",
+      "october": "Octubre",
+      "november": "Noviembre",
+      "december": "Diciembre"
+    }
+  },
+  "products": {
+    "title": "Productos y Servicios",
+    "subtitle": "Nuestras áreas de trabajo",
+    "psychology": "Psicología",
+    "psychologyDesc": "Consultas que restauran la estabilidad interior y el apoyo.",
+    "digitalPsychology": "Psicología Digital",
+    "digitalPsychologyDesc": "Análisis de números y patrones de comportamiento. Conciencia a través de la estructura.",
+    "esoterics": "Esoterismo",
+    "esotericsDesc": "Esoterismo para la vida: conciencia, energía, poder de elección.",
+    "practices": "Prácticas y Meditaciones",
+    "practicesDesc": "Meditaciones para restaurar el enfoque y la paz.",
+    "learnMore": "Saber más"
+  },
+  "compatibility": {
+    "title": "Análisis de Compatibilidad",
+    "person1": "Primer Compañero",
+    "person2": "Segundo Compañero",
+    "namePlaceholder1": "Nombre del primer compañero",
+    "namePlaceholder2": "Nombre del segundo compañero",
+    "calculate": "Calcular Compatibilidad",
+    "excellent": "Excelente Compatibilidad",
+    "good": "Buena Compatibilidad",
+    "moderate": "Compatibilidad Moderada",
+    "challenging": "Compatibilidad Difícil",
+    "destinyArcana": "Arcano del Destino",
+    "unionArcana": "Arcano de Unión",
+    "harmonyArcana": "Arcano de Armonía",
+    "karmaArcana": "Arcano Kármico",
+    "emotionalConnection": "Conexión emocional",
+    "karmicLesson": "Lección kármica",
+    "strengths": "Fortalezas de la Unión",
+    "challenges": "Desafíos y Puntos de Crecimiento",
+    "wantDeepAnalysis": "¿Quieres un análisis profundo de la relación?",
+    "deepAnalysisDesc": "Obtén una consulta profesional con análisis detallado de compatibilidad, recomendaciones personalizadas y respuestas a tus preguntas."
+  },
+  "calendar": {
+    "title": "Calendario",
+    "subtitle": "Códigos del Día",
+    "selectDate": "Seleccionar fecha",
+    "selectDatePrompt": "Selecciona una fecha para ver el pronóstico",
+    "dayCode": "Código del Día",
+    "dayEnergy": "Energía del Día",
+    "mindNumber": "Número de la Mente",
+    "actionNumber": "Número de Acción",
+    "realizationNumber": "Número de Realización",
+    "outcomeNumber": "Número del Resultado",
+    "interpretations": {
+      "mind": {
+        "1": "Hoy es un día para el liderazgo y la iniciativa. Muestra determinación, inicia nuevos proyectos. Es hora de actuar de forma independiente.",
+        "2": "Día para la cooperación y la diplomacia. Presta atención a las alianzas, escucha la intuición. Bueno para negociaciones.",
+        "3": "¡Día creativo! Exprésate, comunica, comparte ideas. Gran momento para presentaciones y aprendizaje.",
+        "4": "Día para asuntos prácticos y organización. Planifica, estructura tareas. Construye cimientos.",
+        "5": "¡Día de cambios y aventuras! Sé flexible, explora cosas nuevas. Gran momento para viajes y comunicación.",
+        "6": "Día para la familia y el cuidado. Presta atención a los seres queridos, crea armonía. Bueno para la creatividad y la belleza.",
+        "7": "Día para la reflexión y el análisis. Retírate, estudia, medita. Escucha tu intuición.",
+        "8": "Disciplina, control y fuerza de voluntad. Pon las cosas en orden, las finanzas. Tiempo para materializar deseos.",
+        "9": "Día de conclusiones y sabiduría. Ayuda a otros, comparte experiencia. Suelta lo viejo, prepárate para lo nuevo."
+      },
+      "action": {
+        "1": "Actúa con decisión e independencia. Asume la responsabilidad.",
+        "2": "Actúa a través de la cooperación. Busca socios y aliados.",
+        "3": "Actúa creativamente. Usa la comunicación como herramienta.",
+        "4": "Actúa metódicamente. Paso a paso hacia la meta.",
+        "5": "Actúa con flexibilidad. Adáptate a las circunstancias.",
+        "6": "Actúa con cuidado. Crea armonía a tu alrededor.",
+        "7": "Actúa con reflexión. Analiza antes de decidir.",
+        "8": "Actúa con poder. Ejerce autoridad y control.",
+        "9": "Actúa con sabiduría. Sirve a propósitos superiores."
+      },
+      "realization": {
+        "1": "Realización a través del liderazgo y la innovación.",
+        "2": "Realización a través de la asociación y el apoyo.",
+        "3": "Realización a través de la creatividad y la comunicación.",
+        "4": "Realización a través del trabajo y la organización.",
+        "5": "Realización a través de cambios y comunicación.",
+        "6": "Realización a través del servicio y la belleza.",
+        "7": "Realización a través del conocimiento y la espiritualidad.",
+        "8": "Realización a través de negocios y éxito material.",
+        "9": "Realización a través de la sabiduría y ayudar a otros."
+      },
+      "total": {
+        "1": "El resultado del día se dirige hacia la independencia y los nuevos comienzos.",
+        "2": "El resultado del día se dirige hacia la armonía y el equilibrio.",
+        "3": "El resultado del día se dirige hacia la alegría y la autoexpresión.",
+        "4": "El resultado del día se dirige hacia la estabilidad y el orden.",
+        "5": "El resultado del día se dirige hacia la libertad y la experiencia.",
+        "6": "El resultado del día se dirige hacia el amor y la responsabilidad.",
+        "7": "El resultado del día se dirige hacia la comprensión y la introspección.",
+        "8": "El resultado del día se dirige hacia los logros y el poder.",
+        "9": "El resultado del día se dirige hacia la finalización y el dejar ir."
+      }
+    }
+  },
+  "support": {
+    "title": "Soporte",
+    "contactUs": "Contáctanos",
+    "contactDesc": "Si tienes preguntas o sugerencias, puedes contactarnos a través de Telegram.",
+    "writeToTelegram": "Escribir a Telegram",
+    "telegram": "Telegram",
+    "email": "Email",
+    "privacyPolicy": "Política de Privacidad",
+    "privacyIntro": "Respetamos tu privacidad y nos comprometemos a proteger tus datos personales.",
+    "dataCollection": "Recopilación de Datos",
+    "dataCollectionDesc": "Solo recopilamos los datos que proporcionas voluntariamente al usar nuestro servicio (nombre, fecha de nacimiento para cálculos).",
+    "dataUsage": "Uso de Datos",
+    "dataUsageDesc": "Los datos proporcionados se utilizan exclusivamente para cálculos numerológicos y no se comparten con terceros.",
+    "dataStorage": "Almacenamiento de Datos",
+    "dataStorageDesc": "Los datos se procesan localmente y no se almacenan en servidores sin tu consentimiento explícito.",
+    "termsOfUse": "Términos de Uso",
+    "generalProvisions": "Disposiciones Generales",
+    "generalProvisionsDesc": "Al usar este servicio, aceptas estos términos de uso. El servicio se proporciona \"tal cual\".",
+    "informationalNature": "Naturaleza Informativa",
+    "informationalNatureDesc": "Todos los cálculos e interpretaciones son de naturaleza informativa y no constituyen asesoramiento psicológico o médico profesional.",
+    "responsibility": "Responsabilidad",
+    "responsibilityDesc": "El usuario toma decisiones de forma independiente basándose en la información recibida. El servicio no es responsable de las acciones tomadas en base a los cálculos.",
+    "termsChanges": "Cambios en los Términos",
+    "termsChangesDesc": "Nos reservamos el derecho de cambiar estos términos. El uso continuado del servicio después de los cambios significa aceptación de los nuevos términos."
+  },
+  "ancestral": {
+    "title": "Numerología Ancestral",
+    "subtitle": "Tu función en el sistema de linaje",
+    "gender": "Género",
+    "selectGender": "Selecciona género",
+    "male": "Masculino",
+    "female": "Femenino",
+    "workingNumbers": "Números de Trabajo",
+    "dateRow": "Fecha de nacimiento",
+    "workingRow": "Números de trabajo",
+    "allDigits": "Todos los dígitos para análisis",
+    "karmicStar": "Estrella Kármica Ancestral",
+    "yourRole": "Tu Rol en el Linaje",
+    "digit": "Dígito",
+    "interpretationsTitle": "Interpretación de la Estrella Ancestral",
+    "digits": {
+      "two": "Derecho a la Vida",
+      "four": "Continuación del Linaje",
+      "five": "Balance de Energías",
+      "seven": "Protección y Suerte",
+      "eight": "Protección del Linaje",
+      "twoTitle": "Derecho a la Vida",
+      "fourTitle": "Derecho a Continuar el Linaje",
+      "fiveTitle": "Balance de Energías",
+      "sevenTitle": "Protección y Suerte",
+      "eightTitle": "Protección del Linaje"
+    },
+    "roles": {
+      "keeper": "Guardián del Linaje",
+      "keeperDesc": "Eres el protector de tu familia. Tu tarea es mantener el sistema unido, guiar a los parientes por el camino correcto. Puedes parecer duro, pero esta es tu función ancestral. Las profesiones relacionadas con la protección son favorables: policía, militar, psicología, medicina.",
+      "healer": "Sanador del Linaje",
+      "healerDesc": "Eres el mago blanco de tu familia. Tu tarea es sanar el linaje física y espiritualmente. Eres naturalmente empático y abierto. La primera mitad de la vida puede haber sido difícil — esto es preparación para tu misión. Las profesiones de ayuda son favorables.",
+      "lastHope": "Última Esperanza del Linaje",
+      "lastHopeDesc": "Eres el gestor de crisis del linaje. El linaje te envió en un momento crítico para salvar la rama familiar. Eres más fuerte de lo que pareces. Tu tarea es revivir las tradiciones del linaje, rezar por los ancestros, preservar la memoria familiar. No puedes separarte completamente de tu familia.",
+      "curse": "Maldición o Voto Ancestral",
+      "curseDesc": "La presencia de un seis en el segundo o cuarto número de trabajo indica una posible maldición o voto ancestral en tu linaje. Se recomienda trabajar con programas ancestrales."
+    },
+    "interpretations": {
+      "2": {
+        "0": "El linaje tenía poca energía en el momento de tu concepción. Es importante llenarte de energía de forma independiente, tener un donante de energía en tu entorno. Después de los 26 años, los niveles de energía pueden caer sin prácticas especiales.",
+        "1": "Eres energéticamente autosuficiente. El linaje te dio el derecho a la vida y suficientes reservas de energía.",
+        "2": "Eres un donante de energía. Puedes compartir energía con tus seres queridos.",
+        "3": "Tu energía tiene una naturaleza pulsante. A estas personas se les llama brujas o brujos — tienes una conexión especial con el mundo energético.",
+        "4": "Eres un donante de energía muy poderoso. Tu tarea es compartir energía no con una persona, sino con muchos a tu alrededor."
+      },
+      "4": {
+        "0": "Posibles dudas o miedos respecto a los hijos, dificultades durante el embarazo o larga recuperación después del parto. Esto no es una prohibición, sino una indicación de características.",
+        "1": "Tienes el potencial para continuar el linaje, buena salud y capacidad de autocuración.",
+        "2": "¡Fantástico potencial de autocuración! Puedes curarte de cualquier enfermedad si lo deseas. También es el programa de madre — la tarea de tener hijos.",
+        "3": "Potencial muy fuerte para la continuación del linaje. Tres cuatros fortalecen tu conexión con la energía ancestral.",
+        "4": "Máximo potencial para la continuación del linaje y autocuración. Eres un eslabón importante en la cadena de generaciones."
+      },
+      "5": {
+        "0": "Para mujeres: eres la última esperanza del linaje. Tienes un núcleo masculino interno y la capacidad de soportar pruebas. Tu tarea es salvar y revivir el linaje.",
+        "1": "Balance saludable de energía masculina y femenina en tu cuerpo. Estado armonioso.",
+        "2": "Eres un brote saludable en el árbol familiar. Tu tarea es dar a luz hijos y continuar el linaje.",
+        "3": "Fallo energético ancestral serio. Posible programa de rechazo del amor en el linaje. Se recomienda trabajo con un especialista.",
+        "4": "Nivel crítico de fallo ancestral. Es necesario un trabajo profundo con programas ancestrales."
+      },
+      "7": {
+        "0": "Hasta los 26 años, el Universo te protege. Después, necesitas ganar protección a través de buenas acciones y programas positivos.",
+        "1": "Tienes un ángel guardián, y es lo suficientemente fuerte para protegerte.",
+        "2": "Además del ángel guardián, tienes un guardián ancestral — protección rezada por los ancestros.",
+        "3": "¡Eres un transmisor de suerte para otros! Puede que no uses esta suerte tú mismo, pero las personas a tu alrededor la reciben de ti.",
+        "4": "Máxima protección del linaje. Estás rodeado de poderosa energía guardiana."
+      },
+      "8": {
+        "0": "Tu tarea es servir a la familia, incluso a tu propio costo. Cuida a los parientes y une a la familia.",
+        "1": "Proteger el linaje es tu prioridad. La familia debe ser lo primero, pero hay equilibrio con los intereses personales.",
+        "2": "Un ocho para la familia, el segundo para la carrera. Tienes potencial para el desarrollo a través de la sociedad.",
+        "3": "¡Grandeza! Un gran regalo del linaje. Tu tarea es iluminar a otros y traer el bien al mundo.",
+        "4": "Máximo regalo ancestral de protector e iluminador. Enorme responsabilidad y oportunidades."
+      }
+    },
+    "wantDeepAnalysis": "¿Quieres un análisis profundo de los programas ancestrales?",
+    "deepAnalysisDesc": "Obtén una consulta profesional con análisis detallado de programas ancestrales, eliminación de patrones negativos y recomendaciones personalizadas."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "lifecod": {
+    "title": "Compatibilidad Life C⚙D",
+    "subtitle": "Análisis profundo de compatibilidad con 8 métodos",
+    "relationType": {
+      "love": "Amor / Relaciones",
+      "business": "Negocios / Sociedad"
+    },
+    "defaultNames": {
+      "partner1": "Pareja 1",
+      "partner2": "Pareja 2",
+      "business1": "Socio A",
+      "business2": "Socio B"
+    },
+    "form": {
+      "name": "Nombre",
+      "namePlaceholder": "Ingresa el nombre",
+      "day": "Día",
+      "month": "Mes",
+      "year": "Año",
+      "person1Love": "Primera pareja",
+      "person2Love": "Segunda pareja",
+      "person1Business": "Socio A",
+      "person2Business": "Socio B",
+      "calculate": "Calcular compatibilidad"
+    },
+    "consciousness": {
+      "title": "Conciencia",
+      "chain": "Cadena de energías",
+      "compatibility": "Compatibilidad de conciencias"
+    },
+    "action": {
+      "title": "Acciones",
+      "chain": "Camino de acciones",
+      "risks": "Riesgos"
+    },
+    "personalYear": {
+      "title": "Año personal"
+    },
+    "stabilizer": {
+      "title": "Estabilizador de pareja",
+      "holder": "Mantiene la unión",
+      "both": "Ambos socios",
+      "none": "Nadie",
+      "noStabilizer": "Sin estabilizador — alto riesgo",
+      "risks": "Desestabilizadores",
+      "status": {
+        "STRONG": "Fuerte",
+        "OK": "Suficiente",
+        "WEAK": "Débil",
+        "NO": "Ausente"
+      }
+    },
+    "interaction": {
+      "title": "Interacción actual",
+      "risk": "Riesgo",
+      "category": {
+        "STABLE": "Estable",
+        "UNSTABLE": "Inestable",
+        "CRISIS": "Crisis",
+        "BREAKDOWN": "Ruptura"
+      }
+    },
+    "yearEntry": {
+      "title": "Año de entrada",
+      "stabilizerNeeded": "Se necesita estabilizador",
+      "status": {
+        "BEST": "Mejor momento",
+        "OK": "Posible",
+        "TEMP": "Temporal",
+        "NO": "No recomendado"
+      }
+    },
+    "forecast": {
+      "title": "Pronóstico de 5 años",
+      "current": "actual",
+      "years": "Años personales",
+      "hasStabilizer": "Tiene estabilizador",
+      "type": {
+        "STABLE": "Período estable",
+        "CRISIS": "Crisis",
+        "BREAKDOWN": "Riesgo de ruptura",
+        "RECOVERY": "Recuperación",
+        "NEW_UNION": "Nueva unión"
+      }
+    },
+    "verdict": {
+      "title": "Veredicto general",
+      "canBeTogether": "Pueden estar juntos ahora",
+      "yes": "Sí, la unión es posible",
+      "no": "No es el mejor momento ahora",
+      "whoHolds": "Quién mantiene la unión",
+      "both": "Ambos socios",
+      "noOne": "Nadie — unión inestable",
+      "mainRisk": "Riesgo principal",
+      "longTerm": "Perspectivas a largo plazo",
+      "recommendation": "Recomendación",
+      "prospect": {
+        "HIGH": "Altas",
+        "MEDIUM": "Medias",
+        "LOW": "Bajas"
+      }
+    },
+    "result": {
+      "title": "Análisis de compatibilidad",
+      "back": "Nuevo cálculo",
+      "cta": {
+        "title": "¿Quieres un análisis personal profundo?",
+        "description": "Obtén una consulta profesional con análisis detallado de tus relaciones, recomendaciones personalizadas y respuestas a todas tus preguntas.",
+        "button": "Reservar consulta"
+      }
+    },
+    "methodSelector": {
+      "title": "Compatibilidad extendida",
+      "description": "8 métodos de análisis: conciencia, acciones, años personales, pronósticos"
+    }
+  }
+}

@@ -1,0 +1,636 @@
+{
+  "nav": {
+    "analyses": "Analyses",
+    "calendar": "Calendar",
+    "products": "Products",
+    "support": "Support"
+  },
+  "hero": {
+    "title": "Life C⚙D",
+    "description1": "Life C⚙D is a life navigation system that shows where a person has lost control of their life and how to regain it.",
+    "description2": "Here we analyze specific questions — relationships, money, life path choices, internal conflicts.",
+    "description3": "In simple words: we help you understand why things happen the way they do and what you can do next. Here you will get a complete analysis of your situation and an action plan.",
+    "welcome": "Welcome!",
+    "bookConsultation": "Book a consultation"
+  },
+  "marquee": {
+    "transformation": "Transformation",
+    "meaning": "Meaning",
+    "harmony": "Harmony"
+  },
+  "calculator": {
+    "title": "Your journey begins here ❤️",
+    "selectMethodology": "Select calculation method",
+    "yourName": "Your name",
+    "namePlaceholder": "Enter your name",
+    "birthDate": "Birth date",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "forecastMonthYear": "Forecast month and year",
+    "forecastYear": "Forecast year",
+    "calculateMonth": "Calculate month forecast",
+    "calculateYear": "Calculate year forecast",
+    "calculatePurpose": "Discover your purpose",
+    "calculateAncestral": "Discover ancestral programs",
+    "calculate": "Calculate"
+  },
+  "methodology": {
+    "methodology1": "Method 1",
+    "methodology2": "Method 2",
+    "arcana22": "22 Arcana",
+    "classic": "Classic",
+    "arcanaDescription": "Extended system with 22 arcana",
+    "classicDescription": "Classical numerology with numbers 1-9",
+    "moreAccurate": "More accurate",
+    "features": {
+      "purpose": "Purpose",
+      "compatibility": "Compatibility",
+      "forecasts": "Forecasts",
+      "lifePeriods": "Life periods",
+      "mindNumber": "Mind Number",
+      "actionNumber": "Action Number",
+      "realizationNumber": "Realization Number",
+      "outcomeNumber": "Outcome Number"
+    }
+  },
+  "methods": {
+    "purpose": "Purpose",
+    "purposeDesc": "Professions and talents by birth date",
+    "compatibility": "Compatibility",
+    "compatibilityDesc": "Partner relationship analysis",
+    "yearForecast": "Year Forecast",
+    "yearForecastDesc": "Full yearly forecast",
+    "monthForecast": "Month Forecast",
+    "monthForecastDesc": "Current month energy calculation",
+    "dayForecast": "Day Forecast",
+    "dayForecastDesc": "Daily energies and tasks",
+    "ancestral": "Ancestral Programs",
+    "ancestralDesc": "Ancestral karma analysis",
+    "fullAnalysis": "Full Analysis",
+    "fullAnalysisDesc": "4 main numbers of your destiny",
+    "soon": "Coming soon"
+  },
+  "analysisTypes": {
+    "fullAnalysis": "Full Analysis",
+    "fullAnalysisDesc": "Description of your given qualities and life path. Matrix analysis and main recommendations.",
+    "contractEnergy": "Contract Energy",
+    "contractEnergyDesc": "Partner compatibility with contracts (marriage, business, other documents) or a specific date.",
+    "monthForecast": "Month Forecast",
+    "monthForecastDesc": "Discover the energies of the upcoming month and get recommendations to achieve your goals.",
+    "yearForecast": "Year Forecast",
+    "yearForecastDesc": "Full yearly forecast with monthly breakdown and key periods for important decisions.",
+    "nameEnergy": "Name Energy",
+    "nameEnergyDesc": "Check the energy of your product or company name. Choose the best name!",
+    "financialCode": "Financial Code",
+    "financialCodeDesc": "Discover your financial potential and best ways to earn based on your birth date.",
+    "professional": "Professional",
+    "basic": "Basic",
+    "soon": "Soon"
+  },
+  "results": {
+    "newCalculation": "New calculation",
+    "birthDate": "Birth date",
+    "position": "Position",
+    "positions": "positions",
+    "pos": "Pos.",
+    "yourPurpose": "Your purpose",
+    "personalMatrix": "Personal matrix",
+    "mainTriangle": "Main triangle",
+    "lifeGoals": "Life goals",
+    "karma": "Karma",
+    "successCode": "Success code",
+    "lifePeriods": "Life periods",
+    "diagonalRow": "Diagonal row — Goals and ways to achieve",
+    "karmicTriangle": "Karmic triangle",
+    "karmicTriangleDesc": "Tasks and mistakes of past incarnations that affect this life. Position 12 is the main karmic task that needs to be completed once.",
+    "successCodeDesc": "Arcana of positions 4, 5, 7 and 12 form your success code — a life program that leads to happiness.",
+    "wantDeepAnalysis": "Want a deep analysis?",
+    "deepAnalysisDesc": "Get a professional consultation with detailed analysis of your matrix, personal recommendations and answers to your questions.",
+    "bookConsultation": "Book a consultation",
+    "legend": {
+      "mirror": "Mirror (amplification)",
+      "reversed": "Reversed (work required)",
+      "mainTask": "Main task"
+    }
+  },
+  "matrix": {
+    "personalMatrix": "Personal Matrix",
+    "yourMatrix": "Your personal matrix",
+    "position": "Position",
+    "positionMeaning": "Position meaning",
+    "description": "Description",
+    "reversedMeaning": "Reversed meaning",
+    "yearForecast": "Year forecast",
+    "monthForecast": "Month forecast",
+    "suitableProfessions": "Suitable professions",
+    "mirror": "Mirror",
+    "reversed": "Reversed",
+    "successCode": "Success Code",
+    "successCodeDesc": "Positions 4, 5, 7 and 12 form your success code",
+    "lifePeriods": "Life Periods",
+    "mirrorArcana": "Mirror Arcana",
+    "mirrorArcanaDesc": "These are your strengths — energies you have already mastered",
+    "reversedArcana": "Reversed Arcana",
+    "reversedArcanaDesc": "These are growth areas — aspects that need work"
+  },
+  "forecast": {
+    "yearForecast": "Year Forecast",
+    "monthForecast": "Month Forecast",
+    "forYear": "for {{year}}",
+    "forMonth": "for {{month}} {{year}}",
+    "yearArcana": "Year Arcana",
+    "monthArcana": "Month Arcana",
+    "monthlyForecast": "Monthly Forecast",
+    "recommendations": "Recommendations",
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
+  },
+  "products": {
+    "title": "Products & Services",
+    "subtitle": "Our areas of work",
+    "psychology": "Psychology",
+    "psychologyDesc": "Consultations that restore inner stability and support.",
+    "digitalPsychology": "Digital Psychology",
+    "digitalPsychologyDesc": "Analysis of numbers and behavior patterns. Awareness through structure.",
+    "esoterics": "Esoterics",
+    "esotericsDesc": "Esoterics for life: awareness, energy, power of choice.",
+    "practices": "Practices & Meditations",
+    "practicesDesc": "Meditations for restoring focus and peace.",
+    "learnMore": "Learn more"
+  },
+  "compatibility": {
+    "title": "Compatibility Analysis",
+    "person1": "First Partner",
+    "person2": "Second Partner",
+    "namePlaceholder1": "First partner's name",
+    "namePlaceholder2": "Second partner's name",
+    "calculate": "Calculate Compatibility",
+    "excellent": "Excellent Compatibility",
+    "good": "Good Compatibility",
+    "moderate": "Moderate Compatibility",
+    "challenging": "Challenging Compatibility",
+    "destinyArcana": "Destiny Arcana",
+    "unionArcana": "Union Arcana",
+    "harmonyArcana": "Harmony Arcana",
+    "karmaArcana": "Karmic Arcana",
+    "emotionalConnection": "Emotional connection",
+    "karmicLesson": "Karmic lesson",
+    "strengths": "Union Strengths",
+    "challenges": "Challenges & Growth Points",
+    "wantDeepAnalysis": "Want a deep relationship analysis?",
+    "deepAnalysisDesc": "Get a professional consultation with detailed compatibility analysis, personalized recommendations and answers to your questions."
+  },
+  "calendar": {
+    "title": "Calendar",
+    "subtitle": "Day Codes",
+    "selectDate": "Select date",
+    "selectDatePrompt": "Select a date to view the forecast",
+    "dayCode": "Day Code",
+    "dayEnergy": "Day Energy",
+    "mindNumber": "Mind Number",
+    "actionNumber": "Action Number",
+    "realizationNumber": "Realization Number",
+    "outcomeNumber": "Outcome Number",
+    "interpretations": {
+      "mind": {
+        "1": "Today is a day for leadership and initiative. Show determination, start new projects. Time to act independently.",
+        "2": "Day for cooperation and diplomacy. Pay attention to partnerships, listen to intuition. Good for negotiations.",
+        "3": "Creative day! Express yourself, communicate, share ideas. Great time for presentations and learning.",
+        "4": "Day for practical matters and organization. Plan ahead, structure tasks. Build foundations.",
+        "5": "Day of changes and adventures! Be flexible, explore new things. Great time for travel and communication.",
+        "6": "Day for family and care. Pay attention to loved ones, create harmony. Good for creativity and beauty.",
+        "7": "Day for reflection and analysis. Retreat, study, meditate. Listen to your intuition.",
+        "8": "Discipline, control and willpower. Put things in order, finances. Time to materialize desires.",
+        "9": "Day of completions and wisdom. Help others, share experience. Let go of the old, prepare for the new."
+      },
+      "action": {
+        "1": "Act decisively and independently. Take responsibility.",
+        "2": "Act through cooperation. Seek partners and allies.",
+        "3": "Act creatively. Use communication as a tool.",
+        "4": "Act methodically. Step by step towards the goal.",
+        "5": "Act flexibly. Adapt to circumstances.",
+        "6": "Act with care. Create harmony around you.",
+        "7": "Act thoughtfully. Analyze before deciding.",
+        "8": "Act with power. Exercise authority and control.",
+        "9": "Act with wisdom. Serve higher purposes."
+      },
+      "realization": {
+        "1": "Realization through leadership and innovation.",
+        "2": "Realization through partnership and support.",
+        "3": "Realization through creativity and communication.",
+        "4": "Realization through work and organization.",
+        "5": "Realization through changes and communication.",
+        "6": "Realization through service and beauty.",
+        "7": "Realization through knowledge and spirituality.",
+        "8": "Realization through business and material success.",
+        "9": "Realization through wisdom and helping others."
+      },
+      "total": {
+        "1": "The day's outcome is directed towards independence and new beginnings.",
+        "2": "The day's outcome is directed towards harmony and balance.",
+        "3": "The day's outcome is directed towards joy and self-expression.",
+        "4": "The day's outcome is directed towards stability and order.",
+        "5": "The day's outcome is directed towards freedom and experience.",
+        "6": "The day's outcome is directed towards love and responsibility.",
+        "7": "The day's outcome is directed towards understanding and introspection.",
+        "8": "The day's outcome is directed towards achievements and power.",
+        "9": "The day's outcome is directed towards completion and letting go."
+      }
+    }
+  },
+  "support": {
+    "title": "Support",
+    "contactUs": "Contact us",
+    "contactDesc": "If you have questions or suggestions, you can contact us via Telegram.",
+    "writeToTelegram": "Write to Telegram",
+    "telegram": "Telegram",
+    "email": "Email",
+    "privacyPolicy": "Privacy Policy",
+    "privacyIntro": "We respect your privacy and are committed to protecting your personal data.",
+    "dataCollection": "Data Collection",
+    "dataCollectionDesc": "We collect only the data you voluntarily provide when using our service (name, birth date for calculations).",
+    "dataUsage": "Data Usage",
+    "dataUsageDesc": "The provided data is used exclusively for numerological calculations and is not shared with third parties.",
+    "dataStorage": "Data Storage",
+    "dataStorageDesc": "Data is processed locally and is not stored on servers without your explicit consent.",
+    "termsOfUse": "Terms of Use",
+    "generalProvisions": "General Provisions",
+    "generalProvisionsDesc": "By using this service, you agree to these terms of use. The service is provided \"as is\".",
+    "informationalNature": "Informational Nature",
+    "informationalNatureDesc": "All calculations and interpretations are informational in nature and do not constitute professional psychological or medical advice.",
+    "responsibility": "Responsibility",
+    "responsibilityDesc": "The user independently makes decisions based on the information received. The service is not responsible for actions taken based on the calculations.",
+    "termsChanges": "Changes to Terms",
+    "termsChangesDesc": "We reserve the right to change these terms. Continued use of the service after changes means acceptance of the new terms."
+  },
+  "ancestral": {
+    "title": "Ancestral Numerology",
+    "subtitle": "Your function in the lineage system",
+    "gender": "Gender",
+    "selectGender": "Select gender",
+    "male": "Male",
+    "female": "Female",
+    "workingNumbers": "Working Numbers",
+    "dateRow": "Birth date",
+    "workingRow": "Working numbers",
+    "allDigits": "All digits for analysis",
+    "karmicStar": "Karmic Ancestral Star",
+    "yourRole": "Your Role in the Lineage",
+    "digit": "Digit",
+    "interpretationsTitle": "Ancestral Star Interpretation",
+    "digits": {
+      "two": "Right to Life",
+      "four": "Lineage Continuation",
+      "five": "Energy Balance",
+      "seven": "Protection & Luck",
+      "eight": "Lineage Protection",
+      "twoTitle": "Right to Life",
+      "fourTitle": "Right to Continue Lineage",
+      "fiveTitle": "Energy Balance",
+      "sevenTitle": "Protection and Luck",
+      "eightTitle": "Lineage Protection"
+    },
+    "roles": {
+      "keeper": "Lineage Keeper",
+      "keeperDesc": "You are the protector of your family. Your task is to keep the system from falling apart, to guide relatives onto the right path. You may seem tough, but this is your ancestral function. Professions related to protection are favorable: police, military, psychology, medicine.",
+      "healer": "Lineage Healer",
+      "healerDesc": "You are the white mage of your family. Your task is to heal the lineage physically and spiritually. You are naturally empathic and open. The first half of life may have been difficult — this is preparation for your mission. Helping professions are favorable.",
+      "lastHope": "Last Hope of the Lineage",
+      "lastHopeDesc": "You are the crisis manager of the lineage. The lineage sent you at a critical moment to save the family branch. You are stronger than you seem. Your task is to revive lineage traditions, pray for ancestors, preserve family memory. You cannot completely separate from your family.",
+      "curse": "Ancestral Curse or Vow",
+      "curseDesc": "The presence of a six in the second or fourth working number indicates a possible ancestral curse or vow in your lineage. Work with ancestral programs is recommended."
+    },
+    "interpretations": {
+      "2": {
+        "0": "The lineage had little energy at the moment of your conception. It's important to fill yourself with energy independently, have an energy donor in your environment. After 26 years, energy levels may drop without special practices.",
+        "1": "You are energetically self-sufficient. The lineage gave you the right to life and sufficient energy reserves.",
+        "2": "You are an energy donor. You can share energy with loved ones.",
+        "3": "Your energy has a pulsating nature. Such people are called witches or wizards — you have a special connection with the energy world.",
+        "4": "You are a very powerful energy donor. Your task is to share energy not with one person, but with many around you."
+      },
+      "4": {
+        "0": "Possible doubts or fears regarding children, difficulties during pregnancy, or long recovery after childbirth. This is not a prohibition, but an indication of features.",
+        "1": "You have the potential to continue the lineage, good health, and the ability for self-healing.",
+        "2": "Fantastic self-healing potential! You can heal yourself from any disease if you wish. Also, this is the mother program — the task of having children.",
+        "3": "Very strong potential for lineage continuation. Three fours strengthen your connection with ancestral energy.",
+        "4": "Maximum potential for lineage continuation and self-healing. You are an important link in the chain of generations."
+      },
+      "5": {
+        "0": "For women: you are the last hope of the lineage. You have an inner masculine core and the ability to withstand trials. Your task is to save and revive the lineage.",
+        "1": "Healthy balance of masculine and feminine energy in your body. Harmonious state.",
+        "2": "You are a healthy bud on the family tree. Your task is to give birth to children and continue the lineage.",
+        "3": "Serious ancestral energy failure. Possible program of rejection of love in the lineage. Work with a specialist is recommended.",
+        "4": "Critical level of ancestral failure. Deep work with ancestral programs is necessary."
+      },
+      "7": {
+        "0": "Until 26 years old, the Universe protects you. After that, you need to earn protection through good deeds and positive programs.",
+        "1": "You have a guardian angel, and they are strong enough to protect you.",
+        "2": "In addition to the guardian angel, you have an ancestral guardian — protection prayed for by ancestors.",
+        "3": "You are a luck transmitter for others! You may not use this luck yourself, but people around you receive it from you.",
+        "4": "Maximum lineage protection. You are surrounded by powerful guardian energy."
+      },
+      "8": {
+        "0": "Your task is to serve the family, even at your own expense. Take care of relatives and unite the family.",
+        "1": "Protecting the lineage is your priority. Family should come first, but there is balance with personal interests.",
+        "2": "One eight for family, the second for career. You have potential for development through society.",
+        "3": "Greatness! A great gift from the lineage. Your task is to enlighten others and bring good to the world.",
+        "4": "Maximum ancestral gift of protector and enlightener. Huge responsibility and opportunities."
+      }
+    },
+    "wantDeepAnalysis": "Want a deep analysis of ancestral programs?",
+    "deepAnalysisDesc": "Get a professional consultation with detailed analysis of ancestral programs, removal of negative patterns, and personalized recommendations."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Personal Life C⚙D Diagnosis",
+      "subtitle": "Understanding yourself, your life cycles, strengths and weaknesses, as well as your current life period.",
+      "description": "This tool helps you see how you make decisions, where your support is, and what you need to pay attention to now.",
+      "disclaimer": "No mysticism. No promises to change you. Just structure and logic."
+    },
+    "step2": {
+      "title": "What you can learn",
+      "suitable": "Suitable if you want to better understand yourself or check if you're going in the right direction."
+    },
+    "step3": {
+      "title": "What's relevant for you now?",
+      "subtitle": "Choose a direction, and we'll show you the right tool"
+    },
+    "benefits": {
+      "strengths": "Your strengths and weaknesses",
+      "decisions": "How you make decisions",
+      "period": "What life period you're in now",
+      "focus": "What to pay attention to in the near future"
+    },
+    "scenarios": {
+      "diagnosis": {
+        "title": "General personality diagnosis",
+        "description": "I want to better understand myself, my strengths and weaknesses."
+      },
+      "period": {
+        "title": "Current life period",
+        "description": "I'm curious about what's happening to me now and why."
+      },
+      "forecast": {
+        "title": "Monthly or yearly forecast",
+        "description": "I want guidance and understanding of the upcoming period."
+      },
+      "crisis": {
+        "title": "If life is difficult now",
+        "description": "There's a feeling of being stuck, overwhelmed, or losing ground."
+      }
+    },
+    "startDiagnosis": "Start diagnosis",
+    "continue": "Continue",
+    "chooseAndContinue": "Choose and continue",
+    "skipToCalculator": "Go to calculator →"
+  },
+  "crisis": {
+    "title": "How to exit a crisis",
+    "intro": "This analysis is for those who understand that there's an area in life that is currently difficult. There's no diagnosis of conditions here. You choose where you need help.",
+    "disclaimer": "This is not psychotherapy or a substitute for a specialist. This is a tool for understanding the structure of the problem.",
+    "continue": "Continue",
+    "back": "Back",
+    "selectArea": "Which area is most difficult right now?",
+    "selectAreaDesc": "Choose one area — the calculator will give precise recommendations for it.",
+    "enterBirthDate": "Enter your birth date",
+    "birthDateNote": "The date is used to determine your life structure and current cycle.",
+    "getResult": "Get result",
+    "personalAnalysis": "Personal analysis",
+    "areas": {
+      "relationships": {
+        "title": "❤️ Relationships"
+      },
+      "career": {
+        "title": "💼 Self-realization / work"
+      },
+      "finances": {
+        "title": "💰 Finances"
+      },
+      "purpose": {
+        "title": "🧭 Path / meaning / feeling lost"
+      },
+      "general": {
+        "title": "🌀 General state"
+      }
+    },
+    "results": {
+      "intro": "This analysis shows what's really happening in the selected area and how to exit the current state.",
+      "whatHappening": "What's really happening",
+      "yourCode": "Your life code",
+      "currentPeriod": "Current period",
+      "whyNow": "Why this crisis is happening now",
+      "mainMistake": "The main mistake in this area",
+      "whatToDo": "What to do step by step",
+      "whatNotToDo": "What NOT to do",
+      "expectedResult": "Expected result",
+      "consultationPrompt": "If you feel you want to analyze the situation deeper or go through this stage with support, a personal consultation will help build an individual roadmap.",
+      "bookConsultation": "Book a consultation",
+      "newAnalysis": "New analysis",
+      "relationships": {
+        "title": "Relationship crisis",
+        "whatHappening": "There's tension, misunderstanding, or detachment in the relationship now. This is not an accident — it's a signal that the current interaction model needs revision.",
+        "whyNow": "You're in a period when old relationship patterns stop working. Life demands a new level of honesty and openness — both with yourself and with your partner.",
+        "mainMistake": "Trying to 'remake' your partner or expecting them to change on their own without your participation in the process.",
+        "step1": "Acknowledge your part of responsibility in the current situation. Not guilt — responsibility.",
+        "step2": "Have an honest conversation with your partner without accusations, using 'I-statements'.",
+        "step3": "Determine what's really important to you in this relationship and whether you're ready to work on it.",
+        "avoid1": "Avoiding conversations and silencing problems",
+        "avoid2": "Looking for someone to blame instead of solutions",
+        "avoid3": "Making radical decisions at the peak of emotions",
+        "expectedResult": "By following the recommendations for 2-3 weeks, you'll feel greater clarity in the relationship and understand which direction to move."
+      },
+      "career": {
+        "title": "Self-realization crisis",
+        "whatHappening": "You feel that your current job or activity doesn't bring satisfaction. This is a sign that it's time to reconsider your professional goals.",
+        "whyNow": "You've entered a period when external achievements lose their value without inner meaning. Life is pushing you to find your true calling.",
+        "mainMistake": "Changing jobs for the sake of changing, without understanding your true needs and talents.",
+        "step1": "Write down everything you like to do, regardless of whether it brings money.",
+        "step2": "Identify your key talents — what comes easily and brings joy.",
+        "step3": "Start integrating these elements into your current work or look for opportunities to apply them.",
+        "avoid1": "Quitting impulsively without a financial cushion",
+        "avoid2": "Comparing yourself to others' success",
+        "avoid3": "Ignoring your true desires for the sake of stability",
+        "expectedResult": "After a month of systematic work on these points, you'll gain a clearer understanding of your path and the first steps to its realization."
+      },
+      "finances": {
+        "title": "Financial crisis",
+        "whatHappening": "Financial tension is not just about money. It reflects your attitude toward your own value and ability to receive.",
+        "whyNow": "The current period shows that old beliefs about money no longer work. It's time to reconsider your financial model.",
+        "mainMistake": "Focusing on 'earning more' instead of understanding why money doesn't stay or come.",
+        "step1": "Conduct an honest audit: where does the money go, what decisions lead to losses.",
+        "step2": "Work on money beliefs. What beliefs did you inherit from your family?",
+        "step3": "Start small: set a realistic financial goal for the next month.",
+        "avoid1": "Taking loans to close other loans",
+        "avoid2": "Ignoring the problem and hoping it will 'sort itself out'",
+        "avoid3": "Making risky financial decisions under stress",
+        "expectedResult": "With a systematic approach, within 1-2 months you'll feel control over the situation and the first signs of financial stabilization."
+      },
+      "purpose": {
+        "title": "Crisis of meaning and direction",
+        "whatHappening": "You're going through a period of 'being lost' — when old landmarks don't work, and new ones aren't clear yet. This is a normal stage of transformation.",
+        "whyNow": "This is a transition period. The old version of yourself is no longer relevant, and the new one is still forming. Such stages are part of the life cycle.",
+        "mainMistake": "Trying to return to the old 'self' or looking for ready-made answers outside.",
+        "step1": "Accept the state of uncertainty as temporary. This is not a dead end — it's a crossroads.",
+        "step2": "Remember moments when you felt in your place. What do they have in common?",
+        "step3": "Start with small experiments: try something new, observe your reactions.",
+        "avoid1": "Making global life decisions in this state",
+        "avoid2": "Isolating yourself from people and closing off",
+        "avoid3": "Seeking answers in alcohol, shopping, or other forms of escapism",
+        "expectedResult": "After 3-4 weeks of consciously living through this period, new landmarks and understanding of next steps will begin to emerge."
+      },
+      "general": {
+        "title": "General crisis state",
+        "whatHappening": "You feel a general heaviness that's hard to localize in one area. This is a complex signal from life about the need for a pause and review.",
+        "whyNow": "Accumulated tension has reached a point where it's impossible to ignore. This is not weakness — it's a protective mechanism of the psyche.",
+        "mainMistake": "Trying to 'push through' on willpower instead of stopping and figuring things out.",
+        "step1": "Allow yourself a pause. Even for one day, completely disconnect from obligations.",
+        "step2": "Write down all sources of tension. What can be removed or delegated right now?",
+        "step3": "Choose ONE area to start working on. Not all at once — just one.",
+        "avoid1": "Continuing to load yourself with new tasks",
+        "avoid2": "Devaluing your condition with phrases like 'others have it worse'",
+        "avoid3": "Isolating yourself from the support of loved ones",
+        "expectedResult": "By following the recommendations, within 1-2 weeks you'll feel that the situation is under control and there's a concrete action plan."
+      }
+    }
+  },
+  "lifecod": {
+    "title": "Life C⚙D Compatibility",
+    "subtitle": "Deep compatibility analysis using 8 methods",
+    "relationType": {
+      "love": "Love / Relationships",
+      "business": "Business / Partnership"
+    },
+    "defaultNames": {
+      "partner1": "Partner 1",
+      "partner2": "Partner 2",
+      "business1": "Partner A",
+      "business2": "Partner B"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Enter name",
+      "day": "Day",
+      "month": "Month",
+      "year": "Year",
+      "person1Love": "First Partner",
+      "person2Love": "Second Partner",
+      "person1Business": "Partner A",
+      "person2Business": "Partner B",
+      "calculate": "Calculate Compatibility"
+    },
+    "consciousness": {
+      "title": "Consciousness",
+      "chain": "Energy chain",
+      "compatibility": "Consciousness Compatibility"
+    },
+    "action": {
+      "title": "Actions",
+      "chain": "Action path",
+      "risks": "Risks"
+    },
+    "personalYear": {
+      "title": "Personal Year"
+    },
+    "stabilizer": {
+      "title": "Pair Stabilizer",
+      "holder": "Holds the union",
+      "both": "Both partners",
+      "none": "No one",
+      "noStabilizer": "No stabilizer — high risk",
+      "risks": "Destabilizers",
+      "status": {
+        "STRONG": "Strong",
+        "OK": "Sufficient",
+        "WEAK": "Weak",
+        "NO": "Absent"
+      }
+    },
+    "interaction": {
+      "title": "Current Interaction",
+      "risk": "Risk",
+      "category": {
+        "STABLE": "Stable",
+        "UNSTABLE": "Unstable",
+        "CRISIS": "Crisis",
+        "BREAKDOWN": "Breakdown"
+      }
+    },
+    "yearEntry": {
+      "title": "Year of Entry",
+      "stabilizerNeeded": "Stabilizer needed",
+      "status": {
+        "BEST": "Best time",
+        "OK": "Possible",
+        "TEMP": "Temporary",
+        "NO": "Not recommended"
+      }
+    },
+    "forecast": {
+      "title": "5-Year Forecast",
+      "current": "current",
+      "years": "Personal years",
+      "hasStabilizer": "Has stabilizer",
+      "type": {
+        "STABLE": "Stable period",
+        "CRISIS": "Crisis",
+        "BREAKDOWN": "Breakdown risk",
+        "RECOVERY": "Recovery",
+        "NEW_UNION": "New union"
+      }
+    },
+    "verdict": {
+      "title": "Overall Verdict",
+      "canBeTogether": "Can be together now",
+      "yes": "Yes, union is possible",
+      "no": "Not the best time now",
+      "whoHolds": "Who holds the union",
+      "both": "Both partners",
+      "noOne": "No one — union is unstable",
+      "mainRisk": "Main risk",
+      "longTerm": "Long-term prospects",
+      "recommendation": "Recommendation",
+      "prospect": {
+        "HIGH": "High",
+        "MEDIUM": "Medium",
+        "LOW": "Low"
+      }
+    },
+    "result": {
+      "title": "Compatibility Analysis",
+      "back": "New calculation",
+      "cta": {
+        "title": "Want a deep personal analysis?",
+        "description": "Get a professional consultation with detailed analysis of your relationships, personalized recommendations, and answers to all your questions.",
+        "button": "Book a consultation"
+      }
+    },
+    "methodSelector": {
+      "title": "Extended Compatibility",
+      "description": "8 analysis methods: consciousness, actions, personal years, forecasts"
+    }
+  }
+}
