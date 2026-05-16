@@ -261,6 +261,112 @@ export function calculateMonthForecast(
 }
 
 // Расчёт совместимости двух людей
+//
+// Алгоритм взвешенной оценки по 6 факторам, каждый из которых даёт 0–100,
+// затем взвешенная сумма ограничивается диапазоном 25–98%.
+//
+// Опирается на ARCANA_UNION_QUALITY — таблицу качества каждого аркана как
+// "энергии для союза", построенную на классической Таро-нумерологии
+// (Маг = лидерство, Влюблённые/Солнце = высокая совместимость, Башня/Дьявол = разрушение).
+
+// Качество каждого аркана как «энергии для союза» (0–100)
+const ARCANA_UNION_QUALITY: Record<number, number> = {
+  1:  75,  // Маг — мастерство, лидерство
+  2:  80,  // Жрица — интуиция, гармония
+  3:  90,  // Императрица — любовь, изобилие
+  4:  70,  // Император — стабильность
+  5:  65,  // Иерофант — традиция, брак
+  6:  95,  // Влюблённые — главный аркан любви
+  7:  60,  // Колесница — движение, но конфликтность
+  8:  80,  // Сила — мягкая власть, терпение
+  9:  50,  // Отшельник — уединение
+  10: 70,  // Колесо — перемены, удача
+  11: 75,  // Справедливость — баланс
+  12: 40,  // Повешенный — пауза, жертва
+  13: 35,  // Смерть — окончания, трансформация
+  14: 90,  // Умеренность — гармония, исцеление
+  15: 30,  // Дьявол — страсть, зависимость
+  16: 25,  // Башня — кризис, разрушение
+  17: 95,  // Звезда — надежда, вдохновение
+  18: 45,  // Луна — иллюзии, тревога
+  19: 100, // Солнце — радость, наполненность
+  20: 70,  // Суд — обновление, пробуждение
+  21: 95,  // Мир — завершённость, успех
+  22: 65,  // Шут — старт, лёгкость
+};
+
+function computeCompatibilityPercent(
+  matrix1Positions: number[],
+  matrix2Positions: number[],
+  destiny1: number,
+  destiny2: number,
+  soul1: number,
+  soul2: number,
+  unionArcana: number,
+  karmaArcana: number,
+  harmonyArcana: number
+): number {
+  // Фактор 1: качество аркана союза (30%)
+  const unionScore = ARCANA_UNION_QUALITY[unionArcana] ?? 50;
+
+  // Фактор 2: качество аркана гармонии — эмоциональная составляющая (20%)
+  const harmonyScore = ARCANA_UNION_QUALITY[harmonyArcana] ?? 50;
+
+  // Фактор 3: кармический аркан (15%)
+  // Лёгкая карма (high quality arcana) — плюс, тяжёлая — минус,
+  // но сглаживаем потому что любая карма даёт рост
+  const karmaScore = 50 + ((ARCANA_UNION_QUALITY[karmaArcana] ?? 50) - 50) * 0.5;
+
+  // Фактор 4: близость арканов предназначения (20%)
+  let destinyScore: number;
+  if (destiny1 === destiny2) {
+    destinyScore = 90;
+  } else if (destiny1 + destiny2 === 23) {
+    // Комплементарная пара (1↔22, 2↔21, ...)
+    destinyScore = 85;
+  } else if (destiny1 + destiny2 === 22) {
+    // Зеркальная пара через 11
+    destinyScore = 80;
+  } else {
+    const diff = Math.abs(destiny1 - destiny2);
+    if (diff <= 3) destinyScore = 70;
+    else if (diff <= 7) destinyScore = 55;
+    else if (diff <= 11) destinyScore = 45;
+    else destinyScore = 35;
+  }
+
+  // Фактор 5: близость арканов души (10%)
+  let soulScore: number;
+  if (soul1 === soul2) {
+    soulScore = 85;
+  } else if (soul1 + soul2 === 22 || soul1 + soul2 === 23) {
+    soulScore = 75;
+  } else {
+    const diff = Math.abs(soul1 - soul2);
+    if (diff <= 4) soulScore = 65;
+    else if (diff <= 8) soulScore = 50;
+    else soulScore = 40;
+  }
+
+  // Фактор 6: перекрытие полных матриц — сколько арканов общие из 12 позиций (5%)
+  const set1 = new Set(matrix1Positions);
+  const set2 = new Set(matrix2Positions);
+  let shared = 0;
+  set1.forEach(a => { if (set2.has(a)) shared++; });
+  const overlapScore = Math.min(98, 50 + shared * 5);
+
+  // Взвешенная сумма
+  const weighted =
+    unionScore   * 0.30 +
+    harmonyScore * 0.20 +
+    karmaScore   * 0.15 +
+    destinyScore * 0.20 +
+    soulScore    * 0.10 +
+    overlapScore * 0.05;
+
+  return Math.round(Math.max(25, Math.min(98, weighted)));
+}
+
 export function calculateCompatibility(
   person1Day: number,
   person1Month: number,
@@ -274,50 +380,37 @@ export function calculateCompatibility(
   // Рассчитываем матрицы обоих людей
   const matrix1 = calculatePersonalMatrix(person1Day, person1Month, person1Year);
   const matrix2 = calculatePersonalMatrix(person2Day, person2Month, person2Year);
-  
+
   // Аркан предназначения (позиция 4) и души (позиция 1)
   const destiny1 = matrix1.positions[3];
   const destiny2 = matrix2.positions[3];
   const soul1 = matrix1.positions[0];
   const soul2 = matrix2.positions[0];
-  
-  // Аркан союза - сумма арканов предназначения
+
+  // Аркан союза — сумма арканов предназначения
   const unionArcana = normalizeToArcana(destiny1 + destiny2);
-  
-  // Кармический аркан - разница арканов предназначения
-  const karmaArcana = normalizeToArcana(Math.abs(destiny1 - destiny2));
-  
-  // Аркан гармонии - сумма арканов души
+
+  // Кармический аркан — разница арканов предназначения
+  // (если разница 0 — берём 22 как "полный круг кармы")
+  const diffDestiny = Math.abs(destiny1 - destiny2);
+  const karmaArcana = normalizeToArcana(diffDestiny === 0 ? 22 : diffDestiny);
+
+  // Аркан гармонии — сумма арканов души
   const harmonyArcana = normalizeToArcana(soul1 + soul2);
-  
-  // Расчёт процента совместимости
-  let compatibilityPercent = 50; // базовый уровень
-  
-  // Одинаковые арканы предназначения - большой плюс
-  if (destiny1 === destiny2) compatibilityPercent += 20;
-  
-  // Одинаковые арканы души - хорошо для эмоциональной связи
-  if (soul1 === soul2) compatibilityPercent += 15;
-  
-  // Гармоничные комбинации (сумма = 22 или равные)
-  if (destiny1 + destiny2 === 22) compatibilityPercent += 10;
-  if (soul1 + soul2 === 22) compatibilityPercent += 10;
-  
-  // Комплементарные арканы
-  const complementaryPairs = [[1, 22], [2, 21], [3, 20], [4, 19], [5, 18], [6, 17], [7, 16], [8, 15], [9, 14], [10, 13], [11, 12]];
-  for (const [a, b] of complementaryPairs) {
-    if ((destiny1 === a && destiny2 === b) || (destiny1 === b && destiny2 === a)) {
-      compatibilityPercent += 15;
-    }
-  }
-  
-  // Ограничиваем до 100%
-  compatibilityPercent = Math.min(100, compatibilityPercent);
-  
+
+  // Процент совместимости — взвешенная оценка по 6 факторам
+  const compatibilityPercent = computeCompatibilityPercent(
+    matrix1.positions,
+    matrix2.positions,
+    destiny1, destiny2,
+    soul1, soul2,
+    unionArcana, karmaArcana, harmonyArcana,
+  );
+
   // Определяем сильные стороны и вызовы на основе арканов
   const strengths = getCompatibilityStrengths(unionArcana, harmonyArcana, destiny1, destiny2);
   const challenges = getCompatibilityChallenges(karmaArcana, soul1, soul2);
-  
+
   return {
     person1: {
       name: person1Name || "Партнёр 1",
