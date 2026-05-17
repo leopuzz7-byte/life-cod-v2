@@ -537,3 +537,4 @@ export function formatBirthDate(day: number, month: number, year: number): strin
   const monthName = getMonthName(month);
   return `${day} ${monthName} ${year}`;
 }
+
