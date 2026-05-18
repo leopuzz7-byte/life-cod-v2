@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAccess } from "@/lib/accessControl";
+import { useAuth } from "@/contexts/AuthContext";
+import { saveAnalysis } from "@/lib/analysisStorage";
 import { PaymentScreen } from "@/components/PaymentScreen";
 import { Header } from "@/components/Header";
 import { DateInput } from "@/components/DateInput";
@@ -17,7 +19,6 @@ import { FinancialCodeResultComponent } from "@/components/FinancialCodeResult";
 import { NameEnergyResultComponent } from "@/components/NameEnergyResult";
 import { ContractEnergyResultComponent } from "@/components/ContractEnergyResult";
 import { ComingSoon } from "@/components/ComingSoon";
-import { OnboardingFlow, ScenarioType } from "@/components/onboarding/OnboardingFlow";
 import { LifeCodInputForm, LifeCodResult, UnifiedPersonalResult } from "@/components/lifecod";
 import { TierSelector } from "@/components/TierSelector";
 import { analysisConfigs, getAnalysisConfig, getConfigsForMethodology, proExtendedDescriptions, type TierType } from "@/lib/analysisConfig";
@@ -51,11 +52,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 const Index = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    const seen = localStorage.getItem("lifecod-onboarding-seen");
-    return !seen;
-  });
+  const { user } = useAuth();
+
+  // Refs for tracking analysis save state
+  const lastInputRef = useRef<Record<string, unknown>>({});
+  const savedResultRef = useRef<unknown>(null);
 
   type ResultType = 
     | { type: "year"; data: YearForecast }
@@ -103,6 +104,12 @@ const Index = () => {
     person2Name: string, person2Day: number, person2Month: number, person2Year: number,
     relationType: RelationType
   ) => {
+    // Track input for saving
+    lastInputRef.current = {
+      person1Name, person1Day, person1Month, person1Year,
+      person2Name, person2Day, person2Month, person2Year,
+      relationType,
+    };
     // Gate professional tier behind payment
     if (selectedTier === 'professional' && paymentStatus !== 'paid') {
       setPendingLifeCodArgs({ p1Name: person1Name, p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p2Name: person2Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, relationType });
@@ -137,6 +144,30 @@ const Index = () => {
     }
   }, [selectedMethod]);
 
+  // Auto-save every new result to "Мои разборы" for logged-in users
+  useEffect(() => {
+    if (!user || !result) return;
+    if (savedResultRef.current === result) return; // already saved this exact result instance
+    savedResultRef.current = result;
+
+    const titleBase = getAnalysisConfig(selectedMethod)?.title || selectedMethod;
+    const personName = (lastInputRef.current?.name as string) || (lastInputRef.current?.person1Name as string) || "";
+    const title = personName ? `${titleBase} — ${personName}` : titleBase;
+
+    saveAnalysis({
+      user_id: user.id,
+      method_id: selectedMethod,
+      methodology: selectedMethodology,
+      tier: selectedTier,
+      result_type: result.type,
+      input: lastInputRef.current,
+      result: result.data as Record<string, unknown>,
+      title,
+    }).catch((e) => {
+      console.error("Failed to save analysis:", e);
+    });
+  }, [result, user, selectedMethod, selectedMethodology, selectedTier]);
+
   const handleCalculate = (
     day: number, 
     month: number, 
@@ -148,7 +179,10 @@ const Index = () => {
     targetDay?: number
   ) => {
     setUserName(name);
-    
+
+    // Запоминаем входные данные — используются для сохранения в БД
+    lastInputRef.current = { day, month, year, name, targetMonth, targetYear, gender, targetDay };
+
     // If professional tier and not yet paid — save data and show payment screen
     if (selectedTier === 'professional' && paymentStatus !== 'paid') {
       setPendingCalcArgs({ day, month, year, name, targetMonth, targetYear, gender, targetDay });
@@ -226,6 +260,7 @@ const Index = () => {
 
   const handleNameEnergyCalculate = () => {
     if (nameEnergyInput.trim()) {
+      lastInputRef.current = { name: nameEnergyInput.trim() };
       const nameResult = calculateNameEnergy(nameEnergyInput.trim());
       setResult({ type: "name", data: nameResult });
     }
@@ -235,6 +270,10 @@ const Index = () => {
     person1Day: number, person1Month: number, person1Year: number, person1Name: string,
     person2Day: number, person2Month: number, person2Year: number, person2Name: string
   ) => {
+    lastInputRef.current = {
+      person1Day, person1Month, person1Year, person1Name,
+      person2Day, person2Month, person2Year, person2Name,
+    };
     // Gate professional tier behind payment
     if (selectedTier === 'professional' && paymentStatus !== 'paid') {
       setPendingCompatArgs({ p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p1Name: person1Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, p2Name: person2Name });
@@ -336,36 +375,6 @@ const Index = () => {
     setSelectedMethod(methodId);
   };
 
-  const handleOnboardingComplete = (scenario: ScenarioType) => {
-    localStorage.setItem("lifecod-onboarding-seen", "true");
-    setShowOnboarding(false);
-    
-    if (scenario === "crisis") {
-      navigate("/crisis");
-    } else if (scenario === "forecast") {
-      setSelectedMethod("year");
-    } else if (scenario === "period") {
-      setSelectedMethod("purpose");
-    }
-  };
-
-  const handleOnboardingSkip = () => {
-    localStorage.setItem("lifecod-onboarding-seen", "true");
-    setShowOnboarding(false);
-  };
-
-  if (showOnboarding) {
-    return (
-      <div className="min-h-screen">
-        <Header />
-        <OnboardingFlow 
-          onComplete={handleOnboardingComplete}
-          onSkip={handleOnboardingSkip}
-        />
-      </div>
-    );
-  }
-
   // Method lists per methodology — built from analysisConfig
   const methodology1Methods = getConfigsForMethodology('1').map(cfg => ({
     id: cfg.id,
@@ -401,8 +410,47 @@ const Index = () => {
           </div>
         ) : !result ? (
           <>
-            {/* Calculator Section — now first thing on the page */}
-            <section className="py-8 md:py-12 lg:py-16">
+            {/* Hero block — shown only to non-authenticated visitors */}
+            {!user && (
+              <section className="pt-8 md:pt-12 lg:pt-16 pb-2">
+                <div className="container mx-auto px-4">
+                  <div className="max-w-2xl mx-auto text-center">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-6">
+                      <Sparkles className="w-6 h-6 text-foreground" />
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-primary mb-5 leading-tight">
+                      Персональная диагностика Life C⚙D
+                    </h1>
+                    <p className="text-base md:text-lg text-muted-foreground mb-4 leading-relaxed">
+                      Понимание себя, своих жизненных циклов, сильных и слабых сторон, а также текущего периода жизни.
+                    </p>
+                    <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
+                      Этот инструмент помогает увидеть, как ты принимаешь решения, где твоя опора и на что сейчас важно обратить внимание.
+                    </p>
+                    <p className="text-sm text-muted-foreground/70 italic mb-8">
+                      Без мистики. Без обещаний изменить тебя. Только структура и логика.
+                    </p>
+                    <div className="flex flex-col items-center gap-3">
+                      <Link to="/register">
+                        <Button className="h-14 px-8 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary">
+                          Начать диагностику
+                          <span className="ml-2">→</span>
+                        </Button>
+                      </Link>
+                      <Link
+                        to="/login"
+                        className="text-sm text-muted-foreground hover:text-primary transition-colors mt-1"
+                      >
+                        Уже есть аккаунт? Войти в калькулятор
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* Calculator Section */}
+            <section className={cn(user ? "py-8 md:py-12 lg:py-16" : "pb-8 md:pb-12 pt-4")}>
               <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
                   <h2 className="text-xl sm:text-2xl md:text-3xl font-display text-primary mb-6 md:mb-8 text-center">
