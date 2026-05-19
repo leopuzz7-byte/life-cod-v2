@@ -92,19 +92,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    let sessionDetermined = false;
 
-    // Safety net: если за 4 сек ничего не пришло — принудительно снимаем loading,
-    // чтобы пользователь не залипал на «Загрузка...» при любых сетевых проблемах.
+    // Safety net срабатывает ТОЛЬКО если getSession реально завис (15 сек),
+    // и НЕ срабатывает если запрос просто медленный — иначе на Ctrl+F5 мы
+    // успевали поставить loading=false до того как Supabase вернул сессию,
+    // и пользователя кикало на /login.
     const safetyTimeout = setTimeout(() => {
-      if (!cancelled) {
-        console.warn("[Auth] getSession timed out, releasing loading state");
+      if (!cancelled && !sessionDetermined) {
+        console.error("[Auth] getSession HUNG after 15s — releasing loading state");
         setLoading(false);
       }
-    }, 4000);
+    }, 15000);
 
     // Получаем текущую сессию при загрузке
     supabase.auth.getSession()
       .then(({ data: { session } }) => {
+        sessionDetermined = true;
         if (cancelled) return;
         setSession(session);
         setUser(session?.user ?? null);
@@ -119,6 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       })
       .catch((e) => {
+        sessionDetermined = true;
         console.error("[Auth] getSession failed:", e);
         if (!cancelled) setLoading(false);
       });
