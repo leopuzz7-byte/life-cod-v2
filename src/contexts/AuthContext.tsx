@@ -53,31 +53,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    // Получаем текущую сессию при загрузке
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        loadProfile(session.user.id).finally(() => setLoading(false));
-      } else {
+    let cancelled = false;
+
+    // Safety net: если за 4 сек ничего не пришло — принудительно снимаем loading,
+    // чтобы пользователь не залипал на «Загрузка...» при любых сетевых проблемах.
+    const safetyTimeout = setTimeout(() => {
+      if (!cancelled) {
+        console.warn("[Auth] getSession timed out, releasing loading state");
         setLoading(false);
       }
-    });
+    }, 4000);
+
+    // Получаем текущую сессию при загрузке
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        if (cancelled) return;
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          loadProfile(session.user.id)
+            .catch((e) => console.error("[Auth] loadProfile failed:", e))
+            .finally(() => {
+              if (!cancelled) setLoading(false);
+            });
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        console.error("[Auth] getSession failed:", e);
+        if (!cancelled) setLoading(false);
+      });
 
     // Подписываемся на изменения сессии
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (cancelled) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          await loadProfile(session.user.id);
+          await loadProfile(session.user.id).catch((e) =>
+            console.error("[Auth] loadProfile in onAuthStateChange failed:", e)
+          );
         } else {
           setProfile(null);
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      clearTimeout(safetyTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
