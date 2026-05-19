@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, AlertCircle, LogOut, KeyRound } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const months = [
   "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
@@ -16,6 +17,111 @@ const months = [
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+// Запасной экран — если профиль не найден в БД, даём пользователю заполнить его заново
+function ProfileNotFoundRecovery() {
+  const { user, signOut, refreshProfile } = useAuth();
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [day, setDay] = useState("");
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleCreate = async () => {
+    setError(null);
+    if (!user) return setError("Сессия потеряна — войдите заново");
+    if (!name.trim()) return setError("Введите имя");
+    if (!day || !month || !year) return setError("Укажите полную дату рождения");
+
+    setSaving(true);
+    const { error: upsertError } = await supabase.from("profiles").upsert({
+      id: user.id,
+      email: user.email || "",
+      name: name.trim(),
+      birth_day: parseInt(day),
+      birth_month: parseInt(month),
+      birth_year: parseInt(year),
+    });
+    setSaving(false);
+
+    if (upsertError) {
+      console.error("[Profile] upsert failed:", upsertError);
+      setError("Не удалось сохранить: " + upsertError.message);
+      return;
+    }
+
+    await refreshProfile();
+    toast.success("Профиль создан");
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container mx-auto px-4 py-8 md:py-12">
+        <div className="max-w-md mx-auto">
+          <div className="text-center mb-6">
+            <h1 className="font-display text-2xl md:text-3xl text-primary mb-2">
+              Завершите создание профиля
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Ваш аккаунт создан, но профиль не заполнен. Пожалуйста, укажите данные.
+            </p>
+          </div>
+
+          <div className="gradient-card rounded-2xl p-6 md:p-8 border border-border space-y-4">
+            {error && (
+              <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
+                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="r-name">Имя</Label>
+              <Input id="r-name" value={name} onChange={(e) => setName(e.target.value)} disabled={saving} />
+            </div>
+            <div className="space-y-2">
+              <Label>Дата рождения</Label>
+              <div className="grid grid-cols-3 gap-2">
+                <Select value={day} onValueChange={setDay} disabled={saving}>
+                  <SelectTrigger><SelectValue placeholder="День" /></SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {days.map((d) => <SelectItem key={d} value={String(d)}>{d}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={month} onValueChange={setMonth} disabled={saving}>
+                  <SelectTrigger><SelectValue placeholder="Месяц" /></SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {months.map((m, i) => <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={year} onValueChange={setYear} disabled={saving}>
+                  <SelectTrigger><SelectValue placeholder="Год" /></SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Button onClick={handleCreate} disabled={saving} className="w-full h-11 rounded-full">
+              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Создать профиль
+            </Button>
+            <Button variant="outline" onClick={handleSignOut} className="w-full h-11 rounded-full">
+              <LogOut className="w-4 h-4 mr-2" /> Выйти
+            </Button>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -41,14 +147,7 @@ export default function Profile() {
   }
 
   if (!profile) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="flex items-center justify-center py-20 text-muted-foreground">
-          Профиль не найден
-        </div>
-      </div>
-    );
+    return <ProfileNotFoundRecovery />;
   }
 
   const handleSave = async () => {

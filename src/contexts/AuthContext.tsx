@@ -38,16 +38,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Загрузка профиля
+  // Загрузка профиля с автоматическим восстановлением из user_metadata если row отсутствует
   const loadProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .maybeSingle();
-    if (!error && data) {
+
+    if (error) {
+      console.error("[Auth] profile select failed:", error);
+      setProfile(null);
+      return;
+    }
+
+    if (data) {
       setProfile(data as Profile);
+      return;
+    }
+
+    // Профиля нет → попробуем восстановить из user_metadata, если там есть имя и дата рождения
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    const meta = currentUser?.user_metadata as Record<string, unknown> | undefined;
+
+    if (currentUser && meta?.name && meta?.birth_day && meta?.birth_month && meta?.birth_year) {
+      console.info("[Auth] profile missing → recreating from user_metadata");
+      const { data: newProfile, error: upsertError } = await supabase
+        .from("profiles")
+        .upsert({
+          id: userId,
+          email: currentUser.email || "",
+          name: meta.name as string,
+          birth_day: Number(meta.birth_day),
+          birth_month: Number(meta.birth_month),
+          birth_year: Number(meta.birth_year),
+        })
+        .select()
+        .maybeSingle();
+
+      if (upsertError) {
+        console.error("[Auth] profile self-heal failed:", upsertError);
+        setProfile(null);
+      } else if (newProfile) {
+        setProfile(newProfile as Profile);
+      } else {
+        setProfile(null);
+      }
     } else {
+      // Метаданных тоже нет — оставляем null, на странице Profile покажем форму создания
       setProfile(null);
     }
   };
@@ -120,20 +158,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name: string,
     birth: { day: number; month: number; year: number }
   ) => {
-    // Сначала создаём пользователя
+    // Сначала создаём пользователя, кладём имя и дату рождения в user_metadata —
+    // это страховка: если INSERT в profiles упадёт, мы потом восстановим профиль из метаданных.
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        // Отключаем подтверждение email — попросил пользователь
         emailRedirectTo: undefined,
+        data: {
+          name,
+          birth_day: birth.day,
+          birth_month: birth.month,
+          birth_year: birth.year,
+        },
       },
     });
-    if (error) return { error: humanizeAuthError(error.message) };
+    if (error) {
+      console.error("[Auth] signUp failed:", error);
+      return { error: humanizeAuthError(error.message) };
+    }
     if (!data.user) return { error: "Не удалось создать пользователя" };
 
-    // Создаём профиль
-    const { error: profileError } = await supabase.from("profiles").insert({
+    // Создаём профиль — используем upsert на случай если row уже есть (повторный signup, гонка и т.п.)
+    const { error: profileError } = await supabase.from("profiles").upsert({
       id: data.user.id,
       email,
       name,
@@ -143,10 +190,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (profileError) {
-      return { error: "Аккаунт создан, но не удалось сохранить профиль: " + profileError.message };
+      console.error("[Auth] profile upsert failed:", profileError);
+      // Не блокируем регистрацию — профиль попробуем восстановить позже из user_metadata
     }
 
-    // Перезагружаем профиль
+    // Перезагружаем профиль (с авто-восстановлением если нужно)
     await loadProfile(data.user.id);
     return { error: null };
   };

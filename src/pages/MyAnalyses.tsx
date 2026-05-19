@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ChevronRight, Trash2, FileText, Plus } from "lucide-react";
+import { ChevronRight, Trash2, FileText, Plus, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   listAnalyses,
@@ -29,12 +29,32 @@ export default function MyAnalyses() {
   const { user } = useAuth();
   const [analyses, setAnalyses] = useState<SavedAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const load = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    const { data } = await listAnalyses(user.id);
-    setAnalyses(data);
+    setLoadError(null);
+
+    // Таймаут на случай если запрос подвисает
+    const timeoutPromise = new Promise<{ data: SavedAnalysis[]; error: string }>((resolve) => {
+      setTimeout(() => resolve({ data: [], error: "Запрос к базе занял слишком много времени. Проверьте подключение и попробуйте обновить страницу." }), 8000);
+    });
+
+    const result = await Promise.race([
+      listAnalyses(user.id),
+      timeoutPromise,
+    ]);
+
+    if (result.error) {
+      console.error("[MyAnalyses] listAnalyses error:", result.error);
+      setLoadError(result.error);
+    } else {
+      setAnalyses(result.data);
+    }
     setLoading(false);
   };
 
@@ -87,6 +107,13 @@ export default function MyAnalyses() {
 
           {loading ? (
             <div className="text-center py-12 text-muted-foreground">Загрузка...</div>
+          ) : loadError ? (
+            <div className="gradient-card rounded-2xl p-6 md:p-8 border border-destructive/40 text-center">
+              <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-3" />
+              <h3 className="font-display text-lg text-foreground mb-2">Не удалось загрузить разборы</h3>
+              <p className="text-sm text-muted-foreground mb-4">{loadError}</p>
+              <Button onClick={load} className="rounded-full">Попробовать снова</Button>
+            </div>
           ) : analyses.length === 0 ? (
             <div className="gradient-card rounded-2xl p-8 md:p-12 border border-border text-center">
               <FileText className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
