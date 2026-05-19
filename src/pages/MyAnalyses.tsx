@@ -30,6 +30,7 @@ export default function MyAnalyses() {
   const [analyses, setAnalyses] = useState<SavedAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [fromCache, setFromCache] = useState(false);
 
   const load = async () => {
     if (!user) {
@@ -39,21 +40,14 @@ export default function MyAnalyses() {
     setLoading(true);
     setLoadError(null);
 
-    // Таймаут на случай если запрос подвисает
-    const timeoutPromise = new Promise<{ data: SavedAnalysis[]; error: string }>((resolve) => {
-      setTimeout(() => resolve({ data: [], error: "Запрос к базе занял слишком много времени. Проверьте подключение и попробуйте обновить страницу." }), 8000);
-    });
-
-    const result = await Promise.race([
-      listAnalyses(user.id),
-      timeoutPromise,
-    ]);
+    const result = await listAnalyses(user.id);
 
     if (result.error) {
       console.error("[MyAnalyses] listAnalyses error:", result.error);
       setLoadError(result.error);
     } else {
       setAnalyses(result.data);
+      setFromCache(!!result.fromCache);
     }
     setLoading(false);
   };
@@ -130,7 +124,14 @@ export default function MyAnalyses() {
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
+            <>
+              {fromCache && (
+                <div className="mb-4 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>Не удалось обновить список с сервера — показана локальная копия. Проверьте подключение к интернету.</span>
+                </div>
+              )}
+              <div className="space-y-3">
               {analyses.map((a) => (
                 <div
                   key={a.id}
@@ -187,6 +188,7 @@ export default function MyAnalyses() {
                 </div>
               ))}
             </div>
+            </>
           )}
         </div>
       </main>

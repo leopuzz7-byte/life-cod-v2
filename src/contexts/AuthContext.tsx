@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { withTimeout } from "@/lib/withTimeout";
 
 export interface Profile {
   id: string;
@@ -11,10 +12,33 @@ export interface Profile {
   birth_year: number;
 }
 
+const PROFILE_CACHE_KEY = "lifecod-profile-cache";
+
+function readCachedProfile(userId: string): Profile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY);
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    if (cached?.id === userId) return cached as Profile;
+  } catch {}
+  return null;
+}
+
+function writeCachedProfile(profile: Profile | null) {
+  try {
+    if (profile) localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile));
+    else localStorage.removeItem(PROFILE_CACHE_KEY);
+  } catch {}
+}
+
 interface AuthContextValue {
   session: Session | null;
   user: User | null;
   profile: Profile | null;
+  // true пока вообще ничего не известно (ни один loadProfile не завершился ни успехом ни ошибкой)
+  profileFetched: boolean;
+  // последняя ошибка при загрузке профиля (если есть)
+  profileError: string | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (
@@ -36,57 +60,84 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [profileFetched, setProfileFetched] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Загрузка профиля с автоматическим восстановлением из user_metadata если row отсутствует
+  // Загрузка профиля с таймаутом, кешем в localStorage и self-heal из user_metadata
   const loadProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
-
-    if (error) {
-      console.error("[Auth] profile select failed:", error);
-      setProfile(null);
-      return;
+    // 1) Сразу показываем кеш если есть (мгновенный UI даже на тупящей сети)
+    const cached = readCachedProfile(userId);
+    if (cached) {
+      setProfile(cached);
+      setProfileFetched(true);
+      setProfileError(null);
     }
 
-    if (data) {
-      setProfile(data as Profile);
-      return;
-    }
+    // 2) Параллельно тянем свежий — но если упадёт таймаут, оставим кеш
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+        10000,
+        "Загрузка профиля"
+      );
 
-    // Профиля нет → попробуем восстановить из user_metadata, если там есть имя и дата рождения
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
-    const meta = currentUser?.user_metadata as Record<string, unknown> | undefined;
-
-    if (currentUser && meta?.name && meta?.birth_day && meta?.birth_month && meta?.birth_year) {
-      console.info("[Auth] profile missing → recreating from user_metadata");
-      const { data: newProfile, error: upsertError } = await supabase
-        .from("profiles")
-        .upsert({
-          id: userId,
-          email: currentUser.email || "",
-          name: meta.name as string,
-          birth_day: Number(meta.birth_day),
-          birth_month: Number(meta.birth_month),
-          birth_year: Number(meta.birth_year),
-        })
-        .select()
-        .maybeSingle();
-
-      if (upsertError) {
-        console.error("[Auth] profile self-heal failed:", upsertError);
-        setProfile(null);
-      } else if (newProfile) {
-        setProfile(newProfile as Profile);
-      } else {
-        setProfile(null);
+      if (error) {
+        console.error("[Auth] profile select failed:", error);
+        // Сеть подвисла — не трём кеш, не трём profile, ставим ошибку для UI
+        setProfileError(error.message);
+        setProfileFetched(true);
+        return;
       }
-    } else {
-      // Метаданных тоже нет — оставляем null, на странице Profile покажем форму создания
-      setProfile(null);
+
+      if (data) {
+        const p = data as Profile;
+        setProfile(p);
+        writeCachedProfile(p);
+        setProfileFetched(true);
+        setProfileError(null);
+        return;
+      }
+
+      // Профиля действительно нет в БД → пробуем self-heal из user_metadata
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const meta = currentUser?.user_metadata as Record<string, unknown> | undefined;
+
+      if (currentUser && meta?.name && meta?.birth_day && meta?.birth_month && meta?.birth_year) {
+        console.info("[Auth] profile missing → recreating from user_metadata");
+        const { data: newProfile, error: upsertError } = await withTimeout(
+          supabase.from("profiles").upsert({
+            id: userId,
+            email: currentUser.email || "",
+            name: meta.name as string,
+            birth_day: Number(meta.birth_day),
+            birth_month: Number(meta.birth_month),
+            birth_year: Number(meta.birth_year),
+          }).select().maybeSingle(),
+          10000,
+          "Создание профиля"
+        );
+
+        if (upsertError) {
+          console.error("[Auth] profile self-heal failed:", upsertError);
+          setProfileError(upsertError.message);
+        } else if (newProfile) {
+          const p = newProfile as Profile;
+          setProfile(p);
+          writeCachedProfile(p);
+          setProfileError(null);
+        }
+      } else {
+        // Метаданных нет, профиля в БД нет → пользователь увидит форму создания
+        setProfile(null);
+        writeCachedProfile(null);
+      }
+      setProfileFetched(true);
+    } catch (err) {
+      console.error("[Auth] loadProfile threw:", err);
+      // Таймаут или сетевая — оставляем что есть в кеше, показываем ошибку
+      setProfileError(err instanceof Error ? err.message : "Сетевая ошибка");
+      setProfileFetched(true);
     }
   };
 
@@ -207,6 +258,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setProfile(null);
+    setProfileFetched(false);
+    setProfileError(null);
+    writeCachedProfile(null);
   };
 
   const resetPassword = async (email: string) => {
@@ -243,6 +297,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         user,
         profile,
+        profileFetched,
+        profileError,
         loading,
         signIn,
         signUp,

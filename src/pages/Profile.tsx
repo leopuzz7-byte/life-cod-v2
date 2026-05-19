@@ -18,6 +18,33 @@ const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
+// Экран ошибки загрузки профиля — когда сеть подвела и мы не знаем, есть ли профиль на сервере
+function ProfileLoadError({ error, onRetry, onSignOut }: { error: string; onRetry: () => void; onSignOut: () => void }) {
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container mx-auto px-4 py-8 md:py-12">
+        <div className="max-w-md mx-auto">
+          <div className="gradient-card rounded-2xl p-6 md:p-8 border border-destructive/40 text-center space-y-4">
+            <AlertCircle className="w-12 h-12 text-destructive mx-auto" />
+            <h2 className="font-display text-xl text-foreground">Не удалось загрузить профиль</h2>
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <p className="text-xs text-muted-foreground">
+              Это похоже на проблему с подключением к интернету. Проверьте сеть и попробуйте ещё раз.
+            </p>
+            <div className="flex flex-col gap-2 pt-2">
+              <Button onClick={onRetry} className="w-full h-11 rounded-full">Попробовать снова</Button>
+              <Button variant="outline" onClick={onSignOut} className="w-full h-11 rounded-full">
+                <LogOut className="w-4 h-4 mr-2" /> Выйти
+              </Button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 // Запасной экран — если профиль не найден в БД, даём пользователю заполнить его заново
 function ProfileNotFoundRecovery() {
   const { user, signOut, refreshProfile } = useAuth();
@@ -125,7 +152,7 @@ function ProfileNotFoundRecovery() {
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { profile, signOut, resetPassword, updateProfile, loading } = useAuth();
+  const { profile, profileFetched, profileError, signOut, resetPassword, updateProfile, refreshProfile, loading } = useAuth();
 
   const [name, setName] = useState(profile?.name || "");
   const [day, setDay] = useState(profile ? String(profile.birth_day) : "");
@@ -135,18 +162,24 @@ export default function Profile() {
   const [sendingReset, setSendingReset] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (loading) {
+  if (loading || !profileFetched) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="flex items-center justify-center py-20 text-muted-foreground">
+          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
           Загрузка профиля...
         </div>
       </div>
     );
   }
 
+  // Профиль загружен (хотя бы из кеша или в реальности) → если он есть, показываем нормально
+  // Если профиля нет И при загрузке была сетевая ошибка → не показываем форму создания (это может быть ложная "пустота" из-за сети)
   if (!profile) {
+    if (profileError) {
+      return <ProfileLoadError error={profileError} onRetry={refreshProfile} onSignOut={async () => { await signOut(); navigate("/"); }} />;
+    }
     return <ProfileNotFoundRecovery />;
   }
 
