@@ -19,25 +19,27 @@ import { toast } from "sonner";
 import {
   listAnalyses,
   deleteAnalysis,
+  getCachedAnalysesList,
   methodLabel,
   methodologyLabel,
   tierLabel,
-  type SavedAnalysis,
+  type SavedAnalysisSummary,
 } from "@/lib/analysisStorage";
 
 export default function MyAnalyses() {
   const { user } = useAuth();
-  const [analyses, setAnalyses] = useState<SavedAnalysis[]>([]);
+  const [analyses, setAnalyses] = useState<SavedAnalysisSummary[]>([]);
+  // loading=true только если у нас НЕТ кеша — иначе показываем кеш сразу
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [fromCache, setFromCache] = useState(false);
 
-  const load = async () => {
+  const load = async (showSpinner = true) => {
     if (!user) {
       setLoading(false);
       return;
     }
-    setLoading(true);
+    if (showSpinner) setLoading(true);
     setLoadError(null);
 
     const result = await listAnalyses(user.id);
@@ -53,7 +55,22 @@ export default function MyAnalyses() {
   };
 
   useEffect(() => {
-    load();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    // 1) Сразу пытаемся показать кеш — мгновенный UI без спиннера
+    const cached = getCachedAnalysesList(user.id);
+    if (cached) {
+      setAnalyses(cached);
+      setLoading(false);
+      // 2) Параллельно подгружаем свежие данные с сервера, без спиннера
+      load(false);
+    } else {
+      // Кеша нет — показываем спиннер и грузим
+      load(true);
+    }
   }, [user]);
 
   const handleDelete = async (id: string) => {
@@ -101,12 +118,12 @@ export default function MyAnalyses() {
 
           {loading ? (
             <div className="text-center py-12 text-muted-foreground">Загрузка...</div>
-          ) : loadError ? (
+          ) : loadError && analyses.length === 0 ? (
             <div className="gradient-card rounded-2xl p-6 md:p-8 border border-destructive/40 text-center">
               <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-3" />
               <h3 className="font-display text-lg text-foreground mb-2">Не удалось загрузить разборы</h3>
               <p className="text-sm text-muted-foreground mb-4">{loadError}</p>
-              <Button onClick={load} className="rounded-full">Попробовать снова</Button>
+              <Button onClick={() => load(true)} className="rounded-full">Попробовать снова</Button>
             </div>
           ) : analyses.length === 0 ? (
             <div className="gradient-card rounded-2xl p-8 md:p-12 border border-border text-center">
