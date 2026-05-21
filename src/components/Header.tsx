@@ -18,18 +18,19 @@ export function Header() {
     { label: t("nav.products"), path: "/products" },
   ];
 
-  // Дополнительные пункты для залогиненных
-  const authedExtra = [
-    { label: "Мои разборы", path: "/my-analyses", icon: FolderClock },
-  ];
+  const isMyAnalysesActive = location.pathname.startsWith("/my-analyses");
 
   return (
     <header className="sticky top-0 z-50 w-full glass-brown border-b border-white/10">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 flex-shrink-0">
-          <img src={logo} alt="Life C⚙D" className="h-10 w-auto brightness-0 invert" />
-          <span className="font-display font-bold text-lg text-white tracking-tight hidden sm:inline">Life C⚙D</span>
+        {/* Logo — цветной SVG на светлой подложке, чтобы читался на тёмной шапке */}
+        <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
+          <span className="inline-flex items-center justify-center bg-white rounded-full p-1 shadow-sm">
+            <img src={logo} alt="Life C⚙D" className="h-8 w-auto" />
+          </span>
+          <span className="font-display font-bold text-lg text-white tracking-tight hidden sm:inline">
+            Life C⚙D
+          </span>
         </Link>
 
         {/* Desktop navigation */}
@@ -51,29 +52,30 @@ export function Header() {
               )}
             </Link>
           ))}
-          {user && authedExtra.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "text-sm font-medium transition-colors relative py-1 flex items-center gap-1.5",
-                location.pathname.startsWith(item.path)
-                  ? "text-white"
-                  : "text-white/70 hover:text-white"
-              )}
-            >
-              <item.icon className="w-4 h-4" />
-              {item.label}
-              {location.pathname.startsWith(item.path) && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/50 rounded-full" />
-              )}
-            </Link>
-          ))}
         </nav>
 
-        {/* Right side: language, support, auth */}
+        {/* Right side: My Analyses, language, support, auth */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Мои разборы — заметная кнопка, видна всегда для залогиненных
+              (и на десктопе, и на мобильных — без прокрутки меню) */}
+          {user && (
+            <Link
+              to="/my-analyses"
+              className={cn(
+                "h-10 px-3 sm:px-4 rounded-full flex items-center gap-1.5 transition-colors border text-sm font-medium",
+                isMyAnalysesActive
+                  ? "bg-white text-primary border-white"
+                  : "bg-white/15 hover:bg-white/25 text-white border-white/25"
+              )}
+              aria-label="Мои разборы"
+            >
+              <FolderClock className="w-4 h-4" />
+              <span className="hidden sm:inline">Мои разборы</span>
+            </Link>
+          )}
+
           <LanguageSelector variant="header" />
+
           <Link
             to="/support"
             className={cn(
@@ -114,7 +116,8 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile navigation */}
+      {/* Mobile navigation — только основные разделы.
+          "Мои разборы" вынесены в кнопку справа сверху, листать не нужно. */}
       <nav className="md:hidden flex items-center justify-start gap-1 pb-2 pt-1 px-3 border-t border-white/10 overflow-x-auto scrollbar-hide">
         {baseNavItems.map((item) => (
           <Link
@@ -123,20 +126,6 @@ export function Header() {
             className={cn(
               "text-[11px] font-medium transition-colors whitespace-nowrap px-2.5 py-1.5 rounded-full flex-shrink-0",
               location.pathname === item.path
-                ? "text-white bg-white/15"
-                : "text-white/70"
-            )}
-          >
-            {item.label}
-          </Link>
-        ))}
-        {user && authedExtra.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "text-[11px] font-medium transition-colors whitespace-nowrap px-2.5 py-1.5 rounded-full flex-shrink-0",
-              location.pathname.startsWith(item.path)
                 ? "text-white bg-white/15"
                 : "text-white/70"
             )}
