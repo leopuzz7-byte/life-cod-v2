@@ -449,8 +449,10 @@ const Index = () => {
               </section>
             )}
 
-            {/* Calculator Section */}
-            <section className={cn(user ? "py-8 md:py-12 lg:py-16" : "pb-8 md:pb-12 pt-4")}>
+            {/* Calculator Section — visible ONLY to authenticated users.
+                Non-authenticated visitors see only the hero block above. */}
+            {user && (
+            <section className="py-8 md:py-12 lg:py-16">
               <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
                   <h2 className="text-xl sm:text-2xl md:text-3xl font-display text-primary mb-6 md:mb-8 text-center">
@@ -717,6 +719,7 @@ const Index = () => {
                 </div>
               </div>
             </section>
+            )}
           </>
         ) : (
           <div className="container mx-auto px-4 py-6 md:py-8">
