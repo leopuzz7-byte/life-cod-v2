@@ -23,14 +23,14 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full glass-brown border-b border-white/10">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        {/* Logo — цветной SVG на светлой подложке, чтобы читался на тёмной шапке */}
-        <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-          <span className="inline-flex items-center justify-center bg-white rounded-full p-1 shadow-sm">
-            <img src={logo} alt="Life C⚙D" className="h-8 w-auto" />
-          </span>
-          <span className="font-display font-bold text-lg text-white tracking-tight hidden sm:inline">
-            Life C⚙D
-          </span>
+        {/* Logo — цветной SVG как есть, без подложки и без фильтров.
+            Текст бренда уже внутри самого логотипа. */}
+        <Link to="/" className="flex items-center flex-shrink-0">
+          <img
+            src={logo}
+            alt="Сердце пилигрима — Life C⚙D"
+            className="h-9 sm:h-10 w-auto"
+          />
         </Link>
 
         {/* Desktop navigation */}
