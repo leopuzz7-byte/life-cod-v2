@@ -168,6 +168,47 @@ const Index = () => {
     });
   }, [result, user, selectedMethod, selectedMethodology, selectedTier]);
 
+  // Restore pending calculation after return from Robokassa payment redirect
+  useEffect(() => {
+    if (sessionStorage.getItem("payment_completed") !== "true") return;
+    sessionStorage.removeItem("payment_completed");
+
+    const raw = localStorage.getItem("pendingCalcData");
+    if (!raw) return;
+    localStorage.removeItem("pendingCalcData");
+
+    try {
+      const saved = JSON.parse(raw) as {
+        day: number; month: number; year: number; name: string;
+        targetMonth?: number; targetYear?: number;
+        gender?: 'male' | 'female'; targetDay?: number;
+        method: string; methodology: "1" | "2";
+      };
+      const { day, month, year, name, targetMonth, targetYear, gender, targetDay } = saved;
+
+      setSelectedMethodology(saved.methodology);
+      setSelectedMethod(saved.method);
+      setSelectedTier("professional");
+      setPaymentStatus("paid");
+      setUserName(name);
+      lastInputRef.current = { day, month, year, name, targetMonth, targetYear, gender, targetDay };
+
+      if (saved.methodology === "2" && saved.method === "classic-full") {
+        setResult({ type: "unified-personal", data: calculateUnifiedPersonalAnalysis(name || "Вы", day, month, year, targetYear || new Date().getFullYear()) });
+        return;
+      }
+      switch (saved.method) {
+        case "year":   setResult({ type: "year",     data: calculateYearForecast(day, month, year, targetYear || new Date().getFullYear()) }); break;
+        case "month":  setResult({ type: "month",    data: calculateMonthForecast(day, month, year, targetMonth || new Date().getMonth() + 1, targetYear || new Date().getFullYear()) }); break;
+        case "day":    setResult({ type: "day",      data: calculateDailyForecast(day, month, year, targetDay || new Date().getDate(), targetMonth || new Date().getMonth() + 1, targetYear || new Date().getFullYear()) }); break;
+        case "contract": setResult({ type: "contract", data: calculateDailyForecast(day, month, year, targetDay || new Date().getDate(), targetMonth || new Date().getMonth() + 1, targetYear || new Date().getFullYear()) }); break;
+        case "finance":  setResult({ type: "finance",  data: calculateFinancialCode(day, month, year) }); break;
+        case "ancestral": setResult({ type: "ancestral", data: calculateAncestralPrograms(day, month, year, gender || 'female') }); break;
+        default:         setResult({ type: "purpose",  data: calculatePersonalMatrix(day, month, year) }); break;
+      }
+    } catch { /* ignore parse errors */ }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleCalculate = (
     day: number, 
     month: number, 
