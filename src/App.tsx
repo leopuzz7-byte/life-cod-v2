@@ -20,6 +20,8 @@ import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import MyAnalyses from "./pages/MyAnalyses";
 import AnalysisDetail from "./pages/AnalysisDetail";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFail from "./pages/PaymentFail";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,10 @@ const App = () => (
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/my-analyses" element={<ProtectedRoute><MyAnalyses /></ProtectedRoute>} />
               <Route path="/my-analyses/:id" element={<ProtectedRoute><AnalysisDetail /></ProtectedRoute>} />
+
+              {/* Оплата — возврат после Робокассы */}
+              <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+              <Route path="/payment/fail" element={<PaymentFail />} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Crown, ShieldCheck, CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
+import { Crown, ShieldCheck, CheckCircle, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { getAnalysisConfig } from "@/lib/analysisConfig";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentScreenProps {
   methodId: string;
@@ -11,20 +12,36 @@ interface PaymentScreenProps {
 
 export function PaymentScreen({ methodId, onPaid, onBack }: PaymentScreenProps) {
   const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const config = getAnalysisConfig(methodId);
 
-  const handleTestPayment = () => {
+  const handlePayment = async () => {
     setProcessing(true);
-    // Simulate payment delay
-    setTimeout(() => {
-      setProcessing(false);
-      onPaid();
-    }, 1500);
-  };
+    setError(null);
 
-  const proFeatures = config?.professional?.description 
-    ? [config.professional.description]
-    : [];
+    try {
+      // Вызываем Edge Function create-payment
+      const { data, error: fnError } = await supabase.functions.invoke("create-payment", {
+        body: { method_id: methodId },
+      });
+
+      if (fnError || !data?.payment_url) {
+        throw new Error(fnError?.message || "Не удалось создать платёж");
+      }
+
+      // Сохраняем order_id — он понадобится на странице /payment/success
+      // чтобы проверить статус оплаты и вернуться к разбору
+      sessionStorage.setItem("pending_order_id", data.order_id);
+      sessionStorage.setItem("pending_method_id", methodId);
+
+      // Редиректим на страницу оплаты Робокассы
+      window.location.href = data.payment_url;
+
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка при создании платежа");
+      setProcessing(false);
+    }
+  };
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
@@ -62,15 +79,22 @@ export function PaymentScreen({ methodId, onPaid, onBack }: PaymentScreenProps) 
             ))}
           </div>
 
+          {error && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm text-left">
+              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           {processing ? (
             <div className="space-y-3">
               <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
-              <p className="text-sm text-muted-foreground">Обработка оплаты...</p>
+              <p className="text-sm text-muted-foreground">Переход к оплате...</p>
             </div>
           ) : (
             <>
               <Button
-                onClick={handleTestPayment}
+                onClick={handlePayment}
                 className="w-full h-14 text-lg bg-primary text-primary-foreground"
                 size="lg"
               >
@@ -78,7 +102,7 @@ export function PaymentScreen({ methodId, onPaid, onBack }: PaymentScreenProps) 
                 Оплатить и получить разбор
               </Button>
               <p className="text-xs text-muted-foreground">
-                🔧 Тестовый режим — оплата имитируется
+                🔒 Безопасная оплата через Робокассу
               </p>
             </>
           )}
