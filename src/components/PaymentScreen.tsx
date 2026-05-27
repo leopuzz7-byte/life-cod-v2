@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Crown, ShieldCheck, CheckCircle, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { Crown, CheckCircle, ArrowLeft, Loader2, AlertCircle, CreditCard, Bitcoin } from "lucide-react";
 import { useState } from "react";
 import { getAnalysisConfig } from "@/lib/analysisConfig";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,18 +10,23 @@ interface PaymentScreenProps {
   onBack: () => void;
 }
 
-export function PaymentScreen({ methodId, onPaid, onBack }: PaymentScreenProps) {
-  const [processing, setProcessing] = useState(false);
+type PayMethod = "card" | "crypto";
+
+export function PaymentScreen({ methodId, onBack }: PaymentScreenProps) {
+  const [processing, setProcessing] = useState<PayMethod | null>(null);
   const [error, setError] = useState<string | null>(null);
   const config = getAnalysisConfig(methodId);
 
-  const handlePayment = async () => {
-    setProcessing(true);
+  // method "card"   -> Edge Function create-payment (Robokassa)
+  // method "crypto" -> Edge Function create-payment-crypto (Plisio)
+  const startPayment = async (method: PayMethod) => {
+    setProcessing(method);
     setError(null);
 
+    const fnName = method === "card" ? "create-payment" : "create-payment-crypto";
+
     try {
-      // Вызываем Edge Function create-payment
-      const { data, error: fnError } = await supabase.functions.invoke("create-payment", {
+      const { data, error: fnError } = await supabase.functions.invoke(fnName, {
         body: { method_id: methodId },
       });
 
@@ -29,17 +34,13 @@ export function PaymentScreen({ methodId, onPaid, onBack }: PaymentScreenProps) 
         throw new Error(fnError?.message || "Не удалось создать платёж");
       }
 
-      // Сохраняем order_id — он понадобится на странице /payment/success
-      // чтобы проверить статус оплаты и вернуться к разбору
       sessionStorage.setItem("pending_order_id", data.order_id);
       sessionStorage.setItem("pending_method_id", methodId);
 
-      // Редиректим на страницу оплаты Робокассы
       window.location.href = data.payment_url;
-
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка при создании платежа");
-      setProcessing(false);
+      setProcessing(null);
     }
   };
 
@@ -87,24 +88,39 @@ export function PaymentScreen({ methodId, onPaid, onBack }: PaymentScreenProps) 
           )}
 
           {processing ? (
-            <div className="space-y-3">
+            <div className="space-y-3 py-2">
               <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
               <p className="text-sm text-muted-foreground">Переход к оплате...</p>
             </div>
           ) : (
-            <>
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-foreground">Выберите способ оплаты:</p>
+
+              {/* Кнопка 1 - оплата картой (Робокасса: карты РФ и иностранные) */}
               <Button
-                onClick={handlePayment}
-                className="w-full h-14 text-lg bg-primary text-primary-foreground"
+                onClick={() => startPayment("card")}
+                className="w-full h-14 text-base bg-primary text-primary-foreground"
                 size="lg"
               >
-                <ShieldCheck className="w-5 h-5 mr-2" />
-                Оплатить и получить разбор
+                <CreditCard className="w-5 h-5 mr-2" />
+                Оплатить картой
               </Button>
-              <p className="text-xs text-muted-foreground">
-                🔒 Безопасная оплата через Робокассу
+
+              {/* Кнопка 2 - оплата криптовалютой (Plisio) */}
+              <Button
+                onClick={() => startPayment("crypto")}
+                variant="outline"
+                className="w-full h-14 text-base border-primary/40"
+                size="lg"
+              >
+                <Bitcoin className="w-5 h-5 mr-2" />
+                Оплатить криптовалютой
+              </Button>
+
+              <p className="text-xs text-muted-foreground pt-1">
+                🔒 Карты — через Робокассу. Криптовалюта — через Plisio (USDT).
               </p>
-            </>
+            </div>
           )}
         </div>
       </div>
