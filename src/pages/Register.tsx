@@ -28,6 +28,7 @@ export default function Register() {
   const [year, setYear] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -40,6 +41,7 @@ export default function Register() {
     if (!day || !month || !year) return setError("Укажите полную дату рождения");
     if (password.length < 6) return setError("Пароль должен быть не короче 6 символов");
     if (password !== confirmPassword) return setError("Пароли не совпадают");
+    if (!agreed) return setError("Необходимо принять политику конфиденциальности");
 
     setSubmitting(true);
     const { error: signUpError } = await signUp(email, password, name.trim(), {
@@ -153,6 +155,28 @@ export default function Register() {
                 disabled={submitting}
                 autoComplete="new-password"
               />
+            </div>
+
+            <div className="flex items-start gap-2 pt-1">
+              <input
+                id="agreed"
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                disabled={submitting}
+                className="mt-1 h-4 w-4 rounded border-border accent-primary cursor-pointer flex-shrink-0"
+              />
+              <label htmlFor="agreed" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                Регистрируясь, вы соглашаетесь с{" "}
+                <a
+                  href="/privacy-policy.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline underline-offset-2 hover:opacity-80"
+                >
+                  Политикой конфиденциальности
+                </a>
+              </label>
             </div>
 
             <Button type="submit" disabled={submitting} className="w-full h-12 rounded-full text-base">

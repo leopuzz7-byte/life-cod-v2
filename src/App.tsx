@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AccessProvider } from "@/lib/accessControl";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Footer } from "@/components/Footer";
 import Index from "./pages/Index";
 import CalendarPage from "./pages/Calendar";
 import ProductsPage from "./pages/Products";
@@ -33,6 +34,7 @@ const App = () => (
           <AccessProvider>
             <Toaster />
             <Sonner />
+            <div className="flex flex-col min-h-screen">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/calendar" element={<CalendarPage />} />
@@ -59,6 +61,8 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <Footer />
+            </div>
           </AccessProvider>
         </AuthProvider>
       </BrowserRouter>

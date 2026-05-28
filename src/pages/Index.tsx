@@ -445,6 +445,7 @@ const Index = () => {
           <div className="container mx-auto px-4 py-6 md:py-8">
             <PaymentScreen
               methodId={selectedMethod}
+              tier={selectedTier}
               onPaid={handlePaymentSuccess}
               onBack={handlePaymentBack}
             />

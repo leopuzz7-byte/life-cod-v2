@@ -6,19 +6,18 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentScreenProps {
   methodId: string;
+  tier: "basic" | "professional";
   onPaid: () => void;
   onBack: () => void;
 }
 
 type PayMethod = "card" | "crypto";
 
-export function PaymentScreen({ methodId, onBack }: PaymentScreenProps) {
+export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
   const [processing, setProcessing] = useState<PayMethod | null>(null);
   const [error, setError] = useState<string | null>(null);
   const config = getAnalysisConfig(methodId);
 
-  // method "card"   -> Edge Function create-payment (Robokassa)
-  // method "crypto" -> Edge Function create-payment-crypto (Plisio)
   const startPayment = async (method: PayMethod) => {
     setProcessing(method);
     setError(null);
@@ -27,22 +26,32 @@ export function PaymentScreen({ methodId, onBack }: PaymentScreenProps) {
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke(fnName, {
-        body: { method_id: methodId },
+        body: { method_id: methodId, tier },
       });
 
-      if (fnError || !data?.payment_url) {
-        throw new Error(fnError?.message || "Не удалось создать платёж");
+      if (fnError || !data) throw new Error(fnError?.message || "Не удалось создать платёж");
+
+      // Базовый бесплатный — сервер вернул free: true
+      if (data.free) {
+        sessionStorage.setItem("payment_completed", "true");
+        sessionStorage.setItem("pending_method_id", methodId);
+        window.location.href = "/payment/success";
+        return;
       }
+
+      if (!data.payment_url) throw new Error("Не получена ссылка на оплату");
 
       sessionStorage.setItem("pending_order_id", data.order_id);
       sessionStorage.setItem("pending_method_id", methodId);
-
       window.location.href = data.payment_url;
+
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка при создании платежа");
       setProcessing(null);
     }
   };
+
+  const tierLabel = tier === "professional" ? "Профессиональный" : "Базовый";
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
@@ -57,11 +66,11 @@ export function PaymentScreen({ methodId, onBack }: PaymentScreenProps) {
           </div>
 
           <div>
-            <h2 className="text-2xl font-display font-semibold text-foreground mb-2">
-              Профессиональный разбор
+            <h2 className="text-2xl font-display font-semibold text-foreground mb-1">
+              {tierLabel} разбор
             </h2>
             <p className="text-sm text-muted-foreground">
-              {config?.title || "Полный детальный анализ"}
+              {config?.title || "Детальный анализ"}
             </p>
           </div>
 
@@ -96,7 +105,6 @@ export function PaymentScreen({ methodId, onBack }: PaymentScreenProps) {
             <div className="space-y-3">
               <p className="text-sm font-medium text-foreground">Выберите способ оплаты:</p>
 
-              {/* Кнопка 1 - оплата картой (Робокасса: карты РФ и иностранные) */}
               <Button
                 onClick={() => startPayment("card")}
                 className="w-full h-14 text-base bg-primary text-primary-foreground"
@@ -106,7 +114,6 @@ export function PaymentScreen({ methodId, onBack }: PaymentScreenProps) {
                 Оплатить картой
               </Button>
 
-              {/* Кнопка 2 - оплата криптовалютой (Plisio) */}
               <Button
                 onClick={() => startPayment("crypto")}
                 variant="outline"
@@ -118,7 +125,15 @@ export function PaymentScreen({ methodId, onBack }: PaymentScreenProps) {
               </Button>
 
               <p className="text-xs text-muted-foreground pt-1">
-                🔒 Карты — через Робокассу. Криптовалюта — через Plisio (USDT).
+                🔒 Карты — Робокасса. Криптовалюта — Plisio (USDT).{" "}
+                <a
+                  href="/oferta-life-cod.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-primary"
+                >
+                  Оплачивая, вы принимаете оферту
+                </a>
               </p>
             </div>
           )}
