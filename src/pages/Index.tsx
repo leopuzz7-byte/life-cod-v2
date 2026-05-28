@@ -21,6 +21,7 @@ import { ContractEnergyResultComponent } from "@/components/ContractEnergyResult
 import { ComingSoon } from "@/components/ComingSoon";
 import { LifeCodInputForm, LifeCodResult, UnifiedPersonalResult } from "@/components/lifecod";
 import { TierSelector } from "@/components/TierSelector";
+import { useMethodPrice } from "@/hooks/useMethodPrice";
 import { analysisConfigs, getAnalysisConfig, getConfigsForMethodology, proExtendedDescriptions, type TierType } from "@/lib/analysisConfig";
 import { 
   calculateYearForecast, 
@@ -77,6 +78,7 @@ const Index = () => {
   const [selectedMethodology, setSelectedMethodology] = useState<"1" | "2">("1");
   const [selectedMethod, setSelectedMethod] = useState("purpose");
   const [selectedTier, setSelectedTier] = useState<TierType>("basic");
+  const { prices: methodPrices } = useMethodPrice(selectedMethod);
   const [result, setResult] = useState<ResultType>(null);
   const [userName, setUserName] = useState("");
   const [nameEnergyInput, setNameEnergyInput] = useState("");
@@ -699,10 +701,12 @@ const Index = () => {
                       <h3 className="text-sm font-medium text-foreground text-center mb-3">
                         Выберите тариф для «{currentConfig.title}»
                       </h3>
-                      <TierSelector 
+                      <TierSelector
                         config={currentConfig}
                         selectedTier={selectedTier}
                         onSelectTier={setSelectedTier}
+                        priceBasic={methodPrices?.price_basic ?? null}
+                        pricePro={methodPrices?.price_pro ?? null}
                       />
                       {/* What's inside Professional extended analysis (per methodology) */}
                       {selectedTier === 'professional' && currentConfig.professional && (
