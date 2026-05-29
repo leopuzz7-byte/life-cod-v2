@@ -493,6 +493,14 @@ export const keyToData: KeyToNumberData[] = [
   }
 ];
 
+import i18n from '@/i18n';
+import { keytoOverlays } from './keytoI18n';
+
 export function getKeyToNumberData(number: number): KeyToNumberData | undefined {
-  return keyToData.find(d => d.number === number);
+  const base = keyToData.find(d => d.number === number);
+  if (!base) return undefined;
+  const lang = i18n.language;
+  if (!lang || lang === 'ru') return base;
+  const overlay = keytoOverlays[lang]?.[number];
+  return overlay ? { ...base, ...overlay } : base;
 }
