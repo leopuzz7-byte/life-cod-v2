@@ -449,13 +449,30 @@ export const arcanaData: Arcana[] = [
   }
 ];
 
+// ============= Локализация =============
+// Переводы накладываются поверх русской базы. Непереведённые поля
+// автоматически показываются по-русски (fallback).
+import i18n from '@/i18n';
+import { arcanaOverlays, type ArcanaText } from './arcanaI18n';
+
+function localizeArcana(base: Arcana): Arcana {
+  const lang = i18n.language;
+  if (!lang || lang === 'ru') return base;
+  const overlay = arcanaOverlays[lang]?.[base.number];
+  if (!overlay) return base;
+  return { ...base, ...overlay };
+}
+
 // Функция получения аркана по номеру
 export function getArcana(number: number): Arcana | undefined {
-  return arcanaData.find(a => a.number === number);
+  const base = arcanaData.find(a => a.number === number);
+  return base ? localizeArcana(base) : undefined;
 }
 
 // Функция получения названия аркана по номеру
 export function getArcanaName(number: number): string {
   const arcana = getArcana(number);
-  return arcana ? arcana.name : `Аркан ${number}`;
+  return arcana ? arcana.name : `${i18n.t("res.arcanaWord")} ${number}`;
 }
+
+export type { ArcanaText };
