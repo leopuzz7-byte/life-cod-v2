@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { NameEnergyResult as NameEnergyType } from "@/lib/nameEnergy";
 import { getArcana } from "@/lib/arcana";
 import { ArrowLeft, CheckCircle, AlertTriangle, MinusCircle } from "lucide-react";
@@ -9,23 +10,24 @@ interface Props {
 }
 
 export function NameEnergyResultComponent({ result, onReset }: Props) {
+  const { t } = useTranslation();
   const arcanaData = getArcana(result.arcana);
 
   return (
     <div className="max-w-3xl mx-auto">
       <Button variant="ghost" onClick={onReset} className="mb-4 text-muted-foreground">
-        <ArrowLeft className="w-4 h-4 mr-2" /> Новый расчёт
+        <ArrowLeft className="w-4 h-4 mr-2" /> {t("res.newCalc")}
       </Button>
 
       <div className="gradient-card rounded-2xl p-6 border border-border mb-6">
-        <h2 className="text-2xl font-display text-primary mb-1">Энергия названия</h2>
+        <h2 className="text-2xl font-display text-primary mb-1">{t("cfg.methods.name.title")}</h2>
         <p className="text-muted-foreground text-sm mb-6">«{result.name}»</p>
 
         {/* Arcana card */}
         <div className="bg-card rounded-xl border border-border p-6 text-center mb-6">
           <div className="text-4xl font-display text-primary mb-2">{result.arcana}</div>
           <div className="text-lg font-display text-foreground mb-1">{result.arcanaName}</div>
-          <div className="text-sm text-muted-foreground">Сумма букв: {result.totalSum}</div>
+          <div className="text-sm text-muted-foreground">{t("res.nameEnergy.lettersSum")} {result.totalSum}</div>
         </div>
 
         {/* Status badge */}
@@ -43,7 +45,7 @@ export function NameEnergyResultComponent({ result, onReset }: Props) {
 
         {/* Letter breakdown */}
         <div className="mb-6">
-          <h3 className="font-display text-foreground text-sm mb-3">Разбор по буквам</h3>
+          <h3 className="font-display text-foreground text-sm mb-3">{t("res.nameEnergy.letterBreakdown")}</h3>
           <div className="flex flex-wrap gap-1">
             {result.letterBreakdown.map((item, i) => (
               <div key={i} className="bg-secondary rounded-lg px-2 py-1 text-center min-w-[2rem]">
@@ -56,7 +58,7 @@ export function NameEnergyResultComponent({ result, onReset }: Props) {
 
         {/* Description */}
         <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
-          <h3 className="font-display text-foreground text-sm mb-2">Описание энергии</h3>
+          <h3 className="font-display text-foreground text-sm mb-2">{t("res.nameEnergy.energyDesc")}</h3>
           <p className="text-sm text-muted-foreground">{result.description}</p>
         </div>
       </div>

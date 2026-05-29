@@ -263,6 +263,15 @@
     "payNote": "Карты — Робокасса. Криптовалюта — Plisio (USDT).",
     "acceptOffer": "Оплачивая, вы принимаете оферту"
   },
+  "res": {
+    "newCalc": "Новый расчёт",
+    "back": "Назад",
+    "nameEnergy": {
+      "lettersSum": "Сумма букв:",
+      "letterBreakdown": "Разбор по буквам",
+      "energyDesc": "Описание энергии"
+    }
+  },
   "nav": {
     "analyses": "Разборы",
     "calendar": "Календарь",

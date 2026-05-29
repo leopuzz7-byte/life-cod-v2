@@ -263,6 +263,15 @@
     "payNote": "Tarjetas — Robokassa. Cripto — Plisio (USDT).",
     "acceptOffer": "Al pagar, aceptas la oferta"
   },
+  "res": {
+    "newCalc": "Nuevo cálculo",
+    "back": "Atrás",
+    "nameEnergy": {
+      "lettersSum": "Suma de letras:",
+      "letterBreakdown": "Desglose por letras",
+      "energyDesc": "Descripción de la energía"
+    }
+  },
   "nav": {
     "analyses": "Análisis",
     "calendar": "Calendario",
