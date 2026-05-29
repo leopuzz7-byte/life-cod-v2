@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn } = useAuth();
@@ -23,8 +25,8 @@ export default function Login() {
     e.preventDefault();
     setError(null);
 
-    if (!email.includes("@")) return setError("Введите корректный email");
-    if (!password) return setError("Введите пароль");
+    if (!email.includes("@")) return setError(t("auth.invalidEmail"));
+    if (!password) return setError(t("auth.enterPassword"));
 
     setSubmitting(true);
     const { error: signInError } = await signIn(email, password);
@@ -35,7 +37,7 @@ export default function Login() {
       return;
     }
 
-    toast.success("Добро пожаловать!");
+    toast.success(t("auth.welcome"));
     navigate(fromPath);
   };
 
@@ -46,10 +48,10 @@ export default function Login() {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-6">
             <h1 className="font-display text-3xl md:text-4xl text-primary mb-2">
-              Вход
+              {t("auth.loginTitle")}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Откройте сохранённые разборы и свой профиль
+              {t("auth.loginSubtitle")}
             </p>
           </div>
 
@@ -76,12 +78,12 @@ export default function Login() {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label htmlFor="password">Пароль</Label>
+                <Label htmlFor="password">{t("auth.password")}</Label>
                 <Link
                   to="/forgot-password"
                   className="text-xs text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Забыли?
+                  {t("auth.forgot")}
                 </Link>
               </div>
               <Input
@@ -96,13 +98,13 @@ export default function Login() {
 
             <Button type="submit" disabled={submitting} className="w-full h-12 rounded-full text-base">
               {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Войти
+              {t("nav.login")}
             </Button>
 
             <p className="text-sm text-center text-muted-foreground pt-2">
-              Нет аккаунта?{" "}
+              {t("auth.noAccount")}{" "}
               <Link to="/register" className="text-primary font-medium hover:underline">
-                Зарегистрироваться
+                {t("auth.register")}
               </Link>
             </p>
           </form>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, AlertCircle } from "lucide-react";
@@ -7,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
 export default function PaymentSuccess() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [status, setStatus] = useState<"checking" | "paid" | "pending" | "error">("checking");
 
@@ -66,7 +68,7 @@ export default function PaymentSuccess() {
         <div className="max-w-md w-full text-center space-y-6">
 
           {status === "checking" && (
-            <LoadingScreen phrases={["Проверяем оплату…", "Почти готово…"]} />
+            <LoadingScreen phrases={[t("payment.checking"), t("payment.almostDone")]} />
           )}
 
           {(status === "paid" || status === "pending") && (
@@ -75,13 +77,13 @@ export default function PaymentSuccess() {
                 <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
               <h1 className="font-display text-2xl text-foreground">
-                Оплата прошла успешно!
+                {t("payment.successTitle")}
               </h1>
               <p className="text-muted-foreground">
-                Профессиональный разбор разблокирован. Нажмите кнопку ниже чтобы получить результат.
+                {t("payment.successDesc")}
               </p>
               <Button onClick={handleContinue} className="w-full h-12 text-base rounded-full">
-                Получить разбор →
+                {t("payment.getAnalysis")} →
               </Button>
             </>
           )}
@@ -92,17 +94,17 @@ export default function PaymentSuccess() {
                 <AlertCircle className="w-10 h-10 text-amber-600" />
               </div>
               <h1 className="font-display text-2xl text-foreground">
-                Не удалось проверить оплату
+                {t("payment.errorTitle")}
               </h1>
               <p className="text-muted-foreground">
-                Если деньги были списаны — свяжитесь с поддержкой. Если нет — попробуйте оплатить снова.
+                {t("payment.errorDesc")}
               </p>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => navigate("/")} className="flex-1 rounded-full">
-                  На главную
+                  {t("payment.toHome")}
                 </Button>
                 <Button onClick={() => navigate("/support")} className="flex-1 rounded-full">
-                  Поддержка
+                  {t("nav.support")}
                 </Button>
               </div>
             </>

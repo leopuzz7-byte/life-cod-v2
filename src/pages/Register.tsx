@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
 export default function Register() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { signUp } = useAuth();
 
@@ -35,11 +37,11 @@ export default function Register() {
     e.preventDefault();
     setError(null);
 
-    if (!name.trim()) return setError("Введите имя");
-    if (!email.includes("@")) return setError("Введите корректный email");
-    if (!day || !month || !year) return setError("Укажите полную дату рождения");
-    if (password.length < 6) return setError("Пароль должен быть не короче 6 символов");
-    if (password !== confirmPassword) return setError("Пароли не совпадают");
+    if (!name.trim()) return setError(t("auth.enterName"));
+    if (!email.includes("@")) return setError(t("auth.invalidEmail"));
+    if (!day || !month || !year) return setError(t("auth.fullBirthDate"));
+    if (password.length < 6) return setError(t("auth.passwordMin"));
+    if (password !== confirmPassword) return setError(t("auth.passwordMismatch"));
 
     setSubmitting(true);
     const { error: signUpError } = await signUp(email, password, name.trim(), {
@@ -54,7 +56,7 @@ export default function Register() {
       return;
     }
 
-    toast.success("Аккаунт создан!");
+    toast.success(t("auth.accountCreated"));
     navigate("/");
   };
 
@@ -65,14 +67,13 @@ export default function Register() {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-6">
             <h1 className="font-display text-3xl md:text-4xl text-primary mb-3 leading-tight">
-              Узнайте, что скрывает<br />дата вашего рождения
+              {t("auth.registerTitle1")}<br />{t("auth.registerTitle2")}
             </h1>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              В вашей дате уже записан код судьбы, сильных сторон и предназначения.
-              Создайте аккаунт — и раскройте его за пару минут.
+              {t("auth.registerSubtitle")}
             </p>
             <p className="text-xs text-accent mt-2 font-medium">
-              ✶ Первый разбор доступен сразу после регистрации
+              ✶ {t("auth.registerBonus")}
             </p>
           </div>
 
@@ -85,10 +86,10 @@ export default function Register() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Имя</Label>
+              <Label htmlFor="name">{t("auth.name")}</Label>
               <Input
                 id="name"
-                placeholder="Как к вам обращаться"
+                placeholder={t("auth.namePlaceholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={submitting}
@@ -110,22 +111,22 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label>Дата рождения</Label>
+              <Label>{t("auth.birthDate")}</Label>
               <div className="grid grid-cols-3 gap-2">
                 <Select value={day} onValueChange={setDay} disabled={submitting}>
-                  <SelectTrigger><SelectValue placeholder="День" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("calculator.day")} /></SelectTrigger>
                   <SelectContent className="max-h-60">
                     {days.map((d) => <SelectItem key={d} value={String(d)}>{d}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={month} onValueChange={setMonth} disabled={submitting}>
-                  <SelectTrigger><SelectValue placeholder="Месяц" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("calculator.month")} /></SelectTrigger>
                   <SelectContent className="max-h-60">
-                    {months.map((m, i) => <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>)}
+                    {months.map((_, i) => <SelectItem key={i} value={String(i + 1)}>{t(`forecast.months.${i + 1}`)}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={year} onValueChange={setYear} disabled={submitting}>
-                  <SelectTrigger><SelectValue placeholder="Год" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("calculator.year")} /></SelectTrigger>
                   <SelectContent className="max-h-60">
                     {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
                   </SelectContent>
@@ -134,11 +135,11 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Пароль</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Минимум 6 символов"
+                placeholder={t("auth.passwordPlaceholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={submitting}
@@ -147,11 +148,11 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Повторите пароль</Label>
+              <Label htmlFor="confirmPassword">{t("auth.confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Ещё раз тот же пароль"
+                placeholder={t("auth.confirmPasswordPlaceholder")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={submitting}
@@ -161,13 +162,13 @@ export default function Register() {
 
             <Button type="submit" disabled={submitting} className="w-full h-12 rounded-full text-base">
               {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Создать аккаунт
+              {t("auth.createAccount")}
             </Button>
 
             <p className="text-sm text-center text-muted-foreground pt-2">
-              У меня уже есть профиль.{" "}
+              {t("auth.haveProfile")}{" "}
               <Link to="/login" className="text-primary font-medium hover:underline">
-                Войти
+                {t("nav.login")}
               </Link>
             </p>
           </form>
