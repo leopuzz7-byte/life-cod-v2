@@ -126,6 +126,26 @@
     "nameCheckPlaceholder": "Introduce el nombre de una empresa, producto o persona",
     "calcNameEnergy": "Calcular la energía del nombre"
   },
+  "myAnalyses": {
+    "subtitle": "El historial de todos los análisis que has hecho",
+    "newAnalysis": "Nuevo análisis",
+    "loadError": "No se pudieron cargar los análisis",
+    "retry": "Intentar de nuevo",
+    "emptyTitle": "Aún no hay ningún análisis",
+    "emptySubtitle": "Haz tu primer análisis — se guardará aquí",
+    "makeAnalysis": "Hacer un análisis",
+    "cacheWarning": "No se pudo actualizar la lista desde el servidor — se muestra una copia local. Comprueba tu conexión a internet.",
+    "deleteTitle": "¿Eliminar este análisis?",
+    "deleteDesc": "Esta acción no se puede deshacer. El análisis se eliminará permanentemente.",
+    "delete": "Eliminar"
+  },
+  "analysisDetail": {
+    "notFound": "Análisis no encontrado",
+    "openError": "No se pudo abrir el análisis",
+    "backToList": "Volver a la lista",
+    "unsupported": "El tipo de análisis «{{type}}» no es compatible para volver a mostrarse",
+    "allAnalyses": "Todos los análisis"
+  },
   "nav": {
     "analyses": "Análisis",
     "calendar": "Calendario",
@@ -533,6 +553,7 @@
   },
   "common": {
     "you": "Tú",
+    "partner": "Pareja",
     "loading": "Cargando...",
     "error": "Error",
     "save": "Guardar",

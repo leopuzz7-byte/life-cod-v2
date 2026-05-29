@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -28,6 +29,7 @@ import {
 } from "@/lib/analysisStorage";
 
 export default function MyAnalyses() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [analyses, setAnalyses] = useState<SavedAnalysisSummary[]>([]);
   // loading=true только если у нас НЕТ кеша — иначе показываем кеш сразу
@@ -103,16 +105,16 @@ export default function MyAnalyses() {
           <div className="flex items-center justify-between mb-6 md:mb-8 gap-3">
             <div>
               <h1 className="font-display text-3xl md:text-4xl text-primary mb-1">
-                Мои разборы
+                {t("nav.myAnalyses")}
               </h1>
               <p className="text-sm text-muted-foreground">
-                История всех сделанных вами разборов
+                {t("myAnalyses.subtitle")}
               </p>
             </div>
             <Link to="/">
               <Button className="rounded-full whitespace-nowrap">
                 <Plus className="w-4 h-4 mr-1.5" />
-                Новый разбор
+                {t("myAnalyses.newAnalysis")}
               </Button>
             </Link>
           </div>
@@ -122,22 +124,22 @@ export default function MyAnalyses() {
           ) : loadError && analyses.length === 0 ? (
             <div className="gradient-card rounded-2xl p-6 md:p-8 border border-destructive/40 text-center">
               <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-3" />
-              <h3 className="font-display text-lg text-foreground mb-2">Не удалось загрузить разборы</h3>
+              <h3 className="font-display text-lg text-foreground mb-2">{t("myAnalyses.loadError")}</h3>
               <p className="text-sm text-muted-foreground mb-4">{loadError}</p>
-              <Button onClick={() => load(true)} className="rounded-full">Попробовать снова</Button>
+              <Button onClick={() => load(true)} className="rounded-full">{t("myAnalyses.retry")}</Button>
             </div>
           ) : analyses.length === 0 ? (
             <div className="gradient-card rounded-2xl p-8 md:p-12 border border-border text-center">
               <FileText className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
               <h3 className="font-display text-xl text-foreground mb-2">
-                Пока нет ни одного разбора
+                {t("myAnalyses.emptyTitle")}
               </h3>
               <p className="text-sm text-muted-foreground mb-6">
-                Сделайте первый разбор — он сохранится здесь
+                {t("myAnalyses.emptySubtitle")}
               </p>
               <Link to="/">
                 <Button className="rounded-full">
-                  Сделать разбор
+                  {t("myAnalyses.makeAnalysis")}
                 </Button>
               </Link>
             </div>
@@ -146,7 +148,7 @@ export default function MyAnalyses() {
               {fromCache && (
                 <div className="mb-4 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>Не удалось обновить список с сервера — показана локальная копия. Проверьте подключение к интернету.</span>
+                  <span>{t("myAnalyses.cacheWarning")}</span>
                 </div>
               )}
               <div className="space-y-3">
@@ -189,15 +191,15 @@ export default function MyAnalyses() {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Удалить этот разбор?</AlertDialogTitle>
+                          <AlertDialogTitle>{t("myAnalyses.deleteTitle")}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Действие нельзя отменить. Разбор будет удалён навсегда.
+                            {t("myAnalyses.deleteDesc")}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Отмена</AlertDialogCancel>
+                          <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
                           <AlertDialogAction onClick={() => handleDelete(a.id)}>
-                            Удалить
+                            {t("myAnalyses.delete")}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>

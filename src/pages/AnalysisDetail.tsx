@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import { ContractEnergyResultComponent } from "@/components/ContractEnergyResult
 import { LifeCodResult, UnifiedPersonalResult } from "@/components/lifecod";
 
 export default function AnalysisDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [analysis, setAnalysis] = useState<SavedAnalysis | null>(null);
@@ -35,7 +37,7 @@ export default function AnalysisDetail() {
     if (!id) return;
     getAnalysis(id).then(({ data, error }) => {
       if (error || !data) {
-        setError(error || "Разбор не найден");
+        setError(error || t("analysisDetail.notFound"));
       } else {
         setAnalysis(data);
       }
@@ -61,10 +63,10 @@ export default function AnalysisDetail() {
         <main className="container mx-auto px-4 py-12">
           <div className="max-w-md mx-auto text-center gradient-card rounded-2xl p-8 border border-border">
             <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
-            <h2 className="font-display text-xl text-foreground mb-2">Не удалось открыть разбор</h2>
+            <h2 className="font-display text-xl text-foreground mb-2">{t("analysisDetail.openError")}</h2>
             <p className="text-sm text-muted-foreground mb-6">{error}</p>
             <Link to="/my-analyses">
-              <Button className="rounded-full">Вернуться к списку</Button>
+              <Button className="rounded-full">{t("analysisDetail.backToList")}</Button>
             </Link>
           </div>
         </main>
@@ -73,7 +75,7 @@ export default function AnalysisDetail() {
   }
 
   const inputData = analysis.input as Record<string, unknown>;
-  const userName = (inputData?.name as string) || "Партнёр";
+  const userName = (inputData?.name as string) || t("common.partner");
   const tier = analysis.tier as "basic" | "professional";
 
   // Подкладываем сохранённый результат в соответствующий компонент
@@ -108,7 +110,7 @@ export default function AnalysisDetail() {
       default:
         return (
           <div className="text-center py-12 text-muted-foreground">
-            Тип разбора «{analysis.result_type}» не поддерживается для повторного отображения
+            {t("analysisDetail.unsupported", { type: analysis.result_type })}
           </div>
         );
     }
@@ -135,7 +137,7 @@ export default function AnalysisDetail() {
               className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
-              Все разборы
+              {t("analysisDetail.allAnalyses")}
             </Link>
             <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
               <span>•</span>

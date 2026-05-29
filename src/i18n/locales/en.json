@@ -126,6 +126,26 @@
     "nameCheckPlaceholder": "Enter a company, product, or personal name",
     "calcNameEnergy": "Calculate name energy"
   },
+  "myAnalyses": {
+    "subtitle": "A history of all the analyses you've made",
+    "newAnalysis": "New analysis",
+    "loadError": "Failed to load analyses",
+    "retry": "Try again",
+    "emptyTitle": "No analyses yet",
+    "emptySubtitle": "Make your first analysis — it will be saved here",
+    "makeAnalysis": "Make an analysis",
+    "cacheWarning": "Couldn't refresh the list from the server — showing a local copy. Check your internet connection.",
+    "deleteTitle": "Delete this analysis?",
+    "deleteDesc": "This action cannot be undone. The analysis will be deleted permanently.",
+    "delete": "Delete"
+  },
+  "analysisDetail": {
+    "notFound": "Analysis not found",
+    "openError": "Couldn't open the analysis",
+    "backToList": "Back to list",
+    "unsupported": "Analysis type «{{type}}» is not supported for re-display",
+    "allAnalyses": "All analyses"
+  },
   "nav": {
     "analyses": "Analyses",
     "calendar": "Calendar",
@@ -514,6 +534,7 @@
   },
   "common": {
     "you": "You",
+    "partner": "Partner",
     "loading": "Loading...",
     "error": "Error",
     "save": "Save",
