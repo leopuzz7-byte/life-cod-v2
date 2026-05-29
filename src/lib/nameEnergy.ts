@@ -1,6 +1,12 @@
 // Энергия названия — перевод букв в числа по системе 22 арканов
 import { normalizeToArcana } from './calculations';
 import { getArcana } from './arcana';
+import i18n from '@/i18n';
+
+function tr(key: string, fallback: string): string {
+  const val = i18n.t(key);
+  return val === key ? fallback : val;
+}
 
 // Таблица: русские и английские буквы → числа 1-9
 const letterMap: Record<string, number> = {
@@ -48,11 +54,11 @@ export function calculateNameEnergy(name: string): NameEnergyResult {
 
   let recommendation = '';
   if (isHarmonious) {
-    recommendation = 'Название несёт гармоничную энергию. Оно привлекает клиентов и способствует развитию.';
+    recommendation = tr('res.nameEnergy.recHarmonious', 'Название несёт гармоничную энергию. Оно привлекает клиентов и способствует развитию.');
   } else if ([7, 9, 12, 13, 16, 18, 20].includes(arcana)) {
-    recommendation = 'Название несёт трансформационную энергию. Возможны резкие перемены и нестабильность. Рекомендуется рассмотреть альтернативные варианты.';
+    recommendation = tr('res.nameEnergy.recTransform', 'Название несёт трансформационную энергию. Возможны резкие перемены и нестабильность. Рекомендуется рассмотреть альтернативные варианты.');
   } else {
-    recommendation = 'Название нейтрально. Энергия не помогает и не мешает. Можно усилить, изменив написание.';
+    recommendation = tr('res.nameEnergy.recNeutral', 'Название нейтрально. Энергия не помогает и не мешает. Можно усилить, изменив написание.');
   }
 
   return {

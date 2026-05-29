@@ -270,7 +270,10 @@
     "nameEnergy": {
       "lettersSum": "Suma de letras:",
       "letterBreakdown": "Desglose por letras",
-      "energyDesc": "Descripción de la energía"
+      "energyDesc": "Descripción de la energía",
+      "recHarmonious": "El nombre lleva una energía armoniosa. Atrae clientes y favorece el crecimiento.",
+      "recTransform": "El nombre lleva una energía transformadora. Son posibles cambios bruscos e inestabilidad. Conviene considerar alternativas.",
+      "recNeutral": "El nombre es neutro. La energía ni ayuda ni estorba. Se puede reforzar cambiando la grafía."
     }
   },
   "nav": {

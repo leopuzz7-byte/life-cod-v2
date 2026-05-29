@@ -270,7 +270,10 @@
     "nameEnergy": {
       "lettersSum": "Letter sum:",
       "letterBreakdown": "Letter breakdown",
-      "energyDesc": "Energy description"
+      "energyDesc": "Energy description",
+      "recHarmonious": "The name carries harmonious energy. It attracts clients and supports growth.",
+      "recTransform": "The name carries transformational energy. Sharp changes and instability are possible. Consider alternative options.",
+      "recNeutral": "The name is neutral. The energy neither helps nor hinders. It can be strengthened by changing the spelling."
     }
   },
   "nav": {
