@@ -276,6 +276,29 @@
       "recNeutral": "El nombre es neutro. La energía ni ayuda ni estorba. Se puede reforzar cambiando la grafía."
     }
   },
+  "matrixGen": {
+    "link_1_2": { "title": "Infancia → Esencia interior", "base": "Las vivencias de la infancia (posición 1) forman el núcleo interior de la personalidad (posición 2).", "tmpl": "El arcano {{a1}} ({{n1}}) en la infancia creó la base para la esencia interior del arcano {{a2}} ({{n2}})." },
+    "link_3_5": { "title": "Talentos → Profesión", "base": "Los talentos sociales (posición 3) influyen directamente en el camino profesional (posición 5).", "tmpl": "La energía de {{a1}} ({{n1}}) en los talentos te orienta hacia una profesión a través de la energía de {{a2}} ({{n2}})." },
+    "link_6_7": { "title": "Punto de apoyo ↔ Meta de vida", "base": "La experiencia caduca (posición 6) debe transformarse en movimiento hacia la meta (posición 7). A menudo, el principal conflicto interno.", "tmpl": "El confort habitual del arcano {{a1}} ({{n1}}) puede obstaculizar el avance hacia la meta del arcano {{a2}} ({{n2}}), o convertirse en un trampolín." },
+    "link_10_12": { "title": "Tareas no cumplidas → Tarea kármica principal", "base": "Las tareas kármicas inconclusas (posición 10) conducen a la tarea principal de la vida (posición 12).", "tmpl": "La cola kármica del arcano {{a1}} ({{n1}}) se desata resolviendo la tarea del arcano {{a2}} ({{n2}})." },
+    "link_2_4": { "title": "Esencia interior → Meta de sabiduría", "base": "El núcleo interior de la personalidad (posición 2) determina la dirección de la acumulación de sabiduría vital (posición 4).", "tmpl": "La esencia del arcano {{a1}} ({{n1}}) orienta la sabiduría hacia el arcano {{a2}} ({{n2}})." },
+    "link_7_8": { "title": "Meta de vida + Forma de alcanzarla", "base": "La meta de vida (posición 7) y el instrumento para alcanzarla (posición 8) deben trabajar juntos.", "tmpl": "La meta del arcano {{a1}} ({{n1}}) se alcanza mediante el método del arcano {{a2}} ({{n2}})." },
+    "profile1": "Tu esencia interior es {{name}} ({{n}}).",
+    "profile2": "Te mueves hacia tu meta de vida — {{name}} ({{n}}).",
+    "profile3": "Tu tarea kármica principal es {{name}} ({{n}}).",
+    "profile4": "Profesionalmente, la energía de {{name}} ({{n}}) te resulta más cercana.",
+    "profile5": "Tu zona de confort es {{name}} ({{n}}); conviene alejarse poco a poco del punto de apoyo {{name6}} ({{n6}}).",
+    "problemConflict": "Un conflicto entre el punto de apoyo ({{n5}} — {{name5}}) y la meta de vida ({{n7}} — {{name7}}): el patrón habitual obstaculiza el avance hacia la meta.",
+    "problemReversed": "Hay arcanos invertidos ({{list}}): señalan energías bloqueadas que requieren ser trabajadas.",
+    "problemKarma": "Nudo kármico: las posiciones 10 ({{p10}}) y 11 ({{p11}}) muestran tareas inconclusas y errores recurrentes. La solución pasa por la tarea principal ({{p12}}).",
+    "growthMirror": "Los arcanos espejo ({{list}}) son tus fortalezas — apóyate en ellos.",
+    "growthSuccess": "El código del éxito ({{list}}) es la clave para realizar tu potencial. Activa estas energías conscientemente.",
+    "growthSocial": "La posición 3 ({{p3}} — {{name3}}) es tu talento social, a través del cual sales al mundo.",
+    "strat1": "Foco principal: resuelve la tarea kármica de la posición 12 ({{name12}}) — esto desatará todos los demás nudos kármicos.",
+    "strat2": "Usa el instrumento de la posición 8 ({{name8}}) para avanzar hacia la meta de la posición 7 ({{name7}}).",
+    "strat3": "Sal poco a poco de la zona de confort de la posición 6 ({{name6}}) — es un guion caduco.",
+    "strat4": "Monetiza tus talentos a través de la posición 5 ({{name5}}) — es tu vector profesional."
+  },
   "nav": {
     "analyses": "Análisis",
     "calendar": "Calendario",

@@ -255,63 +255,56 @@ export function getCrossPositionLinks(matrix: PersonalMatrix): CrossPositionLink
   const links: CrossPositionLink[] = [];
   const p = matrix.positions;
 
-  // Связка 1-2: Детство + Внутренняя суть
   links.push({
     positions: [1, 2],
-    title: "Детство → Внутренняя суть",
-    description: getRelationDescription(p[0], p[1], "Детские переживания (позиция 1) формируют внутреннее ядро личности (позиция 2).", "Аркан {a1} ({n1}) в детстве создал основу для внутренней сути аркана {a2} ({n2})."),
+    title: i18n.t("matrixGen.link_1_2.title"),
+    description: relDesc("matrixGen.link_1_2", p[0], p[1]),
     type: areSynergetic(p[0], p[1]) ? 'synergy' : areConflicting(p[0], p[1]) ? 'conflict' : 'neutral',
   });
 
-  // Связка 3-5: Таланты + Профессия
   links.push({
     positions: [3, 5],
-    title: "Таланты → Профессия",
-    description: getRelationDescription(p[2], p[4], "Социальные таланты (позиция 3) напрямую влияют на профессиональный путь (позиция 5).", "Энергия {a1} ({n1}) в талантах направляет к профессии через энергию {a2} ({n2})."),
+    title: i18n.t("matrixGen.link_3_5.title"),
+    description: relDesc("matrixGen.link_3_5", p[2], p[4]),
     type: areSynergetic(p[2], p[4]) ? 'synergy' : areConflicting(p[2], p[4]) ? 'conflict' : 'neutral',
   });
 
-  // Связка 6-7: Точка опоры + Цель жизни
   links.push({
     positions: [6, 7],
-    title: "Точка опоры ↔ Цель жизни",
-    description: getRelationDescription(p[5], p[6], "Отживший опыт (позиция 6) должен трансформироваться в движение к цели (позиция 7). Часто — главный внутренний конфликт.", "Привычный комфорт аркана {a1} ({n1}) может мешать движению к цели аркана {a2} ({n2}), либо стать трамплином."),
+    title: i18n.t("matrixGen.link_6_7.title"),
+    description: relDesc("matrixGen.link_6_7", p[5], p[6]),
     type: areConflicting(p[5], p[6]) ? 'conflict' : areSynergetic(p[5], p[6]) ? 'synergy' : 'neutral',
   });
 
-  // Связка 10-12: Карма → Главная задача
   links.push({
     positions: [10, 12],
-    title: "Невыполненные задачи → Главная кармическая задача",
-    description: getRelationDescription(p[9], p[11], "Незавершённые кармические задачи (позиция 10) ведут к главной задаче жизни (позиция 12).", "Кармический хвост аркана {a1} ({n1}) развязывается через решение задачи аркана {a2} ({n2})."),
+    title: i18n.t("matrixGen.link_10_12.title"),
+    description: relDesc("matrixGen.link_10_12", p[9], p[11]),
     type: 'neutral',
   });
 
-  // Связка 2-4: Суть + Мудрость
   links.push({
     positions: [2, 4],
-    title: "Внутренняя суть → Цель мудрости",
-    description: getRelationDescription(p[1], p[3], "Внутреннее ядро личности (позиция 2) определяет направление накопления жизненной мудрости (позиция 4).", "Суть аркана {a1} ({n1}) направляет мудрость к аркану {a2} ({n2})."),
+    title: i18n.t("matrixGen.link_2_4.title"),
+    description: relDesc("matrixGen.link_2_4", p[1], p[3]),
     type: areSynergetic(p[1], p[3]) ? 'synergy' : areConflicting(p[1], p[3]) ? 'conflict' : 'neutral',
   });
 
-  // Связка 7-8: Цель + Инструмент
   links.push({
     positions: [7, 8],
-    title: "Цель жизни + Способ достижения",
-    description: getRelationDescription(p[6], p[7], "Цель жизни (позиция 7) и инструмент её достижения (позиция 8) должны работать в связке.", "Цель аркана {a1} ({n1}) достигается через метод аркана {a2} ({n2})."),
+    title: i18n.t("matrixGen.link_7_8.title"),
+    description: relDesc("matrixGen.link_7_8", p[6], p[7]),
     type: areSynergetic(p[6], p[7]) ? 'synergy' : areConflicting(p[6], p[7]) ? 'conflict' : 'neutral',
   });
 
   return links;
 }
 
-function getRelationDescription(a1: number, a2: number, base: string, template: string): string {
+function relDesc(prefix: string, a1: number, a2: number): string {
   const arc1 = getArcana(a1);
   const arc2 = getArcana(a2);
-  const filled = template
-    .replace('{a1}', String(a1)).replace('{n1}', arc1?.name || '')
-    .replace('{a2}', String(a2)).replace('{n2}', arc2?.name || '');
+  const base = i18n.t(`${prefix}.base`);
+  const filled = i18n.t(`${prefix}.tmpl`, { a1, n1: arc1?.name || '', a2, n2: arc2?.name || '' });
   return `${base} ${filled}`;
 }
 
@@ -349,37 +342,37 @@ export function generateMatrixSummary(matrix: PersonalMatrix): MatrixSummary {
   const arcana6 = getArcana(p[5]);
 
   const overallProfile = [
-    `Ваша внутренняя суть — ${arcana2?.name || p[1]} (${p[1]}).`,
-    `Вы двигаетесь к цели жизни — ${arcana7?.name || p[6]} (${p[6]}).`,
-    `Ваша главная кармическая задача — ${arcana12?.name || p[11]} (${p[11]}).`,
-    `Профессионально вам ближе энергия ${arcana5?.name || p[4]} (${p[4]}).`,
-    `Ваша зона комфорта — ${getArcana(p[8])?.name || p[8]} (${p[8]}), от точки опоры ${arcana6?.name || p[5]} (${p[5]}) нужно постепенно отходить.`,
+    i18n.t("matrixGen.profile1", { name: arcana2?.name || p[1], n: p[1] }),
+    i18n.t("matrixGen.profile2", { name: arcana7?.name || p[6], n: p[6] }),
+    i18n.t("matrixGen.profile3", { name: arcana12?.name || p[11], n: p[11] }),
+    i18n.t("matrixGen.profile4", { name: arcana5?.name || p[4], n: p[4] }),
+    i18n.t("matrixGen.profile5", { name: getArcana(p[8])?.name || p[8], n: p[8], name6: arcana6?.name || p[5], n6: p[5] }),
   ].join(' ');
 
   const keyProblems: string[] = [];
   // Конфликт между точкой опоры и целью
   if (areConflicting(p[5], p[6])) {
-    keyProblems.push(`Конфликт между точкой опоры (${p[5]} — ${getArcana(p[5])?.name}) и целью жизни (${p[6]} — ${getArcana(p[6])?.name}): привычный паттерн мешает движению к цели.`);
+    keyProblems.push(i18n.t("matrixGen.problemConflict", { n5: p[5], name5: getArcana(p[5])?.name, n7: p[6], name7: getArcana(p[6])?.name }));
   }
   // Перевёрнутые арканы
   if (matrix.reversedArcana.length > 0) {
-    keyProblems.push(`Есть перевёрнутые арканы (${matrix.reversedArcana.map(r => r.arcana).join(', ')}): они указывают на заблокированные энергии, требующие проработки.`);
+    keyProblems.push(i18n.t("matrixGen.problemReversed", { list: matrix.reversedArcana.map(r => r.arcana).join(', ') }));
   }
   // Кармический хвост
-  keyProblems.push(`Кармический узел: позиции 10 (${p[9]}) и 11 (${p[10]}) показывают незавершённые задачи и повторяющиеся ошибки. Решение — через главную задачу (${p[11]}).`);
+  keyProblems.push(i18n.t("matrixGen.problemKarma", { p10: p[9], p11: p[10], p12: p[11] }));
 
   const growthPoints: string[] = [];
   if (matrix.mirrorArcana.length > 0) {
-    growthPoints.push(`Зеркальные арканы (${matrix.mirrorArcana.map(m => m.arcana).join(', ')}) — ваши сильные стороны, опирайтесь на них.`);
+    growthPoints.push(i18n.t("matrixGen.growthMirror", { list: matrix.mirrorArcana.map(m => m.arcana).join(', ') }));
   }
-  growthPoints.push(`Код успеха (${matrix.successCode.join(', ')}) — ключ к реализации потенциала. Активируйте эти энергии осознанно.`);
-  growthPoints.push(`Позиция 3 (${p[2]} — ${getArcana(p[2])?.name}) — ваш социальный талант, через который вы выходите в мир.`);
+  growthPoints.push(i18n.t("matrixGen.growthSuccess", { list: matrix.successCode.join(', ') }));
+  growthPoints.push(i18n.t("matrixGen.growthSocial", { p3: p[2], name3: getArcana(p[2])?.name }));
 
   const strategicRecommendations: string[] = [
-    `Главный фокус: решите кармическую задачу позиции 12 (${arcana12?.name}) — это развяжет все остальные кармические узлы.`,
-    `Используйте инструмент позиции 8 (${getArcana(p[7])?.name}) для движения к цели позиции 7 (${arcana7?.name}).`,
-    `Постепенно выходите из зоны комфорта позиции 6 (${arcana6?.name}) — это отживший сценарий.`,
-    `Монетизируйте таланты через позицию 5 (${arcana5?.name}) — это ваш профессиональный вектор.`,
+    i18n.t("matrixGen.strat1", { name12: arcana12?.name }),
+    i18n.t("matrixGen.strat2", { name8: getArcana(p[7])?.name, name7: arcana7?.name }),
+    i18n.t("matrixGen.strat3", { name6: arcana6?.name }),
+    i18n.t("matrixGen.strat4", { name5: arcana5?.name }),
   ];
 
   return { overallProfile, keyProblems, growthPoints, strategicRecommendations };

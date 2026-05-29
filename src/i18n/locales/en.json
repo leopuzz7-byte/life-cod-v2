@@ -276,6 +276,29 @@
       "recNeutral": "The name is neutral. The energy neither helps nor hinders. It can be strengthened by changing the spelling."
     }
   },
+  "matrixGen": {
+    "link_1_2": { "title": "Childhood → Inner essence", "base": "Childhood experiences (position 1) shape the inner core of the personality (position 2).", "tmpl": "Arcana {{a1}} ({{n1}}) in childhood created the foundation for the inner essence of arcana {{a2}} ({{n2}})." },
+    "link_3_5": { "title": "Talents → Profession", "base": "Social talents (position 3) directly influence the professional path (position 5).", "tmpl": "The energy of {{a1}} ({{n1}}) in talents directs you toward a profession through the energy of {{a2}} ({{n2}})." },
+    "link_6_7": { "title": "Point of support ↔ Life goal", "base": "Outlived experience (position 6) must transform into movement toward the goal (position 7). Often the main inner conflict.", "tmpl": "The familiar comfort of arcana {{a1}} ({{n1}}) may hinder movement toward the goal of arcana {{a2}} ({{n2}}), or become a springboard." },
+    "link_10_12": { "title": "Unfulfilled tasks → Main karmic task", "base": "Unfinished karmic tasks (position 10) lead to the main task of life (position 12).", "tmpl": "The karmic tail of arcana {{a1}} ({{n1}}) is untied by solving the task of arcana {{a2}} ({{n2}})." },
+    "link_2_4": { "title": "Inner essence → Goal of wisdom", "base": "The inner core of the personality (position 2) determines the direction of accumulating life wisdom (position 4).", "tmpl": "The essence of arcana {{a1}} ({{n1}}) directs wisdom toward arcana {{a2}} ({{n2}})." },
+    "link_7_8": { "title": "Life goal + Way to achieve it", "base": "The life goal (position 7) and the instrument for achieving it (position 8) must work together.", "tmpl": "The goal of arcana {{a1}} ({{n1}}) is achieved through the method of arcana {{a2}} ({{n2}})." },
+    "profile1": "Your inner essence is {{name}} ({{n}}).",
+    "profile2": "You are moving toward your life goal — {{name}} ({{n}}).",
+    "profile3": "Your main karmic task is {{name}} ({{n}}).",
+    "profile4": "Professionally, the energy of {{name}} ({{n}}) is closer to you.",
+    "profile5": "Your comfort zone is {{name}} ({{n}}); you need to gradually move away from the point of support {{name6}} ({{n6}}).",
+    "problemConflict": "A conflict between the point of support ({{n5}} — {{name5}}) and the life goal ({{n7}} — {{name7}}): the habitual pattern hinders movement toward the goal.",
+    "problemReversed": "There are reversed arcana ({{list}}): they point to blocked energies that require working through.",
+    "problemKarma": "Karmic knot: positions 10 ({{p10}}) and 11 ({{p11}}) show unfinished tasks and recurring mistakes. The solution is through the main task ({{p12}}).",
+    "growthMirror": "Mirror arcana ({{list}}) are your strengths — lean on them.",
+    "growthSuccess": "The success code ({{list}}) is the key to realizing your potential. Activate these energies consciously.",
+    "growthSocial": "Position 3 ({{p3}} — {{name3}}) is your social talent, through which you step into the world.",
+    "strat1": "Main focus: solve the karmic task of position 12 ({{name12}}) — this will untie all other karmic knots.",
+    "strat2": "Use the instrument of position 8 ({{name8}}) to move toward the goal of position 7 ({{name7}}).",
+    "strat3": "Gradually step out of the comfort zone of position 6 ({{name6}}) — it's an outlived script.",
+    "strat4": "Monetize your talents through position 5 ({{name5}}) — it's your professional vector."
+  },
   "nav": {
     "analyses": "Analyses",
     "calendar": "Calendar",
