@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, AlertCircle } from "lucide-react";
 import {
@@ -48,7 +49,7 @@ export default function AnalysisDetail() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="text-center py-20 text-muted-foreground">Загрузка...</div>
+        <LoadingScreen />
       </div>
     );
   }

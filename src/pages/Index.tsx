@@ -456,40 +456,75 @@ const Index = () => {
           <>
             {/* Hero block — shown only to non-authenticated visitors */}
             {!user && (
-              <section className="pt-8 md:pt-12 lg:pt-16 pb-2">
-                <div className="container mx-auto px-4">
+              <section className="relative pt-10 md:pt-16 lg:pt-24 pb-6 overflow-hidden">
+                {/* Анимированные звёзды на фоне — чистый CSS, не влияют на скорость */}
+                <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+                  {[
+                    { top: "12%", left: "8%", size: "text-lg", delay: "0s", dur: "4s" },
+                    { top: "22%", left: "85%", size: "text-2xl", delay: "0.8s", dur: "5s" },
+                    { top: "55%", left: "12%", size: "text-xl", delay: "1.5s", dur: "4.5s" },
+                    { top: "68%", left: "90%", size: "text-lg", delay: "0.4s", dur: "5.5s" },
+                    { top: "40%", left: "78%", size: "text-base", delay: "2s", dur: "4s" },
+                    { top: "78%", left: "45%", size: "text-sm", delay: "1.2s", dur: "6s" },
+                    { top: "15%", left: "55%", size: "text-sm", delay: "2.5s", dur: "5s" },
+                  ].map((s, i) => (
+                    <span
+                      key={i}
+                      className={`absolute ${s.size} select-none`}
+                      style={{
+                        top: s.top,
+                        left: s.left,
+                        color: "hsl(var(--gold) / 0.35)",
+                        animation: `floatStar ${s.dur} ease-in-out ${s.delay} infinite`,
+                      }}
+                    >
+                      ✦
+                    </span>
+                  ))}
+                </div>
+
+                <div className="container mx-auto px-4 relative">
                   <div className="max-w-2xl mx-auto text-center">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-6">
-                      <Sparkles className="w-6 h-6 text-foreground" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary mb-6 animate-[fadeInUp_0.6s_ease] shadow-sm">
+                      <Sparkles className="w-7 h-7 text-accent animate-[breathe_3s_ease-in-out_infinite]" />
                     </div>
-                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-primary mb-5 leading-tight">
-                      Персональная диагностика Life C⚙D
+                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-primary mb-5 leading-tight animate-[fadeInUp_0.7s_ease]">
+                      Узнайте, что зашифровано<br className="hidden sm:block" /> в дате вашего рождения
                     </h1>
-                    <p className="text-base md:text-lg text-muted-foreground mb-4 leading-relaxed">
-                      Понимание себя, своих жизненных циклов, сильных и слабых сторон, а также текущего периода жизни.
+                    <p className="text-base md:text-lg text-muted-foreground mb-4 leading-relaxed animate-[fadeInUp_0.8s_ease]">
+                      Ваши жизненные циклы, сильные стороны, предназначение и точка, в которой вы находитесь сейчас — всё это уже записано в вашей дате.
                     </p>
-                    <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
-                      Этот инструмент помогает увидеть, как ты принимаешь решения, где твоя опора и на что сейчас важно обратить внимание.
+                    <p className="text-sm text-muted-foreground/70 italic mb-8 animate-[fadeInUp_0.9s_ease]">
+                      Структура и логика, проверенные методики. Ваш разбор — за пару минут.
                     </p>
-                    <p className="text-sm text-muted-foreground/70 italic mb-8">
-                      Без мистики. Без обещаний изменить тебя. Только структура и логика.
-                    </p>
-                    <div className="flex flex-col items-center gap-3">
+                    <div className="flex flex-col items-center gap-3 animate-[fadeInUp_1s_ease]">
                       <Link to="/register">
-                        <Button className="h-14 px-8 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary">
-                          Начать диагностику
+                        <Button className="h-14 px-10 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary hover:scale-105 transition-transform duration-300">
+                          Раскрыть свой код
                           <span className="ml-2">→</span>
                         </Button>
                       </Link>
-                      <Link
-                        to="/login"
-                        className="text-sm text-muted-foreground hover:text-primary transition-colors mt-1"
-                      >
+                      <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors mt-1">
                         Уже есть аккаунт? Войти в калькулятор
                       </Link>
                     </div>
                   </div>
                 </div>
+
+                <style>{`
+                  @keyframes floatStar {
+                    0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+                    50% { transform: translateY(-12px) scale(1.2); opacity: 0.7; }
+                  }
+                  @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(16px); }
+                    to { opacity: 1; transform: translateY(0); }
+                  }
+                  @keyframes breathe {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.15); }
+                  }
+                `}</style>
               </section>
             )}
 

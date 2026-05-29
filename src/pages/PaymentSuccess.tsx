@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
@@ -65,13 +66,7 @@ export default function PaymentSuccess() {
         <div className="max-w-md w-full text-center space-y-6">
 
           {status === "checking" && (
-            <>
-              <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
-              <h1 className="font-display text-2xl text-foreground">
-                Проверяем оплату...
-              </h1>
-              <p className="text-muted-foreground">Подождите несколько секунд</p>
-            </>
+            <LoadingScreen phrases={["Проверяем оплату…", "Почти готово…"]} />
           )}
 
           {(status === "paid" || status === "pending") && (

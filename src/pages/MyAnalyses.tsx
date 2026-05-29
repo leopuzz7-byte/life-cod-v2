@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -117,7 +118,7 @@ export default function MyAnalyses() {
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-muted-foreground">Загрузка...</div>
+            <LoadingScreen />
           ) : loadError && analyses.length === 0 ? (
             <div className="gradient-card rounded-2xl p-6 md:p-8 border border-destructive/40 text-center">
               <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-3" />
