@@ -114,11 +114,26 @@
       }
     }
   },
+  "home": {
+    "heroTitle1": "Discover what's encoded",
+    "heroTitle2": "in your date of birth",
+    "heroP1": "Your life cycles, strengths, purpose, and the point where you are right now — all of this is already recorded in your date.",
+    "heroP2": "Structure and logic, proven methods. Your analysis — in just a couple of minutes.",
+    "heroCta": "Reveal your code",
+    "heroLogin": "Already have an account? Log in to the calculator",
+    "soon": "Soon",
+    "nameCheckLabel": "Name to check",
+    "nameCheckPlaceholder": "Enter a company, product, or personal name",
+    "calcNameEnergy": "Calculate name energy"
+  },
   "nav": {
     "analyses": "Analyses",
     "calendar": "Calendar",
     "products": "Products",
-    "support": "Support"
+    "support": "Support",
+    "myAnalyses": "My Analyses",
+    "profile": "Profile",
+    "login": "Log in"
   },
   "hero": {
     "title": "Life C⚙D",
@@ -498,6 +513,7 @@
     "deepAnalysisDesc": "Get a professional consultation with detailed analysis of ancestral programs, removal of negative patterns, and personalized recommendations."
   },
   "common": {
+    "you": "You",
     "loading": "Loading...",
     "error": "Error",
     "save": "Save",

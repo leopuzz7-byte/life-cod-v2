@@ -114,11 +114,26 @@
       }
     }
   },
+  "home": {
+    "heroTitle1": "Descubre qué está cifrado",
+    "heroTitle2": "en tu fecha de nacimiento",
+    "heroP1": "Tus ciclos de vida, fortalezas, propósito y el punto en el que te encuentras ahora — todo esto ya está registrado en tu fecha.",
+    "heroP2": "Estructura y lógica, métodos comprobados. Tu análisis — en solo un par de minutos.",
+    "heroCta": "Revela tu código",
+    "heroLogin": "¿Ya tienes cuenta? Entra a la calculadora",
+    "soon": "Pronto",
+    "nameCheckLabel": "Nombre a comprobar",
+    "nameCheckPlaceholder": "Introduce el nombre de una empresa, producto o persona",
+    "calcNameEnergy": "Calcular la energía del nombre"
+  },
   "nav": {
     "analyses": "Análisis",
     "calendar": "Calendario",
     "products": "Productos",
-    "support": "Soporte"
+    "support": "Soporte",
+    "myAnalyses": "Mis análisis",
+    "profile": "Perfil",
+    "login": "Entrar"
   },
   "hero": {
     "title": "Life C⚙D",
@@ -517,6 +532,7 @@
     "deepAnalysisDesc": "Obtén una consulta profesional con análisis detallado de programas ancestrales, eliminación de patrones negativos y recomendaciones personalizadas."
   },
   "common": {
+    "you": "Tú",
     "loading": "Cargando...",
     "error": "Error",
     "save": "Guardar",

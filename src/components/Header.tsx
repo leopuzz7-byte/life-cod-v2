@@ -67,10 +67,10 @@ export function Header() {
                   ? "bg-white text-primary border-white"
                   : "bg-white/15 hover:bg-white/25 text-white border-white/25"
               )}
-              aria-label="Мои разборы"
+              aria-label={t("nav.myAnalyses")}
             >
               <FolderClock className="w-4 h-4" />
-              <span className="hidden sm:inline">Мои разборы</span>
+              <span className="hidden sm:inline">{t("nav.myAnalyses")}</span>
             </Link>
           )}
 
@@ -84,7 +84,7 @@ export function Header() {
                 ? "bg-white/20 text-white border-white/30"
                 : "bg-white/10 hover:bg-white/20 text-white/80 border-white/20"
             )}
-            aria-label="Поддержка"
+            aria-label={t("nav.support")}
           >
             <HelpCircle className="w-5 h-5" />
           </Link>
@@ -101,7 +101,7 @@ export function Header() {
                 )}
               >
                 <User className="w-4 h-4" />
-                <span className="hidden sm:inline">Профиль</span>
+                <span className="hidden sm:inline">{t("nav.profile")}</span>
               </Link>
             ) : (
               <Link
@@ -109,7 +109,7 @@ export function Header() {
                 className="h-10 px-4 rounded-full flex items-center gap-2 transition-colors border bg-white/10 hover:bg-white/20 text-white border-white/20 text-sm font-medium"
               >
                 <LogIn className="w-4 h-4" />
-                <span>Войти</span>
+                <span>{t("nav.login")}</span>
               </Link>
             )
           )}

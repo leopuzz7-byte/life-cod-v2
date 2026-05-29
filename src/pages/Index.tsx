@@ -196,7 +196,7 @@ const Index = () => {
       lastInputRef.current = { day, month, year, name, targetMonth, targetYear, gender, targetDay };
 
       if (saved.methodology === "2" && saved.method === "classic-full") {
-        setResult({ type: "unified-personal", data: calculateUnifiedPersonalAnalysis(name || "Вы", day, month, year, targetYear || new Date().getFullYear()) });
+        setResult({ type: "unified-personal", data: calculateUnifiedPersonalAnalysis(name || t("common.you"), day, month, year, targetYear || new Date().getFullYear()) });
         return;
       }
       switch (saved.method) {
@@ -237,7 +237,7 @@ const Index = () => {
     // Methodology 2 — main "Predназначение" (classic-full) routes to keyto/unified
     if (selectedMethodology === "2" && selectedMethod === "classic-full") {
       if (selectedTier === 'professional') {
-        const unifiedResult = calculateUnifiedPersonalAnalysis(name || "Вы", day, month, year, targetYear || new Date().getFullYear());
+        const unifiedResult = calculateUnifiedPersonalAnalysis(name || t("common.you"), day, month, year, targetYear || new Date().getFullYear());
         setResult({ type: "unified-personal", data: unifiedResult });
         return;
       }
@@ -371,7 +371,7 @@ const Index = () => {
       // Methodology 2 — main "Predназначение" (classic-full) routes to keyto/unified
       if (selectedMethodology === "2" && selectedMethod === "classic-full") {
         if (selectedTier === 'professional') {
-          const unifiedResult = calculateUnifiedPersonalAnalysis(name || "Вы", day, month, year, targetYear || new Date().getFullYear());
+          const unifiedResult = calculateUnifiedPersonalAnalysis(name || t("common.you"), day, month, year, targetYear || new Date().getFullYear());
           setResult({ type: "unified-personal", data: unifiedResult });
           return;
         }
@@ -489,23 +489,23 @@ const Index = () => {
                       <Sparkles className="w-7 h-7 text-accent animate-[breathe_3s_ease-in-out_infinite]" />
                     </div>
                     <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-primary mb-5 leading-tight animate-[fadeInUp_0.7s_ease]">
-                      Узнайте, что зашифровано<br className="hidden sm:block" /> в дате вашего рождения
+                      {t("home.heroTitle1")}<br className="hidden sm:block" /> {t("home.heroTitle2")}
                     </h1>
                     <p className="text-base md:text-lg text-muted-foreground mb-4 leading-relaxed animate-[fadeInUp_0.8s_ease]">
-                      Ваши жизненные циклы, сильные стороны, предназначение и точка, в которой вы находитесь сейчас — всё это уже записано в вашей дате.
+                      {t("home.heroP1")}
                     </p>
                     <p className="text-sm text-muted-foreground/70 italic mb-8 animate-[fadeInUp_0.9s_ease]">
-                      Структура и логика, проверенные методики. Ваш разбор — за пару минут.
+                      {t("home.heroP2")}
                     </p>
                     <div className="flex flex-col items-center gap-3 animate-[fadeInUp_1s_ease]">
                       <Link to="/register">
                         <Button className="h-14 px-10 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary hover:scale-105 transition-transform duration-300">
-                          Раскрыть свой код
+                          {t("home.heroCta")}
                           <span className="ml-2">→</span>
                         </Button>
                       </Link>
                       <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors mt-1">
-                        Уже есть аккаунт? Войти в калькулятор
+                        {t("home.heroLogin")}
                       </Link>
                     </div>
                   </div>
@@ -620,7 +620,7 @@ const Index = () => {
                                 )}
                                 {method.comingSoon && (
                                   <span className="text-[9px] md:text-[10px] px-1.5 py-0.5 bg-secondary text-muted-foreground rounded-full font-medium ml-auto">
-                                    Скоро
+                                    {t("home.soon")}
                                   </span>
                                 )}
                               </div>
@@ -711,7 +711,7 @@ const Index = () => {
                                 )}
                                 {method.comingSoon && (
                                   <span className="text-[9px] md:text-[10px] px-1.5 py-0.5 bg-secondary text-muted-foreground rounded-full font-medium ml-auto">
-                                    Скоро
+                                    {t("home.soon")}
                                   </span>
                                 )}
                               </div>
@@ -766,9 +766,9 @@ const Index = () => {
                       <div className="gradient-card rounded-2xl p-5 sm:p-8 border border-border">
                         <div className="space-y-5">
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">Название для проверки</label>
+                            <label className="text-sm font-medium text-foreground">{t("home.nameCheckLabel")}</label>
                             <Input
-                              placeholder="Введите название компании, продукта или имя"
+                              placeholder={t("home.nameCheckPlaceholder")}
                               value={nameEnergyInput}
                               onChange={(e) => setNameEnergyInput(e.target.value)}
                               className="bg-background border-border focus:border-primary focus:ring-primary/20 h-12 text-foreground placeholder:text-muted-foreground"
@@ -779,7 +779,7 @@ const Index = () => {
                             disabled={!nameEnergyInput.trim()}
                             className="w-full h-14 text-lg font-display btn-fill animate-gentle-shake bg-primary hover:bg-primary text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed disabled:animate-none transition-all duration-300 rounded-full border-2 border-primary"
                           >
-                            Рассчитать энергию названия
+                            {t("home.calcNameEnergy")}
                           </Button>
                         </div>
                       </div>
