@@ -213,6 +213,25 @@
     "changePassword": "Change password",
     "account": "Account"
   },
+  "reset": {
+    "forgotTitle": "Password reset",
+    "forgotSubtitle": "Enter your email and we'll send a link to change your password",
+    "linkSent": "Link sent",
+    "checkEmail1": "Check your email",
+    "checkEmail2": "If there's no email — check your Spam folder.",
+    "backToLogin": "Back to sign in",
+    "sendLink": "Send link",
+    "rememberedPassword": "Remembered your password?",
+    "newTitle": "New password",
+    "newSubtitle": "Create a new password and confirm it",
+    "changed": "Password changed",
+    "redirecting": "Redirecting to home...",
+    "invalidLink": "Invalid link",
+    "invalidLinkDesc": "The link has expired or was already used. Request a new one.",
+    "requestNew": "Request a new link",
+    "newPasswordLabel": "New password",
+    "saveNewPassword": "Save new password"
+  },
   "nav": {
     "analyses": "Analyses",
     "calendar": "Calendar",

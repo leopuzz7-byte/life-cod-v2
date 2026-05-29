@@ -213,6 +213,25 @@
     "changePassword": "Cambiar contraseña",
     "account": "Cuenta"
   },
+  "reset": {
+    "forgotTitle": "Restablecer contraseña",
+    "forgotSubtitle": "Introduce tu email y te enviaremos un enlace para cambiar la contraseña",
+    "linkSent": "Enlace enviado",
+    "checkEmail1": "Revisa tu correo",
+    "checkEmail2": "Si no hay ningún correo — revisa la carpeta de Spam.",
+    "backToLogin": "Volver a iniciar sesión",
+    "sendLink": "Enviar enlace",
+    "rememberedPassword": "¿Recordaste tu contraseña?",
+    "newTitle": "Nueva contraseña",
+    "newSubtitle": "Crea una nueva contraseña y confírmala",
+    "changed": "Contraseña cambiada",
+    "redirecting": "Redirigiendo al inicio...",
+    "invalidLink": "Enlace no válido",
+    "invalidLinkDesc": "El enlace ha caducado o ya se ha usado. Solicita uno nuevo.",
+    "requestNew": "Solicitar un nuevo enlace",
+    "newPasswordLabel": "Nueva contraseña",
+    "saveNewPassword": "Guardar nueva contraseña"
+  },
   "nav": {
     "analyses": "Análisis",
     "calendar": "Calendario",

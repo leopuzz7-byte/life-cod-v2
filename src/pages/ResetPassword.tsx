@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { updatePassword } = useAuth();
   const [password, setPassword] = useState("");
@@ -28,8 +30,8 @@ export default function ResetPassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (password.length < 6) return setError("Пароль должен быть не короче 6 символов");
-    if (password !== confirmPassword) return setError("Пароли не совпадают");
+    if (password.length < 6) return setError(t("auth.passwordMin"));
+    if (password !== confirmPassword) return setError(t("auth.passwordMismatch"));
 
     setSubmitting(true);
     const { error: updateError } = await updatePassword(password);
@@ -50,10 +52,10 @@ export default function ResetPassword() {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-6">
             <h1 className="font-display text-3xl md:text-4xl text-primary mb-2">
-              Новый пароль
+              {t("reset.newTitle")}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Придумайте новый пароль и подтвердите его
+              {t("reset.newSubtitle")}
             </p>
           </div>
 
@@ -61,18 +63,18 @@ export default function ResetPassword() {
             {done ? (
               <div className="text-center space-y-4">
                 <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
-                <h2 className="font-display text-xl text-foreground">Пароль изменён</h2>
-                <p className="text-sm text-muted-foreground">Перенаправляем на главную...</p>
+                <h2 className="font-display text-xl text-foreground">{t("reset.changed")}</h2>
+                <p className="text-sm text-muted-foreground">{t("reset.redirecting")}</p>
               </div>
             ) : hasRecoverySession === false ? (
               <div className="text-center space-y-3">
                 <AlertCircle className="w-10 h-10 text-destructive mx-auto" />
-                <h2 className="font-display text-lg text-foreground">Ссылка недействительна</h2>
+                <h2 className="font-display text-lg text-foreground">{t("reset.invalidLink")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Ссылка устарела или уже была использована. Запросите новую.
+                  {t("reset.invalidLinkDesc")}
                 </p>
                 <Link to="/forgot-password" className="inline-block text-sm text-primary font-medium hover:underline pt-2">
-                  Запросить новую ссылку
+                  {t("reset.requestNew")}
                 </Link>
               </div>
             ) : (
@@ -85,11 +87,11 @@ export default function ResetPassword() {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Новый пароль</Label>
+                  <Label htmlFor="password">{t("reset.newPasswordLabel")}</Label>
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Минимум 6 символов"
+                    placeholder={t("auth.passwordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={submitting}
@@ -98,7 +100,7 @@ export default function ResetPassword() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Повторите пароль</Label>
+                  <Label htmlFor="confirmPassword">{t("auth.confirmPassword")}</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -111,7 +113,7 @@ export default function ResetPassword() {
 
                 <Button type="submit" disabled={submitting} className="w-full h-12 rounded-full text-base">
                   {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  Сохранить новый пароль
+                  {t("reset.saveNewPassword")}
                 </Button>
               </form>
             )}
