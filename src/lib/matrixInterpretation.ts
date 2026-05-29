@@ -1,6 +1,8 @@
 // Глубокий анализ для профессионального разбора матрицы предназначения
 import { getArcana, positionDescriptions } from './arcana';
 import { PersonalMatrix } from './calculations';
+import i18n from '@/i18n';
+import { matrixDeepOverlays, matrixTraitsOverlays, positionTitleOverlays, type DeepMeaning, type Traits } from './matrixI18n';
 
 export interface PositionInterpretation {
   position: number;
@@ -211,18 +213,34 @@ const arcanaTraits: Record<number, { strengths: string[]; weaknesses: string[]; 
   },
 };
 
+// Выбор локализованных данных с fallback на русскую базу
+function pickDeep(position: number): DeepMeaning | undefined {
+  const lang = i18n.language;
+  if (lang && lang !== 'ru' && matrixDeepOverlays[lang]?.[position]) return matrixDeepOverlays[lang][position];
+  return positionDeepMeanings[position];
+}
+function pickTraits(arcanaNumber: number): Traits {
+  const lang = i18n.language;
+  if (lang && lang !== 'ru' && matrixTraitsOverlays[lang]?.[arcanaNumber]) return matrixTraitsOverlays[lang][arcanaNumber];
+  return arcanaTraits[arcanaNumber] || { strengths: [], weaknesses: [], recommendations: [] };
+}
+function pickPositionTitle(position: number): string {
+  const lang = i18n.language;
+  if (lang && lang !== 'ru' && positionTitleOverlays[lang]?.[position]) return positionTitleOverlays[lang][position];
+  return positionDescriptions[position]?.title || `${i18n.t("matrix.position")} ${position}`;
+}
+
 // Генерация глубокой трактовки позиции
 export function getPositionInterpretation(position: number, arcanaNumber: number): PositionInterpretation {
   const arcana = getArcana(arcanaNumber);
-  const posDesc = positionDescriptions[position];
-  const deepMeaning = positionDeepMeanings[position];
-  const traits = arcanaTraits[arcanaNumber] || { strengths: [], weaknesses: [], recommendations: [] };
+  const deepMeaning = pickDeep(position);
+  const traits = pickTraits(arcanaNumber);
 
   return {
     position,
     arcanaNumber,
-    arcanaName: arcana?.name || `Аркан ${arcanaNumber}`,
-    positionTitle: posDesc?.title || `Позиция ${position}`,
+    arcanaName: arcana?.name || `${i18n.t("res.arcanaWord")} ${arcanaNumber}`,
+    positionTitle: pickPositionTitle(position),
     lifeManifestations: deepMeaning?.lifeContext || '',
     strengths: traits.strengths,
     weaknesses: traits.weaknesses,
