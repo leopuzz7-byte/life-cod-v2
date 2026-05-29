@@ -8,7 +8,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-4 md:py-5">
         {/* Десктоп — одна строка */}
         <div className="hidden md:flex items-center justify-between gap-4 text-xs text-muted-foreground">
-          <span>© {year} Life COD — Ковалёва Надежда. Все права защищены.</span>
+          <span>© {year} Life COD — Ковалева Серина Надежда Александровна. Все права защищены.</span>
 
           <div className="flex items-center gap-4">
             <a
