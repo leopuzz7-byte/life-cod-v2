@@ -1,6 +1,8 @@
 import { Download } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function Footer() {
+  const { t } = useTranslation();
   const year = new Date().getFullYear();
 
   return (
@@ -8,7 +10,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-4 md:py-5">
         {/* Десктоп — одна строка */}
         <div className="hidden md:flex items-center justify-between gap-4 text-xs text-muted-foreground">
-          <span>© {year} Life COD — Ковалева Серина Надежда Александровна. Все права защищены.</span>
+          <span>© {year} Life COD — Ковалева Серина Надежда Александровна. {t("footer.rights")}</span>
 
           <div className="flex items-center gap-4">
             <a
@@ -19,7 +21,7 @@ export function Footer() {
               className="flex items-center gap-1 hover:text-primary transition-colors"
             >
               <Download className="w-3 h-3" />
-              Публичная оферта
+              {t("footer.offer")}
             </a>
             <span className="text-border">|</span>
             <a
@@ -30,7 +32,7 @@ export function Footer() {
               className="flex items-center gap-1 hover:text-primary transition-colors"
             >
               <Download className="w-3 h-3" />
-              Политика конфиденциальности
+              {t("footer.privacy")}
             </a>
           </div>
         </div>
@@ -46,7 +48,7 @@ export function Footer() {
               className="flex items-center gap-1 hover:text-primary transition-colors"
             >
               <Download className="w-3 h-3" />
-              Оферта
+              {t("footer.offerShort")}
             </a>
             <span className="text-border">|</span>
             <a
@@ -57,7 +59,7 @@ export function Footer() {
               className="flex items-center gap-1 hover:text-primary transition-colors"
             >
               <Download className="w-3 h-3" />
-              Политика конфиденциальности
+              {t("footer.privacy")}
             </a>
           </div>
           <span>© {year} Life COD — Ковалёва Надежда</span>

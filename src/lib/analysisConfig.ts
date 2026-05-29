@@ -272,8 +272,44 @@ export const analysisConfigs: AnalysisTypeConfig[] = [
   },
 ];
 
+import i18n from '@/i18n';
+
+// Возвращает перевод по ключу, либо fallback (встроенный русский), если ключ отсутствует.
+function tr(key: string, fallback: string): string {
+  const val = i18n.t(key);
+  return val === key ? fallback : val;
+}
+
+// Локализует строки конфига через i18n. ID/структура не меняются — только тексты.
+function localizeConfig(cfg: AnalysisTypeConfig): AnalysisTypeConfig {
+  const base = `cfg.methods.${cfg.id}`;
+  return {
+    ...cfg,
+    title: tr(`${base}.title`, cfg.title),
+    description: tr(`${base}.desc`, cfg.description),
+    basic: {
+      ...cfg.basic,
+      label: tr('cfg.tierBasic', cfg.basic.label),
+      description: tr(`${base}.basicDesc`, cfg.basic.description),
+    },
+    professional: cfg.professional
+      ? {
+          ...cfg.professional,
+          label: tr('cfg.tierPro', cfg.professional.label),
+          description: tr(`${base}.proDesc`, cfg.professional.description),
+        }
+      : null,
+  };
+}
+
+// Локализованные описания того, что входит в Профессиональный разбор
+export function proExtendedDescription(methodology: '1' | '2'): string {
+  return tr(`cfg.proExtended.${methodology}`, proExtendedDescriptions[methodology]);
+}
+
 export function getAnalysisConfig(id: string): AnalysisTypeConfig | undefined {
-  return analysisConfigs.find(c => c.id === id);
+  const cfg = analysisConfigs.find(c => c.id === id);
+  return cfg ? localizeConfig(cfg) : undefined;
 }
 
 // Возвращает конфиги разделов для конкретной методики в нужном порядке
@@ -286,5 +322,6 @@ export function getConfigsForMethodology(methodology: '1' | '2'): AnalysisTypeCo
   const order = methodology === '1' ? order1 : order2;
   return order
     .map(id => analysisConfigs.find(c => c.id === id && c.methodologies.includes(methodology)))
-    .filter((c): c is AnalysisTypeConfig => c !== undefined);
+    .filter((c): c is AnalysisTypeConfig => c !== undefined)
+    .map(localizeConfig);
 }

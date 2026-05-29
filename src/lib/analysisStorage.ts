@@ -161,14 +161,25 @@ export const METHOD_LABELS: Record<string, string> = {
   "lifecod-compatibility": "Совместимость (классика)",
 };
 
+import i18n from "@/i18n";
+
+function tr(key: string, fallback: string): string {
+  const val = i18n.t(key);
+  return val === key ? fallback : val;
+}
+
 export function methodLabel(methodId: string): string {
-  return METHOD_LABELS[methodId] || methodId;
+  return tr(`cfg.methods.${methodId}.savedLabel`, METHOD_LABELS[methodId] || methodId);
 }
 
 export function methodologyLabel(m: string): string {
-  return m === "1" ? "Методика 1 (22 Аркана)" : "Методика 2 (Классика)";
+  return m === "1"
+    ? tr("cfg.methodologyLabel.1", "Методика 1 (22 Аркана)")
+    : tr("cfg.methodologyLabel.2", "Методика 2 (Классика)");
 }
 
 export function tierLabel(t: string): string {
-  return t === "professional" ? "Профессиональный" : "Базовый";
+  return t === "professional"
+    ? tr("cfg.tierPro", "Профессиональный")
+    : tr("cfg.tierBasic", "Базовый");
 }

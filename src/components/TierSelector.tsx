@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Check, Crown, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { TierType, AnalysisTypeConfig } from "@/lib/analysisConfig";
 
 interface TierSelectorProps {
@@ -10,12 +11,6 @@ interface TierSelectorProps {
   pricePro?: number | null;     // цена из БД
 }
 
-function formatPrice(price: number | null | undefined): string {
-  if (price == null) return "...";
-  if (price === 0) return "Бесплатно";
-  return price.toLocaleString("ru-RU") + " ₽";
-}
-
 export function TierSelector({
   config,
   selectedTier,
@@ -23,6 +18,14 @@ export function TierSelector({
   priceBasic,
   pricePro,
 }: TierSelectorProps) {
+  const { t } = useTranslation();
+
+  const formatPrice = (price: number | null | undefined): string => {
+    if (price == null) return "...";
+    if (price === 0) return t("cfg.free");
+    return price.toLocaleString("ru-RU") + " ₽";
+  };
+
   if (!config.professional) return null;
 
   // Показываем базовый только если он доступен в конфиге
@@ -68,7 +71,7 @@ export function TierSelector({
                 )}>
                   {priceBasic != null
                     ? formatPrice(priceBasic)
-                    : config.basic.isFree ? "Бесплатно" : "..."}
+                    : config.basic.isFree ? t("cfg.free") : "..."}
                 </span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">

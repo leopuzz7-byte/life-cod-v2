@@ -1,4 +1,119 @@
 {
+  "footer": {
+    "rights": "Todos los derechos reservados.",
+    "offer": "Oferta pública",
+    "offerShort": "Oferta",
+    "privacy": "Política de Privacidad"
+  },
+  "cfg": {
+    "tierBasic": "Básico",
+    "tierPro": "Profesional",
+    "free": "Gratis",
+    "comingSoon": "Próximamente",
+    "chooseTierFor": "Elige un plan para «{{title}}»",
+    "proIncludesTitle": "Qué incluye el análisis Profesional ampliado:",
+    "proExtended": {
+      "1": "Método 1 (22 Arcanos): matriz completa de 12 posiciones, diagonal, karma, código del éxito, períodos de vida, programas ancestrales, pronósticos día/mes/año, energía del contrato.",
+      "2": "Método 2 (Clásico): los 4 números del destino, pináculos, año/mes/día personal, código financiero, perfil psicológico, mapa energético, plan de acción, pronósticos."
+    },
+    "methodologyLabel": {
+      "1": "Método 1 (22 Arcanos)",
+      "2": "Método 2 (Clásico)"
+    },
+    "methods": {
+      "purpose": {
+        "title": "Propósito",
+        "desc": "Tu matriz personal del destino en 12 posiciones",
+        "basicDesc": "",
+        "proDesc": "Las 12 posiciones de la matriz, diagonal, karma, código del éxito, períodos de vida",
+        "savedLabel": "Propósito"
+      },
+      "compatibility": {
+        "title": "Compatibilidad",
+        "desc": "Análisis de compatibilidad de dos personas por fecha de nacimiento",
+        "basicDesc": "Porcentaje de compatibilidad, arcano de unión, conclusiones breves",
+        "proDesc": "Análisis completo: armonía, karma, fortalezas/debilidades, recomendaciones",
+        "savedLabel": "Compatibilidad"
+      },
+      "year": {
+        "title": "Pronóstico Anual",
+        "desc": "La energía y los temas clave de tu año",
+        "basicDesc": "",
+        "proDesc": "Pronóstico detallado, recomendaciones, profesiones adecuadas, obstáculos",
+        "savedLabel": "Pronóstico Anual"
+      },
+      "month": {
+        "title": "Pronóstico Mensual",
+        "desc": "El triángulo de energía del mes",
+        "basicDesc": "",
+        "proDesc": "Las tres energías, arcanos influyentes, recomendaciones detalladas",
+        "savedLabel": "Pronóstico Mensual"
+      },
+      "day": {
+        "title": "Pronóstico Diario",
+        "desc": "Un desglose detallado de las energías de un día concreto",
+        "basicDesc": "",
+        "proDesc": "Las 12 posiciones del día con descripciones completas",
+        "savedLabel": "Pronóstico Diario"
+      },
+      "ancestral": {
+        "title": "Linaje",
+        "desc": "Estrella kármica y programas ancestrales",
+        "basicDesc": "",
+        "proDesc": "Interpretaciones completas de todos los dígitos, análisis profundo de maldiciones y roles",
+        "savedLabel": "Linaje"
+      },
+      "contract": {
+        "title": "Energía del Contrato",
+        "desc": "Análisis energético de la fecha de firma del contrato",
+        "basicDesc": "",
+        "proDesc": "Las 12 posiciones: recursos, motivos ocultos, lección kármica",
+        "savedLabel": "Energía del Contrato"
+      },
+      "classic-full": {
+        "title": "Propósito",
+        "desc": "Los 4 números principales de tu destino",
+        "basicDesc": "Resumen de la matriz base, perfil breve",
+        "proDesc": "Informe completo: pináculos, año personal, código financiero, perfil psicológico, mapa energético, plan de acción",
+        "savedLabel": "Propósito (Clásico)"
+      },
+      "lifecod-compatibility": {
+        "title": "Compatibilidad",
+        "desc": "Análisis de compatibilidad de pareja por numerología clásica",
+        "basicDesc": "Compatibilidad por números del destino, conclusiones breves",
+        "proDesc": "Análisis profundo de pareja: vínculos de años, patrones de riesgo, recomendaciones",
+        "savedLabel": "Compatibilidad (Clásico)"
+      },
+      "business": {
+        "title": "Negocios",
+        "desc": "Análisis de asociación empresarial",
+        "basicDesc": "Próximamente",
+        "proDesc": "Próximamente",
+        "savedLabel": "Negocios"
+      },
+      "name": {
+        "title": "Energía del Nombre",
+        "desc": "Análisis numerológico de un nombre o título",
+        "basicDesc": "",
+        "proDesc": "Arcano del nombre, armonía, recomendación completa",
+        "savedLabel": "Energía del Nombre"
+      },
+      "finance": {
+        "title": "Código Financiero",
+        "desc": "Tu código de potencial financiero",
+        "basicDesc": "",
+        "proDesc": "Los 4 arcanos, misión, bloqueos, profesiones, recomendaciones detalladas",
+        "savedLabel": "Código Financiero"
+      },
+      "success-path": {
+        "title": "Camino al Éxito",
+        "desc": "Un mapa del camino hacia la autorrealización",
+        "basicDesc": "",
+        "proDesc": "Próximamente",
+        "savedLabel": "Camino al Éxito"
+      }
+    }
+  },
   "nav": {
     "analyses": "Análisis",
     "calendar": "Calendario",

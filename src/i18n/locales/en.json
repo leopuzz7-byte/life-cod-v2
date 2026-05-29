@@ -1,4 +1,119 @@
 {
+  "footer": {
+    "rights": "All rights reserved.",
+    "offer": "Public Offer",
+    "offerShort": "Offer",
+    "privacy": "Privacy Policy"
+  },
+  "cfg": {
+    "tierBasic": "Basic",
+    "tierPro": "Professional",
+    "free": "Free",
+    "comingSoon": "Coming soon",
+    "chooseTierFor": "Choose a plan for «{{title}}»",
+    "proIncludesTitle": "What's included in the Professional extended analysis:",
+    "proExtended": {
+      "1": "Method 1 (22 Arcana): full 12-position matrix, diagonal, karma, success code, life periods, ancestral programs, day/month/year forecasts, contract energy.",
+      "2": "Method 2 (Classic): all 4 destiny numbers, pinnacles, personal year/month/day, financial code, psychological profile, energy map, action plan, forecasts."
+    },
+    "methodologyLabel": {
+      "1": "Method 1 (22 Arcana)",
+      "2": "Method 2 (Classic)"
+    },
+    "methods": {
+      "purpose": {
+        "title": "Purpose",
+        "desc": "Your personal destiny matrix across 12 positions",
+        "basicDesc": "",
+        "proDesc": "All 12 matrix positions, diagonal, karma, success code, life periods",
+        "savedLabel": "Purpose"
+      },
+      "compatibility": {
+        "title": "Compatibility",
+        "desc": "Compatibility analysis of two people by birth date",
+        "basicDesc": "Compatibility percentage, union arcana, brief conclusions",
+        "proDesc": "Full analysis: harmony, karma, strengths/weaknesses, recommendations",
+        "savedLabel": "Compatibility"
+      },
+      "year": {
+        "title": "Year Forecast",
+        "desc": "The energy and key themes of your year",
+        "basicDesc": "",
+        "proDesc": "Detailed forecast, recommendations, suitable professions, pitfalls",
+        "savedLabel": "Year Forecast"
+      },
+      "month": {
+        "title": "Month Forecast",
+        "desc": "The energy triangle of the month",
+        "basicDesc": "",
+        "proDesc": "All three energies, influencing arcana, detailed recommendations",
+        "savedLabel": "Month Forecast"
+      },
+      "day": {
+        "title": "Day Forecast",
+        "desc": "A detailed breakdown of energies for a specific day",
+        "basicDesc": "",
+        "proDesc": "All 12 positions of the day with full descriptions",
+        "savedLabel": "Day Forecast"
+      },
+      "ancestral": {
+        "title": "Lineage",
+        "desc": "Karmic star and ancestral programs",
+        "basicDesc": "",
+        "proDesc": "Full interpretations of all digits, deep analysis of curses and roles",
+        "savedLabel": "Lineage"
+      },
+      "contract": {
+        "title": "Contract Energy",
+        "desc": "Energy analysis of the contract signing date",
+        "basicDesc": "",
+        "proDesc": "All 12 positions: resources, hidden motives, karmic lesson",
+        "savedLabel": "Contract Energy"
+      },
+      "classic-full": {
+        "title": "Purpose",
+        "desc": "The 4 main numbers of your destiny",
+        "basicDesc": "Overview of the base matrix, brief profile",
+        "proDesc": "Full report: pinnacles, personal year, financial code, psychological profile, energy map, action plan",
+        "savedLabel": "Purpose (Classic)"
+      },
+      "lifecod-compatibility": {
+        "title": "Compatibility",
+        "desc": "Couple compatibility analysis by classical numerology",
+        "basicDesc": "Compatibility by destiny numbers, brief conclusions",
+        "proDesc": "Deep couple analysis: year links, risk patterns, recommendations",
+        "savedLabel": "Compatibility (Classic)"
+      },
+      "business": {
+        "title": "Business",
+        "desc": "Business partnership analysis",
+        "basicDesc": "Coming soon",
+        "proDesc": "Coming soon",
+        "savedLabel": "Business"
+      },
+      "name": {
+        "title": "Name Energy",
+        "desc": "Numerological analysis of a name or title",
+        "basicDesc": "",
+        "proDesc": "Name arcana, harmony, full recommendation",
+        "savedLabel": "Name Energy"
+      },
+      "finance": {
+        "title": "Financial Code",
+        "desc": "Your financial potential code",
+        "basicDesc": "",
+        "proDesc": "All 4 arcana, mission, blocks, professions, detailed recommendations",
+        "savedLabel": "Financial Code"
+      },
+      "success-path": {
+        "title": "Path to Success",
+        "desc": "A map of the path to self-realization",
+        "basicDesc": "",
+        "proDesc": "Coming soon",
+        "savedLabel": "Path to Success"
+      }
+    }
+  },
   "nav": {
     "analyses": "Analyses",
     "calendar": "Calendar",
