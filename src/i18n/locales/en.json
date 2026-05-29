@@ -232,6 +232,37 @@
     "newPasswordLabel": "New password",
     "saveNewPassword": "Save new password"
   },
+  "paywall": {
+    "processing": "Processing payment...",
+    "processingDesc": "Please wait. The analysis will open automatically once payment is confirmed.",
+    "defaultTitle": "Professional analysis",
+    "defaultDesc": "A full detailed analysis with extended descriptions and recommendations",
+    "buy": "Buy the professional analysis",
+    "instant": "Access opens instantly after payment",
+    "devUnlock": "DEV: Unlock for testing",
+    "activated1": "Your result is activated at",
+    "activatedDesc": "Full activation is available after purchasing the professional analysis — all blocks will open right on this page.",
+    "buyFull": "Buy the full analysis"
+  },
+  "paymentScreen": {
+    "createError": "Failed to create payment",
+    "noUrl": "No payment link received",
+    "genericError": "Error while creating the payment",
+    "tierAnalysis": "{{tier}} analysis",
+    "detailedAnalysis": "Detailed analysis",
+    "feature1": "All positions and analysis blocks",
+    "feature2": "Extended interpretations",
+    "feature3": "Detailed recommendations",
+    "feature4": "Hidden influences and nuances",
+    "feature5": "Full depth of analysis",
+    "backToChoice": "Back to selection",
+    "redirecting": "Redirecting to payment...",
+    "choosePayMethod": "Choose a payment method:",
+    "payCard": "Pay by card",
+    "payCrypto": "Pay with crypto",
+    "payNote": "Cards — Robokassa. Crypto — Plisio (USDT).",
+    "acceptOffer": "By paying, you accept the offer"
+  },
   "nav": {
     "analyses": "Analyses",
     "calendar": "Calendar",

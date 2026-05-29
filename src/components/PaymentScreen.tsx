@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Crown, CheckCircle, ArrowLeft, Loader2, AlertCircle, CreditCard, Bitcoin } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getAnalysisConfig } from "@/lib/analysisConfig";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -14,6 +15,7 @@ interface PaymentScreenProps {
 type PayMethod = "card" | "crypto";
 
 export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
+  const { t } = useTranslation();
   const [processing, setProcessing] = useState<PayMethod | null>(null);
   const [error, setError] = useState<string | null>(null);
   const config = getAnalysisConfig(methodId);
@@ -29,7 +31,7 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
         body: { method_id: methodId, tier },
       });
 
-      if (fnError || !data) throw new Error(fnError?.message || "Не удалось создать платёж");
+      if (fnError || !data) throw new Error(fnError?.message || t("paymentScreen.createError"));
 
       // Базовый бесплатный — сервер вернул free: true
       if (data.free) {
@@ -39,25 +41,25 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
         return;
       }
 
-      if (!data.payment_url) throw new Error("Не получена ссылка на оплату");
+      if (!data.payment_url) throw new Error(t("paymentScreen.noUrl"));
 
       sessionStorage.setItem("pending_order_id", data.order_id);
       sessionStorage.setItem("pending_method_id", methodId);
       window.location.href = data.payment_url;
 
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Ошибка при создании платежа");
+      setError(e instanceof Error ? e.message : t("paymentScreen.genericError"));
       setProcessing(null);
     }
   };
 
-  const tierLabel = tier === "professional" ? "Профессиональный" : "Базовый";
+  const tierLabel = tier === "professional" ? t("cfg.tierPro") : t("cfg.tierBasic");
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
       <div className="max-w-md w-full mx-auto p-6">
         <Button variant="ghost" onClick={onBack} className="mb-6 text-muted-foreground">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Назад к выбору
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t("paymentScreen.backToChoice")}
         </Button>
 
         <div className="gradient-card rounded-2xl p-8 border-2 border-primary/30 text-center space-y-6">
@@ -67,20 +69,20 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
 
           <div>
             <h2 className="text-2xl font-display font-semibold text-foreground mb-1">
-              {tierLabel} разбор
+              {t("paymentScreen.tierAnalysis", { tier: tierLabel })}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {config?.title || "Детальный анализ"}
+              {config?.title || t("paymentScreen.detailedAnalysis")}
             </p>
           </div>
 
           <div className="text-left space-y-2">
             {[
-              "Все позиции и блоки анализа",
-              "Расширенные расшифровки",
-              "Детальные рекомендации",
-              "Скрытые влияния и нюансы",
-              "Полная глубина анализа",
+              t("paymentScreen.feature1"),
+              t("paymentScreen.feature2"),
+              t("paymentScreen.feature3"),
+              t("paymentScreen.feature4"),
+              t("paymentScreen.feature5"),
             ].map((feature, i) => (
               <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                 <CheckCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -99,11 +101,11 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
           {processing ? (
             <div className="space-y-3 py-2">
               <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
-              <p className="text-sm text-muted-foreground">Переход к оплате...</p>
+              <p className="text-sm text-muted-foreground">{t("paymentScreen.redirecting")}</p>
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm font-medium text-foreground">Выберите способ оплаты:</p>
+              <p className="text-sm font-medium text-foreground">{t("paymentScreen.choosePayMethod")}</p>
 
               <Button
                 onClick={() => startPayment("card")}
@@ -111,7 +113,7 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
                 size="lg"
               >
                 <CreditCard className="w-5 h-5 mr-2" />
-                Оплатить картой
+                {t("paymentScreen.payCard")}
               </Button>
 
               <Button
@@ -121,18 +123,18 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
                 size="lg"
               >
                 <Bitcoin className="w-5 h-5 mr-2" />
-                Оплатить криптовалютой
+                {t("paymentScreen.payCrypto")}
               </Button>
 
               <p className="text-xs text-muted-foreground pt-1">
-                🔒 Карты — Робокасса. Криптовалюта — Plisio (USDT).{" "}
+                🔒 {t("paymentScreen.payNote")}{" "}
                 <a
                   href="/oferta-life-cod.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline underline-offset-2 hover:text-primary"
                 >
-                  Оплачивая, вы принимаете оферту
+                  {t("paymentScreen.acceptOffer")}
                 </a>
               </p>
             </div>

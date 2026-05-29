@@ -1,4 +1,5 @@
 import { Lock, Crown, Loader2, CheckCircle, ShieldCheck } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAccess, type AccessState } from "@/lib/accessControl";
@@ -93,6 +94,7 @@ function PaywallContent({
   onTestUnlock: () => void;
   isDevMode: boolean;
 }) {
+  const { t } = useTranslation();
   if (state === 'payment_pending') {
     return (
       <>
@@ -100,10 +102,10 @@ function PaywallContent({
           <Loader2 className="w-6 h-6 text-primary animate-spin" />
         </div>
         <h3 className="font-display font-semibold text-foreground text-lg mb-2">
-          Обработка оплаты...
+          {t("paywall.processing")}
         </h3>
         <p className="text-sm text-muted-foreground">
-          Пожалуйста, подождите. После подтверждения оплаты разбор откроется автоматически.
+          {t("paywall.processingDesc")}
         </p>
       </>
     );
@@ -115,10 +117,10 @@ function PaywallContent({
         <Lock className="w-6 h-6 text-primary" />
       </div>
       <h3 className="font-display font-semibold text-foreground text-lg mb-2">
-        {title || "Профессиональный разбор"}
+        {title || t("paywall.defaultTitle")}
       </h3>
       <p className="text-sm text-muted-foreground mb-4">
-        {description || "Полный детальный анализ с расширенными описаниями и рекомендациями"}
+        {description || t("paywall.defaultDesc")}
       </p>
 
       {features && features.length > 0 && (
@@ -138,11 +140,11 @@ function PaywallContent({
         size="lg"
       >
         <Crown className="w-4 h-4 mr-2" />
-        Купить профессиональный разбор
+        {t("paywall.buy")}
       </Button>
 
       <p className="text-xs text-muted-foreground">
-        Доступ откроется мгновенно после оплаты
+        {t("paywall.instant")}
       </p>
 
       {/* Dev mode test button */}
@@ -154,7 +156,7 @@ function PaywallContent({
           className="mt-3 border-dashed border-primary/50 text-primary"
         >
           <ShieldCheck className="w-3 h-3 mr-1" />
-          DEV: Открыть для теста
+          {t("paywall.devUnlock")}
         </Button>
       )}
     </>
@@ -163,26 +165,27 @@ function PaywallContent({
 
 /** Маркетинговый CTA-блок */
 export function ActivationBanner({ score = 37 }: { score?: number }) {
+  const { t } = useTranslation();
   const { unlock, startPayment, isDevMode } = useAccess();
 
   return (
     <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/20 rounded-2xl p-6 text-center space-y-4">
       <div className="flex items-center justify-center gap-2">
         <Crown className="w-6 h-6 text-primary" />
-        <h3 className="font-display font-semibold text-xl text-primary">Профессиональный разбор</h3>
+        <h3 className="font-display font-semibold text-xl text-primary">{t("paywall.defaultTitle")}</h3>
       </div>
       <p className="text-foreground font-medium">
-        Ваш результат активирован на <span className="text-primary font-bold text-lg">{score}%</span>
+        {t("paywall.activated1")} <span className="text-primary font-bold text-lg">{score}%</span>
       </p>
       <p className="text-muted-foreground text-sm max-w-lg mx-auto">
-        Полная активация доступна после покупки профессионального разбора — все блоки откроются прямо на этой странице.
+        {t("paywall.activatedDesc")}
       </p>
       <Button size="lg" className="bg-primary text-primary-foreground" onClick={startPayment}>
-        <Crown className="w-4 h-4 mr-2" /> Купить полный разбор
+        <Crown className="w-4 h-4 mr-2" /> {t("paywall.buyFull")}
       </Button>
       {isDevMode && (
         <Button variant="outline" size="sm" onClick={unlock} className="border-dashed border-primary/50 text-primary">
-          <ShieldCheck className="w-3 h-3 mr-1" /> DEV: Открыть для теста
+          <ShieldCheck className="w-3 h-3 mr-1" /> {t("paywall.devUnlock")}
         </Button>
       )}
     </div>

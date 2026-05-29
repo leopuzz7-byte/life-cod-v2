@@ -232,6 +232,37 @@
     "newPasswordLabel": "Nueva contraseña",
     "saveNewPassword": "Guardar nueva contraseña"
   },
+  "paywall": {
+    "processing": "Procesando el pago...",
+    "processingDesc": "Por favor, espera. El análisis se abrirá automáticamente una vez confirmado el pago.",
+    "defaultTitle": "Análisis profesional",
+    "defaultDesc": "Un análisis completo y detallado con descripciones ampliadas y recomendaciones",
+    "buy": "Comprar el análisis profesional",
+    "instant": "El acceso se abre al instante tras el pago",
+    "devUnlock": "DEV: Desbloquear para pruebas",
+    "activated1": "Tu resultado está activado al",
+    "activatedDesc": "La activación completa está disponible tras comprar el análisis profesional — todos los bloques se abrirán en esta misma página.",
+    "buyFull": "Comprar el análisis completo"
+  },
+  "paymentScreen": {
+    "createError": "No se pudo crear el pago",
+    "noUrl": "No se recibió el enlace de pago",
+    "genericError": "Error al crear el pago",
+    "tierAnalysis": "Análisis {{tier}}",
+    "detailedAnalysis": "Análisis detallado",
+    "feature1": "Todas las posiciones y bloques del análisis",
+    "feature2": "Interpretaciones ampliadas",
+    "feature3": "Recomendaciones detalladas",
+    "feature4": "Influencias ocultas y matices",
+    "feature5": "Profundidad completa del análisis",
+    "backToChoice": "Volver a la selección",
+    "redirecting": "Redirigiendo al pago...",
+    "choosePayMethod": "Elige un método de pago:",
+    "payCard": "Pagar con tarjeta",
+    "payCrypto": "Pagar con cripto",
+    "payNote": "Tarjetas — Robokassa. Cripto — Plisio (USDT).",
+    "acceptOffer": "Al pagar, aceptas la oferta"
+  },
   "nav": {
     "analyses": "Análisis",
     "calendar": "Calendario",
