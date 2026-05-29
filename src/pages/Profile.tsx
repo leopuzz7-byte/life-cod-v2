@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -21,6 +22,7 @@ const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
 // Экран ошибки загрузки профиля — когда сеть подвела и мы не знаем, есть ли профиль на сервере
 function ProfileLoadError({ error, onRetry, onSignOut }: { error: string; onRetry: () => void; onSignOut: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -28,15 +30,15 @@ function ProfileLoadError({ error, onRetry, onSignOut }: { error: string; onRetr
         <div className="max-w-md mx-auto">
           <div className="gradient-card rounded-2xl p-6 md:p-8 border border-destructive/40 text-center space-y-4">
             <AlertCircle className="w-12 h-12 text-destructive mx-auto" />
-            <h2 className="font-display text-xl text-foreground">Не удалось загрузить профиль</h2>
+            <h2 className="font-display text-xl text-foreground">{t("profile.loadErrorTitle")}</h2>
             <p className="text-sm text-muted-foreground">{error}</p>
             <p className="text-xs text-muted-foreground">
-              Это похоже на проблему с подключением к интернету. Проверьте сеть и попробуйте ещё раз.
+              {t("profile.loadErrorHint")}
             </p>
             <div className="flex flex-col gap-2 pt-2">
-              <Button onClick={onRetry} className="w-full h-11 rounded-full">Попробовать снова</Button>
+              <Button onClick={onRetry} className="w-full h-11 rounded-full">{t("profile.retry")}</Button>
               <Button variant="outline" onClick={onSignOut} className="w-full h-11 rounded-full">
-                <LogOut className="w-4 h-4 mr-2" /> Выйти
+                <LogOut className="w-4 h-4 mr-2" /> {t("profile.signOut")}
               </Button>
             </div>
           </div>
@@ -48,6 +50,7 @@ function ProfileLoadError({ error, onRetry, onSignOut }: { error: string; onRetr
 
 // Запасной экран — если профиль не найден в БД, даём пользователю заполнить его заново
 function ProfileNotFoundRecovery() {
+  const { t } = useTranslation();
   const { user, signOut, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
@@ -59,9 +62,9 @@ function ProfileNotFoundRecovery() {
 
   const handleCreate = async () => {
     setError(null);
-    if (!user) return setError("Сессия потеряна — войдите заново");
-    if (!name.trim()) return setError("Введите имя");
-    if (!day || !month || !year) return setError("Укажите полную дату рождения");
+    if (!user) return setError(t("profile.sessionLost"));
+    if (!name.trim()) return setError(t("auth.enterName"));
+    if (!day || !month || !year) return setError(t("auth.fullBirthDate"));
 
     setSaving(true);
     const { error: upsertError } = await supabase.from("profiles").upsert({
@@ -76,12 +79,12 @@ function ProfileNotFoundRecovery() {
 
     if (upsertError) {
       console.error("[Profile] upsert failed:", upsertError);
-      setError("Не удалось сохранить: " + upsertError.message);
+      setError(t("profile.saveFailed") + upsertError.message);
       return;
     }
 
     await refreshProfile();
-    toast.success("Профиль создан");
+    toast.success(t("profile.created"));
   };
 
   const handleSignOut = async () => {
@@ -96,10 +99,10 @@ function ProfileNotFoundRecovery() {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-6">
             <h1 className="font-display text-2xl md:text-3xl text-primary mb-2">
-              Завершите создание профиля
+              {t("profile.recoveryTitle")}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Ваш аккаунт создан, но профиль не заполнен. Пожалуйста, укажите данные.
+              {t("profile.recoverySubtitle")}
             </p>
           </div>
 
@@ -111,26 +114,26 @@ function ProfileNotFoundRecovery() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="r-name">Имя</Label>
+              <Label htmlFor="r-name">{t("auth.name")}</Label>
               <Input id="r-name" value={name} onChange={(e) => setName(e.target.value)} disabled={saving} />
             </div>
             <div className="space-y-2">
-              <Label>Дата рождения</Label>
+              <Label>{t("auth.birthDate")}</Label>
               <div className="grid grid-cols-3 gap-2">
                 <Select value={day} onValueChange={setDay} disabled={saving}>
-                  <SelectTrigger><SelectValue placeholder="День" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("calculator.day")} /></SelectTrigger>
                   <SelectContent className="max-h-60">
                     {days.map((d) => <SelectItem key={d} value={String(d)}>{d}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={month} onValueChange={setMonth} disabled={saving}>
-                  <SelectTrigger><SelectValue placeholder="Месяц" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("calculator.month")} /></SelectTrigger>
                   <SelectContent className="max-h-60">
-                    {months.map((m, i) => <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>)}
+                    {months.map((_, i) => <SelectItem key={i} value={String(i + 1)}>{t(`forecast.months.${i + 1}`)}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={year} onValueChange={setYear} disabled={saving}>
-                  <SelectTrigger><SelectValue placeholder="Год" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("calculator.year")} /></SelectTrigger>
                   <SelectContent className="max-h-60">
                     {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
                   </SelectContent>
@@ -139,10 +142,10 @@ function ProfileNotFoundRecovery() {
             </div>
             <Button onClick={handleCreate} disabled={saving} className="w-full h-11 rounded-full">
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Создать профиль
+              {t("profile.createProfile")}
             </Button>
             <Button variant="outline" onClick={handleSignOut} className="w-full h-11 rounded-full">
-              <LogOut className="w-4 h-4 mr-2" /> Выйти
+              <LogOut className="w-4 h-4 mr-2" /> {t("profile.signOut")}
             </Button>
           </div>
         </div>
@@ -152,6 +155,7 @@ function ProfileNotFoundRecovery() {
 }
 
 export default function Profile() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { profile, profileFetched, profileError, signOut, resetPassword, updateProfile, refreshProfile, loading } = useAuth();
 
@@ -183,8 +187,8 @@ export default function Profile() {
 
   const handleSave = async () => {
     setError(null);
-    if (!name.trim()) return setError("Имя не может быть пустым");
-    if (!day || !month || !year) return setError("Укажите полную дату рождения");
+    if (!name.trim()) return setError(t("profile.nameEmpty"));
+    if (!day || !month || !year) return setError(t("auth.fullBirthDate"));
 
     setSaving(true);
     const { error: updateError } = await updateProfile({
@@ -199,7 +203,7 @@ export default function Profile() {
       setError(updateError);
       return;
     }
-    toast.success("Профиль обновлён");
+    toast.success(t("profile.updated"));
   };
 
   const handleSendResetLink = async () => {
@@ -211,7 +215,7 @@ export default function Profile() {
       toast.error(resetError);
       return;
     }
-    toast.success("Ссылка для смены пароля отправлена на вашу почту");
+    toast.success(t("profile.resetSent"));
   };
 
   const handleSignOut = async () => {
@@ -231,13 +235,13 @@ export default function Profile() {
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-2xl mx-auto">
           <div className="mb-6 md:mb-8">
-            <h1 className="font-display text-3xl md:text-4xl text-primary mb-2">Мой профиль</h1>
-            <p className="text-sm text-muted-foreground">Личные данные и настройки аккаунта</p>
+            <h1 className="font-display text-3xl md:text-4xl text-primary mb-2">{t("profile.title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("profile.subtitle")}</p>
           </div>
 
           {/* Personal info */}
           <div className="gradient-card rounded-2xl p-6 md:p-8 border border-border mb-4 space-y-4">
-            <h2 className="font-display text-xl text-foreground mb-1">Личные данные</h2>
+            <h2 className="font-display text-xl text-foreground mb-1">{t("profile.personalData")}</h2>
 
             {error && (
               <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
@@ -249,11 +253,11 @@ export default function Profile() {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" value={profile.email} disabled />
-              <p className="text-xs text-muted-foreground">Email сейчас изменить нельзя</p>
+              <p className="text-xs text-muted-foreground">{t("profile.emailCantChange")}</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="name">Имя</Label>
+              <Label htmlFor="name">{t("auth.name")}</Label>
               <Input
                 id="name"
                 value={name}
@@ -266,19 +270,19 @@ export default function Profile() {
               <Label>Дата рождения</Label>
               <div className="grid grid-cols-3 gap-2">
                 <Select value={day} onValueChange={setDay} disabled={saving}>
-                  <SelectTrigger><SelectValue placeholder="День" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("calculator.day")} /></SelectTrigger>
                   <SelectContent className="max-h-60">
                     {days.map((d) => <SelectItem key={d} value={String(d)}>{d}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={month} onValueChange={setMonth} disabled={saving}>
-                  <SelectTrigger><SelectValue placeholder="Месяц" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("calculator.month")} /></SelectTrigger>
                   <SelectContent className="max-h-60">
-                    {months.map((m, i) => <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>)}
+                    {months.map((_, i) => <SelectItem key={i} value={String(i + 1)}>{t(`forecast.months.${i + 1}`)}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={year} onValueChange={setYear} disabled={saving}>
-                  <SelectTrigger><SelectValue placeholder="Год" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("calculator.year")} /></SelectTrigger>
                   <SelectContent className="max-h-60">
                     {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
                   </SelectContent>
@@ -292,15 +296,15 @@ export default function Profile() {
               className="w-full h-11 rounded-full"
             >
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Сохранить изменения
+              {t("profile.saveChanges")}
             </Button>
           </div>
 
           {/* Security */}
           <div className="gradient-card rounded-2xl p-6 md:p-8 border border-border mb-4 space-y-4">
-            <h2 className="font-display text-xl text-foreground mb-1">Безопасность</h2>
+            <h2 className="font-display text-xl text-foreground mb-1">{t("profile.security")}</h2>
             <p className="text-sm text-muted-foreground">
-              Мы отправим ссылку на email <span className="font-medium text-foreground">{profile.email}</span> — по ней вы сможете задать новый пароль.
+              {t("profile.resetHint1")} <span className="font-medium text-foreground">{profile.email}</span> {t("profile.resetHint2")}
             </p>
             <Button
               variant="outline"
@@ -309,20 +313,20 @@ export default function Profile() {
               className="w-full h-11 rounded-full"
             >
               {sendingReset ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <KeyRound className="w-4 h-4 mr-2" />}
-              Сменить пароль
+              {t("profile.changePassword")}
             </Button>
           </div>
 
           {/* Sign out */}
           <div className="gradient-card rounded-2xl p-6 md:p-8 border border-border space-y-4">
-            <h2 className="font-display text-xl text-foreground mb-1">Аккаунт</h2>
+            <h2 className="font-display text-xl text-foreground mb-1">{t("profile.account")}</h2>
             <Button
               variant="outline"
               onClick={handleSignOut}
               className="w-full h-11 rounded-full"
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Выйти
+              {t("profile.signOut")}
             </Button>
           </div>
         </div>
