@@ -299,6 +299,22 @@
     "strat3": "Gradually step out of the comfort zone of position 6 ({{name6}}) — it's an outlived script.",
     "strat4": "Monetize your talents through position 5 ({{name5}}) — it's your professional vector."
   },
+  "daily": {
+    "pos": {
+      "1": "Morning / Start of the day",
+      "2": "Potential of the day",
+      "3": "Self-esteem",
+      "4": "Goal of the day",
+      "5": "Resource",
+      "6": "Foundation",
+      "7": "Task of the day",
+      "8": "Way to solve it",
+      "9": "Result",
+      "10": "Subconscious",
+      "11": "External influence",
+      "12": "Outcome / Karmic task of the day"
+    }
+  },
   "nav": {
     "analyses": "Analyses",
     "calendar": "Calendar",

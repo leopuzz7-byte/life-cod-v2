@@ -299,6 +299,22 @@
     "strat3": "Sal poco a poco de la zona de confort de la posición 6 ({{name6}}) — es un guion caduco.",
     "strat4": "Monetiza tus talentos a través de la posición 5 ({{name5}}) — es tu vector profesional."
   },
+  "daily": {
+    "pos": {
+      "1": "Mañana / Inicio del día",
+      "2": "Potencial del día",
+      "3": "Autoestima",
+      "4": "Meta del día",
+      "5": "Recurso",
+      "6": "Base",
+      "7": "Tarea del día",
+      "8": "Forma de resolverlo",
+      "9": "Resultado",
+      "10": "Subconsciente",
+      "11": "Influencia externa",
+      "12": "Resultado / Tarea kármica del día"
+    }
+  },
   "nav": {
     "analyses": "Análisis",
     "calendar": "Calendario",

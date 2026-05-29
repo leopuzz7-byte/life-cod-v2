@@ -1,6 +1,7 @@
 // Прогноз на день — 12-позиционная матрица совместимости персоны с датой
 import { normalizeToArcana, dayToArcana, yearToArcana } from './calculations';
 import { getArcana } from './arcana';
+import i18n from '@/i18n';
 
 export interface DailyForecastPosition {
   position: number;
@@ -61,7 +62,7 @@ export function calculateDailyForecast(
     return {
       position: i + 1,
       arcana,
-      title: positionTitles[i + 1],
+      title: (() => { const k = `daily.pos.${i + 1}`; const v = i18n.t(k); return v === k ? positionTitles[i + 1] : v; })(),
       description: arcanaData?.yearForecast || '',
     };
   });
