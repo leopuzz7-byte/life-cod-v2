@@ -155,8 +155,37 @@
       "september": "September",
       "october": "October",
       "november": "November",
-      "december": "December"
-    }
+      "december": "December",
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
+    },
+    "for": "for",
+    "yourYearArcana": "Your arcana of the year",
+    "monthTriangle": "Triangle of the month",
+    "monthResult": "Result of the month",
+    "monthNum": "Month",
+    "howToRead": "How to read the triangle",
+    "yearEnergyBackground": "energy of the year, background influence",
+    "monthEnergy": "energy of the month",
+    "monthResultEnergy": "final energy, the main theme of the month",
+    "mainMonthArcana": "Main arcana of the month",
+    "influencingEnergies": "Influencing energies",
+    "yearEnergyTitle": "Energy of the year",
+    "energyOf": "Energy",
+    "wantMore": "Want to know more?",
+    "wantMoreDesc": "Get a professional analysis that accounts for every nuance of your personal matrix, with individual recommendations for the year.",
+    "wantFullMonthForecast": "Want the full monthly forecast?",
+    "wantFullMonthForecastDesc": "Get a detailed breakdown of each day of the month with favorable dates for important decisions and recommendations."
   },
   "products": {
     "title": "Products & Services",
@@ -632,5 +661,38 @@
       "title": "Extended Compatibility",
       "description": "8 analysis methods: consciousness, actions, personal years, forecasts"
     }
+  },
+  "keyto": {
+    "yourCalculation": "your numerology calculation",
+    "yourCalculationDefault": "Your numerology calculation",
+    "methodology1Classic": "Methodology 1 — classical numerology (numbers 1-9)",
+    "mindNumber": "Mind Number",
+    "actionNumber": "Action Number",
+    "realizationNumber": "Realization Number",
+    "outcomeNumber": "Outcome Number",
+    "number": "Number",
+    "detailedAnalysis": "Detailed analysis",
+    "positiveQualities": "Positive qualities",
+    "negativeQualities": "Negative qualities",
+    "karmicTask": "Karmic task",
+    "suitableProfessions": "Suitable professions",
+    "planet": "Planet",
+    "luckyDay": "Lucky day",
+    "stone": "Stone",
+    "color": "Color",
+    "wantDeeperAnalysis": "Want a deeper analysis?",
+    "tryMethodology2": "Try Methodology 2 — an expanded system with 22 arcana for a more precise analysis of your personality and purpose.",
+    "tryMethodology2Btn": "Try Methodology 2",
+    "consultSpecialist": "Consult a specialist"
+  },
+  "pdf": {
+    "download": "Download PDF",
+    "generating": "Generating PDF...",
+    "matrixTitle": "MATRIX OF PURPOSE",
+    "matrixSubtitle": "Description of your gifts and life path",
+    "ancestralTitle": "ANCESTRAL NUMEROLOGY",
+    "ancestralSubtitle": "Analysis of ancestral programs and karmic connections",
+    "consultationTitle": "Want a deep analysis?",
+    "consultationText": "Book a personal consultation for a detailed analysis"
   }
 }

@@ -109,7 +109,29 @@
     "mindNumber": "Número de la Mente",
     "actionNumber": "Número de Acción",
     "realizationNumber": "Número de Realización",
-    "outcomeNumber": "Número del Resultado"
+    "outcomeNumber": "Número del Resultado",
+    "yourPurpose": "Tu propósito",
+    "personalMatrix": "Matriz personal",
+    "mainTriangle": "Triángulo principal",
+    "lifeGoals": "Metas de vida",
+    "karma": "Karma",
+    "successCode": "Código del éxito",
+    "lifePeriods": "Periodos de vida",
+    "positions": "posiciones",
+    "position": "Posición",
+    "diagonalRow": "Fila diagonal — Metas y formas de alcanzarlas",
+    "karmicTriangle": "Triángulo kármico",
+    "karmicTriangleDesc": "Tareas y errores de encarnaciones pasadas que influyen en esta vida. La posición 12 es la tarea kármica principal, que basta con cumplir una sola vez.",
+    "successCodeDesc": "Los arcanos de las posiciones 4, 5, 7 y 12 forman tu código del éxito: un programa de vida que, al seguirlo, te hará sentir feliz.",
+    "pos": "Pos.",
+    "wantDeepAnalysis": "¿Quieres un análisis profundo?",
+    "deepAnalysisDesc": "Obtén una consulta profesional con un análisis detallado de tu matriz, recomendaciones personales y respuestas a tus preguntas.",
+    "bookConsultation": "Reservar una consulta",
+    "legend": {
+      "mirror": "Espejado (refuerzo)",
+      "reversed": "Invertido (a trabajar)",
+      "mainTask": "Tarea principal"
+    }
   },
   "matrix": {
     "personalMatrix": "Matriz Personal",
@@ -128,7 +150,8 @@
     "mirrorArcana": "Arcanos Espejo",
     "mirrorArcanaDesc": "Estas son tus fortalezas — energías que ya has dominado",
     "reversedArcana": "Arcanos Invertidos",
-    "reversedArcanaDesc": "Estas son áreas de crecimiento — aspectos que necesitan trabajo"
+    "reversedArcanaDesc": "Estas son áreas de crecimiento — aspectos que necesitan trabajo",
+    "monthForecast": "Pronóstico del mes"
   },
   "forecast": {
     "yearForecast": "Pronóstico Anual",
@@ -151,8 +174,37 @@
       "september": "Septiembre",
       "october": "Octubre",
       "november": "Noviembre",
-      "december": "Diciembre"
-    }
+      "december": "Diciembre",
+      "1": "Enero",
+      "2": "Febrero",
+      "3": "Marzo",
+      "4": "Abril",
+      "5": "Mayo",
+      "6": "Junio",
+      "7": "Julio",
+      "8": "Agosto",
+      "9": "Septiembre",
+      "10": "Octubre",
+      "11": "Noviembre",
+      "12": "Diciembre"
+    },
+    "for": "para",
+    "yourYearArcana": "Tu arcano del año",
+    "monthTriangle": "Triángulo del mes",
+    "monthResult": "Resultado del mes",
+    "monthNum": "Mes",
+    "howToRead": "Cómo leer el triángulo",
+    "yearEnergyBackground": "energía del año, influencia de fondo",
+    "monthEnergy": "energía del mes",
+    "monthResultEnergy": "energía final, tema principal del mes",
+    "mainMonthArcana": "Arcano principal del mes",
+    "influencingEnergies": "Energías influyentes",
+    "yearEnergyTitle": "Energía del año",
+    "energyOf": "Energía",
+    "wantMore": "¿Quieres saber más?",
+    "wantMoreDesc": "Obtén un análisis profesional que considera todos los matices de tu matriz personal y recomendaciones individuales para el año.",
+    "wantFullMonthForecast": "¿Quieres el pronóstico completo del mes?",
+    "wantFullMonthForecastDesc": "Obtén un análisis detallado de cada día del mes con fechas favorables para decisiones importantes y recomendaciones."
   },
   "products": {
     "title": "Productos y Servicios",
@@ -474,6 +526,192 @@
     "methodSelector": {
       "title": "Compatibilidad extendida",
       "description": "8 métodos de análisis: conciencia, acciones, años personales, pronósticos"
+    }
+  },
+  "keyto": {
+    "yourCalculation": "tu cálculo numerológico",
+    "yourCalculationDefault": "Tu cálculo numerológico",
+    "methodology1Classic": "Metodología 1 — numerología clásica (números 1-9)",
+    "mindNumber": "Número de la Mente",
+    "actionNumber": "Número de la Acción",
+    "realizationNumber": "Número de la Realización",
+    "outcomeNumber": "Número del Resultado",
+    "number": "Número",
+    "detailedAnalysis": "Análisis detallado",
+    "positiveQualities": "Cualidades positivas",
+    "negativeQualities": "Cualidades negativas",
+    "karmicTask": "Tarea kármica",
+    "suitableProfessions": "Profesiones adecuadas",
+    "planet": "Planeta",
+    "luckyDay": "Día de suerte",
+    "stone": "Piedra",
+    "color": "Color",
+    "wantDeeperAnalysis": "¿Quieres un análisis más profundo?",
+    "tryMethodology2": "Prueba la Metodología 2 — un sistema ampliado con 22 arcanos para un análisis más preciso de tu personalidad y propósito.",
+    "tryMethodology2Btn": "Probar la Metodología 2",
+    "consultSpecialist": "Consulta con un especialista"
+  },
+  "pdf": {
+    "download": "Descargar PDF",
+    "generating": "Generando PDF...",
+    "matrixTitle": "MATRIZ DEL PROPÓSITO",
+    "matrixSubtitle": "Descripción de tus dones y tu camino de vida",
+    "ancestralTitle": "NUMEROLOGÍA ANCESTRAL",
+    "ancestralSubtitle": "Análisis de programas ancestrales y vínculos kármicos",
+    "consultationTitle": "¿Quieres un análisis profundo?",
+    "consultationText": "Reserva una consulta personal para un análisis detallado"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Diagnóstico personal Life C⚙D",
+      "subtitle": "Comprensión de ti mismo, de tus ciclos vitales, de tus fortalezas y debilidades, y del periodo actual de tu vida.",
+      "description": "Esta herramienta te ayuda a ver cómo tomas decisiones, dónde está tu apoyo y a qué es importante prestar atención ahora.",
+      "disclaimer": "Sin misticismo. Sin promesas de cambiarte. Solo estructura y lógica."
+    },
+    "step2": {
+      "title": "Qué puedes descubrir",
+      "suitable": "Te conviene si quieres entenderte mejor o comprobar si vas en la dirección correcta."
+    },
+    "step3": {
+      "title": "¿Qué es relevante para ti ahora?",
+      "subtitle": "Elige una dirección y te mostraremos la herramienta adecuada"
+    },
+    "benefits": {
+      "strengths": "Tus fortalezas y debilidades",
+      "decisions": "Cómo tomas decisiones",
+      "period": "En qué periodo de vida te encuentras ahora",
+      "focus": "A qué prestar atención en el futuro próximo"
+    },
+    "scenarios": {
+      "diagnosis": {
+        "title": "Diagnóstico general de la personalidad",
+        "description": "Quiero entenderme mejor, conocer mis fortalezas y debilidades."
+      },
+      "period": {
+        "title": "Periodo de vida actual",
+        "description": "Me interesa qué me ocurre ahora y por qué."
+      },
+      "forecast": {
+        "title": "Pronóstico del mes o del año",
+        "description": "Quiero orientación y comprensión del periodo próximo."
+      },
+      "crisis": {
+        "title": "Si ahora la vida es difícil",
+        "description": "Sientes un callejón sin salida, sobrecarga o pérdida de apoyo."
+      }
+    },
+    "startDiagnosis": "Comenzar el diagnóstico",
+    "continue": "Continuar",
+    "chooseAndContinue": "Elegir y continuar",
+    "skipToCalculator": "Ir a la calculadora →"
+  },
+  "crisis": {
+    "title": "Cómo salir de la crisis",
+    "intro": "Este análisis es para quienes sienten que hay un área de su vida que ahora resulta difícil. Aquí no se diagnostican estados. Tú mismo(a) eliges dónde necesitas ayuda.",
+    "disclaimer": "Esto no es psicoterapia ni sustituye a un especialista. Es una herramienta para comprender la estructura del problema.",
+    "continue": "Continuar",
+    "back": "Atrás",
+    "selectArea": "¿En qué área es ahora más difícil?",
+    "selectAreaDesc": "Elige un área — la calculadora dará recomendaciones precisas justo para ella.",
+    "enterBirthDate": "Introduce tu fecha de nacimiento",
+    "birthDateNote": "La fecha se usa para determinar tu estructura vital y tu ciclo actual.",
+    "getResult": "Obtener resultado",
+    "personalAnalysis": "Análisis personal",
+    "areas": {
+      "relationships": {
+        "title": "❤️ Relaciones"
+      },
+      "career": {
+        "title": "💼 Autorrealización / trabajo"
+      },
+      "finances": {
+        "title": "💰 Finanzas"
+      },
+      "purpose": {
+        "title": "🧭 Camino / sentido / desorientación"
+      },
+      "general": {
+        "title": "🌀 Estado general"
+      }
+    },
+    "results": {
+      "intro": "Este análisis muestra qué ocurre realmente en el área elegida y cómo salir del estado actual.",
+      "whatHappening": "Qué ocurre en realidad",
+      "yourCode": "Tu código vital",
+      "currentPeriod": "Periodo actual",
+      "whyNow": "Por qué esta crisis es justo ahora",
+      "mainMistake": "El error principal en esta área",
+      "whatToDo": "Qué hacer paso a paso",
+      "whatNotToDo": "Qué NO hacer",
+      "expectedResult": "Resultado esperado",
+      "consultationPrompt": "Si sientes que quieres analizar la situación más a fondo o atravesar esta etapa con apoyo, una consulta personal te ayudará a trazar un itinerario individual.",
+      "bookConsultation": "Reservar una consulta",
+      "newAnalysis": "Nuevo análisis",
+      "relationships": {
+        "title": "Crisis en las relaciones",
+        "whatHappening": "Ahora en la relación se percibe tensión, incomprensión o distanciamiento. No es casualidad: es una señal de que el modelo actual de interacción necesita revisión.",
+        "whyNow": "Estás en un periodo en el que los viejos patrones de relación dejan de funcionar. La vida exige un nuevo nivel de honestidad y apertura, tanto contigo mismo(a) como con tu pareja.",
+        "mainMistake": "Intentar «cambiar» a la pareja o esperar que cambie sola sin tu participación en el proceso.",
+        "step1": "Reconoce tu parte de responsabilidad en la situación actual. No la culpa: la responsabilidad.",
+        "step2": "Mantén una conversación honesta con tu pareja sin reproches, usando mensajes en primera persona.",
+        "step3": "Define qué es realmente importante para ti en esta relación y si estás dispuesto(a) a trabajar en ello.",
+        "avoid1": "Evitar las conversaciones y callar los problemas",
+        "avoid2": "Buscar culpables en lugar de soluciones",
+        "avoid3": "Tomar decisiones drásticas en el pico de las emociones",
+        "expectedResult": "Siguiendo las recomendaciones, en 2-3 semanas sentirás mayor claridad en la relación y comprenderás en qué dirección avanzar."
+      },
+      "career": {
+        "title": "Crisis en la autorrealización",
+        "whatHappening": "Sientes que tu trabajo o actividad actual no te aporta satisfacción. Es señal de que es hora de revisar tus metas profesionales.",
+        "whyNow": "Has entrado en un periodo en el que los logros externos pierden valor sin un sentido interior. La vida te empuja a buscar tu verdadera vocación.",
+        "mainMistake": "Cambiar de trabajo por cambiar, sin entender tus verdaderas necesidades y talentos.",
+        "step1": "Anota todo lo que te gusta hacer, independientemente de si te da dinero.",
+        "step2": "Identifica tus talentos clave: aquello que te sale con facilidad y te da alegría.",
+        "step3": "Empieza a integrar estos elementos en tu trabajo actual o busca oportunidades para aplicarlos.",
+        "avoid1": "Renunciar impulsivamente sin un colchón financiero",
+        "avoid2": "Compararte con el éxito ajeno",
+        "avoid3": "Ignorar tus verdaderos deseos en aras de la estabilidad",
+        "expectedResult": "Tras un mes de trabajo sistemático sobre estos puntos, obtendrás una comprensión más clara de tu camino y los primeros pasos hacia su realización."
+      },
+      "finances": {
+        "title": "Crisis en las finanzas",
+        "whatHappening": "La tensión financiera no es solo cuestión de dinero. Refleja tu relación con tu propio valor y tu capacidad de recibir.",
+        "whyNow": "El periodo actual muestra que las viejas creencias sobre el dinero ya no funcionan. Es hora de revisar tu modelo financiero.",
+        "mainMistake": "Centrarse en «ganar más» en lugar de entender por qué el dinero no se queda o no llega.",
+        "step1": "Haz una auditoría honesta: a dónde se va el dinero, qué decisiones llevan a pérdidas.",
+        "step2": "Trabaja con tus creencias sobre el dinero. ¿Qué ideas heredaste de tu familia?",
+        "step3": "Empieza por lo pequeño: fija una meta financiera realista para el próximo mes.",
+        "avoid1": "Pedir préstamos para cubrir otros préstamos",
+        "avoid2": "Ignorar el problema y esperar que «se arregle solo»",
+        "avoid3": "Tomar decisiones financieras arriesgadas bajo estrés",
+        "expectedResult": "Con un enfoque sistemático, en 1-2 meses aparecerá una sensación de control sobre la situación y las primeras señales de estabilización financiera."
+      },
+      "purpose": {
+        "title": "Crisis de sentido y dirección",
+        "whatHappening": "Atraviesas un periodo de «desorientación», cuando los viejos referentes no funcionan y los nuevos aún no están claros. Es una etapa normal de transformación.",
+        "whyNow": "Es un periodo de transición. La vieja versión de ti ya no es vigente y la nueva todavía se está formando. Estas etapas son parte del ciclo vital.",
+        "mainMistake": "Intentar volver al «yo» antiguo o buscar respuestas hechas en el exterior.",
+        "step1": "Acepta el estado de incertidumbre como temporal. No es un callejón sin salida: es un cruce de caminos.",
+        "step2": "Recuerda los momentos en que te sentías en tu lugar. ¿Qué tienen en común?",
+        "step3": "Empieza con pequeños experimentos: prueba algo nuevo, observa tus reacciones.",
+        "avoid1": "Tomar decisiones globales sobre la vida en este estado",
+        "avoid2": "Aislarte de las personas y cerrarte",
+        "avoid3": "Buscar respuestas en el alcohol, las compras u otras formas de escapismo",
+        "expectedResult": "En 3-4 semanas de vivir conscientemente este periodo, empezarán a aparecer nuevos referentes y la comprensión de los siguientes pasos."
+      },
+      "general": {
+        "title": "Estado general de crisis",
+        "whatHappening": "Sientes una pesadez general difícil de localizar en un área concreta. Es una señal compleja de la vida sobre la necesidad de una pausa y una revisión.",
+        "whyNow": "La tensión acumulada ha llegado a un punto en que ignorarla es imposible. No es debilidad: es un mecanismo de defensa de la psique.",
+        "mainMistake": "Intentar «aguantar» a fuerza de voluntad en lugar de detenerte y analizar.",
+        "step1": "Permítete una pausa. Aunque sea un solo día, desconéctate por completo de las obligaciones.",
+        "step2": "Anota todas las fuentes de tensión. ¿Qué puedes eliminar o delegar ahora mismo?",
+        "step3": "Elige UN área para empezar a trabajar. No todas a la vez: solo una.",
+        "avoid1": "Seguir cargándote con nuevas tareas",
+        "avoid2": "Devaluar tu estado con frases como «otros están peor»",
+        "avoid3": "Aislarte del apoyo de tus seres queridos",
+        "expectedResult": "Siguiendo las recomendaciones, en 1-2 semanas aparecerá la sensación de que la situación está bajo control y de que hay un plan de acción concreto."
+      }
     }
   }
 }
