@@ -56,7 +56,7 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
     }
     await generatePDF({
       title: t("results.yourPurpose"),
-      subtitle: isPro ? "Профессиональный разбор" : "Базовый разбор",
+      subtitle: isPro ? t("res.proAnalysis") : t("res.basicAnalysis"),
       birthDate: formatBirthDateForPDF(matrix.birthDate.day, matrix.birthDate.month, matrix.birthDate.year),
       name: name || undefined,
       sections,
@@ -76,8 +76,8 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
     { id: "karmic" as TabType, label: t("results.karma") },
     { id: "success" as TabType, label: t("results.successCode") },
     { id: "periods" as TabType, label: t("results.lifePeriods") },
-    { id: "links" as TabType, label: "Связки позиций" },
-    { id: "summary" as TabType, label: "Итоговый анализ" },
+    { id: "links" as TabType, label: t("res.matrix.linksTab") },
+    { id: "summary" as TabType, label: t("res.matrix.summaryTab") },
   ];
 
   const visibleTabs = isPro ? proTabs : basicTabs;
@@ -102,7 +102,7 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
           "inline-block px-3 py-1 rounded-full text-xs font-medium mb-2",
           isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
         )}>
-          {isPro ? "✦ Профессиональный разбор" : "Базовый разбор"}
+          {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
         </span>
         <h1 className="text-2xl md:text-3xl font-display text-primary mb-2">{t("results.yourPurpose")}</h1>
         {name && <p className="text-lg text-foreground mb-1">{name}</p>}
@@ -229,9 +229,9 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
             </div>
             {!isPro && (
               <div className="mt-6 p-4 rounded-xl border border-primary/20 bg-primary/5 text-center">
-                <p className="text-sm text-muted-foreground mb-1">Это базовый разбор — 6 из 12 позиций</p>
+                <p className="text-sm text-muted-foreground mb-1">{t("res.matrix.basicNote")}</p>
                 <p className="text-xs text-muted-foreground">
-                  Профессиональный разбор включает все 12 позиций, связки, кармический треугольник, код успеха, жизненные периоды и итоговый анализ
+                  {t("res.matrix.proIncludes")}
                 </p>
               </div>
             )}
@@ -246,7 +246,7 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
               {t("results.diagonalRow")}
             </h2>
             <p className="text-sm text-muted-foreground mb-2">
-              Диагональ судьбы определяет вашу цель жизни (позиция 7), инструмент достижения (позиция 8) и зону комфорта (позиция 9).
+              {t("res.matrix.diagonalNote")}
             </p>
             <div className="grid gap-4">
               {[7, 8, 9].map((pos) => (
@@ -323,7 +323,7 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
                         <div key={pos} className="flex flex-col items-center bg-muted/50 rounded-lg p-2 min-w-[60px]">
                           <span className="text-lg font-display font-bold text-primary">{matrix.positions[pos - 1]}</span>
                           <span className="text-xs text-muted-foreground">{arcana?.name || ''}</span>
-                          <span className="text-[10px] text-muted-foreground/60">поз. {pos}</span>
+                          <span className="text-[10px] text-muted-foreground/60">{t("res.matrix.posShort", { pos })}</span>
                         </div>
                       );
                     })}
@@ -339,10 +339,10 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
           <>
             <h2 className="text-lg font-display text-foreground flex items-center gap-2">
               <Link2 className="w-5 h-5 text-primary" />
-              Связки позиций
+              {t("res.matrix.linksTab")}
             </h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Анализ комбинаций чисел в матрице — как позиции влияют друг на друга, где есть конфликты и усиления.
+              {t("res.matrix.linksDesc")}
             </p>
             <div className="grid gap-4">
               {crossLinks.map((link, i) => (
@@ -357,19 +357,19 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
           <>
             <h2 className="text-lg font-display text-foreground flex items-center gap-2">
               <FileText className="w-5 h-5 text-primary" />
-              Итоговый анализ
+              {t("res.matrix.summaryTab")}
             </h2>
 
             {/* Overall profile */}
             <div className="gradient-card rounded-xl p-5 border border-primary/30">
-              <h3 className="font-display font-semibold text-foreground mb-3">Общая картина</h3>
+              <h3 className="font-display font-semibold text-foreground mb-3">{t("res.matrix.overallPicture")}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{summary.overallProfile}</p>
             </div>
 
             {/* Key problems */}
             <div className="rounded-xl p-5 border border-destructive/20 bg-destructive/5">
               <h3 className="font-display font-semibold text-foreground mb-3 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-destructive" /> Ключевые проблемы
+                <AlertTriangle className="w-5 h-5 text-destructive" /> {t("res.matrix.keyProblems")}
               </h3>
               <ul className="space-y-2">
                 {summary.keyProblems.map((p, i) => (
@@ -383,7 +383,7 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
             {/* Growth points */}
             <div className="rounded-xl p-5 border border-emerald-500/20 bg-emerald-500/5">
               <h3 className="font-display font-semibold text-foreground mb-3 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-600" /> Точки роста
+                <TrendingUp className="w-5 h-5 text-emerald-600" /> {t("res.matrix.growthPoints")}
               </h3>
               <ul className="space-y-2">
                 {summary.growthPoints.map((g, i) => (
@@ -397,7 +397,7 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
             {/* Strategic recommendations */}
             <div className="rounded-xl p-5 border border-primary/20 bg-primary/5">
               <h3 className="font-display font-semibold text-foreground mb-3 flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-primary" /> Стратегические рекомендации
+                <Lightbulb className="w-5 h-5 text-primary" /> {t("res.matrix.strategicRec")}
               </h3>
               <ol className="space-y-2">
                 {summary.strategicRecommendations.map((r, i) => (
@@ -438,6 +438,7 @@ function MatrixCell({ position, value, isMirror = false, isReversed = false, isH
 }
 
 function CrossLinkCard({ link, matrix }: { link: CrossPositionLink; matrix: PersonalMatrix }) {
+  const { t } = useTranslation();
   const [p1, p2] = link.positions;
   const v1 = matrix.positions[p1 - 1];
   const v2 = matrix.positions[p2 - 1];
@@ -465,7 +466,7 @@ function CrossLinkCard({ link, matrix }: { link: CrossPositionLink; matrix: Pers
             link.type === 'conflict' && "bg-destructive/10 text-destructive",
             link.type === 'neutral' && "bg-muted text-muted-foreground",
           )}>
-            {link.type === 'synergy' ? '✦ Синергия' : link.type === 'conflict' ? '⚡ Конфликт' : '○ Нейтральная связь'}
+            {link.type === 'synergy' ? `✦ ${t("res.matrix.synergy")}` : link.type === 'conflict' ? `⚡ ${t("res.matrix.conflict")}` : `○ ${t("res.matrix.neutral")}`}
           </span>
         </div>
       </div>
