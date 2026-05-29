@@ -285,6 +285,18 @@
       "conflict": "Конфликт",
       "neutral": "Нейтральная связь"
     },
+    "arcanaCard": {
+      "position": "Позиция {{n}}",
+      "mirror": "Зеркальный",
+      "reversed": "Перевёрнутый",
+      "lifeManifest": "Как проявляется в жизни",
+      "strengths": "Сильные стороны",
+      "weaknesses": "Слабые стороны",
+      "whereEarns": "Где зарабатывает",
+      "whereLoses": "Где теряет",
+      "recommendations": "Рекомендации",
+      "professions": "Подходящие профессии"
+    },
     "nameEnergy": {
       "lettersSum": "Сумма букв:",
       "letterBreakdown": "Разбор по буквам",

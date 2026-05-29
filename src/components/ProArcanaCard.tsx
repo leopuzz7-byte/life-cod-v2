@@ -2,6 +2,7 @@ import { getArcana } from "@/lib/arcana";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronUp, Sparkles, AlertTriangle, TrendingUp, TrendingDown, Lightbulb, Target } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PositionInterpretation } from "@/lib/matrixInterpretation";
 
 interface ProArcanaCardProps {
@@ -11,6 +12,7 @@ interface ProArcanaCardProps {
 }
 
 export function ProArcanaCard({ interpretation, isMirror = false, isReversed = false }: ProArcanaCardProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
   const arcana = getArcana(interpretation.arcanaNumber);
   if (!arcana) return null;
@@ -37,18 +39,18 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
             </div>
             <div>
               <div className="text-xs text-muted-foreground mb-0.5">
-                Позиция {interpretation.position}: {interpretation.positionTitle}
+                {t("res.arcanaCard.position", { n: interpretation.position })}: {interpretation.positionTitle}
               </div>
               <div className="flex items-center gap-2">
                 <h3 className="font-display font-semibold text-foreground">{arcana.name}</h3>
                 {isMirror && (
                   <span className="flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                    <Sparkles className="w-3 h-3" /> Зеркальный
+                    <Sparkles className="w-3 h-3" /> {t("res.arcanaCard.mirror")}
                   </span>
                 )}
                 {isReversed && !isMirror && (
                   <span className="flex items-center gap-1 text-xs text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
-                    <AlertTriangle className="w-3 h-3" /> Перевёрнутый
+                    <AlertTriangle className="w-3 h-3" /> {t("res.arcanaCard.reversed")}
                   </span>
                 )}
               </div>
@@ -74,7 +76,7 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
           {interpretation.lifeManifestations && (
             <div className="bg-accent/30 rounded-lg p-3">
               <h4 className="text-sm font-medium text-foreground mb-1 flex items-center gap-1.5">
-                <Target className="w-4 h-4 text-primary" /> Как проявляется в жизни
+                <Target className="w-4 h-4 text-primary" /> {t("res.arcanaCard.lifeManifest")}
               </h4>
               <p className="text-sm text-muted-foreground leading-relaxed">{interpretation.lifeManifestations}</p>
             </div>
@@ -85,7 +87,7 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
             {interpretation.strengths.length > 0 && (
               <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-lg p-3">
                 <h4 className="text-sm font-medium text-emerald-700 dark:text-emerald-400 mb-2 flex items-center gap-1.5">
-                  <TrendingUp className="w-4 h-4" /> Сильные стороны
+                  <TrendingUp className="w-4 h-4" /> {t("res.arcanaCard.strengths")}
                 </h4>
                 <ul className="space-y-1">
                   {interpretation.strengths.map((s, i) => (
@@ -99,7 +101,7 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
             {interpretation.weaknesses.length > 0 && (
               <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3">
                 <h4 className="text-sm font-medium text-destructive mb-2 flex items-center gap-1.5">
-                  <TrendingDown className="w-4 h-4" /> Слабые стороны
+                  <TrendingDown className="w-4 h-4" /> {t("res.arcanaCard.weaknesses")}
                 </h4>
                 <ul className="space-y-1">
                   {interpretation.weaknesses.map((w, i) => (
@@ -116,13 +118,13 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {interpretation.whereEarns && (
               <div className="rounded-lg p-3 bg-amber-500/5 border border-amber-500/20">
-                <h4 className="text-sm font-medium text-amber-700 dark:text-amber-400 mb-1">💰 Где зарабатывает</h4>
+                <h4 className="text-sm font-medium text-amber-700 dark:text-amber-400 mb-1">💰 {t("res.arcanaCard.whereEarns")}</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">{interpretation.whereEarns}</p>
               </div>
             )}
             {interpretation.whereLoses && (
               <div className="rounded-lg p-3 bg-muted/50 border border-border">
-                <h4 className="text-sm font-medium text-muted-foreground mb-1">⚠️ Где теряет</h4>
+                <h4 className="text-sm font-medium text-muted-foreground mb-1">⚠️ {t("res.arcanaCard.whereLoses")}</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">{interpretation.whereLoses}</p>
               </div>
             )}
@@ -132,7 +134,7 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
           {interpretation.recommendations.length > 0 && (
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
               <h4 className="text-sm font-medium text-primary mb-2 flex items-center gap-1.5">
-                <Lightbulb className="w-4 h-4" /> Рекомендации
+                <Lightbulb className="w-4 h-4" /> {t("res.arcanaCard.recommendations")}
               </h4>
               <ul className="space-y-1.5">
                 {interpretation.recommendations.map((r, i) => (
@@ -147,7 +149,7 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
           {/* Подходящие профессии */}
           {arcana.professions.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-foreground mb-2">Подходящие профессии</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">{t("res.arcanaCard.professions")}</h4>
               <div className="flex flex-wrap gap-2">
                 {arcana.professions.map((p, i) => (
                   <span key={i} className="text-xs bg-secondary px-2 py-1 rounded-full text-secondary-foreground">{p}</span>

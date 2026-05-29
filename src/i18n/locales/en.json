@@ -285,6 +285,18 @@
       "conflict": "Conflict",
       "neutral": "Neutral link"
     },
+    "arcanaCard": {
+      "position": "Position {{n}}",
+      "mirror": "Mirror",
+      "reversed": "Reversed",
+      "lifeManifest": "How it manifests in life",
+      "strengths": "Strengths",
+      "weaknesses": "Weaknesses",
+      "whereEarns": "Where you earn",
+      "whereLoses": "Where you lose",
+      "recommendations": "Recommendations",
+      "professions": "Suitable professions"
+    },
     "nameEnergy": {
       "lettersSum": "Letter sum:",
       "letterBreakdown": "Letter breakdown",
