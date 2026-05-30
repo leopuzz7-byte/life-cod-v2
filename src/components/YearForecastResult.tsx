@@ -60,7 +60,7 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
           "inline-block px-3 py-1 rounded-full text-xs font-medium mb-2",
           isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
         )}>
-          {isPro ? "✦ Профессиональный разбор" : "Базовый разбор"}
+          {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
         </span>
         <h1 className="text-2xl md:text-3xl font-display text-primary mb-2">
           {t("forecast.yearForecast")} {t("forecast.forYear", { year: forecast.targetYear })}
@@ -82,7 +82,7 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
         </div>
         <div className="p-4 bg-muted/30 rounded-xl mb-4">
           <p className="text-sm text-muted-foreground">
-            <strong>Планета:</strong> {arcana?.planet || "—"} · <strong>Стихия:</strong> {arcana?.element || "—"}
+            <strong>{t("res.year.planetWord")}</strong> {arcana?.planet || "—"} · <strong>{t("res.year.elementWord")}</strong> {arcana?.element || "—"}
           </p>
         </div>
         <ArcanaCard number={forecast.arcana} showYearForecast={true} compact={false} />
@@ -92,136 +92,136 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
       {isPro && proData && (
         <>
           {/* 1. ВВОДНЫЙ БЛОК */}
-          <ProSectionBlock icon={BookOpen} title="Введение в ваш год" variant="highlight">
+          <ProSectionBlock icon={BookOpen} title={t("res.year.intro")} variant="highlight">
             <ProTextBlock text={proData.intro} className="mb-4" />
             <div className="p-4 bg-primary/5 rounded-xl border border-primary/10">
-              <h4 className="text-sm font-medium text-foreground mb-2">Основная энергия года</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">{t("res.year.mainEnergy")}</h4>
               <ProTextBlock text={proData.mainEnergy} />
             </div>
           </ProSectionBlock>
 
           {/* 2. ОСНОВНОЙ РАЗБОР */}
-          <ProSectionBlock icon={Target} title="Глубокий разбор аркана года">
+          <ProSectionBlock icon={Target} title={t("res.year.deepArcana")}>
             <ProTextBlock text={proData.overview} className="mb-4" />
             <ProTextBlock text={proData.deepMeaning} className="mb-4" />
             
             <div className="grid md:grid-cols-2 gap-4 mb-4">
               <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
                 <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-1.5">
-                  <TrendingUp className="w-4 h-4 text-emerald-600" /> Сильные стороны года
+                  <TrendingUp className="w-4 h-4 text-emerald-600" /> {t("res.year.strengths")}
                 </h4>
                 <ProListBlock items={proData.strengths} icon="✦" />
               </div>
               <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4">
                 <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 text-destructive" /> Слабые стороны года
+                  <AlertTriangle className="w-4 h-4 text-destructive" /> {t("res.year.weaknesses")}
                 </h4>
                 <ProListBlock items={proData.weaknesses} icon="⚠" />
               </div>
             </div>
 
             <div className="bg-muted/30 rounded-xl p-4 mb-4">
-              <h4 className="text-sm font-medium text-foreground mb-2">Искажения энергии</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">{t("res.year.distortions")}</h4>
               <ProTextBlock text={proData.distortions} />
             </div>
             
             <div className="bg-accent/20 rounded-xl p-4">
-              <h4 className="text-sm font-medium text-foreground mb-2">Как проявляется в жизни</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">{t("res.year.lifeManifest")}</h4>
               <ProTextBlock text={proData.lifeExamples} />
             </div>
           </ProSectionBlock>
 
           {/* 3. РАЗБОР ПО СФЕРАМ ЖИЗНИ */}
-          <ProSectionBlock icon={Briefcase} title="💰 Деньги и финансы">
+          <ProSectionBlock icon={Briefcase} title={t("res.year.money")}>
             <ProTextBlock text={proData.money} className="mb-4" />
             <div className="grid md:grid-cols-3 gap-3">
               <div className="bg-destructive/5 rounded-lg p-3 border border-destructive/10">
-                <h5 className="text-xs font-medium text-destructive mb-1">Риски</h5>
+                <h5 className="text-xs font-medium text-destructive mb-1">{t("res.risksWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.moneyRisks}</p>
               </div>
               <div className="bg-emerald-500/5 rounded-lg p-3 border border-emerald-500/10">
-                <h5 className="text-xs font-medium text-emerald-600 mb-1">Возможности</h5>
+                <h5 className="text-xs font-medium text-emerald-600 mb-1">{t("res.opportunitiesWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.moneyOpportunities}</p>
               </div>
               <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                <h5 className="text-xs font-medium text-primary mb-1">Рекомендации</h5>
+                <h5 className="text-xs font-medium text-primary mb-1">{t("res.recommendationsWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.moneyRecommendations}</p>
               </div>
             </div>
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Briefcase} title="💼 Работа и реализация">
+          <ProSectionBlock icon={Briefcase} title={t("res.year.work")}>
             <ProTextBlock text={proData.career} className="mb-4" />
             <div className="grid md:grid-cols-3 gap-3">
               <div className="bg-destructive/5 rounded-lg p-3 border border-destructive/10">
-                <h5 className="text-xs font-medium text-destructive mb-1">Риски</h5>
+                <h5 className="text-xs font-medium text-destructive mb-1">{t("res.risksWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.careerRisks}</p>
               </div>
               <div className="bg-emerald-500/5 rounded-lg p-3 border border-emerald-500/10">
-                <h5 className="text-xs font-medium text-emerald-600 mb-1">Возможности</h5>
+                <h5 className="text-xs font-medium text-emerald-600 mb-1">{t("res.opportunitiesWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.careerOpportunities}</p>
               </div>
               <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                <h5 className="text-xs font-medium text-primary mb-1">Рекомендации</h5>
+                <h5 className="text-xs font-medium text-primary mb-1">{t("res.recommendationsWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.careerRecommendations}</p>
               </div>
             </div>
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Heart} title="❤️ Отношения">
+          <ProSectionBlock icon={Heart} title={t("res.year.relationships")}>
             <ProTextBlock text={proData.relationships} className="mb-4" />
             <div className="grid md:grid-cols-3 gap-3">
               <div className="bg-destructive/5 rounded-lg p-3 border border-destructive/10">
-                <h5 className="text-xs font-medium text-destructive mb-1">Риски</h5>
+                <h5 className="text-xs font-medium text-destructive mb-1">{t("res.risksWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.relationshipsRisks}</p>
               </div>
               <div className="bg-emerald-500/5 rounded-lg p-3 border border-emerald-500/10">
-                <h5 className="text-xs font-medium text-emerald-600 mb-1">Возможности</h5>
+                <h5 className="text-xs font-medium text-emerald-600 mb-1">{t("res.opportunitiesWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.relationshipsOpportunities}</p>
               </div>
               <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                <h5 className="text-xs font-medium text-primary mb-1">Рекомендации</h5>
+                <h5 className="text-xs font-medium text-primary mb-1">{t("res.recommendationsWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.relationshipsRecommendations}</p>
               </div>
             </div>
           </ProSectionBlock>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={Activity} title="🏥 Здоровье">
+            <ProSectionBlock icon={Activity} title={t("res.year.health")}>
               <ProTextBlock text={proData.health} className="mb-3" />
               <div className="bg-destructive/5 rounded-lg p-3 border border-destructive/10 mb-2">
-                <h5 className="text-xs font-medium text-destructive mb-1">Риски</h5>
+                <h5 className="text-xs font-medium text-destructive mb-1">{t("res.risksWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.healthRisks}</p>
               </div>
               <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                <h5 className="text-xs font-medium text-primary mb-1">Рекомендации</h5>
+                <h5 className="text-xs font-medium text-primary mb-1">{t("res.recommendationsWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.healthRecommendations}</p>
               </div>
             </ProSectionBlock>
 
-            <ProSectionBlock icon={Brain} title="🧠 Внутреннее состояние">
+            <ProSectionBlock icon={Brain} title={t("res.year.innerState")}>
               <ProTextBlock text={proData.innerState} className="mb-3" />
               <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                <h5 className="text-xs font-medium text-primary mb-1">Рекомендации</h5>
+                <h5 className="text-xs font-medium text-primary mb-1">{t("res.recommendationsWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.innerStateRecommendations}</p>
               </div>
             </ProSectionBlock>
           </div>
 
           {/* 4. СВЯЗКИ И ВЗАИМОДЕЙСТВИЕ */}
-          <ProSectionBlock icon={Zap} title="Энергетические взаимодействия">
+          <ProSectionBlock icon={Zap} title={t("res.year.energyInteractions")}>
             <ProTextBlock text={proData.energyInteractions} />
           </ProSectionBlock>
 
           {/* 5. ДОПОЛНИТЕЛЬНАЯ МЕТОДИКА */}
-          <ProSectionBlock icon={BookOpen} title="Дополнительная методика (система Капустина)" variant="highlight">
+          <ProSectionBlock icon={BookOpen} title={t("res.year.additionalMethod")} variant="highlight">
             <ProTextBlock text={proData.additionalInsight} />
           </ProSectionBlock>
 
           {/* ===== ПОДРОБНЫЙ ПОМЕСЯЧНЫЙ ПРОГНОЗ ===== */}
-          <ProSectionBlock icon={Calendar} title="📅 Подробный прогноз по месяцам" variant="highlight">
+          <ProSectionBlock icon={Calendar} title={t("res.year.monthlyForecast")} variant="highlight">
             <p className="text-sm text-muted-foreground mb-6">
-              Ниже — детальный разбор каждого месяца {forecast.targetYear} года. Каждый месяц имеет свою энергию, тему и рекомендации.
+              {t("res.year.monthlyIntro", { year: forecast.targetYear })}
             </p>
             <div className="space-y-6">
               {detailedMonths.map((m) => (
@@ -232,7 +232,7 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
                         {m.name} {forecast.targetYear}
                       </h3>
                       <p className="text-xs text-muted-foreground">
-                        Аркан месяца: {m.arcanaInfluence} · Планета: {m.planet}
+                        {t("res.year.arcanaOfMonth")} {m.arcanaInfluence} · {t("res.year.planetWord")} {m.planet}
                       </p>
                     </div>
                     <div className="bg-primary/20 text-primary text-xs font-medium px-2 py-1 rounded-md">
@@ -244,14 +244,14 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
                     
                     <div className="bg-muted/30 rounded-lg p-3">
                       <h5 className="text-xs font-medium text-foreground mb-1 flex items-center gap-1.5">
-                        <AlertTriangle className="w-3.5 h-3.5 text-destructive" /> На что обратить внимание
+                        <AlertTriangle className="w-3.5 h-3.5 text-destructive" /> {t("res.year.attention")}
                       </h5>
                       <p className="text-xs text-muted-foreground leading-relaxed">{m.attention}</p>
                     </div>
                     
                     <div className="bg-primary/5 rounded-lg p-3">
                       <h5 className="text-xs font-medium text-primary mb-1 flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-primary" /> Рекомендации
+                        <CheckCircle className="w-3.5 h-3.5 text-primary" /> {t("res.recommendationsWord")}
                       </h5>
                       <p className="text-xs text-muted-foreground leading-relaxed">{m.recommendations}</p>
                     </div>
@@ -262,9 +262,9 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
           </ProSectionBlock>
 
           {/* ===== ПЕРИОДЫ ВНУТРИ ГОДА ===== */}
-          <ProSectionBlock icon={Clock} title="📊 Периоды внутри года">
+          <ProSectionBlock icon={Clock} title={t("res.year.periodsTitle")}>
             <p className="text-sm text-muted-foreground mb-4">
-              Год разделён на четыре ключевых периода, каждый со своей энергией и задачами.
+              {t("res.year.periodsIntro")}
             </p>
             <div className="space-y-4">
               {yearPeriods.map((period, i) => (
@@ -276,11 +276,11 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
                   <ProTextBlock text={period.description} />
                   <div className="grid md:grid-cols-2 gap-3">
                     <div className="bg-destructive/5 rounded-lg p-3 border border-destructive/10">
-                      <h5 className="text-xs font-medium text-destructive mb-1">Риски периода</h5>
+                      <h5 className="text-xs font-medium text-destructive mb-1">{t("res.year.periodRisks")}</h5>
                       <p className="text-xs text-muted-foreground">{period.risks}</p>
                     </div>
                     <div className="bg-emerald-500/5 rounded-lg p-3 border border-emerald-500/10">
-                      <h5 className="text-xs font-medium text-emerald-600 mb-1">Возможности</h5>
+                      <h5 className="text-xs font-medium text-emerald-600 mb-1">{t("res.opportunitiesWord")}</h5>
                       <p className="text-xs text-muted-foreground">{period.opportunities}</p>
                     </div>
                   </div>
@@ -292,15 +292,15 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
           {/* ===== РЕСУРСЫ ГОДА ===== */}
           {yearResources && (
             <>
-              <ProSectionBlock icon={Battery} title="⚡ Что даёт энергию в этом году" variant="success">
+              <ProSectionBlock icon={Battery} title={t("res.year.givesEnergy")} variant="success">
                 <ProListBlock items={yearResources.givesEnergy} icon="✦" />
               </ProSectionBlock>
 
-              <ProSectionBlock icon={BatteryWarning} title="🔻 Что забирает энергию" variant="warning">
+              <ProSectionBlock icon={BatteryWarning} title={t("res.year.takesEnergy")} variant="warning">
                 <ProListBlock items={yearResources.takesEnergy} icon="⚠" />
               </ProSectionBlock>
 
-              <ProSectionBlock icon={Star} title="🌟 Таланты и возможности года" variant="success">
+              <ProSectionBlock icon={Star} title={t("res.year.talents")} variant="success">
                 <ProListBlock items={yearResources.talents} icon="★" />
               </ProSectionBlock>
             </>
@@ -309,47 +309,47 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
           {/* ===== EXTRA: HEALING THEMES, BIRTHDAY RITUAL, MAIN EXAM, YEAR TASKS ===== */}
           {yearExtra && (
             <>
-              <ProSectionBlock icon={Lightbulb} title="🩹 Исцеляющие темы года" variant="highlight">
+              <ProSectionBlock icon={Lightbulb} title={t("res.year.healingThemes")} variant="highlight">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Темы, которые год приглашает вас проработать для глубинного исцеления.
+                  {t("res.year.healingIntro")}
                 </p>
                 <ProListBlock items={yearExtra.healingThemes} icon="💚" />
               </ProSectionBlock>
 
-              <ProSectionBlock icon={Sparkles} title="🎂 Ритуал дня рождения">
+              <ProSectionBlock icon={Sparkles} title={t("res.year.bdayRitual")}>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Практики для входа в новый годовой цикл с максимальной осознанностью.
+                  {t("res.year.bdayIntro")}
                 </p>
                 <ProNumberedList items={yearExtra.birthdayRitual} />
               </ProSectionBlock>
 
-              <ProSectionBlock icon={Target} title="📋 Главный экзамен года" variant="warning">
+              <ProSectionBlock icon={Target} title={t("res.year.mainExam")} variant="warning">
                 <div className="bg-muted/30 rounded-xl p-4 mb-4">
-                  <h4 className="text-sm font-medium text-foreground mb-2">Ключевой вопрос:</h4>
+                  <h4 className="text-sm font-medium text-foreground mb-2">{t("res.year.keyQuestion")}</h4>
                   <p className="text-sm text-primary font-medium italic">«{yearExtra.mainExam.question}»</p>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
                     <h4 className="text-sm font-medium text-emerald-600 mb-3 flex items-center gap-1.5">
-                      <CheckCircle className="w-4 h-4" /> Положительные проявления
+                      <CheckCircle className="w-4 h-4" /> {t("res.year.positiveManifest")}
                     </h4>
                     <ProListBlock items={yearExtra.mainExam.plusAnswers} icon="✦" />
                   </div>
                   <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4">
                     <h4 className="text-sm font-medium text-destructive mb-3 flex items-center gap-1.5">
-                      <AlertTriangle className="w-4 h-4" /> Отрицательные проявления
+                      <AlertTriangle className="w-4 h-4" /> {t("res.year.negativeManifest")}
                     </h4>
                     <ProListBlock items={yearExtra.mainExam.minusAnswers} icon="⚠" />
                   </div>
                 </div>
               </ProSectionBlock>
 
-              <ProSectionBlock icon={BookOpen} title="📝 Задачи года" variant="success">
+              <ProSectionBlock icon={BookOpen} title={t("res.year.yearTasks")} variant="success">
                 <ProNumberedList items={yearExtra.yearTasks} />
               </ProSectionBlock>
 
               {yearExtra.lifeSphereThemes.length > 0 && (
-                <ProSectionBlock icon={Heart} title="💡 Тематики сфер жизни">
+                <ProSectionBlock icon={Heart} title={t("res.year.lifeSphereThemes")}>
                   <ProListBlock items={yearExtra.lifeSphereThemes} icon="→" />
                 </ProSectionBlock>
               )}
@@ -357,38 +357,38 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
           )}
 
           {/* 6. РИСКИ */}
-          <ProSectionBlock icon={ShieldAlert} title="Риски года" variant="warning">
+          <ProSectionBlock icon={ShieldAlert} title={t("res.year.risksOfYear")} variant="warning">
             <ProListBlock items={proData.risks} icon="⚠" className="mb-4" />
             <div className="bg-muted/30 rounded-xl p-4">
-              <h4 className="text-sm font-medium text-foreground mb-2">Повторяющиеся паттерны</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">{t("res.year.repeatingPatterns")}</h4>
               <ProTextBlock text={proData.repeatingPatterns} />
             </div>
           </ProSectionBlock>
 
           {/* 7. ВОЗМОЖНОСТИ */}
-          <ProSectionBlock icon={Sparkles} title="Возможности года" variant="success">
+          <ProSectionBlock icon={Sparkles} title={t("res.year.opportunitiesOfYear")} variant="success">
             <ProListBlock items={proData.opportunities} icon="★" />
           </ProSectionBlock>
 
           {/* 8. РЕКОМЕНДАЦИИ */}
-          <ProSectionBlock icon={CheckCircle} title="Рекомендации" variant="highlight">
-            <h4 className="text-sm font-medium text-foreground mb-3">Что делать</h4>
+          <ProSectionBlock icon={CheckCircle} title={t("res.recommendationsWord")} variant="highlight">
+            <h4 className="text-sm font-medium text-foreground mb-3">{t("res.whatToDo")}</h4>
             <ProNumberedList items={proData.recommendations} className="mb-6" />
-            
-            <h4 className="text-sm font-medium text-destructive mb-3">Чего избегать</h4>
+
+            <h4 className="text-sm font-medium text-destructive mb-3">{t("res.whatToAvoid")}</h4>
             <ProListBlock items={proData.whatToAvoid} icon="✗" />
           </ProSectionBlock>
 
           {/* 9. ИТОГ */}
-          <ProSectionBlock icon={MessageCircle} title="Итог" variant="highlight">
+          <ProSectionBlock icon={MessageCircle} title={t("res.conclusion")} variant="highlight">
             <ProTextBlock text={proData.conclusion} className="mb-4" />
             <div className="grid md:grid-cols-2 gap-3">
               <div className="bg-primary/10 rounded-xl p-4 text-center">
-                <h4 className="text-xs font-medium text-primary mb-1">Ключевая мысль</h4>
+                <h4 className="text-xs font-medium text-primary mb-1">{t("res.year.keyThought")}</h4>
                 <p className="text-sm text-foreground font-medium italic">«{proData.keyThought}»</p>
               </div>
               <div className="bg-primary/10 rounded-xl p-4 text-center">
-                <h4 className="text-xs font-medium text-primary mb-1">Главный вектор</h4>
+                <h4 className="text-xs font-medium text-primary mb-1">{t("res.year.mainVector")}</h4>
                 <p className="text-sm text-foreground font-medium">{proData.mainVector}</p>
               </div>
             </div>
@@ -400,10 +400,7 @@ export function YearForecastResult({ forecast, name, onReset, tier = 'basic' }: 
       {!isPro && (
         <div className="bg-muted/30 rounded-xl border border-border p-5 text-center space-y-2">
           <p className="text-sm text-muted-foreground">
-            В профессиональном разборе: глубокий анализ аркана года, подробный разбор по всем сферам жизни 
-            (деньги, карьера, отношения, здоровье, внутреннее состояние), детальный помесячный прогноз на 12 месяцев,
-            периоды внутри года, ресурсы и энергия, риски и возможности, 
-            связки энергий, дополнительная методика и персональные рекомендации.
+            {t("res.year.proFooter")}
           </p>
         </div>
       )}
