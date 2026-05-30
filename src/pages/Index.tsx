@@ -21,11 +21,10 @@ import { ContractEnergyResultComponent } from "@/components/ContractEnergyResult
 import { ComingSoon } from "@/components/ComingSoon";
 import { LifeCodInputForm, LifeCodResult, UnifiedPersonalResult } from "@/components/lifecod";
 import { TierSelector } from "@/components/TierSelector";
-import { useMethodPrice } from "@/hooks/useMethodPrice";
-import { analysisConfigs, getAnalysisConfig, getConfigsForMethodology, proExtendedDescription, type TierType } from "@/lib/analysisConfig";
-import { 
-  calculateYearForecast, 
-  calculateMonthForecast, 
+import { analysisConfigs, getAnalysisConfig, getConfigsForMethodology, proExtendedDescriptions, type TierType } from "@/lib/analysisConfig";
+import {
+  calculateYearForecast,
+  calculateMonthForecast,
   calculatePersonalMatrix,
   calculateCompatibility,
   YearForecast,
@@ -59,7 +58,7 @@ const Index = () => {
   const lastInputRef = useRef<Record<string, unknown>>({});
   const savedResultRef = useRef<unknown>(null);
 
-  type ResultType = 
+  type ResultType =
     | { type: "year"; data: YearForecast }
     | { type: "month"; data: MonthForecast }
     | { type: "purpose"; data: PersonalMatrix }
@@ -78,7 +77,6 @@ const Index = () => {
   const [selectedMethodology, setSelectedMethodology] = useState<"1" | "2">("1");
   const [selectedMethod, setSelectedMethod] = useState("purpose");
   const [selectedTier, setSelectedTier] = useState<TierType>("basic");
-  const { prices: methodPrices } = useMethodPrice(selectedMethod);
   const [result, setResult] = useState<ResultType>(null);
   const [userName, setUserName] = useState("");
   const [nameEnergyInput, setNameEnergyInput] = useState("");
@@ -96,6 +94,79 @@ const Index = () => {
     p2Name: string; p2Day: number; p2Month: number; p2Year: number;
     relationType: RelationType;
   } | null>(null);
+
+  // Обработка возврата с /payment/success.
+  // PaymentSuccess сохраняет "payment_completed" в sessionStorage и редиректит на "/".
+  // Здесь восстанавливаем все pending данные и запускаем расчёт.
+  useEffect(() => {
+    const completed = sessionStorage.getItem("payment_completed");
+    if (completed !== "true") return;
+
+    // Чистим флаг сразу
+    sessionStorage.removeItem("payment_completed");
+    sessionStorage.removeItem("pending_order_id");
+
+    // Восстанавливаем pendingCalcData (одиночные разборы)
+    const calcRaw = sessionStorage.getItem("pendingCalcData") || localStorage.getItem("pendingCalcData");
+    if (calcRaw) {
+      try {
+        const d = JSON.parse(calcRaw);
+        sessionStorage.removeItem("pendingCalcData");
+        localStorage.removeItem("pendingCalcData");
+        if (d.methodology) setSelectedMethodology(d.methodology as "1" | "2");
+        if (d.method) setSelectedMethod(d.method);
+        setPendingCalcArgs(d);
+        sessionStorage.removeItem("pending_method_id");
+        setPaymentStatus("paid");
+        return;
+      } catch {}
+    }
+
+    // Восстанавливаем pendingCompatData (совместимость М1)
+    const compatRaw = sessionStorage.getItem("pendingCompatData");
+    if (compatRaw) {
+      try {
+        const d = JSON.parse(compatRaw);
+        sessionStorage.removeItem("pendingCompatData");
+        if (d.methodology) setSelectedMethodology(d.methodology as "1" | "2");
+        if (d.method) setSelectedMethod(d.method);
+        setPendingCompatArgs(d);
+        sessionStorage.removeItem("pending_method_id");
+        setPaymentStatus("paid");
+        return;
+      } catch {}
+    }
+
+    // Восстанавливаем pendingLifeCodData (совместимость М2)
+    const lifecodRaw = sessionStorage.getItem("pendingLifeCodData");
+    if (lifecodRaw) {
+      try {
+        const d = JSON.parse(lifecodRaw);
+        sessionStorage.removeItem("pendingLifeCodData");
+        if (d.methodology) setSelectedMethodology(d.methodology as "1" | "2");
+        if (d.method) setSelectedMethod(d.method);
+        setPendingLifeCodArgs(d);
+        sessionStorage.removeItem("pending_method_id");
+        setPaymentStatus("paid");
+        return;
+      } catch {}
+    }
+
+    // Fallback: просто ставим paid, пусть юзер пересчитает
+    const pendingMethod = sessionStorage.getItem("pending_method_id");
+    sessionStorage.removeItem("pending_method_id");
+    if (pendingMethod) setSelectedMethod(pendingMethod);
+    setPaymentStatus("paid");
+  }, []);
+
+  // Когда paymentStatus становится "paid" и есть pending данные — автоматически считаем разбор
+  useEffect(() => {
+    if (paymentStatus === "paid" && result === null) {
+      if (pendingCalcArgs || pendingCompatArgs || pendingLifeCodArgs) {
+        handlePaymentSuccess();
+      }
+    }
+  }, [paymentStatus, pendingCalcArgs, pendingCompatArgs, pendingLifeCodArgs]);
 
   // Get current analysis config
   const currentConfig = getAnalysisConfig(selectedMethod);
@@ -115,6 +186,7 @@ const Index = () => {
     // Gate professional tier behind payment
     if (selectedTier === 'professional' && paymentStatus !== 'paid') {
       setPendingLifeCodArgs({ p1Name: person1Name, p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p2Name: person2Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, relationType });
+      sessionStorage.setItem("pendingLifeCodData", JSON.stringify({ p1Name: person1Name, p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p2Name: person2Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, relationType, method: selectedMethod, methodology: selectedMethodology }));
       setPaymentStatus("pending");
       return;
     }
@@ -170,51 +242,10 @@ const Index = () => {
     });
   }, [result, user, selectedMethod, selectedMethodology, selectedTier]);
 
-  // Restore pending calculation after return from Robokassa payment redirect
-  useEffect(() => {
-    if (sessionStorage.getItem("payment_completed") !== "true") return;
-    sessionStorage.removeItem("payment_completed");
-
-    const raw = localStorage.getItem("pendingCalcData");
-    if (!raw) return;
-    localStorage.removeItem("pendingCalcData");
-
-    try {
-      const saved = JSON.parse(raw) as {
-        day: number; month: number; year: number; name: string;
-        targetMonth?: number; targetYear?: number;
-        gender?: 'male' | 'female'; targetDay?: number;
-        method: string; methodology: "1" | "2";
-      };
-      const { day, month, year, name, targetMonth, targetYear, gender, targetDay } = saved;
-
-      setSelectedMethodology(saved.methodology);
-      setSelectedMethod(saved.method);
-      setSelectedTier("professional");
-      setPaymentStatus("paid");
-      setUserName(name);
-      lastInputRef.current = { day, month, year, name, targetMonth, targetYear, gender, targetDay };
-
-      if (saved.methodology === "2" && saved.method === "classic-full") {
-        setResult({ type: "unified-personal", data: calculateUnifiedPersonalAnalysis(name || t("common.you"), day, month, year, targetYear || new Date().getFullYear()) });
-        return;
-      }
-      switch (saved.method) {
-        case "year":   setResult({ type: "year",     data: calculateYearForecast(day, month, year, targetYear || new Date().getFullYear()) }); break;
-        case "month":  setResult({ type: "month",    data: calculateMonthForecast(day, month, year, targetMonth || new Date().getMonth() + 1, targetYear || new Date().getFullYear()) }); break;
-        case "day":    setResult({ type: "day",      data: calculateDailyForecast(day, month, year, targetDay || new Date().getDate(), targetMonth || new Date().getMonth() + 1, targetYear || new Date().getFullYear()) }); break;
-        case "contract": setResult({ type: "contract", data: calculateDailyForecast(day, month, year, targetDay || new Date().getDate(), targetMonth || new Date().getMonth() + 1, targetYear || new Date().getFullYear()) }); break;
-        case "finance":  setResult({ type: "finance",  data: calculateFinancialCode(day, month, year) }); break;
-        case "ancestral": setResult({ type: "ancestral", data: calculateAncestralPrograms(day, month, year, gender || 'female') }); break;
-        default:         setResult({ type: "purpose",  data: calculatePersonalMatrix(day, month, year) }); break;
-      }
-    } catch { /* ignore parse errors */ }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   const handleCalculate = (
-    day: number, 
-    month: number, 
-    year: number, 
+    day: number,
+    month: number,
+    year: number,
     name: string,
     targetMonth?: number,
     targetYear?: number,
@@ -237,7 +268,7 @@ const Index = () => {
     // Methodology 2 — main "Predназначение" (classic-full) routes to keyto/unified
     if (selectedMethodology === "2" && selectedMethod === "classic-full") {
       if (selectedTier === 'professional') {
-        const unifiedResult = calculateUnifiedPersonalAnalysis(name || t("common.you"), day, month, year, targetYear || new Date().getFullYear());
+        const unifiedResult = calculateUnifiedPersonalAnalysis(name || "Вы", day, month, year, targetYear || new Date().getFullYear());
         setResult({ type: "unified-personal", data: unifiedResult });
         return;
       }
@@ -255,7 +286,7 @@ const Index = () => {
       }
       case "month": {
         const monthForecast = calculateMonthForecast(
-          day, month, year, 
+          day, month, year,
           targetMonth || new Date().getMonth() + 1,
           targetYear || new Date().getFullYear()
         );
@@ -320,6 +351,7 @@ const Index = () => {
     // Gate professional tier behind payment
     if (selectedTier === 'professional' && paymentStatus !== 'paid') {
       setPendingCompatArgs({ p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p1Name: person1Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, p2Name: person2Name });
+      sessionStorage.setItem("pendingCompatData", JSON.stringify({ p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p1Name: person1Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, p2Name: person2Name, method: selectedMethod, methodology: selectedMethodology }));
       setPaymentStatus("pending");
       return;
     }
@@ -347,7 +379,7 @@ const Index = () => {
   // After successful payment, run the pending calculation and show result
   const handlePaymentSuccess = () => {
     setPaymentStatus("paid");
-    
+
     // Handle pending compatibility args
     if (pendingCompatArgs) {
       const { p1Day, p1Month, p1Year, p1Name, p2Day, p2Month, p2Year, p2Name } = pendingCompatArgs;
@@ -355,7 +387,7 @@ const Index = () => {
       setResult({ type: "compatibility", data: compatResult });
       return;
     }
-    
+
     // Handle pending lifecod args
     if (pendingLifeCodArgs) {
       const { p1Name, p1Day, p1Month, p1Year, p2Name, p2Day, p2Month, p2Year, relationType } = pendingLifeCodArgs;
@@ -363,7 +395,7 @@ const Index = () => {
       setResult({ type: "lifecod", data: lifecodResult });
       return;
     }
-    
+
     if (pendingCalcArgs) {
       const { day, month, year, name, targetMonth, targetYear, gender, targetDay } = pendingCalcArgs;
       setUserName(name);
@@ -371,7 +403,7 @@ const Index = () => {
       // Methodology 2 — main "Predназначение" (classic-full) routes to keyto/unified
       if (selectedMethodology === "2" && selectedMethod === "classic-full") {
         if (selectedTier === 'professional') {
-          const unifiedResult = calculateUnifiedPersonalAnalysis(name || t("common.you"), day, month, year, targetYear || new Date().getFullYear());
+          const unifiedResult = calculateUnifiedPersonalAnalysis(name || "Вы", day, month, year, targetYear || new Date().getFullYear());
           setResult({ type: "unified-personal", data: unifiedResult });
           return;
         }
@@ -440,14 +472,13 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Header />
-      
+
       <main className="relative z-10">
         {paymentStatus === "pending" && !result ? (
           /* Payment gate — shown when professional tier selected but not yet paid */
           <div className="container mx-auto px-4 py-6 md:py-8">
             <PaymentScreen
               methodId={selectedMethod}
-              tier={selectedTier}
               onPaid={handlePaymentSuccess}
               onBack={handlePaymentBack}
             />
@@ -456,75 +487,40 @@ const Index = () => {
           <>
             {/* Hero block — shown only to non-authenticated visitors */}
             {!user && (
-              <section className="relative pt-10 md:pt-16 lg:pt-24 pb-6 overflow-hidden">
-                {/* Анимированные звёзды на фоне — чистый CSS, не влияют на скорость */}
-                <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-                  {[
-                    { top: "12%", left: "8%", size: "text-lg", delay: "0s", dur: "4s" },
-                    { top: "22%", left: "85%", size: "text-2xl", delay: "0.8s", dur: "5s" },
-                    { top: "55%", left: "12%", size: "text-xl", delay: "1.5s", dur: "4.5s" },
-                    { top: "68%", left: "90%", size: "text-lg", delay: "0.4s", dur: "5.5s" },
-                    { top: "40%", left: "78%", size: "text-base", delay: "2s", dur: "4s" },
-                    { top: "78%", left: "45%", size: "text-sm", delay: "1.2s", dur: "6s" },
-                    { top: "15%", left: "55%", size: "text-sm", delay: "2.5s", dur: "5s" },
-                  ].map((s, i) => (
-                    <span
-                      key={i}
-                      className={`absolute ${s.size} select-none`}
-                      style={{
-                        top: s.top,
-                        left: s.left,
-                        color: "hsl(var(--gold) / 0.35)",
-                        animation: `floatStar ${s.dur} ease-in-out ${s.delay} infinite`,
-                      }}
-                    >
-                      ✦
-                    </span>
-                  ))}
-                </div>
-
-                <div className="container mx-auto px-4 relative">
+              <section className="pt-8 md:pt-12 lg:pt-16 pb-2">
+                <div className="container mx-auto px-4">
                   <div className="max-w-2xl mx-auto text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary mb-6 animate-[fadeInUp_0.6s_ease] shadow-sm">
-                      <Sparkles className="w-7 h-7 text-accent animate-[breathe_3s_ease-in-out_infinite]" />
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-6">
+                      <Sparkles className="w-6 h-6 text-foreground" />
                     </div>
-                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-primary mb-5 leading-tight animate-[fadeInUp_0.7s_ease]">
-                      {t("home.heroTitle1")}<br className="hidden sm:block" /> {t("home.heroTitle2")}
+                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-primary mb-5 leading-tight">
+                      Персональная диагностика Life C⚙D
                     </h1>
-                    <p className="text-base md:text-lg text-muted-foreground mb-4 leading-relaxed animate-[fadeInUp_0.8s_ease]">
-                      {t("home.heroP1")}
+                    <p className="text-base md:text-lg text-muted-foreground mb-4 leading-relaxed">
+                      Понимание себя, своих жизненных циклов, сильных и слабых сторон, а также текущего периода жизни.
                     </p>
-                    <p className="text-sm text-muted-foreground/70 italic mb-8 animate-[fadeInUp_0.9s_ease]">
-                      {t("home.heroP2")}
+                    <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
+                      Этот инструмент помогает увидеть, как ты принимаешь решения, где твоя опора и на что сейчас важно обратить внимание.
                     </p>
-                    <div className="flex flex-col items-center gap-3 animate-[fadeInUp_1s_ease]">
+                    <p className="text-sm text-muted-foreground/70 italic mb-8">
+                      Без мистики. Без обещаний изменить тебя. Только структура и логика.
+                    </p>
+                    <div className="flex flex-col items-center gap-3">
                       <Link to="/register">
-                        <Button className="h-14 px-10 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary hover:scale-105 transition-transform duration-300">
-                          {t("home.heroCta")}
+                        <Button className="h-14 px-8 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary">
+                          Начать диагностику
                           <span className="ml-2">→</span>
                         </Button>
                       </Link>
-                      <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors mt-1">
-                        {t("home.heroLogin")}
+                      <Link
+                        to="/login"
+                        className="text-sm text-muted-foreground hover:text-primary transition-colors mt-1"
+                      >
+                        Уже есть аккаунт? Войти в калькулятор
                       </Link>
                     </div>
                   </div>
                 </div>
-
-                <style>{`
-                  @keyframes floatStar {
-                    0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
-                    50% { transform: translateY(-12px) scale(1.2); opacity: 0.7; }
-                  }
-                  @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(16px); }
-                    to { opacity: 1; transform: translateY(0); }
-                  }
-                  @keyframes breathe {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.15); }
-                  }
-                `}</style>
               </section>
             )}
 
@@ -537,7 +533,7 @@ const Index = () => {
                   <h2 className="text-xl sm:text-2xl md:text-3xl font-display text-primary mb-6 md:mb-8 text-center">
                     {t("calculator.title")}
                   </h2>
-                  
+
                   <p className="text-sm text-muted-foreground text-center mb-4 md:mb-6">
                     {t("calculator.selectMethodology")}
                   </p>
@@ -557,7 +553,7 @@ const Index = () => {
                         <Sparkles className="w-3 h-3" />
                         {t("methodology.moreAccurate")}
                       </div>
-                      
+
                       <div className="flex items-start gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
@@ -569,7 +565,7 @@ const Index = () => {
                             <Check className="w-3 h-3 md:w-4 md:h-4 text-primary-foreground" />
                           )}
                         </div>
-                        
+
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <h3 className="font-display font-semibold text-foreground text-base md:text-lg">
@@ -620,7 +616,7 @@ const Index = () => {
                                 )}
                                 {method.comingSoon && (
                                   <span className="text-[9px] md:text-[10px] px-1.5 py-0.5 bg-secondary text-muted-foreground rounded-full font-medium ml-auto">
-                                    {t("home.soon")}
+                                    Скоро
                                   </span>
                                 )}
                               </div>
@@ -711,7 +707,7 @@ const Index = () => {
                                 )}
                                 {method.comingSoon && (
                                   <span className="text-[9px] md:text-[10px] px-1.5 py-0.5 bg-secondary text-muted-foreground rounded-full font-medium ml-auto">
-                                    {t("home.soon")}
+                                    Скоро
                                   </span>
                                 )}
                               </div>
@@ -734,20 +730,18 @@ const Index = () => {
                   {currentConfig && !currentConfig.comingSoon && (
                     <div className="max-w-xl mx-auto mb-2">
                       <h3 className="text-sm font-medium text-foreground text-center mb-3">
-                        {t("cfg.chooseTierFor", { title: currentConfig.title })}
+                        Выберите тариф для «{currentConfig.title}»
                       </h3>
                       <TierSelector
                         config={currentConfig}
                         selectedTier={selectedTier}
                         onSelectTier={setSelectedTier}
-                        priceBasic={methodPrices?.price_basic ?? null}
-                        pricePro={methodPrices?.price_pro ?? null}
                       />
                       {/* What's inside Professional extended analysis (per methodology) */}
                       {selectedTier === 'professional' && currentConfig.professional && (
                         <div className="mt-1 mb-4 px-4 py-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-foreground leading-relaxed">
-                          <p className="font-medium mb-1 text-primary">{t("cfg.proIncludesTitle")}</p>
-                          <p className="text-muted-foreground">{proExtendedDescription(selectedMethodology)}</p>
+                          <p className="font-medium mb-1 text-primary">Что входит в Профессиональный расширенный разбор:</p>
+                          <p className="text-muted-foreground">{proExtendedDescriptions[selectedMethodology]}</p>
                         </div>
                       )}
                     </div>
@@ -766,9 +760,9 @@ const Index = () => {
                       <div className="gradient-card rounded-2xl p-5 sm:p-8 border border-border">
                         <div className="space-y-5">
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">{t("home.nameCheckLabel")}</label>
+                            <label className="text-sm font-medium text-foreground">Название для проверки</label>
                             <Input
-                              placeholder={t("home.nameCheckPlaceholder")}
+                              placeholder="Введите название компании, продукта или имя"
                               value={nameEnergyInput}
                               onChange={(e) => setNameEnergyInput(e.target.value)}
                               className="bg-background border-border focus:border-primary focus:ring-primary/20 h-12 text-foreground placeholder:text-muted-foreground"
@@ -779,7 +773,7 @@ const Index = () => {
                             disabled={!nameEnergyInput.trim()}
                             className="w-full h-14 text-lg font-display btn-fill animate-gentle-shake bg-primary hover:bg-primary text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed disabled:animate-none transition-all duration-300 rounded-full border-2 border-primary"
                           >
-                            {t("home.calcNameEnergy")}
+                            Рассчитать энергию названия
                           </Button>
                         </div>
                       </div>
@@ -792,9 +786,9 @@ const Index = () => {
                     <CompatibilityDateInput onCalculate={handleCompatibilityCalculate} />
                   ) : (
                     /* Default — single date input form */
-                    <DateInput 
+                    <DateInput
                       selectedMethod={selectedMethod}
-                      onCalculate={handleCalculate} 
+                      onCalculate={handleCalculate}
                     />
                   )}
                 </div>

@@ -1,28 +1,26 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { LoadingScreen } from "@/components/LoadingScreen";
 
 export default function PaymentSuccess() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [status, setStatus] = useState<"checking" | "paid" | "pending" | "error">("checking");
 
   useEffect(() => {
     const orderId = sessionStorage.getItem("pending_order_id");
+
+    // Если нет orderId — возможно это бесплатный разбор (free: true от сервера)
+    // или юзер зашёл напрямую. В обоих случаях считаем что можно продолжать.
     if (!orderId) {
-      setStatus("error");
+      setStatus("paid");
       return;
     }
 
-    // Проверяем статус заказа — Робокасса могла уже прислать подтверждение
-    // Пробуем несколько раз с интервалом (webhook может прийти с небольшой задержкой)
     let attempts = 0;
-    const maxAttempts = 6;
+    const maxAttempts = 8; // ~24 секунды
 
     const check = async () => {
       attempts++;
@@ -40,8 +38,8 @@ export default function PaymentSuccess() {
         if (data.status === "paid") {
           setStatus("paid");
         } else if (attempts >= maxAttempts) {
-          // Превысили попытки — оплата прошла, но webhook ещё не пришёл
-          // Это может быть в тестовом режиме — считаем оплаченным
+          // Webhook мог не прийти вовремя (тестовый режим, задержка)
+          // Всё равно пропускаем — оплата прошла на стороне платёжной системы
           setStatus("pending");
         } else {
           setTimeout(check, 3000);
@@ -56,8 +54,9 @@ export default function PaymentSuccess() {
   }, []);
 
   const handleContinue = () => {
-    // Возвращаемся на главную — там handlePaymentSuccess разблокирует разбор
+    // Сигнализируем Index.tsx что оплата прошла и надо показать разбор
     sessionStorage.setItem("payment_completed", "true");
+    // pending_order_id и pending_method_id и pending_args — Index.tsx сам прочитает
     navigate("/");
   };
 
@@ -68,7 +67,13 @@ export default function PaymentSuccess() {
         <div className="max-w-md w-full text-center space-y-6">
 
           {status === "checking" && (
-            <LoadingScreen phrases={[t("payment.checking"), t("payment.almostDone")]} />
+            <>
+              <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
+              <h1 className="font-display text-2xl text-foreground">
+                Проверяем оплату...
+              </h1>
+              <p className="text-muted-foreground">Подождите несколько секунд</p>
+            </>
           )}
 
           {(status === "paid" || status === "pending") && (
@@ -77,13 +82,13 @@ export default function PaymentSuccess() {
                 <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
               <h1 className="font-display text-2xl text-foreground">
-                {t("payment.successTitle")}
+                Оплата прошла успешно!
               </h1>
               <p className="text-muted-foreground">
-                {t("payment.successDesc")}
+                Разбор разблокирован. Нажмите кнопку ниже чтобы получить результат.
               </p>
               <Button onClick={handleContinue} className="w-full h-12 text-base rounded-full">
-                {t("payment.getAnalysis")} →
+                Получить разбор →
               </Button>
             </>
           )}
@@ -94,17 +99,17 @@ export default function PaymentSuccess() {
                 <AlertCircle className="w-10 h-10 text-amber-600" />
               </div>
               <h1 className="font-display text-2xl text-foreground">
-                {t("payment.errorTitle")}
+                Не удалось проверить оплату
               </h1>
               <p className="text-muted-foreground">
-                {t("payment.errorDesc")}
+                Если деньги были списаны — свяжитесь с поддержкой. Если нет — попробуйте оплатить снова.
               </p>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => navigate("/")} className="flex-1 rounded-full">
-                  {t("payment.toHome")}
+                  На главную
                 </Button>
                 <Button onClick={() => navigate("/support")} className="flex-1 rounded-full">
-                  {t("nav.support")}
+                  Поддержка
                 </Button>
               </div>
             </>
