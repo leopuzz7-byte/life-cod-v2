@@ -317,6 +317,17 @@
       "recommendations": "Recommendations",
       "professions": "Suitable professions"
     },
+    "ancestralPro": {
+      "intro": "Introduction to ancestral programs",
+      "karmicDebt": "Karmic debt of the lineage",
+      "healingPath": "Path of healing",
+      "gifts": "Ancestral gifts",
+      "blocks": "Ancestral blocks",
+      "patterns": "Generational patterns",
+      "rituals": "🕯️ Rituals for working with the lineage",
+      "recommendations": "Recommendations",
+      "proFooter": "The professional analysis includes: all 5 digits of the star, the karmic debt of the lineage, the path of healing, ancestral gifts and blocks, rituals, generational patterns, and personalized recommendations."
+    },
     "nameEnergy": {
       "lettersSum": "Letter sum:",
       "letterBreakdown": "Letter breakdown",

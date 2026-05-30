@@ -317,6 +317,17 @@
       "recommendations": "Recomendaciones",
       "professions": "Profesiones adecuadas"
     },
+    "ancestralPro": {
+      "intro": "Introducción a los programas ancestrales",
+      "karmicDebt": "Deuda kármica del linaje",
+      "healingPath": "Camino de sanación",
+      "gifts": "Dones ancestrales",
+      "blocks": "Bloqueos ancestrales",
+      "patterns": "Patrones generacionales",
+      "rituals": "🕯️ Rituales para trabajar con el linaje",
+      "recommendations": "Recomendaciones",
+      "proFooter": "El análisis profesional incluye: los 5 dígitos de la estrella, la deuda kármica del linaje, el camino de sanación, los dones y bloqueos ancestrales, los rituales, los patrones generacionales y recomendaciones personalizadas."
+    },
     "nameEnergy": {
       "lettersSum": "Suma de letras:",
       "letterBreakdown": "Desglose por letras",

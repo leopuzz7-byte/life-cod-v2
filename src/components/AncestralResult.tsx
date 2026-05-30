@@ -84,7 +84,7 @@ export function AncestralResultComponent({ result, name, onReset, tier = 'basic'
           "inline-block px-3 py-1 rounded-full text-xs font-medium",
           isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
         )}>
-          {isPro ? "✦ Профессиональный разбор" : "Базовый разбор"}
+          {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
         </span>
         <h2 className="text-2xl md:text-3xl font-display text-primary">{t("ancestral.title")}</h2>
         {name && <p className="text-lg text-foreground">{name}</p>}
@@ -204,46 +204,46 @@ export function AncestralResultComponent({ result, name, onReset, tier = 'basic'
       {/* ===== PRO CONTENT ===== */}
       {isPro && proData && (
         <div className="space-y-6">
-          <ProSectionBlock icon={BookOpen} title="Введение в родовые программы" variant="highlight">
+          <ProSectionBlock icon={BookOpen} title={t("res.ancestralPro.intro")} variant="highlight">
             <ProTextBlock text={proData.intro} className="mb-4" />
             <ProTextBlock text={proData.lineageOverview} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={AlertTriangle} title="Кармический долг рода" variant="warning">
+          <ProSectionBlock icon={AlertTriangle} title={t("res.ancestralPro.karmicDebt")} variant="warning">
             <ProTextBlock text={proData.karmicDebt} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Heart} title="Путь исцеления">
+          <ProSectionBlock icon={Heart} title={t("res.ancestralPro.healingPath")}>
             <ProTextBlock text={proData.healingPath} />
           </ProSectionBlock>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={Sparkles} title="Родовые дары" variant="success">
+            <ProSectionBlock icon={Sparkles} title={t("res.ancestralPro.gifts")} variant="success">
               <ProListBlock items={proData.ancestralGifts} icon="★" />
             </ProSectionBlock>
             {proData.ancestralBlocks.length > 0 && (
-              <ProSectionBlock icon={Shield} title="Родовые блоки" variant="warning">
+              <ProSectionBlock icon={Shield} title={t("res.ancestralPro.blocks")} variant="warning">
                 <ProListBlock items={proData.ancestralBlocks} icon="⚠" />
               </ProSectionBlock>
             )}
           </div>
 
-          <ProSectionBlock icon={Target} title="Генерационные паттерны">
+          <ProSectionBlock icon={Target} title={t("res.ancestralPro.patterns")}>
             <ProTextBlock text={proData.generationalPatterns} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Sparkles} title="🕯️ Ритуалы для работы с родом">
+          <ProSectionBlock icon={Sparkles} title={t("res.ancestralPro.rituals")}>
             <ProNumberedList items={proData.rituals} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={CheckCircle} title="Рекомендации" variant="highlight">
-            <h4 className="text-sm font-medium text-foreground mb-3">Что делать</h4>
+          <ProSectionBlock icon={CheckCircle} title={t("res.ancestralPro.recommendations")} variant="highlight">
+            <h4 className="text-sm font-medium text-foreground mb-3">{t("res.whatToDo")}</h4>
             <ProNumberedList items={proData.recommendations} className="mb-6" />
-            <h4 className="text-sm font-medium text-destructive mb-3">Чего избегать</h4>
+            <h4 className="text-sm font-medium text-destructive mb-3">{t("res.whatToAvoid")}</h4>
             <ProListBlock items={proData.avoidList} icon="✗" />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={MessageCircle} title="Итог" variant="highlight">
+          <ProSectionBlock icon={MessageCircle} title={t("res.conclusion")} variant="highlight">
             <ProTextBlock text={proData.conclusion} className="mb-4" />
             <div className="bg-primary/10 rounded-xl p-4 text-center">
               <p className="text-sm text-foreground font-medium italic">«{proData.keyThought}»</p>
@@ -255,8 +255,7 @@ export function AncestralResultComponent({ result, name, onReset, tier = 'basic'
       {!isPro && (
         <div className="bg-muted/30 rounded-xl border border-border p-5 text-center space-y-2">
           <p className="text-sm text-muted-foreground">
-            В профессиональном разборе: все 5 цифр звезды, кармический долг рода, путь исцеления,
-            родовые дары и блоки, ритуалы, генерационные паттерны и персональные рекомендации.
+            {t("res.ancestralPro.proFooter")}
           </p>
         </div>
       )}
