@@ -328,6 +328,27 @@
       "recommendations": "Recommendations",
       "proFooter": "The professional analysis includes: all 5 digits of the star, the karmic debt of the lineage, the path of healing, ancestral gifts and blocks, rituals, generational patterns, and personalized recommendations."
     },
+    "month": {
+      "deepEnergies": "Deep analysis of the month's energies",
+      "yearBg": "Background energy of the year",
+      "monthEnergy": "Energy of the month",
+      "resultEnergy": "Resulting energy",
+      "synergyConflict": "Synergy and conflicts of energies",
+      "money": "💰 Money and finances",
+      "career": "💼 Career and work",
+      "relationships": "❤️ Relationships",
+      "health": "🏥 Health",
+      "innerState": "🧠 Inner state",
+      "weekly": "📅 Week-by-week forecast",
+      "week1": "Week 1",
+      "week2": "Week 2",
+      "week3": "Week 3",
+      "week4": "Week 4",
+      "dailyPractice": "Daily practice",
+      "keyDays": "Key days",
+      "summary": "Month summary",
+      "proFooter": "The professional analysis includes: deep analysis of all three triangle energies, a breakdown by life spheres, a week-by-week forecast, synergy and conflicts of energies, daily practices, and personalized recommendations."
+    },
     "nameEnergy": {
       "lettersSum": "Letter sum:",
       "letterBreakdown": "Letter breakdown",

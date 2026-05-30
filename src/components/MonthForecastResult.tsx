@@ -67,7 +67,7 @@ export function MonthForecastResult({ forecast, name, onReset, tier = 'basic' }:
           "inline-block px-3 py-1 rounded-full text-xs font-medium mb-2",
           isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
         )}>
-          {isPro ? "✦ Профессиональный разбор" : "Базовый разбор"}
+          {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
         </span>
         <h1 className="text-2xl md:text-3xl font-display text-primary mb-2">
           {t("forecast.monthForecast")} — {monthName} {forecast.targetYear}
@@ -139,66 +139,66 @@ export function MonthForecastResult({ forecast, name, onReset, tier = 'basic' }:
       {/* ===== PRO CONTENT ===== */}
       {isPro && proData && (
         <>
-          <ProSectionBlock icon={BookOpen} title="Глубокий анализ энергий месяца" variant="highlight">
+          <ProSectionBlock icon={BookOpen} title={t("res.month.deepEnergies")} variant="highlight">
             <div className="space-y-4">
               <div className="bg-muted/30 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-foreground mb-2">Фоновая энергия года</h4>
+                <h4 className="text-sm font-medium text-foreground mb-2">{t("res.month.yearBg")}</h4>
                 <ProTextBlock text={proData.yearEnergyAnalysis} />
               </div>
               <div className="bg-muted/30 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-foreground mb-2">Энергия месяца</h4>
+                <h4 className="text-sm font-medium text-foreground mb-2">{t("res.month.monthEnergy")}</h4>
                 <ProTextBlock text={proData.monthEnergyAnalysis} />
               </div>
               <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
-                <h4 className="text-sm font-medium text-foreground mb-2">Результирующая энергия</h4>
+                <h4 className="text-sm font-medium text-foreground mb-2">{t("res.month.resultEnergy")}</h4>
                 <ProTextBlock text={proData.resultEnergyAnalysis} />
               </div>
             </div>
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Target} title="Синергия и конфликты энергий">
+          <ProSectionBlock icon={Target} title={t("res.month.synergyConflict")}>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="bg-emerald-500/5 rounded-xl p-4 border border-emerald-500/20">
-                <h4 className="text-sm font-medium text-emerald-600 mb-2">Синергия</h4>
+                <h4 className="text-sm font-medium text-emerald-600 mb-2">{t("res.matrix.synergy")}</h4>
                 <ProTextBlock text={proData.synergy} />
               </div>
               <div className="bg-destructive/5 rounded-xl p-4 border border-destructive/20">
-                <h4 className="text-sm font-medium text-destructive mb-2">Конфликт</h4>
+                <h4 className="text-sm font-medium text-destructive mb-2">{t("res.matrix.conflict")}</h4>
                 <ProTextBlock text={proData.conflicts} />
               </div>
             </div>
           </ProSectionBlock>
 
           {/* Life spheres */}
-          <ProSectionBlock icon={Briefcase} title="💰 Деньги и финансы">
+          <ProSectionBlock icon={Briefcase} title={t("res.month.money")}>
             <ProTextBlock text={proData.money} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Briefcase} title="💼 Карьера и работа">
+          <ProSectionBlock icon={Briefcase} title={t("res.month.career")}>
             <ProTextBlock text={proData.career} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Heart} title="❤️ Отношения">
+          <ProSectionBlock icon={Heart} title={t("res.month.relationships")}>
             <ProTextBlock text={proData.relationships} />
           </ProSectionBlock>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={Activity} title="🏥 Здоровье">
+            <ProSectionBlock icon={Activity} title={t("res.month.health")}>
               <ProTextBlock text={proData.health} />
             </ProSectionBlock>
-            <ProSectionBlock icon={Brain} title="🧠 Внутреннее состояние">
+            <ProSectionBlock icon={Brain} title={t("res.month.innerState")}>
               <ProTextBlock text={proData.innerState} />
             </ProSectionBlock>
           </div>
 
           {/* Weekly breakdown */}
-          <ProSectionBlock icon={Clock} title="📅 Понедельный прогноз" variant="highlight">
+          <ProSectionBlock icon={Clock} title={t("res.month.weekly")} variant="highlight">
             <div className="space-y-4">
               {[
-                { title: "1-я неделя", text: proData.firstWeek },
-                { title: "2-я неделя", text: proData.secondWeek },
-                { title: "3-я неделя", text: proData.thirdWeek },
-                { title: "4-я неделя", text: proData.fourthWeek },
+                { title: t("res.month.week1"), text: proData.firstWeek },
+                { title: t("res.month.week2"), text: proData.secondWeek },
+                { title: t("res.month.week3"), text: proData.thirdWeek },
+                { title: t("res.month.week4"), text: proData.fourthWeek },
               ].map((week, i) => (
                 <div key={i} className="border border-border rounded-xl p-4">
                   <h4 className="text-sm font-medium text-foreground mb-2">{week.title}</h4>
@@ -209,23 +209,23 @@ export function MonthForecastResult({ forecast, name, onReset, tier = 'basic' }:
           </ProSectionBlock>
 
           {/* Recommendations */}
-          <ProSectionBlock icon={CheckCircle} title="Рекомендации" variant="success">
-            <h4 className="text-sm font-medium text-foreground mb-3">Что делать</h4>
+          <ProSectionBlock icon={CheckCircle} title={t("res.ancestralPro.recommendations")} variant="success">
+            <h4 className="text-sm font-medium text-foreground mb-3">{t("res.whatToDo")}</h4>
             <ProNumberedList items={proData.toDo} className="mb-6" />
-            <h4 className="text-sm font-medium text-destructive mb-3">Чего избегать</h4>
+            <h4 className="text-sm font-medium text-destructive mb-3">{t("res.whatToAvoid")}</h4>
             <ProListBlock items={proData.toAvoid} icon="✗" />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Sparkles} title="Ежедневная практика">
+          <ProSectionBlock icon={Sparkles} title={t("res.month.dailyPractice")}>
             <ProTextBlock text={proData.dailyPractice} className="mb-4" />
             <div className="bg-muted/30 rounded-xl p-4">
-              <h4 className="text-xs font-medium text-muted-foreground mb-1">Ключевые дни</h4>
+              <h4 className="text-xs font-medium text-muted-foreground mb-1">{t("res.month.keyDays")}</h4>
               <ProTextBlock text={proData.keyDays} />
             </div>
           </ProSectionBlock>
 
           {/* Summary */}
-          <ProSectionBlock icon={MessageCircle} title="Итог месяца" variant="highlight">
+          <ProSectionBlock icon={MessageCircle} title={t("res.month.summary")} variant="highlight">
             <ProTextBlock text={proData.mainMessage} />
           </ProSectionBlock>
         </>
@@ -234,8 +234,7 @@ export function MonthForecastResult({ forecast, name, onReset, tier = 'basic' }:
       {!isPro && (
         <div className="bg-muted/30 rounded-xl border border-border p-5 text-center space-y-2">
           <p className="text-sm text-muted-foreground">
-            В профессиональном разборе: глубокий анализ всех трёх энергий треугольника, разбор по сферам жизни,
-            понедельный прогноз, синергия и конфликты энергий, ежедневные практики и персональные рекомендации.
+            {t("res.month.proFooter")}
           </p>
         </div>
       )}
