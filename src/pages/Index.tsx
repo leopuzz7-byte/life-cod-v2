@@ -43,6 +43,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Users, FileText, Building, Type, Wallet, Lock, Calendar, CalendarDays, Compass, Brain, Clock, Sparkles, Check, Heart, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMethodPrice } from "@/hooks/useMethodPrice";
 
 // Icon mapping for config
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -363,6 +364,7 @@ const Index = () => {
   };
 
   const { lock, isDevMode, toggleDevMode } = useAccess();
+  const { prices: methodPrices } = useMethodPrice(selectedMethod);
 
   const handleReset = () => {
     setResult(null);
@@ -736,6 +738,8 @@ const Index = () => {
                         config={currentConfig}
                         selectedTier={selectedTier}
                         onSelectTier={setSelectedTier}
+                        priceBasic={methodPrices?.price_basic ?? null}
+                        pricePro={methodPrices?.price_pro ?? null}
                       />
                       {/* What's inside Professional extended analysis (per methodology) */}
                       {selectedTier === 'professional' && currentConfig.professional && (
