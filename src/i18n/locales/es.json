@@ -328,6 +328,23 @@
       "recommendations": "Recomendaciones",
       "proFooter": "El análisis profesional incluye: los 5 dígitos de la estrella, la deuda kármica del linaje, el camino de sanación, los dones y bloqueos ancestrales, los rituales, los patrones generacionales y recomendaciones personalizadas."
     },
+    "day": {
+      "dateWord": "fecha",
+      "energyAnalysis": "Análisis energético del día",
+      "mainEnergy": "Energía principal del día",
+      "strategy": "Estrategia del día",
+      "morning": "Mañana",
+      "dayStrategy": "Estrategia diurna",
+      "evening": "Noche",
+      "money": "Dinero",
+      "career": "Carrera",
+      "relationships": "Relaciones",
+      "health": "Salud",
+      "risks": "Riesgos del día",
+      "opportunities": "Oportunidades del día",
+      "practice": "Práctica del día",
+      "proFooter": "El análisis profesional incluye: las 12 posiciones, análisis energético profundo, estrategia del día hora a hora, desglose por áreas de la vida, riesgos y oportunidades, y prácticas y rituales del día."
+    },
     "month": {
       "deepEnergies": "Análisis profundo de las energías del mes",
       "yearBg": "Energía de fondo del año",

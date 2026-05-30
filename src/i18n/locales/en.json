@@ -328,6 +328,23 @@
       "recommendations": "Recommendations",
       "proFooter": "The professional analysis includes: all 5 digits of the star, the karmic debt of the lineage, the path of healing, ancestral gifts and blocks, rituals, generational patterns, and personalized recommendations."
     },
+    "day": {
+      "dateWord": "date",
+      "energyAnalysis": "Energy analysis of the day",
+      "mainEnergy": "Main energy of the day",
+      "strategy": "Strategy of the day",
+      "morning": "Morning",
+      "dayStrategy": "Daytime strategy",
+      "evening": "Evening",
+      "money": "Money",
+      "career": "Career",
+      "relationships": "Relationships",
+      "health": "Health",
+      "risks": "Risks of the day",
+      "opportunities": "Opportunities of the day",
+      "practice": "Practice of the day",
+      "proFooter": "The professional analysis includes: all 12 positions, deep energy analysis, an hour-by-hour strategy for the day, a breakdown by life spheres, risks and opportunities, and practices and rituals for the day."
+    },
     "month": {
       "deepEnergies": "Deep analysis of the month's energies",
       "yearBg": "Background energy of the year",
