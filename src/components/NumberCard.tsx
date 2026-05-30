@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { numberDescriptions, categoryDescriptions } from "@/lib/numerology";
+import { useTranslation } from "react-i18next";
+import { getNumberDescription, getCategoryDescription } from "@/lib/numerology";
 import { ChevronDown, ChevronUp, Star, Heart, Briefcase, Sparkles, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,9 +11,10 @@ interface NumberCardProps {
 }
 
 export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
-  const numberInfo = numberDescriptions[number];
-  const categoryInfo = categoryDescriptions[category];
+  const numberInfo = getNumberDescription(number);
+  const categoryInfo = getCategoryDescription(category);
 
   if (!numberInfo) return null;
 
@@ -105,7 +107,7 @@ export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
           <div className="space-y-3">
             <h4 className="text-lg font-display font-semibold text-foreground flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-primary" />
-              Общая характеристика
+              {t("res.numCard.general")}
             </h4>
             <p className="text-foreground/90 leading-relaxed">
               {numberInfo.detailedDescription}
@@ -115,7 +117,7 @@ export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
           {/* Category-specific Interpretation */}
           <div className="bg-card/50 rounded-xl p-5 border border-border/30">
             <h4 className="text-base font-display font-semibold text-primary mb-3">
-              {categoryInfo.icon} {categoryInfo.title}: Ваша интерпретация
+              {categoryInfo.icon} {categoryInfo.title}: {t("res.numCard.yourInterpretation")}
             </h4>
             <p className="text-foreground/90 leading-relaxed">
               {getInterpretation()}
@@ -125,19 +127,19 @@ export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
           {/* Details Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="bg-card/50 rounded-xl p-4 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Планета</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("res.numCard.planet")}</p>
               <p className="text-sm font-medium text-foreground">{numberInfo.planet}</p>
             </div>
             <div className="bg-card/50 rounded-xl p-4 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Удачный день</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("res.numCard.luckyDay")}</p>
               <p className="text-sm font-medium text-foreground">{numberInfo.day}</p>
             </div>
             <div className="bg-card/50 rounded-xl p-4 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Цвет удачи</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("res.numCard.luckyColor")}</p>
               <p className="text-sm font-medium text-foreground">{numberInfo.color.split(',')[0]}</p>
             </div>
             <div className="bg-card/50 rounded-xl p-4 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Камень</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("res.numCard.stone")}</p>
               <p className="text-sm font-medium text-foreground">{numberInfo.stone.split(',')[0]}</p>
             </div>
           </div>
@@ -146,7 +148,7 @@ export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
           <div className="space-y-3">
             <h4 className="text-base font-display font-semibold text-foreground flex items-center gap-2">
               <Heart className="w-4 h-4 text-pink-400" />
-              Отношения и любовь
+              {t("res.numCard.relationships")}
             </h4>
             <p className="text-foreground/80 leading-relaxed text-sm">
               {numberInfo.relationships}
@@ -157,7 +159,7 @@ export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
           <div className="space-y-3">
             <h4 className="text-base font-display font-semibold text-foreground flex items-center gap-2">
               <Briefcase className="w-4 h-4 text-blue-400" />
-              Подходящие профессии
+              {t("res.arcanaCard.professions")}
             </h4>
             <div className="flex flex-wrap gap-2">
               {numberInfo.career.map((job) => (
@@ -175,7 +177,7 @@ export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
           <div className="space-y-3">
             <h4 className="text-base font-display font-semibold text-foreground flex items-center gap-2">
               <Activity className="w-4 h-4 text-green-400" />
-              Здоровье
+              {t("res.numCard.health")}
             </h4>
             <p className="text-foreground/80 leading-relaxed text-sm">
               {numberInfo.health}
@@ -185,7 +187,7 @@ export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
           {/* Qualities */}
           <div className="space-y-4">
             <div>
-              <p className="text-xs text-muted-foreground mb-2 font-medium">✅ Позитивные качества</p>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">✅ {t("res.numCard.positive")}</p>
               <div className="flex flex-wrap gap-2">
                 {numberInfo.positive.map((quality) => (
                   <span
@@ -199,7 +201,7 @@ export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
             </div>
 
             <div>
-              <p className="text-xs text-muted-foreground mb-2 font-medium">⚠️ Теневые качества</p>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">⚠️ {t("res.numCard.negative")}</p>
               <div className="flex flex-wrap gap-2">
                 {numberInfo.negative.map((quality) => (
                   <span
@@ -216,7 +218,7 @@ export function NumberCard({ number, category, delay = 0 }: NumberCardProps) {
           {/* Advice */}
           <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl p-5 border border-primary/20">
             <h4 className="text-base font-display font-semibold text-primary mb-2">
-              💡 Совет для развития
+              💡 {t("res.numCard.advice")}
             </h4>
             <p className="text-foreground/90 leading-relaxed text-sm">
               {numberInfo.advice}

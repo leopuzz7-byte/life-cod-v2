@@ -275,6 +275,19 @@
     "recommendationsWord": "Рекомендации",
     "risksWord": "Риски",
     "opportunitiesWord": "Возможности",
+    "numCard": {
+      "general": "Общая характеристика",
+      "yourInterpretation": "Ваша интерпретация",
+      "planet": "Планета",
+      "luckyDay": "Удачный день",
+      "luckyColor": "Цвет удачи",
+      "stone": "Камень",
+      "relationships": "Отношения и любовь",
+      "health": "Здоровье",
+      "positive": "Позитивные качества",
+      "negative": "Теневые качества",
+      "advice": "Совет для развития"
+    },
     "year": {
       "intro": "Введение в ваш год",
       "mainEnergy": "Основная энергия года",

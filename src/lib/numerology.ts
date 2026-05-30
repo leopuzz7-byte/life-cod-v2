@@ -236,6 +236,28 @@ export const numberDescriptions: Record<number, {
   }
 };
 
+import i18n from '@/i18n';
+import { numberOverlays, categoryOverlays } from './numerologyI18n';
+
+// Локализованный доступ к описаниям чисел (fallback на русский)
+export function getNumberDescription(n: number) {
+  const base = numberDescriptions[n];
+  if (!base) return base;
+  const lang = i18n.language;
+  if (!lang || lang === 'ru') return base;
+  const ov = numberOverlays[lang]?.[n];
+  return ov ? { ...base, ...ov } : base;
+}
+
+export function getCategoryDescription(category: "mind" | "action" | "realization" | "total") {
+  const base = categoryDescriptions[category];
+  const lang = i18n.language;
+  if (lang && lang !== 'ru' && categoryOverlays[lang]?.[category]) {
+    return { ...base, ...categoryOverlays[lang][category] };
+  }
+  return base;
+}
+
 export const categoryDescriptions = {
   mind: {
     title: "Число Ума",

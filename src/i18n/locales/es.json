@@ -275,6 +275,19 @@
     "recommendationsWord": "Recomendaciones",
     "risksWord": "Riesgos",
     "opportunitiesWord": "Oportunidades",
+    "numCard": {
+      "general": "Características generales",
+      "yourInterpretation": "Tu interpretación",
+      "planet": "Planeta",
+      "luckyDay": "Día de suerte",
+      "luckyColor": "Color de la suerte",
+      "stone": "Piedra",
+      "relationships": "Relaciones y amor",
+      "health": "Salud",
+      "positive": "Cualidades positivas",
+      "negative": "Cualidades de sombra",
+      "advice": "Consejo para el desarrollo"
+    },
     "year": {
       "intro": "Introducción a tu año",
       "mainEnergy": "Energía principal del año",
