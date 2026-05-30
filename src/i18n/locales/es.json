@@ -328,6 +328,32 @@
       "recommendations": "Recomendaciones",
       "proFooter": "El análisis profesional incluye: los 5 dígitos de la estrella, la deuda kármica del linaje, el camino de sanación, los dones y bloqueos ancestrales, los rituales, los patrones generacionales y recomendaciones personalizadas."
     },
+    "contract": {
+      "birth": "Nacimiento",
+      "contractDate": "Fecha del contrato",
+      "good": "La fecha es favorable para firmar el contrato",
+      "caution": "La fecha requiere atención — hay energías difíciles",
+      "energyAnalysis": "Análisis energético del contrato",
+      "keyPositions": "Análisis profundo de las posiciones clave",
+      "hiddenRisks": "Riesgos ocultos",
+      "bestStrategy": "Estrategia óptima",
+      "timing": "Análisis del momento",
+      "proFooter": "El análisis profesional incluye: las 12 posiciones, análisis profundo de las posiciones clave, riesgos ocultos, estrategia óptima, análisis del momento y recomendaciones personalizadas.",
+      "pos": {
+        "1": "Inicio / Primera impresión",
+        "2": "Esencia interior del contrato",
+        "3": "Interacción de las partes",
+        "4": "Meta / Resultado del contrato",
+        "5": "Recursos y oportunidades",
+        "6": "Base de la relación",
+        "7": "Tarea principal",
+        "8": "Forma de resolverlo",
+        "9": "Resultado de la colaboración",
+        "10": "Motivos ocultos",
+        "11": "Circunstancias externas",
+        "12": "Lección kármica"
+      }
+    },
     "day": {
       "dateWord": "fecha",
       "energyAnalysis": "Análisis energético del día",

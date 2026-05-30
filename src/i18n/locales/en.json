@@ -328,6 +328,32 @@
       "recommendations": "Recommendations",
       "proFooter": "The professional analysis includes: all 5 digits of the star, the karmic debt of the lineage, the path of healing, ancestral gifts and blocks, rituals, generational patterns, and personalized recommendations."
     },
+    "contract": {
+      "birth": "Birth",
+      "contractDate": "Contract date",
+      "good": "The date is favorable for signing the contract",
+      "caution": "The date needs attention — there are difficult energies",
+      "energyAnalysis": "Energy analysis of the contract",
+      "keyPositions": "Deep analysis of key positions",
+      "hiddenRisks": "Hidden risks",
+      "bestStrategy": "Optimal strategy",
+      "timing": "Timing analysis",
+      "proFooter": "The professional analysis includes: all 12 positions, deep analysis of key positions, hidden risks, optimal strategy, timing analysis, and personalized recommendations.",
+      "pos": {
+        "1": "Beginning / First impression",
+        "2": "Inner essence of the contract",
+        "3": "Interaction of the parties",
+        "4": "Goal / Result of the contract",
+        "5": "Resources and opportunities",
+        "6": "Foundation of the relationship",
+        "7": "Main task",
+        "8": "Way to solve it",
+        "9": "Outcome of the cooperation",
+        "10": "Hidden motives",
+        "11": "External circumstances",
+        "12": "Karmic lesson"
+      }
+    },
     "day": {
       "dateWord": "date",
       "energyAnalysis": "Energy analysis of the day",

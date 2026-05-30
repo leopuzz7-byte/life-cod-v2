@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
 import { getArcana } from "@/lib/arcana";
@@ -31,6 +32,8 @@ const contractPositionTitles: Record<number, string> = {
 };
 
 export function ContractEnergyResultComponent({ result, personName, onReset, tier = 'basic' }: Props) {
+  const { t } = useTranslation();
+  const posTitle = (n: number) => { const k = `res.contract.pos.${n}`; const v = t(k); return v === k ? contractPositionTitles[n] : v; };
   const isPro = tier === 'professional';
   const { targetDate, birthDate, positions } = result;
   const contractDateStr = `${targetDate.day}.${String(targetDate.month).padStart(2, '0')}.${targetDate.year}`;
@@ -47,7 +50,7 @@ export function ContractEnergyResultComponent({ result, personName, onReset, tie
   return (
     <div className="max-w-3xl mx-auto">
       <Button variant="ghost" onClick={onReset} className="mb-4 text-muted-foreground">
-        <ArrowLeft className="w-4 h-4 mr-2" /> Новый расчёт
+        <ArrowLeft className="w-4 h-4 mr-2" /> {t("res.newCalc")}
       </Button>
 
       <div className="text-center mb-4">
@@ -55,16 +58,16 @@ export function ContractEnergyResultComponent({ result, personName, onReset, tie
           "inline-block px-3 py-1 rounded-full text-xs font-medium mb-2",
           isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
         )}>
-          {isPro ? "✦ Профессиональный разбор" : "Базовый разбор"}
+          {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
         </span>
       </div>
 
       <div className="gradient-card rounded-2xl p-6 border border-border mb-6">
-        <h2 className="text-2xl font-display text-primary mb-1">Энергия договора</h2>
+        <h2 className="text-2xl font-display text-primary mb-1">{t("cfg.methods.contract.title")}</h2>
         <p className="text-muted-foreground text-sm mb-1">
-          {personName ? `${personName} (${birthDateStr})` : `Рождение: ${birthDateStr}`}
+          {personName ? `${personName} (${birthDateStr})` : `${t("res.contract.birth")}: ${birthDateStr}`}
         </p>
-        <p className="text-muted-foreground text-sm mb-4">Дата договора: {contractDateStr}</p>
+        <p className="text-muted-foreground text-sm mb-4">{t("res.contract.contractDate")}: {contractDateStr}</p>
 
         <div className={`p-4 rounded-xl border mb-6 ${
           isGood 
@@ -72,7 +75,7 @@ export function ContractEnergyResultComponent({ result, personName, onReset, tie
             : 'bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800'
         }`}>
           <p className="text-sm font-medium text-foreground">
-            {isGood ? '✅ Дата благоприятна для заключения договора' : '⚠️ Дата требует внимания — есть сложные энергии'}
+            {isGood ? `✅ ${t("res.contract.good")}` : `⚠️ ${t("res.contract.caution")}`}
           </p>
         </div>
 
@@ -85,7 +88,7 @@ export function ContractEnergyResultComponent({ result, personName, onReset, tie
                   <div className="flex items-center gap-3 text-left">
                     <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">{pos.arcana}</span>
                     <div>
-                      <span className="font-display text-foreground text-sm">{contractPositionTitles[pos.position]}</span>
+                      <span className="font-display text-foreground text-sm">{posTitle(pos.position)}</span>
                       <span className="text-xs text-muted-foreground ml-2">{arcanaData?.name}</span>
                     </div>
                   </div>
@@ -100,35 +103,35 @@ export function ContractEnergyResultComponent({ result, personName, onReset, tie
       {/* ===== PRO CONTENT ===== */}
       {isPro && proData && (
         <div className="space-y-6">
-          <ProSectionBlock icon={BookOpen} title="Энергетический анализ договора" variant="highlight">
+          <ProSectionBlock icon={BookOpen} title={t("res.contract.energyAnalysis")} variant="highlight">
             <ProTextBlock text={proData.intro} className="mb-4" />
             <ProTextBlock text={proData.overallEnergy} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Target} title="Глубокий разбор ключевых позиций">
+          <ProSectionBlock icon={Target} title={t("res.contract.keyPositions")}>
             <ProTextBlock text={proData.keyPositionsDeep} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={AlertTriangle} title="Скрытые риски" variant="warning">
+          <ProSectionBlock icon={AlertTriangle} title={t("res.contract.hiddenRisks")} variant="warning">
             <ProTextBlock text={proData.hiddenRisks} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Shield} title="Оптимальная стратегия">
+          <ProSectionBlock icon={Shield} title={t("res.contract.bestStrategy")}>
             <ProTextBlock text={proData.bestStrategy} className="mb-4" />
             <div className="bg-muted/30 rounded-xl p-4">
-              <h4 className="text-sm font-medium text-foreground mb-2">Анализ тайминга</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">{t("res.contract.timing")}</h4>
               <ProTextBlock text={proData.timingAnalysis} />
             </div>
           </ProSectionBlock>
 
-          <ProSectionBlock icon={CheckCircle} title="Рекомендации" variant="success">
-            <h4 className="text-sm font-medium text-foreground mb-3">Что делать</h4>
+          <ProSectionBlock icon={CheckCircle} title={t("res.ancestralPro.recommendations")} variant="success">
+            <h4 className="text-sm font-medium text-foreground mb-3">{t("res.whatToDo")}</h4>
             <ProListBlock items={proData.recommendations} icon="✦" className="mb-6" />
-            <h4 className="text-sm font-medium text-destructive mb-3">Чего избегать</h4>
+            <h4 className="text-sm font-medium text-destructive mb-3">{t("res.whatToAvoid")}</h4>
             <ProListBlock items={proData.avoidList} icon="✗" />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={MessageCircle} title="Итог" variant="highlight">
+          <ProSectionBlock icon={MessageCircle} title={t("res.conclusion")} variant="highlight">
             <ProTextBlock text={proData.conclusion} />
           </ProSectionBlock>
         </div>
@@ -137,8 +140,7 @@ export function ContractEnergyResultComponent({ result, personName, onReset, tie
       {!isPro && (
         <div className="bg-muted/30 rounded-xl border border-border p-5 text-center space-y-2">
           <p className="text-sm text-muted-foreground">
-            В профессиональном разборе: все 12 позиций, глубокий анализ ключевых позиций, скрытые риски,
-            оптимальная стратегия, анализ тайминга и персональные рекомендации.
+            {t("res.contract.proFooter")}
           </p>
         </div>
       )}
