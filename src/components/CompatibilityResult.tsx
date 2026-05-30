@@ -74,7 +74,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
           "inline-block px-3 py-1 rounded-full text-xs font-medium mb-2",
           isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
         )}>
-          {isPro ? "✦ Профессиональный разбор" : "Базовый разбор"}
+          {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
         </span>
         <div className="flex items-center justify-center gap-2 mb-2">
           <Heart className="w-6 h-6 text-primary" />
@@ -136,29 +136,29 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
       {isPro && proData && (
         <>
           {/* 1. ВВОДНЫЙ БЛОК */}
-          <ProSectionBlock icon={BookOpen} title="Введение в анализ пары" variant="highlight" className="mb-6">
+          <ProSectionBlock icon={BookOpen} title={t("res.compat.intro")} variant="highlight" className="mb-6">
             <ProTextBlock text={proData.intro} className="mb-4" />
             <div className="p-4 bg-primary/5 rounded-xl border border-primary/10">
-              <h4 className="text-sm font-medium text-foreground mb-2">Энергия пары</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">{t("res.compat.pairEnergy")}</h4>
               <ProTextBlock text={proData.pairEnergy} />
             </div>
           </ProSectionBlock>
 
           {/* 2. ОСНОВНОЙ РАЗБОР */}
-          <ProSectionBlock icon={Target} title="Глубокий разбор арканов пары" className="mb-6">
+          <ProSectionBlock icon={Target} title={t("res.compat.deepArcana")} className="mb-6">
             <ProTextBlock text={proData.pairDynamics} className="mb-4" />
-            
+
             <div className="space-y-4">
               <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
                 <h4 className="text-sm font-medium text-foreground mb-2">
-                  Аркан Союза ({result.unionArcana} — {unionArcana?.name})
+                  {t("compatibility.unionArcana")} ({result.unionArcana} — {unionArcana?.name})
                 </h4>
                 <ProTextBlock text={proData.unionDeepMeaning} />
               </div>
-              
+
               <div className="bg-accent/20 rounded-xl p-4 border border-border">
                 <h4 className="text-sm font-medium text-foreground mb-2">
-                  Аркан Гармонии ({result.harmonyArcana} — {harmonyArcana?.name})
+                  {t("compatibility.harmonyArcana")} ({result.harmonyArcana} — {harmonyArcana?.name})
                 </h4>
                 <ProTextBlock text={proData.harmonyDeepMeaning} />
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed whitespace-pre-line">
@@ -168,7 +168,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               
               <div className="bg-destructive/5 rounded-xl p-4 border border-destructive/20">
                 <h4 className="text-sm font-medium text-foreground mb-2">
-                  Аркан Кармы ({result.karmaArcana} — {karmaArcana?.name})
+                  {t("compatibility.karmaArcana")} ({result.karmaArcana} — {karmaArcana?.name})
                 </h4>
                 <ProTextBlock text={proData.karmaDeepMeaning} />
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed whitespace-pre-line">
@@ -179,41 +179,41 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
           </ProSectionBlock>
 
           {/* 3. РАЗБОР ПО СФЕРАМ */}
-          <ProSectionBlock icon={Wallet} title="💰 Финансовая динамика пары" className="mb-6">
+          <ProSectionBlock icon={Wallet} title={t("res.compat.financialDynamics")} className="mb-6">
             <ProTextBlock text={proData.financialDynamics} className="mb-4" />
             <div className="grid md:grid-cols-2 gap-3">
               <div className="bg-destructive/5 rounded-lg p-3 border border-destructive/10">
-                <h5 className="text-xs font-medium text-destructive mb-1">Финансовые риски</h5>
+                <h5 className="text-xs font-medium text-destructive mb-1">{t("res.compat.financialRisks")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.financialRisks}</p>
               </div>
               <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                <h5 className="text-xs font-medium text-primary mb-1">Рекомендации</h5>
+                <h5 className="text-xs font-medium text-primary mb-1">{t("res.recommendationsWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.financialRecommendations}</p>
               </div>
             </div>
           </ProSectionBlock>
 
-          <ProSectionBlock icon={TrendingUp} title="💼 Карьерная совместимость" className="mb-6">
+          <ProSectionBlock icon={TrendingUp} title={t("res.compat.careerCompat")} className="mb-6">
             <ProTextBlock text={proData.careerDynamics} className="mb-3" />
             <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-              <h5 className="text-xs font-medium text-primary mb-1">Рекомендации</h5>
+              <h5 className="text-xs font-medium text-primary mb-1">{t("res.recommendationsWord")}</h5>
               <p className="text-xs text-muted-foreground">{proData.careerRecommendations}</p>
             </div>
           </ProSectionBlock>
 
           <div className="grid md:grid-cols-2 gap-4 mb-6">
-            <ProSectionBlock icon={Flame} title="🔥 Сексуальная совместимость">
+            <ProSectionBlock icon={Flame} title={t("res.compat.sexualCompat")}>
               <ProTextBlock text={proData.sexualChemistry} className="mb-3" />
               <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                <h5 className="text-xs font-medium text-primary mb-1">Рекомендации</h5>
+                <h5 className="text-xs font-medium text-primary mb-1">{t("res.recommendationsWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.sexualRecommendations}</p>
               </div>
             </ProSectionBlock>
 
-            <ProSectionBlock icon={Brain} title="💭 Эмоциональная связь">
+            <ProSectionBlock icon={Brain} title={t("res.compat.emotionalBond")}>
               <ProTextBlock text={proData.emotionalDynamics} className="mb-3" />
               <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                <h5 className="text-xs font-medium text-primary mb-1">Рекомендации</h5>
+                <h5 className="text-xs font-medium text-primary mb-1">{t("res.recommendationsWord")}</h5>
                 <p className="text-xs text-muted-foreground">{proData.emotionalRecommendations}</p>
               </div>
             </ProSectionBlock>
@@ -224,28 +224,28 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
             <div className="gradient-card rounded-xl p-5 border border-destructive/20">
               <div className="flex items-center gap-2 mb-3">
                 <AlertTriangle className="w-5 h-5 text-destructive" />
-                <h3 className="font-display font-semibold text-foreground text-sm">Зоны конфликтов</h3>
+                <h3 className="font-display font-semibold text-foreground text-sm">{t("res.compat.conflictZones")}</h3>
               </div>
               <ProListBlock items={proData.conflictZones} icon="⚠" />
             </div>
             <div className="gradient-card rounded-xl p-5 border border-emerald-500/20">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-display font-semibold text-foreground text-sm">Зоны роста</h3>
+                <h3 className="font-display font-semibold text-foreground text-sm">{t("res.compat.growthZones")}</h3>
               </div>
               <ProListBlock items={proData.growthAreas} icon="↑" />
             </div>
             <div className="gradient-card rounded-xl p-5 border border-primary/20">
               <div className="flex items-center gap-2 mb-3">
                 <Zap className="w-5 h-5 text-primary" />
-                <h3 className="font-display font-semibold text-foreground text-sm">Синергия</h3>
+                <h3 className="font-display font-semibold text-foreground text-sm">{t("res.matrix.synergy")}</h3>
               </div>
               <ProListBlock items={proData.synergyPoints} icon="✦" />
             </div>
           </div>
 
           {/* 5. СЦЕНАРИИ */}
-          <ProSectionBlock icon={Sparkles} title="Сценарии развития отношений" className="mb-6">
+          <ProSectionBlock icon={Sparkles} title={t("res.compat.scenarios")} className="mb-6">
             <div className="space-y-4">
               {proData.scenarios.map((s, i) => (
                 <div key={i} className={cn(
@@ -262,30 +262,30 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
           </ProSectionBlock>
 
           {/* 6. РИСКИ */}
-          <ProSectionBlock icon={ShieldAlert} title="Риски отношений" variant="warning" className="mb-6">
+          <ProSectionBlock icon={ShieldAlert} title={t("res.compat.risksTitle")} variant="warning" className="mb-6">
             <ProListBlock items={proData.risks} icon="⚠" className="mb-4" />
             <div className="bg-muted/30 rounded-xl p-4">
-              <h4 className="text-sm font-medium text-foreground mb-2">Повторяющиеся паттерны</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">{t("res.compat.repeatingPatterns")}</h4>
               <ProTextBlock text={proData.repeatingPatterns} />
             </div>
           </ProSectionBlock>
 
           {/* 7. ВОЗМОЖНОСТИ */}
-          <ProSectionBlock icon={Sparkles} title="Возможности пары" variant="success" className="mb-6">
+          <ProSectionBlock icon={Sparkles} title={t("res.compat.opportunities")} variant="success" className="mb-6">
             <ProListBlock items={proData.opportunities} icon="★" />
           </ProSectionBlock>
 
           {/* 8. РЕКОМЕНДАЦИИ */}
-          <ProSectionBlock icon={CheckCircle} title="Рекомендации на каждый день" variant="highlight" className="mb-6">
-            <h4 className="text-sm font-medium text-foreground mb-3">Что делать</h4>
+          <ProSectionBlock icon={CheckCircle} title={t("res.compat.dailyRec")} variant="highlight" className="mb-6">
+            <h4 className="text-sm font-medium text-foreground mb-3">{t("res.whatToDo")}</h4>
             <ProNumberedList items={proData.dailyLifeTips} className="mb-6" />
-            
-            <h4 className="text-sm font-medium text-destructive mb-3">Чего избегать</h4>
+
+            <h4 className="text-sm font-medium text-destructive mb-3">{t("res.whatToAvoid")}</h4>
             <ProListBlock items={proData.whatToAvoid} icon="✗" />
           </ProSectionBlock>
 
           {/* 9. ИТОГ */}
-          <ProSectionBlock icon={Shield} title="Долгосрочный прогноз и итог" variant="highlight" className="mb-6">
+          <ProSectionBlock icon={Shield} title={t("res.compat.longTerm")} variant="highlight" className="mb-6">
             <ProTextBlock text={proData.longTermOutlook} className="mb-4" />
             <div className="border-t border-border pt-4">
               <ProTextBlock text={proData.conclusion} className="mb-3" />
@@ -360,9 +360,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
           </div>
           <div className="bg-muted/30 rounded-xl border border-border p-5 text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              В профессиональном разборе: глубокий анализ арканов пары (союз, гармония, карма), 
-              финансовая и сексуальная совместимость, эмоциональная связь, зоны конфликтов и синергии, 
-              3 сценария развития, повторяющиеся паттерны, рекомендации на каждый день и долгосрочный прогноз.
+              {t("res.compat.proFooter")}
             </p>
           </div>
         </>
