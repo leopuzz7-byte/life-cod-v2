@@ -19,38 +19,50 @@ export default function PaymentSuccess() {
       return;
     }
 
-    let attempts = 0;
-    const maxAttempts = 8; // ~24 секунды
+    // Прогрессивный опрос: часто в начале (быстрый вебхук ловится почти мгновенно),
+    // затем реже. Суммарно ~23 секунды ожидания до фолбэка.
+    const delays = [1000, 1000, 1500, 2000, 2500, 3000, 3000, 3000, 3000, 3000];
+    let attempt = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let cancelled = false;
 
     const check = async () => {
-      attempts++;
+      if (cancelled) return;
       try {
         const { data, error } = await supabase.functions.invoke("payment-status", {
           body: { order_id: orderId },
         });
+        if (cancelled) return;
 
-        if (error || !data) {
-          if (attempts >= maxAttempts) setStatus("error");
-          else setTimeout(check, 3000);
+        if (!error && data?.status === "paid") {
+          setStatus("paid");
           return;
         }
 
-        if (data.status === "paid") {
-          setStatus("paid");
-        } else if (attempts >= maxAttempts) {
+        if (attempt < delays.length) {
+          // ещё не оплачено или временная ошибка — пробуем снова
+          timer = setTimeout(check, delays[attempt++]);
+        } else if (data) {
           // Webhook мог не прийти вовремя (тестовый режим, задержка)
           // Всё равно пропускаем — оплата прошла на стороне платёжной системы
           setStatus("pending");
         } else {
-          setTimeout(check, 3000);
+          setStatus("error");
         }
       } catch {
-        if (attempts >= maxAttempts) setStatus("error");
-        else setTimeout(check, 3000);
+        if (cancelled) return;
+        if (attempt < delays.length) timer = setTimeout(check, delays[attempt++]);
+        else setStatus("error");
       }
     };
 
     check();
+
+    // Чистим таймер при размонтировании — иначе setState после ухода со страницы
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   const handleContinue = () => {
