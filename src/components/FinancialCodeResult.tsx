@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FinancialCodeResult as FinancialCodeType } from "@/lib/financialCode";
 import { getArcana } from "@/lib/arcana";
@@ -16,14 +17,15 @@ interface Props {
 }
 
 export function FinancialCodeResultComponent({ result, name, onReset, tier = 'basic' }: Props) {
+  const { t } = useTranslation();
   const isPro = tier === 'professional';
   const proData = isPro ? getFinancialCodeProData(result.talentArcana, result.resourceArcana, result.missionArcana, result.blockArcana) : null;
 
   const allCards = [
-    { arcana: result.talentArcana, title: 'Талант для заработка', desc: result.talentDesc, icon: Star, color: 'text-yellow-500' },
-    { arcana: result.resourceArcana, title: 'Финансовый ресурс', desc: result.resourceDesc, icon: Wallet, color: 'text-green-500' },
-    { arcana: result.missionArcana, title: 'Финансовая миссия', desc: result.missionDesc, icon: Shield, color: 'text-blue-500' },
-    { arcana: result.blockArcana, title: 'Финансовый блок', desc: result.blockDesc, icon: AlertTriangle, color: 'text-red-400' },
+    { arcana: result.talentArcana, title: t('res.finance.talent'), desc: result.talentDesc, icon: Star, color: 'text-yellow-500' },
+    { arcana: result.resourceArcana, title: t('res.finance.resource'), desc: result.resourceDesc, icon: Wallet, color: 'text-green-500' },
+    { arcana: result.missionArcana, title: t('res.finance.mission'), desc: result.missionDesc, icon: Shield, color: 'text-blue-500' },
+    { arcana: result.blockArcana, title: t('res.finance.block'), desc: result.blockDesc, icon: AlertTriangle, color: 'text-red-400' },
   ];
 
   const shownCards = isPro ? allCards : allCards.slice(0, 2);
@@ -31,7 +33,7 @@ export function FinancialCodeResultComponent({ result, name, onReset, tier = 'ba
   return (
     <div className="max-w-3xl mx-auto">
       <Button variant="ghost" onClick={onReset} className="mb-4 text-muted-foreground">
-        <ArrowLeft className="w-4 h-4 mr-2" /> Новый расчёт
+        <ArrowLeft className="w-4 h-4 mr-2" /> {t("res.newCalc")}
       </Button>
 
       <div className="text-center mb-4">
@@ -39,14 +41,14 @@ export function FinancialCodeResultComponent({ result, name, onReset, tier = 'ba
           "inline-block px-3 py-1 rounded-full text-xs font-medium mb-2",
           isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
         )}>
-          {isPro ? "✦ Профессиональный разбор" : "Базовый разбор"}
+          {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
         </span>
       </div>
 
       <div className="gradient-card rounded-2xl p-6 border border-border mb-6">
-        <h2 className="text-2xl font-display text-primary mb-1">Финансовый код</h2>
+        <h2 className="text-2xl font-display text-primary mb-1">{t("cfg.methods.finance.title")}</h2>
         <p className="text-muted-foreground text-sm mb-6">
-          {name ? `${name}, ` : ''}дата рождения: {result.birthDate.day}.{String(result.birthDate.month).padStart(2, '0')}.{result.birthDate.year}
+          {name ? `${name}, ` : ''}{t("res.finance.birthDate")}: {result.birthDate.day}.{String(result.birthDate.month).padStart(2, '0')}.{result.birthDate.year}
         </p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -79,7 +81,7 @@ export function FinancialCodeResultComponent({ result, name, onReset, tier = 'ba
 
         {isPro && result.professions.length > 0 && (
           <div className="mt-4 p-4 bg-primary/5 rounded-xl border border-primary/20">
-            <h3 className="font-display text-foreground text-sm mb-2">Рекомендуемые профессии для заработка</h3>
+            <h3 className="font-display text-foreground text-sm mb-2">{t("res.finance.recProfessions")}</h3>
             <div className="flex flex-wrap gap-2">
               {result.professions.map((p, i) => (
                 <span key={i} className="text-xs px-3 py-1 bg-secondary rounded-full text-muted-foreground">{p}</span>
@@ -92,69 +94,69 @@ export function FinancialCodeResultComponent({ result, name, onReset, tier = 'ba
       {/* ===== PRO CONTENT ===== */}
       {isPro && proData && (
         <div className="space-y-6">
-          <ProSectionBlock icon={BookOpen} title="Введение в ваш финансовый код" variant="highlight">
+          <ProSectionBlock icon={BookOpen} title={t("res.finance.intro")} variant="highlight">
             <ProTextBlock text={proData.intro} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Star} title="Глубокий разбор позиций">
+          <ProSectionBlock icon={Star} title={t("res.finance.deepPositions")}>
             <div className="space-y-4">
               <div className="bg-yellow-500/5 rounded-xl p-4 border border-yellow-500/20">
                 <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-1.5">
-                  <Star className="w-4 h-4 text-yellow-500" /> Талант для заработка
+                  <Star className="w-4 h-4 text-yellow-500" /> {t("res.finance.talent")}
                 </h4>
                 <ProTextBlock text={proData.talentDeep} />
               </div>
               <div className="bg-emerald-500/5 rounded-xl p-4 border border-emerald-500/20">
                 <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-1.5">
-                  <Wallet className="w-4 h-4 text-emerald-500" /> Финансовый ресурс
+                  <Wallet className="w-4 h-4 text-emerald-500" /> {t("res.finance.resource")}
                 </h4>
                 <ProTextBlock text={proData.resourceDeep} />
               </div>
               <div className="bg-blue-500/5 rounded-xl p-4 border border-blue-500/20">
                 <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-1.5">
-                  <Shield className="w-4 h-4 text-blue-500" /> Финансовая миссия
+                  <Shield className="w-4 h-4 text-blue-500" /> {t("res.finance.mission")}
                 </h4>
                 <ProTextBlock text={proData.missionDeep} />
               </div>
               <div className="bg-destructive/5 rounded-xl p-4 border border-destructive/20">
                 <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 text-destructive" /> Финансовый блок
+                  <AlertTriangle className="w-4 h-4 text-destructive" /> {t("res.finance.block")}
                 </h4>
                 <ProTextBlock text={proData.blockDeep} />
               </div>
             </div>
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Brain} title="Денежная психология">
+          <ProSectionBlock icon={Brain} title={t("res.finance.moneyPsychology")}>
             <ProTextBlock text={proData.moneyPsychology} />
           </ProSectionBlock>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={TrendingUp} title="Стратегия дохода">
+            <ProSectionBlock icon={TrendingUp} title={t("res.finance.incomeStrategy")}>
               <ProTextBlock text={proData.incomeStrategy} />
             </ProSectionBlock>
-            <ProSectionBlock icon={Target} title="Инвестиционный профиль">
+            <ProSectionBlock icon={Target} title={t("res.finance.investmentProfile")}>
               <ProTextBlock text={proData.investmentProfile} />
             </ProSectionBlock>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={AlertTriangle} title="Финансовые риски" variant="warning">
+            <ProSectionBlock icon={AlertTriangle} title={t("res.finance.risks")} variant="warning">
               <ProListBlock items={proData.financialRisks} icon="⚠" />
             </ProSectionBlock>
-            <ProSectionBlock icon={Sparkles} title="Финансовые возможности" variant="success">
+            <ProSectionBlock icon={Sparkles} title={t("res.finance.opportunities")} variant="success">
               <ProListBlock items={proData.financialOpportunities} icon="★" />
             </ProSectionBlock>
           </div>
 
-          <ProSectionBlock icon={CheckCircle} title="План действий" variant="highlight">
-            <h4 className="text-sm font-medium text-foreground mb-3">Что делать</h4>
+          <ProSectionBlock icon={CheckCircle} title={t("res.finance.actionPlan")} variant="highlight">
+            <h4 className="text-sm font-medium text-foreground mb-3">{t("res.whatToDo")}</h4>
             <ProNumberedList items={proData.actionPlan} className="mb-6" />
-            <h4 className="text-sm font-medium text-destructive mb-3">Чего избегать</h4>
+            <h4 className="text-sm font-medium text-destructive mb-3">{t("res.whatToAvoid")}</h4>
             <ProListBlock items={proData.avoidList} icon="✗" />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={MessageCircle} title="Итог" variant="highlight">
+          <ProSectionBlock icon={MessageCircle} title={t("res.conclusion")} variant="highlight">
             <ProTextBlock text={proData.conclusion} className="mb-4" />
             <div className="bg-primary/10 rounded-xl p-4 text-center">
               <p className="text-sm text-foreground font-medium italic">«{proData.keyThought}»</p>
@@ -166,8 +168,7 @@ export function FinancialCodeResultComponent({ result, name, onReset, tier = 'ba
       {!isPro && (
         <div className="bg-muted/30 rounded-xl border border-border p-5 text-center space-y-2">
           <p className="text-sm text-muted-foreground">
-            В профессиональном разборе: глубокий анализ всех 4 позиций, денежная психология, стратегия дохода,
-            инвестиционный профиль, риски и возможности, план действий и персональные рекомендации.
+            {t("res.finance.proFooter")}
           </p>
         </div>
       )}
