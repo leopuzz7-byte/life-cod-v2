@@ -1,6 +1,15 @@
 // Детальный помесячный прогноз для профессионального разбора
 // Генерация развёрнутых текстов на основе аркана года
 
+import i18n from '@/i18n';
+import {
+  monthNamesI18n,
+  getPlanetLocalized,
+  getMonthThemeLocalized,
+  getPeriodsLocalized,
+  getResourcesLocalized,
+} from './yearForecastDetailedI18n';
+
 export interface DetailedMonthForecast {
   month: number;
   name: string;
@@ -192,12 +201,14 @@ function generateMonthDescription(yearArcana: number, month: number, targetYear:
     },
   };
 
-  const at = arcanaThemes[monthArcana] || arcanaThemes[1]!;
+  const lang = i18n.language;
+  const at = getMonthThemeLocalized(monthArcana, lang) || arcanaThemes[monthArcana] || arcanaThemes[1]!;
+  const names = lang === 'en' || lang === 'es' ? monthNamesI18n[lang] : monthNames;
 
   return {
     month,
-    name: monthNames[month],
-    planet: mp.planet,
+    name: names[month],
+    planet: getPlanetLocalized(mp.planet, lang),
     arcanaInfluence: monthArcana,
     theme: at.theme,
     description: at.desc,
@@ -209,6 +220,9 @@ function generateMonthDescription(yearArcana: number, month: number, targetYear:
 
 // Генерация периодов внутри года
 export function generateYearPeriods(yearArcana: number, targetYear: number): YearPeriod[] {
+  const localized = getPeriodsLocalized(yearArcana, targetYear, i18n.language);
+  if (localized) return localized;
+
   const periods: YearPeriod[] = [
     {
       title: "Период I: Запуск и настройка",
@@ -245,6 +259,9 @@ export function generateYearPeriods(yearArcana: number, targetYear: number): Yea
 
 // Генерация ресурсов/энергетических факторов
 export function generateYearResources(yearArcana: number): YearResources {
+  const localized = getResourcesLocalized(yearArcana, i18n.language);
+  if (localized) return localized;
+
   const resourceSets: Record<number, Partial<YearResources>> = {
     1: {
       givesEnergy: ["Новые начинания и первые шаги", "Обучение новым навыкам", "Общение с вдохновляющими людьми", "Физическая активность, особенно утренняя", "Работа с аффирмациями и намерениями", "Ведение дневника идей", "Нетворкинг и знакомства", "Путешествия в новые места"],
