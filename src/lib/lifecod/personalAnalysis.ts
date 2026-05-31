@@ -10,6 +10,8 @@ import { calculateFinancialCodeLC, FinancialCodeLCModule } from './financialCode
 import { calculatePsychProfile, PsychProfileModule } from './psychProfile';
 import { calculateEnergyMap, EnergyMapModule } from './energyMap';
 import { calculateActionPlan, ActionPlanModule } from './actionPlan';
+import i18n from '@/i18n';
+import { getPAStrings } from './personalAnalysisI18n';
 
 // ============= ТИПЫ =============
 
@@ -201,19 +203,20 @@ function calculatePersonalYearModule(day: number, month: number, targetYear: num
   const py = reduceToSingle(rawSum);
   const desc = personalYearDescriptions[py];
   const isCrisis = [7, 8, 9].includes(py);
+  const L = getPAStrings(i18n.language)?.labels;
 
   return {
     year: targetYear,
     personalYear: py,
-    name: desc?.name || `Год ${py}`,
+    name: desc?.name || (L ? L.nameYear(py) : `Год ${py}`),
     theme: desc?.theme || '',
     forRelationships: desc?.forRelationships || '',
     forBusiness: desc?.forBusiness || '',
     isCrisis,
     calcTrace: {
-      input: `Дата: ${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}, Год: ${targetYear}`,
+      input: `${L?.date ?? 'Дата'}: ${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}, ${L?.year ?? 'Год'}: ${targetYear}`,
       steps,
-      result: `Личный год: ${py}`,
+      result: `${L?.personalYear ?? 'Личный год'}: ${py}`,
     },
   };
 }
@@ -285,15 +288,18 @@ function calculateYearInActionsModule(personalYear: number, birthDay: number): Y
     },
   };
 
-  const desc = gaDescriptions[result] || gaDescriptions[5]!;
+  const S = getPAStrings(i18n.language);
+  const gaLoc = S?.ga ?? gaDescriptions;
+  const desc = gaLoc[result] || gaLoc[5]!;
+  const L = S?.labels;
 
   return {
     value: result,
     intermediateSum: rawSum,
     calcTrace: {
-      input: `LY = ${personalYear}, День = ${birthDay}`,
+      input: `LY = ${personalYear}, ${L?.day ?? 'День'} = ${birthDay}`,
       steps,
-      result: `Год в действиях: ${result}`,
+      result: `${L?.yearInActions ?? 'Год в действиях'}: ${result}`,
     },
     behavior: desc.behavior,
     minusBehavior: desc.minus,
@@ -336,24 +342,25 @@ function calculateConsciousnessModule(day: number, month: number): Consciousness
   // Уникальные значения в порядке появления
   const uniqueChain = [...new Set(chain)];
 
+  const L = getPAStrings(i18n.language)?.labels;
   const steps: string[] = [];
   if (day > 9) steps.push(`${day} → ${String(day).split('').join('+')} = ${sumDigits(day)}${sumDigits(day) > 9 ? ' → ' + dayReduced : ''}`);
-  else steps.push(`День: ${day}`);
+  else steps.push(`${L?.day ?? 'День'}: ${day}`);
   if (month > 9) steps.push(`${month} → ${String(month).split('').join('+')} = ${sumDigits(month)}${sumDigits(month) > 9 ? ' → ' + monthReduced : ''}`);
-  else steps.push(`Месяц: ${month}`);
+  else steps.push(`${L?.month ?? 'Месяц'}: ${month}`);
   steps.push(`${dayReduced} + ${monthReduced} = ${rawSum}${rawSum > 9 ? ' → ' + result : ''}`);
-  steps.push(`Цепочка: ${uniqueChain.join(' → ')}`);
+  steps.push(`${L?.chain ?? 'Цепочка'}: ${uniqueChain.join(' → ')}`);
 
   const desc = consciousnessDescriptions[result];
 
   return {
     result,
     chain: uniqueChain,
-    name: desc?.name || `Сознание ${result}`,
+    name: desc?.name || (L ? L.nameConsciousness(result) : `Сознание ${result}`),
     calcTrace: {
-      input: `Дата: ${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}`,
+      input: `${L?.date ?? 'Дата'}: ${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}`,
       steps,
-      result: `Число сознания: ${result}`,
+      result: `${L?.consciousnessNumber ?? 'Число сознания'}: ${result}`,
     },
     innerState: desc?.core || '',
     personalLife: desc?.inRelationships || '',
@@ -365,7 +372,7 @@ function calculateConsciousnessModule(day: number, month: number): Consciousness
 }
 
 function getConsciousnessWarning(consciousness: number): string {
-  const warnings: Record<number, string> = {
+  const warnings: Record<number, string> = getPAStrings(i18n.language)?.warnings ?? {
     1: 'Склонность к изоляции при неосознанном проживании',
     2: 'Риск созависимости и потери себя в партнёре',
     3: 'Риск поверхностности и нереализованных обещаний',
@@ -390,7 +397,8 @@ function calculateActionsModule(year: number): ActionsModule {
   const intermediateSum = digit1 + digit2;
   let current = intermediateSum;
 
-  const steps: string[] = [`Год: ${year}, последние цифры: ${digit1} и ${digit2}`];
+  const L = getPAStrings(i18n.language)?.labels;
+  const steps: string[] = [`${L?.year ?? 'Год'}: ${year}, ${i18n.language === 'en' ? 'last digits' : i18n.language === 'es' ? 'últimas cifras' : 'последние цифры'}: ${digit1} ${i18n.language === 'en' ? 'and' : i18n.language === 'es' ? 'y' : 'и'} ${digit2}`];
   steps.push(`${digit1} + ${digit2} = ${intermediateSum}`);
 
   if (intermediateSum > 9) {
@@ -401,20 +409,20 @@ function calculateActionsModule(year: number): ActionsModule {
   }
   chain.push(current);
   const uniqueChain = [...new Set(chain)];
-  steps.push(`Цепочка: ${uniqueChain.join(' → ')}`);
+  steps.push(`${L?.chain ?? 'Цепочка'}: ${uniqueChain.join(' → ')}`);
 
   const desc = actionDescriptions[current];
 
   return {
     result: current,
     chain: uniqueChain,
-    name: desc?.name || `Действие ${current}`,
+    name: desc?.name || (L ? L.nameAction(current) : `Действие ${current}`),
     calcTrace: {
-      input: `Год рождения: ${year}`,
+      input: `${i18n.language === 'en' ? 'Birth year' : i18n.language === 'es' ? 'Año de nacimiento' : 'Год рождения'}: ${year}`,
       steps,
-      result: `Число действий: ${current}`,
+      result: `${L?.actionsNumber ?? 'Число действий'}: ${current}`,
     },
-    chainMeaning: `Связка ${uniqueChain.join('-')}: ${desc?.core || ''}`,
+    chainMeaning: L ? L.bond(uniqueChain.join('-'), desc?.core || '') : `Связка ${uniqueChain.join('-')}: ${desc?.core || ''}`,
     plus: desc ? [desc.inPlus] : [],
     minus: desc ? [desc.inMinus] : [],
     love: desc?.inRelationships || '',
@@ -430,7 +438,8 @@ function calculatePinnaclesModule(day: number, month: number, year: number): { p
   const currentAge = new Date().getFullYear() - year;
   const activeIndex = getActivePinnacleIndex(data.pinnacles, currentAge);
 
-  // pinnacleDescriptions already imported at top
+  const S = getPAStrings(i18n.language);
+  const L = S?.labels;
 
   const pinnacles: PinnacleModule[] = data.pinnacles.map((p, i) => {
     const desc = pinnacleDescriptions[p.value];
@@ -446,13 +455,13 @@ function calculatePinnaclesModule(day: number, month: number, year: number): { p
       endYear: p.endYear,
       isActive,
       isCrisis,
-      name: desc?.name || `Пиннакль ${p.value}`,
+      name: desc?.name || (L ? L.namePinnacle(p.value) : `Пиннакль ${p.value}`),
       essence: desc?.essence || '',
       lovePlus: desc?.lovePlus || [],
       loveMinus: desc?.loveMinus || [],
       businessPlus: desc?.businessPlus || [],
       businessMinus: desc?.businessMinus || [],
-      risks: isCrisis ? ['Кризисный период', 'Высокая вероятность трансформации'] : [],
+      risks: isCrisis ? (S?.pinnacleCrisisRisks ?? ['Кризисный период', 'Высокая вероятность трансформации']) : [],
       calcTrace: {
         input: `P${i + 1}`,
         steps: [(data.steps as any)[`P${i + 1}`] || ''],
@@ -462,19 +471,19 @@ function calculatePinnaclesModule(day: number, month: number, year: number): { p
   });
 
   const calcTrace: CalcTrace = {
-    input: `Дата: ${day}.${String(month).padStart(2, '0')}.${year}`,
+    input: `${L?.date ?? 'Дата'}: ${day}.${String(month).padStart(2, '0')}.${year}`,
     steps: [
-      `День: ${data.steps.dayCore}`,
-      `Месяц: ${data.steps.monthCore}`,
-      `Год: ${data.steps.yearCore}`,
+      `${L?.day ?? 'День'}: ${data.steps.dayCore}`,
+      `${L?.month ?? 'Месяц'}: ${data.steps.monthCore}`,
+      `${L?.year ?? 'Год'}: ${data.steps.yearCore}`,
       `Life Path: ${data.steps.lifePath}`,
       `P1 (DD+MM): ${data.steps.P1}`,
       `P2 (DD+YY): ${data.steps.P2}`,
       `P3 (P1+P2): ${data.steps.P3}`,
       `P4 (MM+YY): ${data.steps.P4}`,
-      `Граница P1: ${data.steps.timing}`,
+      `${L?.p1border ?? 'Граница P1'}: ${data.steps.timing}`,
     ],
-    result: `Пиннакли: ${data.pinnacles.map((p, i) => `P${i + 1}=${p.value}`).join(', ')}`,
+    result: `${L?.pinnacles ?? 'Пиннакли'}: ${data.pinnacles.map((p, i) => `P${i + 1}=${p.value}`).join(', ')}`,
   };
 
   return { pinnacles, calcTrace };
@@ -485,33 +494,32 @@ function calculatePinnaclesModule(day: number, month: number, year: number): { p
 function calculateSummaryNumbers(consciousness: number, action: number, personalYear: number, pinnacleValue: number): SummaryNumbersModule {
   const sumBase = consciousness + action;
   const sumFull = sumBase + personalYear + pinnacleValue;
+  const S = getPAStrings(i18n.language);
+  const L = S?.labels;
+  const consW = L?.consciousness ?? 'Сознание';
+  const actW = L?.actions ?? 'Действия';
+  const pinW = i18n.language === 'en' ? 'Pinnacle' : i18n.language === 'es' ? 'Pináculo' : 'Пиннакль';
 
   const steps = [
-    `SUM_base = Сознание(${consciousness}) + Действия(${action}) = ${sumBase}`,
-    `SUM_full = SUM_base(${sumBase}) + LY(${personalYear}) + Пиннакль(${pinnacleValue}) = ${sumFull}`,
+    `SUM_base = ${consW}(${consciousness}) + ${actW}(${action}) = ${sumBase}`,
+    `SUM_full = SUM_base(${sumBase}) + LY(${personalYear}) + ${pinW}(${pinnacleValue}) = ${sumFull}`,
   ];
 
   let intensityLevel: 'SOFT' | 'TRANSFORM' | 'PRESSURE' | 'OVERHEAT';
-  let intensityLabel: string;
-  let interpretation: string;
+  if (sumFull <= 12) intensityLevel = 'SOFT';
+  else if (sumFull <= 18) intensityLevel = 'TRANSFORM';
+  else if (sumFull <= 22) intensityLevel = 'PRESSURE';
+  else intensityLevel = 'OVERHEAT';
 
-  if (sumFull <= 12) {
-    intensityLevel = 'SOFT';
-    intensityLabel = 'Мягкий';
-    interpretation = 'Период спокойного развития. Энергии гармоничны, давление минимально.';
-  } else if (sumFull <= 18) {
-    intensityLevel = 'TRANSFORM';
-    intensityLabel = 'Трансформация';
-    interpretation = 'Период активных перемен. Старые сценарии ломаются, формируется новое.';
-  } else if (sumFull <= 22) {
-    intensityLevel = 'PRESSURE';
-    intensityLabel = 'Давление';
-    interpretation = 'Высокая нагрузка. Внешнее давление, необходимость принимать решения.';
-  } else {
-    intensityLevel = 'OVERHEAT';
-    intensityLabel = 'Перегрев';
-    interpretation = 'Перегрузка системы. Необходимо снижать нагрузку, иначе — сбои и кризисы.';
-  }
+  const ruIntensity: Record<typeof intensityLevel, { label: string; interpretation: string }> = {
+    SOFT: { label: 'Мягкий', interpretation: 'Период спокойного развития. Энергии гармоничны, давление минимально.' },
+    TRANSFORM: { label: 'Трансформация', interpretation: 'Период активных перемен. Старые сценарии ломаются, формируется новое.' },
+    PRESSURE: { label: 'Давление', interpretation: 'Высокая нагрузка. Внешнее давление, необходимость принимать решения.' },
+    OVERHEAT: { label: 'Перегрев', interpretation: 'Перегрузка системы. Необходимо снижать нагрузку, иначе — сбои и кризисы.' },
+  };
+  const intens = (S?.intensity ?? ruIntensity)[intensityLevel];
+  const intensityLabel = intens.label;
+  const interpretation = intens.interpretation;
 
   return {
     sumBase,
@@ -520,7 +528,7 @@ function calculateSummaryNumbers(consciousness: number, action: number, personal
     intensityLevel,
     intensityLabel,
     calcTrace: {
-      input: `Сознание: ${consciousness}, Действия: ${action}, LY: ${personalYear}, Пиннакль: ${pinnacleValue}`,
+      input: `${consW}: ${consciousness}, ${actW}: ${action}, LY: ${personalYear}, ${pinW}: ${pinnacleValue}`,
       steps,
       result: `SUM_base = ${sumBase}, SUM_full = ${sumFull} → ${intensityLabel}`,
     },
@@ -539,82 +547,85 @@ function calculateRiskScore(
 ): RiskScoreModule {
   let score = 0;
   const factors: string[] = [];
+  const factorScores: number[] = [];
   const recommendations: string[] = [];
+
+  const S = getPAStrings(i18n.language);
+  const F = S?.factors;
+  const R = S?.recs;
+  const Lb = S?.labels;
+  const addFactor = (label: string, pts: number) => { factors.push(label); factorScores.push(pts); };
 
   // Фактор 1: Кризисные годы (7-9)
   if ([7, 8, 9].includes(personalYear)) {
     score += 25;
-    factors.push(`Кризисный личный год (${personalYear})`);
-    if (personalYear === 7) recommendations.push('Не начинать новые проекты. Анализировать.');
-    if (personalYear === 8) recommendations.push('Контролировать финансы. Не давить.');
-    if (personalYear === 9) recommendations.push('Завершать старое. Не возвращаться в прошлое.');
+    addFactor(F ? F.crisisYear(personalYear) : `Кризисный личный год (${personalYear})`, 25);
+    if (personalYear === 7) recommendations.push(R?.year7 ?? 'Не начинать новые проекты. Анализировать.');
+    if (personalYear === 8) recommendations.push(R?.year8 ?? 'Контролировать финансы. Не давить.');
+    if (personalYear === 9) recommendations.push(R?.year9 ?? 'Завершать старое. Не возвращаться в прошлое.');
   } else if ([5, 6].includes(personalYear)) {
     score += 10;
-    factors.push(`Напряжённый год (${personalYear})`);
-    if (personalYear === 5) recommendations.push('Не бросать начатое. Довести до результата.');
-    if (personalYear === 6) recommendations.push('Делегировать. Не тянуть всё на себе.');
+    addFactor(F ? F.tenseYear(personalYear) : `Напряжённый год (${personalYear})`, 10);
+    if (personalYear === 5) recommendations.push(R?.year5 ?? 'Не бросать начатое. Довести до результата.');
+    if (personalYear === 6) recommendations.push(R?.year6 ?? 'Делегировать. Не тянуть всё на себе.');
   }
 
   // Фактор 2: Пиннакли
   if ([7, 8, 9].includes(pinnacleValue)) {
     score += 20;
-    factors.push(`Кризисный пиннакль (${pinnacleValue})`);
-    recommendations.push('Кризисный период жизни — замедлиться, не разрушать.');
+    addFactor(F ? F.crisisPinnacle(pinnacleValue) : `Кризисный пиннакль (${pinnacleValue})`, 20);
+    recommendations.push(R?.crisisPinnacle ?? 'Кризисный период жизни — замедлиться, не разрушать.');
   }
 
   // Фактор 3: Challenges
   if ([7, 8, 9].includes(challengeValue)) {
     score += 15;
-    factors.push(`Тяжёлый урок (Challenge = ${challengeValue})`);
-    recommendations.push('Внутренний конфликт обострён — работать с психологом.');
+    addFactor(F ? F.hardLesson(challengeValue) : `Тяжёлый урок (Challenge = ${challengeValue})`, 15);
+    recommendations.push(R?.hardLesson ?? 'Внутренний конфликт обострён — работать с психологом.');
   }
 
   // Фактор 4: Цепочки сознания/действий
   if ([7, 8, 9].includes(consciousness)) {
     score += 10;
-    factors.push(`Напряжённое сознание (${consciousness})`);
+    addFactor(F ? F.tenseConsciousness(consciousness) : `Напряжённое сознание (${consciousness})`, 10);
   }
   if ([7, 8, 9].includes(action)) {
     score += 10;
-    factors.push(`Напряжённые действия (${action})`);
+    addFactor(F ? F.tenseActions(action) : `Напряжённые действия (${action})`, 10);
   }
 
   // Фактор 5: Суммарные числа
   if (sumFull > 22) {
     score += 15;
-    factors.push(`Перегрев суммарных чисел (${sumFull})`);
-    recommendations.push('Снизить нагрузку. Приоритизировать.');
+    addFactor(F ? F.overheatSum(sumFull) : `Перегрев суммарных чисел (${sumFull})`, 15);
+    recommendations.push(R?.overheat ?? 'Снизить нагрузку. Приоритизировать.');
   } else if (sumFull > 18) {
     score += 10;
-    factors.push(`Давление суммарных чисел (${sumFull})`);
+    addFactor(F ? F.pressureSum(sumFull) : `Давление суммарных чисел (${sumFull})`, 10);
   }
 
   // Фактор 6: Комбинация кризисов
   if ([7, 8, 9].includes(personalYear) && [7, 8, 9].includes(pinnacleValue)) {
     score += 10;
-    factors.push('Двойной кризис: год + пиннакль');
-    recommendations.push('⚠️ Особо опасный период. Минимум изменений.');
+    addFactor(F?.doubleCrisis ?? 'Двойной кризис: год + пиннакль', 10);
+    recommendations.push(R?.doubleCrisis ?? '⚠️ Особо опасный период. Минимум изменений.');
   }
 
   // Ограничиваем 0-100
   score = Math.min(100, Math.max(0, score));
 
   let level: RiskScoreLevel;
-  let label: string;
-  if (score <= 30) {
-    level = 'LOW';
-    label = 'Низкий риск';
-  } else if (score <= 60) {
-    level = 'MEDIUM';
-    label = 'Средний риск';
-  } else {
-    level = 'HIGH';
-    label = 'Высокий риск';
-  }
+  if (score <= 30) level = 'LOW';
+  else if (score <= 60) level = 'MEDIUM';
+  else level = 'HIGH';
+  const ruLevels: Record<RiskScoreLevel, string> = { LOW: 'Низкий риск', MEDIUM: 'Средний риск', HIGH: 'Высокий риск' };
+  const label = (S?.levels ?? ruLevels)[level];
 
   if (recommendations.length === 0) {
-    recommendations.push('Благоприятный период для развития и новых начинаний.');
+    recommendations.push(R?.favorable ?? 'Благоприятный период для развития и новых начинаний.');
   }
+
+  const pinW = i18n.language === 'en' ? 'Pinnacle' : i18n.language === 'es' ? 'Pináculo' : 'Пиннакль';
 
   return {
     score,
@@ -623,9 +634,9 @@ function calculateRiskScore(
     factors,
     recommendations,
     calcTrace: {
-      input: `LY=${personalYear}, Пиннакль=${pinnacleValue}, Challenge=${challengeValue}, Сознание=${consciousness}, Действия=${action}, SUM=${sumFull}`,
-      steps: factors.map((f, i) => `+${getFactorScore(f)} — ${f}`),
-      result: `Risk Score: ${score}/100 → ${label}`,
+      input: `LY=${personalYear}, ${pinW}=${pinnacleValue}, Challenge=${challengeValue}, ${Lb?.consciousness ?? 'Сознание'}=${consciousness}, ${Lb?.actions ?? 'Действия'}=${action}, SUM=${sumFull}`,
+      steps: factors.map((f, i) => `+${factorScores[i]} — ${f}`),
+      result: `${Lb?.riskScore ?? 'Risk Score'}: ${score}/100 → ${label}`,
     },
   };
 }
