@@ -7,6 +7,7 @@ import { calculatePinnacles, getIntegratedYearAnalysis, pinnacleDescriptions, ch
 import { calculateMonthlyForecast } from "./monthlyForecast";
 import { calculatePersonalYear } from "./calculations";
 import { getPairYearLink, getPairYearRatingLabel } from "./pairYearLinks";
+import i18n from "@/i18n";
 
 // ============= PERSONAL PDF =============
 
@@ -157,20 +158,27 @@ export async function generateLifeCodCompatibilityPDF(
   const p1 = result.person1;
   const p2 = result.person2;
 
+  const lang = i18n.language;
+  const pl = (ru: string, en: string, es: string) => (lang === 'en' ? en : lang === 'es' ? es : ru);
+
   // Verdict
-  const verdictLabel = result.overallVerdict.longTermProspect === 'HIGH' ? 'Высокие'
-    : result.overallVerdict.longTermProspect === 'MEDIUM' ? 'Средние' : 'Низкие';
-  
+  const verdictLabel = result.overallVerdict.longTermProspect === 'HIGH' ? pl('Высокие', 'High', 'Altas')
+    : result.overallVerdict.longTermProspect === 'MEDIUM' ? pl('Средние', 'Medium', 'Medias') : pl('Низкие', 'Low', 'Bajas');
+
   sections.push({
-    title: 'Общий вердикт',
+    title: pl('Общий вердикт', 'Overall verdict', 'Veredicto general'),
     content: [
-      `Можно ли быть вместе сейчас: ${result.overallVerdict.canBeTogetherNow ? 'Да' : 'Нет'}`,
-      `Долгосрочные перспективы: ${verdictLabel}`,
-      `Главный риск: ${result.overallVerdict.mainRisk}`,
-      `Рекомендация: ${result.overallVerdict.recommendation}`,
+      `${pl('Можно ли быть вместе сейчас', 'Can you be together now', '¿Podéis estar juntos ahora?')}: ${result.overallVerdict.canBeTogetherNow ? pl('Да', 'Yes', 'Sí') : pl('Нет', 'No', 'No')}`,
+      `${pl('Долгосрочные перспективы', 'Long-term prospects', 'Perspectivas a largo plazo')}: ${verdictLabel}`,
+      `${pl('Главный риск', 'Main risk', 'Riesgo principal')}: ${result.overallVerdict.mainRisk}`,
+      `${pl('Рекомендация', 'Recommendation', 'Recomendación')}: ${result.overallVerdict.recommendation}`,
     ],
     highlight: true,
   });
+
+  const consW = pl('Сознание', 'Consciousness', 'Conciencia');
+  const actW = pl('Действия', 'Actions', 'Acciones');
+  const pyW = pl('Личный год', 'Personal year', 'Año personal');
 
   // Person summaries
   [p1, p2].forEach(p => {
@@ -179,16 +187,16 @@ export async function generateLifeCodCompatibilityPDF(
     sections.push({
       title: `${p.name} (${p.birthDate.day}.${String(p.birthDate.month).padStart(2, '0')}.${p.birthDate.year})`,
       content: [
-        `Сознание: ${p.consciousness.result} — ${cons?.name || ''} (${cons?.core || ''})`,
-        `Действия: ${p.action.result} — ${act?.name || ''} (${act?.core || ''})`,
-        `Личный год: ${p.currentPersonalYear}`,
+        `${consW}: ${p.consciousness.result} — ${cons?.name || ''} (${cons?.core || ''})`,
+        `${actW}: ${p.action.result} — ${act?.name || ''} (${act?.core || ''})`,
+        `${pyW}: ${p.currentPersonalYear}`,
       ],
     });
   });
 
   // Consciousness compatibility
   sections.push({
-    title: 'Совместимость сознаний',
+    title: pl('Совместимость сознаний', 'Consciousness compatibility', 'Compatibilidad de conciencias'),
     content: [
       `${p1.consciousness.result} (${p1.name}) ↔ ${p2.consciousness.result} (${p2.name})`,
       result.consciousnessCompatibility.description,
@@ -199,20 +207,23 @@ export async function generateLifeCodCompatibilityPDF(
   });
 
   // Stabilizer
-  const stabLabels = { STRONG: 'Сильный', OK: 'Нормальный', WEAK: 'Слабый', NO: 'Нет' };
+  const stabLabels = {
+    STRONG: pl('Сильный', 'Strong', 'Fuerte'), OK: pl('Нормальный', 'Normal', 'Normal'),
+    WEAK: pl('Слабый', 'Weak', 'Débil'), NO: pl('Нет', 'None', 'Ninguno'),
+  };
   sections.push({
-    title: 'Стабилизатор',
+    title: pl('Стабилизатор', 'Stabilizer', 'Estabilizador'),
     content: [
-      `Статус: ${stabLabels[result.stabilizer.status]}`,
+      `${pl('Статус', 'Status', 'Estado')}: ${stabLabels[result.stabilizer.status]}`,
       result.stabilizer.hasStabilizer
-        ? `Тип: ${result.stabilizer.stabilizerType}`
-        : 'Стабилизатор отсутствует',
+        ? `${pl('Тип', 'Type', 'Tipo')}: ${result.stabilizer.stabilizerType}`
+        : pl('Стабилизатор отсутствует', 'No stabilizer', 'Sin estabilizador'),
     ],
   });
 
   // 81-link pair year matrix
   sections.push({
-    title: 'Связка личных годов (81 матрица)',
+    title: i18n.t('lifecod.pairLinksTitle'),
     content: result.forecast.map(point => {
       const link = getPairYearLink(point.person1Year, point.person2Year);
       return `${point.year}: ${point.person1Year}↔${point.person2Year} — ${getPairYearRatingLabel(link.rating)} — ${link.dynamics}`;
@@ -222,14 +233,20 @@ export async function generateLifeCodCompatibilityPDF(
 
   // Forecast
   sections.push({
-    title: 'Прогноз на 5 лет',
+    title: pl('Прогноз на 5 лет', '5-year forecast', 'Pronóstico a 5 años'),
     content: result.forecast.map(point => {
-      const typeLabels = { STABLE: 'Стабильный', CRISIS: 'Кризис', BREAKDOWN: 'Разрыв', RECOVERY: 'Восстановление', NEW_UNION: 'Новый союз' };
+      const typeLabels = {
+        STABLE: pl('Стабильный', 'Stable', 'Estable'), CRISIS: pl('Кризис', 'Crisis', 'Crisis'),
+        BREAKDOWN: pl('Разрыв', 'Breakup', 'Ruptura'), RECOVERY: pl('Восстановление', 'Recovery', 'Recuperación'),
+        NEW_UNION: pl('Новый союз', 'New union', 'Nueva unión'),
+      };
       return `${point.year}: ${typeLabels[point.type]} — ${point.description}`;
     }),
   });
 
-  const title = result.relationType === 'love' ? 'Совместимость (любовь)' : 'Совместимость (бизнес)';
+  const title = result.relationType === 'love'
+    ? pl('Совместимость (любовь)', 'Compatibility (love)', 'Compatibilidad (amor)')
+    : pl('Совместимость (бизнес)', 'Compatibility (business)', 'Compatibilidad (negocios)');
 
   await generatePDF({
     title,
