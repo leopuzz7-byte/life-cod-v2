@@ -1,15 +1,16 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { 
-  UnifiedPersonalAnalysis, 
+import {
+  UnifiedPersonalAnalysis,
   CalcTrace,
   RiskScoreLevel,
 } from "@/lib/lifecod/personalAnalysis";
-import { 
-  ArrowLeft, Activity, Mountain, Calculator, Brain, Zap, Shield, 
-  TrendingUp, TrendingDown, AlertTriangle, Lock, ChevronDown, ChevronUp, 
-  Flame, BarChart3, Star, Wallet, Heart, Target, Eye, Calendar,
+import {
+  ArrowLeft, Activity, Mountain, Calculator, Brain, Zap, Shield,
+  TrendingUp, TrendingDown, AlertTriangle, Lock, ChevronDown, ChevronUp,
+  Flame, BarChart3, Star, Wallet, Heart, Target, Calendar,
   Lightbulb, Skull, Sparkles, Crown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,13 +23,15 @@ interface UnifiedPersonalResultProps {
 
 // Компонент calc_trace
 function CalcTraceBlock({ trace, isPaid }: { trace: CalcTrace; isPaid?: boolean }) {
+  const { t } = useTranslation();
+  const tp = (k: string) => t(`lifecod.personal.${k}`);
   const [open, setOpen] = useState(false);
-  
+
   if (!isPaid) {
     return (
       <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground flex items-center gap-2">
         <Lock className="w-3 h-3" />
-        <span>Расчёт доступен в полном отчёте</span>
+        <span>{tp('calcAvailable')}</span>
       </div>
     );
   }
@@ -41,13 +44,13 @@ function CalcTraceBlock({ trace, isPaid }: { trace: CalcTrace; isPaid?: boolean 
       >
         <span className="flex items-center gap-1.5">
           <Calculator className="w-3 h-3" />
-          Показать расчёт
+          {tp('showCalc')}
         </span>
         {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
       </button>
       {open && (
         <div className="px-3 pb-3 space-y-1 text-xs font-mono border-t border-border/50 pt-2">
-          <p className="text-muted-foreground">Вход: {trace.input}</p>
+          <p className="text-muted-foreground">{tp('input')}: {trace.input}</p>
           {trace.steps.map((step, i) => (
             <p key={i} className="text-foreground">{step}</p>
           ))}
@@ -59,9 +62,10 @@ function CalcTraceBlock({ trace, isPaid }: { trace: CalcTrace; isPaid?: boolean 
 }
 
 // Заблюренный блок — если isPaid, показываем контент без замков
-function PaidBlock({ children, isPaid }: { children: React.ReactNode; isPaid: boolean; label?: string; level?: string }) {
+function PaidBlock({ children, isPaid }: { children: React.ReactNode; isPaid: boolean }) {
+  const { t } = useTranslation();
   if (isPaid) return <>{children}</>;
-  
+
   return (
     <div className="relative">
       <div className="blur-sm pointer-events-none select-none">
@@ -70,7 +74,7 @@ function PaidBlock({ children, isPaid }: { children: React.ReactNode; isPaid: bo
       <div className="absolute inset-0 flex items-center justify-center bg-background/60 rounded-xl">
         <div className="text-center space-y-2 p-4">
           <Lock className="w-6 h-6 text-primary mx-auto" />
-          <p className="text-sm font-medium">Доступно в профессиональном разборе</p>
+          <p className="text-sm font-medium">{t('lifecod.personal.availablePro')}</p>
         </div>
       </div>
     </div>
@@ -80,22 +84,24 @@ function PaidBlock({ children, isPaid }: { children: React.ReactNode; isPaid: bo
 type TabId = 'overview' | 'destiny' | 'ly' | 'forecast' | 'finance' | 'psych' | 'energy' | 'pinnacles' | 'risk' | 'plan';
 
 export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: UnifiedPersonalResultProps) {
+  const { t } = useTranslation();
+  const tp = (k: string, opts?: Record<string, unknown>) => t(`lifecod.personal.${k}`, opts);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
 
   // Простая логика: isPaid = true → все блоки открыты
   const showPaid = isPaid;
 
-  const tabs: { id: TabId; label: string; icon: typeof Activity; tier: 'free' | 'standard' | 'premium' }[] = [
-    { id: 'overview', label: 'Обзор', icon: Activity, tier: 'free' },
-    { id: 'destiny', label: 'Матрица', icon: Star, tier: 'free' },
-    { id: 'pinnacles', label: 'Пиннаклы', icon: Mountain, tier: 'standard' },
-    { id: 'ly', label: 'Годы', icon: TrendingUp, tier: 'free' },
-    { id: 'forecast', label: 'Прогноз', icon: Calendar, tier: 'standard' },
-    { id: 'finance', label: 'Финкод', icon: Wallet, tier: 'standard' },
-    { id: 'psych', label: 'Психопрофиль', icon: Brain, tier: 'premium' },
-    { id: 'energy', label: 'Энергокарта', icon: Zap, tier: 'premium' },
-    { id: 'risk', label: 'Risk Score', icon: BarChart3, tier: 'free' },
-    { id: 'plan', label: 'План', icon: Target, tier: 'standard' },
+  const tabs: { id: TabId; icon: typeof Activity; tier: 'free' | 'standard' | 'premium' }[] = [
+    { id: 'overview', icon: Activity, tier: 'free' },
+    { id: 'destiny', icon: Star, tier: 'free' },
+    { id: 'pinnacles', icon: Mountain, tier: 'standard' },
+    { id: 'ly', icon: TrendingUp, tier: 'free' },
+    { id: 'forecast', icon: Calendar, tier: 'standard' },
+    { id: 'finance', icon: Wallet, tier: 'standard' },
+    { id: 'psych', icon: Brain, tier: 'premium' },
+    { id: 'energy', icon: Zap, tier: 'premium' },
+    { id: 'risk', icon: BarChart3, tier: 'free' },
+    { id: 'plan', icon: Target, tier: 'standard' },
   ];
 
   const riskColors: Record<RiskScoreLevel, string> = {
@@ -111,12 +117,13 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
   };
 
   const an = analysis;
+  const monthsShort = tp('monthsShort', { returnObjects: true }) as string[];
 
   const tierBadge = (tier: 'free' | 'standard' | 'premium') => {
     if (tier === 'free' || isPaid) return null;
     return (
       <span className={cn("text-[9px] px-1 py-0.5 rounded-sm font-medium",
-        tier === 'standard' ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400" 
+        tier === 'standard' ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400"
         : "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400"
       )}>
         {tier === 'standard' ? 'STD' : 'PRO'}
@@ -129,11 +136,11 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="font-display text-2xl md:text-3xl text-primary">Персональный анализ</h1>
+          <h1 className="font-display text-2xl md:text-3xl text-primary">{tp('title')}</h1>
           <p className="text-muted-foreground">{an.name} • {an.birthDay}.{String(an.birthMonth).padStart(2, '0')}.{an.birthYear}</p>
         </div>
         <Button variant="outline" onClick={onReset}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Назад
+          <ArrowLeft className="w-4 h-4 mr-2" /> {tp('back')}
         </Button>
       </div>
 
@@ -145,11 +152,11 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
           </div>
           <div>
             <p className={cn("font-semibold", riskColors[an.riskScore.level])}>{an.riskScore.label}</p>
-            <p className="text-xs text-muted-foreground">Risk Score на {an.targetYear} год</p>
+            <p className="text-xs text-muted-foreground">{tp('riskScoreYear', { year: an.targetYear })}</p>
           </div>
         </div>
         <div className="text-sm">
-          <span className="font-medium">Личный год: </span>
+          <span className="font-medium">{tp('personalYearShort')}: </span>
           <span className={cn(an.currentPersonalYear.isCrisis ? "text-red-600 font-bold" : "text-foreground")}>
             {an.currentPersonalYear.personalYear} — {an.currentPersonalYear.name}
           </span>
@@ -170,7 +177,7 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
             )}
           >
             <tab.icon className="w-3.5 h-3.5" />
-            {tab.label}
+            {tp(`tabs.${tab.id}`)}
             {tierBadge(tab.tier)}
           </button>
         ))}
@@ -181,24 +188,24 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
         <div className="space-y-6">
           {/* Quick summary cards */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            <SummaryCard label="Душа" value={an.destinyMatrix.soulNumber} sub={an.destinyMatrix.soulName} />
-            <SummaryCard label="Миссия" value={an.destinyMatrix.missionNumber} sub={an.destinyMatrix.missionName} />
-            <SummaryCard label="Личный год" value={an.currentPersonalYear.personalYear} sub={an.currentPersonalYear.name} crisis={an.currentPersonalYear.isCrisis} />
-            <SummaryCard label="Финканал" value={an.financialCode.channelNumber} sub={an.financialCode.channelName} />
-            <SummaryCard label="Сегодня" value={an.today.personalDay} sub={an.today.name} />
+            <SummaryCard label={tp('sumSoul')} value={an.destinyMatrix.soulNumber} sub={an.destinyMatrix.soulName} />
+            <SummaryCard label={tp('sumMission')} value={an.destinyMatrix.missionNumber} sub={an.destinyMatrix.missionName} />
+            <SummaryCard label={tp('sumPY')} value={an.currentPersonalYear.personalYear} sub={an.currentPersonalYear.name} crisis={an.currentPersonalYear.isCrisis} />
+            <SummaryCard label={tp('sumFinChannel')} value={an.financialCode.channelNumber} sub={an.financialCode.channelName} />
+            <SummaryCard label={tp('sumToday')} value={an.today.personalDay} sub={an.today.name} />
           </div>
 
           {/* Current state */}
           <div className="bg-card rounded-xl border p-4 md:p-6 space-y-3">
-            <h3 className="font-display font-semibold text-lg">Базовый вывод</h3>
+            <h3 className="font-display font-semibold text-lg">{tp('baseConclusion')}</h3>
             <div className="space-y-2 text-sm">
-              <p>🔮 Ваша душа — <strong>{an.destinyMatrix.soulNumber}</strong> ({an.destinyMatrix.soulName}): {an.destinyMatrix.soulDesc}</p>
-              <p>🎯 Миссия — <strong>{an.destinyMatrix.missionNumber}</strong>: {an.destinyMatrix.missionDesc}</p>
-              <p>📅 Личный год — <strong>{an.currentPersonalYear.personalYear}</strong>: {an.currentPersonalYear.theme}</p>
-              <p>📆 Сегодня — <strong>{an.today.personalDay}</strong>: {an.today.energy}</p>
+              <p>🔮 {tp('yourSoul')} — <strong>{an.destinyMatrix.soulNumber}</strong> ({an.destinyMatrix.soulName}): {an.destinyMatrix.soulDesc}</p>
+              <p>🎯 {tp('missionWord')} — <strong>{an.destinyMatrix.missionNumber}</strong>: {an.destinyMatrix.missionDesc}</p>
+              <p>📅 {tp('pyWord')} — <strong>{an.currentPersonalYear.personalYear}</strong>: {an.currentPersonalYear.theme}</p>
+              <p>📆 {tp('todayWord')} — <strong>{an.today.personalDay}</strong>: {an.today.energy}</p>
               {an.currentPersonalYear.isCrisis && (
                 <p className="text-red-600 dark:text-red-400 font-medium">
-                  ⚠️ Высокая вероятность кризисных событий при неосознанном проживании
+                  {tp('crisisWarning')}
                 </p>
               )}
             </div>
@@ -206,7 +213,7 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
 
           {/* Базовые риски */}
           <div className="bg-card rounded-xl border p-4 md:p-6 space-y-3">
-            <h3 className="font-display font-semibold text-lg">Базовые риски</h3>
+            <h3 className="font-display font-semibold text-lg">{tp('baseRisks')}</h3>
             <div className="space-y-1 text-sm">
               {an.riskScore.factors.slice(0, 2).map((f, i) => (
                 <p key={i} className="flex items-start gap-2">
@@ -216,7 +223,6 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
             </div>
           </div>
 
-          {/* Show upsell only if NOT paid */}
           {!isPaid && <ActivationCTA />}
         </div>
       )}
@@ -225,21 +231,21 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
       {activeTab === 'destiny' && (
         <div className="space-y-4">
           <div className="bg-card rounded-xl border p-4 md:p-6 space-y-4">
-            <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Star className="w-5 h-5 text-primary" /> Матрица судьбы</h3>
+            <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Star className="w-5 h-5 text-primary" /> {tp('destinyTitle')}</h3>
             <CalcTraceBlock trace={an.destinyMatrix.calcTrace} isPaid={showPaid} />
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <DestinyCard label="Число души" value={an.destinyMatrix.soulNumber} name={an.destinyMatrix.soulName} desc={an.destinyMatrix.soulDesc} />
-              <DestinyCard label="Миссия" value={an.destinyMatrix.missionNumber} name={an.destinyMatrix.missionName} desc={an.destinyMatrix.missionDesc} />
-              <DestinyCard label="Реализация" value={an.destinyMatrix.realizationNumber} name={an.destinyMatrix.realizationName} desc={an.destinyMatrix.realizationDesc} />
-              <DestinyCard label="Итог жизни" value={an.destinyMatrix.lifeOutcomeNumber} name={an.destinyMatrix.lifeOutcomeName} desc={an.destinyMatrix.lifeOutcomeDesc} />
+              <DestinyCard label={tp('cardSoul')} value={an.destinyMatrix.soulNumber} name={an.destinyMatrix.soulName} desc={an.destinyMatrix.soulDesc} />
+              <DestinyCard label={tp('cardMission')} value={an.destinyMatrix.missionNumber} name={an.destinyMatrix.missionName} desc={an.destinyMatrix.missionDesc} />
+              <DestinyCard label={tp('cardRealization')} value={an.destinyMatrix.realizationNumber} name={an.destinyMatrix.realizationName} desc={an.destinyMatrix.realizationDesc} />
+              <DestinyCard label={tp('cardLifeOutcome')} value={an.destinyMatrix.lifeOutcomeNumber} name={an.destinyMatrix.lifeOutcomeName} desc={an.destinyMatrix.lifeOutcomeDesc} />
             </div>
           </div>
 
           {/* Кармические задачи */}
-          <PaidBlock isPaid={showPaid} label="Кармические задачи доступны в полном отчёте" level="Стандарт">
+          <PaidBlock isPaid={showPaid}>
             <div className="bg-card rounded-xl border p-4 md:p-6 space-y-3">
-              <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Skull className="w-5 h-5 text-amber-600" /> Кармические задачи</h3>
+              <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Skull className="w-5 h-5 text-amber-600" /> {tp('karmicTitle')}</h3>
               {an.destinyMatrix.karmicTasks.length > 0 ? (
                 <div className="space-y-2 text-sm">
                   {an.destinyMatrix.karmicTasks.map((k, i) => (
@@ -250,28 +256,28 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">Все числа присутствуют — кармические задачи минимальны</p>
+                <p className="text-sm text-muted-foreground">{tp('karmicMinimal')}</p>
               )}
             </div>
           </PaidBlock>
 
           {/* Теневая и сильная энергии */}
-          <PaidBlock isPaid={showPaid} label="Энергетический баланс в полном отчёте" level="Стандарт">
+          <PaidBlock isPaid={showPaid}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-card rounded-xl border p-4 space-y-2">
-                <h4 className="font-medium text-red-600 dark:text-red-400 flex items-center gap-1"><TrendingDown className="w-4 h-4" /> Теневая энергия (дефициты)</h4>
+                <h4 className="font-medium text-red-600 dark:text-red-400 flex items-center gap-1"><TrendingDown className="w-4 h-4" /> {tp('shadowTitle')}</h4>
                 {an.destinyMatrix.shadowEnergy.length > 0 ? (
                   an.destinyMatrix.shadowEnergy.map((s, i) => (
                     <p key={i} className="text-sm">• {s.desc}</p>
                   ))
-                ) : <p className="text-sm text-muted-foreground">Дефицитов нет</p>}
+                ) : <p className="text-sm text-muted-foreground">{tp('noDeficits')}</p>}
               </div>
               <div className="bg-card rounded-xl border p-4 space-y-2">
-                <h4 className="font-medium text-green-600 dark:text-green-400 flex items-center gap-1"><TrendingUp className="w-4 h-4" /> Сильные энергии</h4>
+                <h4 className="font-medium text-green-600 dark:text-green-400 flex items-center gap-1"><TrendingUp className="w-4 h-4" /> {tp('strongTitle')}</h4>
                 {an.destinyMatrix.strongEnergies.map((s, i) => (
                   <p key={i} className="text-sm">• {s.desc} {s.count > 1 && `(×${s.count})`}</p>
                 ))}
-                {an.destinyMatrix.strongEnergies.length === 0 && <p className="text-sm text-muted-foreground">Нет выраженных сильных энергий</p>}
+                {an.destinyMatrix.strongEnergies.length === 0 && <p className="text-sm text-muted-foreground">{tp('noStrong')}</p>}
               </div>
             </div>
           </PaidBlock>
@@ -285,19 +291,19 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
         <div className="space-y-4">
           <div className="bg-card rounded-xl border p-4 md:p-6 space-y-4">
             <h3 className="font-display font-semibold text-lg">
-              {an.targetYear}: Личный год {an.currentPersonalYear.personalYear} — {an.currentPersonalYear.name}
+              {an.targetYear}: {tp('pyWord')} {an.currentPersonalYear.personalYear} — {an.currentPersonalYear.name}
             </h3>
             <CalcTraceBlock trace={an.currentPersonalYear.calcTrace} isPaid={showPaid} />
             <p className="text-sm">{an.currentPersonalYear.theme}</p>
-            
-            <PaidBlock isPaid={showPaid} label="Подробности доступны в полном отчёте">
+
+            <PaidBlock isPaid={showPaid}>
               <div className="space-y-3 text-sm">
                 <div>
-                  <p className="font-medium text-pink-600 dark:text-pink-400 flex items-center gap-1 mb-1"><Flame className="w-3 h-3" /> Отношения</p>
+                  <p className="font-medium text-pink-600 dark:text-pink-400 flex items-center gap-1 mb-1"><Flame className="w-3 h-3" /> {tp('relationships')}</p>
                   <p>{an.currentPersonalYear.forRelationships}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1 mb-1"><TrendingUp className="w-3 h-3" /> Бизнес</p>
+                  <p className="font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1 mb-1"><TrendingUp className="w-3 h-3" /> {tp('business')}</p>
                   <p>{an.currentPersonalYear.forBusiness}</p>
                 </div>
               </div>
@@ -306,16 +312,16 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
 
           {/* Год в действиях */}
           <div className="bg-card rounded-xl border p-4 md:p-6 space-y-4">
-            <h3 className="font-display font-semibold text-lg">Год в действиях: {an.yearInActions.value}</h3>
+            <h3 className="font-display font-semibold text-lg">{tp('yearInActionsTitle', { n: an.yearInActions.value })}</h3>
             <CalcTraceBlock trace={an.yearInActions.calcTrace} isPaid={showPaid} />
-            <PaidBlock isPaid={showPaid} label="Поведенческий разбор в полном отчёте">
+            <PaidBlock isPaid={showPaid}>
               <div className="space-y-3 text-sm">
                 <div>
-                  <p className="font-medium mb-1">Как действует:</p>
+                  <p className="font-medium mb-1">{tp('howActs')}</p>
                   {an.yearInActions.behavior.map((b, i) => <p key={i} className="text-green-700 dark:text-green-400">✓ {b}</p>)}
                 </div>
                 <div>
-                  <p className="font-medium mb-1">Стоп-сигналы:</p>
+                  <p className="font-medium mb-1">{tp('stopSignals')}</p>
                   {an.yearInActions.stopSignals.map((s, i) => <p key={i} className="text-amber-700 dark:text-amber-400">⚠ {s}</p>)}
                 </div>
               </div>
@@ -324,7 +330,7 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
 
           {/* 5-year forecast */}
           <div className="bg-card rounded-xl border p-4 md:p-6 space-y-4">
-            <h3 className="font-display font-semibold text-lg">Прогноз на 5 лет</h3>
+            <h3 className="font-display font-semibold text-lg">{tp('forecast5y')}</h3>
             <div className="space-y-2">
               {an.personalYears.map((py, i) => (
                 <div key={py.year} className={cn(
@@ -350,11 +356,11 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
       {/* ===== ПРОГНОЗ (месяц/день) ===== */}
       {activeTab === 'forecast' && (
         <div className="space-y-4">
-          <PaidBlock isPaid={showPaid} label="Помесячный прогноз — уровень Стандарт" level="Стандарт">
+          <PaidBlock isPaid={showPaid}>
             {/* Today */}
             <div className="bg-primary/5 rounded-xl border-2 border-primary p-4 md:p-6 space-y-3">
               <h3 className="font-display font-semibold text-lg flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-primary" /> Сегодня: {an.today.name}
+                <Calendar className="w-5 h-5 text-primary" /> {tp('todayTitle', { name: an.today.name })}
               </h3>
               <CalcTraceBlock trace={an.today.calcTrace} isPaid={true} />
               <p className="text-sm">{an.today.energy}</p>
@@ -363,20 +369,20 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
             {/* Current month */}
             <div className="bg-card rounded-xl border-2 border-primary/50 p-4 md:p-6 space-y-3 mt-4">
               <h3 className="font-display font-semibold text-lg">
-                Текущий месяц: {an.currentMonth.personalMonth} — {an.currentMonth.name}
+                {tp('currentMonthTitle', { n: an.currentMonth.personalMonth, name: an.currentMonth.name })}
               </h3>
               <CalcTraceBlock trace={an.currentMonth.calcTrace} isPaid={true} />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                 <div className="bg-muted/30 rounded-lg p-3">
-                  <p className="font-medium mb-1">⚡ Энергия</p>
+                  <p className="font-medium mb-1">{tp('energyHdr')}</p>
                   <p>{an.currentMonth.energy}</p>
                 </div>
                 <div className="bg-muted/30 rounded-lg p-3">
-                  <p className="font-medium mb-1">🟢 Возможности</p>
+                  <p className="font-medium mb-1">{tp('oppHdr')}</p>
                   <p>{an.currentMonth.opportunities}</p>
                 </div>
                 <div className="bg-muted/30 rounded-lg p-3">
-                  <p className="font-medium mb-1">🔴 Риски</p>
+                  <p className="font-medium mb-1">{tp('risksHdr')}</p>
                   <p>{an.currentMonth.risks}</p>
                 </div>
               </div>
@@ -384,10 +390,9 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
 
             {/* All 12 months */}
             <div className="bg-card rounded-xl border p-4 md:p-6 space-y-3 mt-4">
-              <h3 className="font-display font-semibold text-lg">12 месяцев {an.targetYear}</h3>
+              <h3 className="font-display font-semibold text-lg">{tp('months12', { year: an.targetYear })}</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {an.forecastMonths.map((m) => {
-                  const monthNames = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
                   const isCurrent = m.month === an.currentMonth.month;
                   return (
                     <div key={m.month} className={cn(
@@ -395,7 +400,7 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
                       isCurrent ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border",
                       [7, 8, 9].includes(m.personalMonth) && "bg-red-50 dark:bg-red-950/20"
                     )}>
-                      <p className="text-xs text-muted-foreground">{monthNames[m.month - 1]}</p>
+                      <p className="text-xs text-muted-foreground">{monthsShort[m.month - 1]}</p>
                       <p className="text-xl font-display font-bold text-primary">{m.personalMonth}</p>
                       <p className="text-[10px] text-muted-foreground truncate">{m.name}</p>
                     </div>
@@ -410,26 +415,26 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
       {/* ===== ФИНАНСОВЫЙ КОД ===== */}
       {activeTab === 'finance' && (
         <div className="space-y-4">
-          <PaidBlock isPaid={showPaid} label="Финансовый код — уровень Стандарт" level="Стандарт">
+          <PaidBlock isPaid={showPaid}>
             <div className="bg-card rounded-xl border p-4 md:p-6 space-y-4">
-              <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Wallet className="w-5 h-5 text-primary" /> Финансовый код</h3>
+              <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Wallet className="w-5 h-5 text-primary" /> {tp('financeTitle')}</h3>
               <CalcTraceBlock trace={an.financialCode.calcTrace} isPaid={true} />
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-green-50 dark:bg-green-950/30 rounded-xl p-4 border border-green-200 dark:border-green-800">
-                  <p className="text-xs text-muted-foreground mb-1">Финансовый канал</p>
+                  <p className="text-xs text-muted-foreground mb-1">{tp('finChannel')}</p>
                   <p className="text-2xl font-display font-bold text-green-700 dark:text-green-400">{an.financialCode.channelNumber}</p>
                   <p className="font-medium text-sm">{an.financialCode.channelName}</p>
                   <p className="text-xs text-muted-foreground mt-1">{an.financialCode.channelDesc}</p>
                 </div>
                 <div className="bg-red-50 dark:bg-red-950/30 rounded-xl p-4 border border-red-200 dark:border-red-800">
-                  <p className="text-xs text-muted-foreground mb-1">Блокировка денег</p>
+                  <p className="text-xs text-muted-foreground mb-1">{tp('finBlock')}</p>
                   <p className="text-2xl font-display font-bold text-red-700 dark:text-red-400">{an.financialCode.blockNumber}</p>
                   <p className="font-medium text-sm">{an.financialCode.blockName}</p>
                   <p className="text-xs text-muted-foreground mt-1">{an.financialCode.blockDesc}</p>
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-950/30 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                  <p className="text-xs text-muted-foreground mb-1">Активация</p>
+                  <p className="text-xs text-muted-foreground mb-1">{tp('finActivation')}</p>
                   <p className="text-2xl font-display font-bold text-blue-700 dark:text-blue-400">{an.financialCode.activationNumber}</p>
                   <p className="font-medium text-sm">{an.financialCode.activationName}</p>
                   <p className="text-xs text-muted-foreground mt-1">{an.financialCode.activationDesc}</p>
@@ -437,7 +442,7 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
               </div>
 
               <div className="bg-muted/30 rounded-xl p-4 space-y-2">
-                <p className="font-medium text-sm">💼 Рекомендуемые сферы дохода:</p>
+                <p className="font-medium text-sm">{tp('finSpheres')}</p>
                 <div className="flex flex-wrap gap-2">
                   {an.financialCode.spheres.map((s, i) => (
                     <span key={i} className="text-xs px-2.5 py-1 bg-primary/10 text-primary rounded-full">{s}</span>
@@ -447,7 +452,7 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
 
               {an.financialCode.moneyMistakes.length > 0 && (
                 <div className="bg-red-50 dark:bg-red-950/30 rounded-xl p-4 space-y-1">
-                  <p className="font-medium text-sm text-red-700 dark:text-red-400">🚫 Ошибки в деньгах:</p>
+                  <p className="font-medium text-sm text-red-700 dark:text-red-400">{tp('finMistakes')}</p>
                   {an.financialCode.moneyMistakes.map((m, i) => (
                     <p key={i} className="text-sm">• {m}</p>
                   ))}
@@ -461,39 +466,39 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
       {/* ===== ПСИХОПРОФИЛЬ ===== */}
       {activeTab === 'psych' && (
         <div className="space-y-4">
-          <PaidBlock isPaid={showPaid} label="Психопрофиль — уровень Премиум" level="Премиум">
+          <PaidBlock isPaid={showPaid}>
             <div className="bg-card rounded-xl border p-4 md:p-6 space-y-4">
-              <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Brain className="w-5 h-5 text-primary" /> Психологическая расшифровка</h3>
+              <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Brain className="w-5 h-5 text-primary" /> {tp('psychTitle')}</h3>
               <CalcTraceBlock trace={an.psychProfile.calcTrace} isPaid={true} />
 
               <div className="bg-primary/5 rounded-xl p-4 border border-primary/20">
-                <p className="text-xs text-muted-foreground mb-1">Поведенческий психотип</p>
+                <p className="text-xs text-muted-foreground mb-1">{tp('psychotype')}</p>
                 <p className="text-xl font-display font-bold text-primary">{an.psychProfile.psychotype.name}</p>
                 <p className="text-sm mt-1">{an.psychProfile.psychotype.desc}</p>
               </div>
 
               <div className="bg-card rounded-xl border p-4 space-y-2">
-                <p className="font-medium text-sm flex items-center gap-1"><Heart className="w-4 h-4 text-pink-500" /> Реакция в отношениях</p>
+                <p className="font-medium text-sm flex items-center gap-1"><Heart className="w-4 h-4 text-pink-500" /> {tp('psychReaction')}</p>
                 <p className="text-sm">{an.psychProfile.relationshipReaction}</p>
               </div>
 
               {an.psychProfile.fears.length > 0 && (
                 <div className="bg-card rounded-xl border p-4 space-y-2">
-                  <p className="font-medium text-sm">😨 Страхи</p>
+                  <p className="font-medium text-sm">{tp('psychFears')}</p>
                   {an.psychProfile.fears.map((f, i) => <p key={i} className="text-sm text-red-700 dark:text-red-400">• {f}</p>)}
                 </div>
               )}
 
               {an.psychProfile.lifeScenarios.length > 0 && (
                 <div className="bg-card rounded-xl border p-4 space-y-2">
-                  <p className="font-medium text-sm">🎭 Сценарии жизни</p>
+                  <p className="font-medium text-sm">{tp('psychScenarios')}</p>
                   {an.psychProfile.lifeScenarios.map((s, i) => <p key={i} className="text-sm">• {s}</p>)}
                 </div>
               )}
 
               {an.psychProfile.repeatingCycles.length > 0 && (
                 <div className="bg-card rounded-xl border p-4 space-y-2">
-                  <p className="font-medium text-sm">🔄 Повторяющиеся циклы</p>
+                  <p className="font-medium text-sm">{tp('psychCycles')}</p>
                   {an.psychProfile.repeatingCycles.map((c, i) => <p key={i} className="text-sm">• {c}</p>)}
                 </div>
               )}
@@ -505,15 +510,15 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
       {/* ===== ЭНЕРГОКАРТА ===== */}
       {activeTab === 'energy' && (
         <div className="space-y-4">
-          <PaidBlock isPaid={showPaid} label="Энергокарта — уровень Премиум" level="Премиум">
+          <PaidBlock isPaid={showPaid}>
             <div className="bg-card rounded-xl border p-4 md:p-6 space-y-4">
-              <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Zap className="w-5 h-5 text-primary" /> Энергетическая карта</h3>
+              <h3 className="font-display font-semibold text-lg flex items-center gap-2"><Zap className="w-5 h-5 text-primary" /> {tp('energyTitle')}</h3>
               <CalcTraceBlock trace={an.energyMap.calcTrace} isPaid={true} />
 
               {/* Balance */}
               <div className="bg-muted/30 rounded-xl p-4 space-y-2">
                 <div className="flex justify-between items-center">
-                  <p className="font-medium text-sm">Баланс энергии</p>
+                  <p className="font-medium text-sm">{tp('energyBalance')}</p>
                   <span className={cn("text-sm font-bold",
                     an.energyMap.balance >= 75 ? "text-green-600" :
                     an.energyMap.balance >= 50 ? "text-amber-600" : "text-red-600"
@@ -545,15 +550,15 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
               {/* Leaks & Strengths */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <p className="font-medium text-sm text-red-600 dark:text-red-400">🔋 Утечки ресурса</p>
+                  <p className="font-medium text-sm text-red-600 dark:text-red-400">{tp('energyLeaks')}</p>
                   {an.energyMap.leaks.length > 0 ? (
                     an.energyMap.leaks.map((l, i) => <p key={i} className="text-sm">• {l.desc}</p>)
-                  ) : <p className="text-sm text-muted-foreground">Утечек не обнаружено</p>}
+                  ) : <p className="text-sm text-muted-foreground">{tp('noLeaks')}</p>}
                 </div>
                 <div className="space-y-2">
-                  <p className="font-medium text-sm text-green-600 dark:text-green-400">💪 Сила личности</p>
+                  <p className="font-medium text-sm text-green-600 dark:text-green-400">{tp('energyStrength')}</p>
                   {an.energyMap.strengths.map((s, i) => <p key={i} className="text-sm">• {s.desc}</p>)}
-                  {an.energyMap.strengths.length === 0 && <p className="text-sm text-muted-foreground">Равномерное распределение</p>}
+                  {an.energyMap.strengths.length === 0 && <p className="text-sm text-muted-foreground">{tp('evenDist')}</p>}
                 </div>
               </div>
             </div>
@@ -564,7 +569,7 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
       {/* ===== ПИННАКЛИ ===== */}
       {activeTab === 'pinnacles' && (
         <div className="space-y-4">
-          <PaidBlock isPaid={showPaid} label="Пиннакли — уровень Стандарт" level="Стандарт">
+          <PaidBlock isPaid={showPaid}>
             <div className="bg-card rounded-xl border p-4">
               <CalcTraceBlock trace={an.pinnaclesCalcTrace} isPaid={true} />
             </div>
@@ -577,21 +582,21 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl font-display font-bold text-primary">P{p.index + 1} = {p.value}</span>
-                    {p.isActive && <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">Сейчас</span>}
+                    {p.isActive && <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">{tp('pinNow')}</span>}
                     {p.isCrisis && <AlertTriangle className="w-4 h-4 text-red-500" />}
                   </div>
-                  <span className="text-sm text-muted-foreground">{p.startAge}–{p.endAge ?? '∞'} лет ({p.startYear}–{p.endYear ?? '...'})</span>
+                  <span className="text-sm text-muted-foreground">{p.startAge}–{p.endAge ?? '∞'} {tp('yearsWord')} ({p.startYear}–{p.endYear ?? '...'})</span>
                 </div>
                 <p className="font-medium">{p.name}</p>
                 <p className="text-sm text-muted-foreground">{p.essence}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div className="space-y-2">
-                    <p className="font-medium text-pink-600 dark:text-pink-400 flex items-center gap-1"><Flame className="w-3 h-3" /> Любовь</p>
+                    <p className="font-medium text-pink-600 dark:text-pink-400 flex items-center gap-1"><Flame className="w-3 h-3" /> {tp('pinLove')}</p>
                     {p.lovePlus.map((s, j) => <p key={j} className="text-green-700 dark:text-green-400">✓ {s}</p>)}
                     {p.loveMinus.map((s, j) => <p key={j} className="text-red-700 dark:text-red-400">✗ {s}</p>)}
                   </div>
                   <div className="space-y-2">
-                    <p className="font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Бизнес</p>
+                    <p className="font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1"><TrendingUp className="w-3 h-3" /> {tp('pinBusiness')}</p>
                     {p.businessPlus.map((s, j) => <p key={j} className="text-green-700 dark:text-green-400">✓ {s}</p>)}
                     {p.businessMinus.map((s, j) => <p key={j} className="text-red-700 dark:text-red-400">✗ {s}</p>)}
                   </div>
@@ -619,22 +624,22 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
               </div>
               <div>
                 <h3 className={cn("font-display font-semibold text-xl", riskColors[an.riskScore.level])}>{an.riskScore.label}</h3>
-                <p className="text-sm text-muted-foreground">Risk Score на {an.targetYear}</p>
+                <p className="text-sm text-muted-foreground">{tp('riskScoreOn', { year: an.targetYear })}</p>
               </div>
             </div>
             <CalcTraceBlock trace={an.riskScore.calcTrace} isPaid={showPaid} />
           </div>
 
-          <PaidBlock isPaid={showPaid} label="Полная карта рисков в полном отчёте">
+          <PaidBlock isPaid={showPaid}>
             <div className="bg-card rounded-xl border p-4 md:p-6 space-y-3">
-              <h3 className="font-display font-semibold text-lg">Факторы риска</h3>
+              <h3 className="font-display font-semibold text-lg">{tp('riskFactors')}</h3>
               {an.riskScore.factors.map((f, i) => (
                 <p key={i} className="flex items-start gap-2 text-sm"><AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />{f}</p>
               ))}
-              {an.riskScore.factors.length === 0 && <p className="text-sm text-muted-foreground">Критических факторов нет</p>}
+              {an.riskScore.factors.length === 0 && <p className="text-sm text-muted-foreground">{tp('noFactors')}</p>}
             </div>
             <div className="bg-card rounded-xl border p-4 md:p-6 space-y-3 mt-4">
-              <h3 className="font-display font-semibold text-lg">Рекомендации</h3>
+              <h3 className="font-display font-semibold text-lg">{tp('recommendations')}</h3>
               {an.riskScore.recommendations.map((r, i) => (
                 <p key={i} className="flex items-start gap-2 text-sm"><Shield className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />{r}</p>
               ))}
@@ -646,22 +651,22 @@ export function UnifiedPersonalResult({ analysis, onReset, isPaid = false }: Uni
       {/* ===== ПЛАН ДЕЙСТВИЙ ===== */}
       {activeTab === 'plan' && (
         <div className="space-y-4">
-          <PaidBlock isPaid={showPaid} label="План действий — уровень Стандарт" level="Стандарт">
+          <PaidBlock isPaid={showPaid}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800 p-4 space-y-2">
-                <p className="font-display font-semibold text-green-700 dark:text-green-400 flex items-center gap-1"><Lightbulb className="w-4 h-4" /> Что делать сейчас</p>
+                <p className="font-display font-semibold text-green-700 dark:text-green-400 flex items-center gap-1"><Lightbulb className="w-4 h-4" /> {tp('planDo')}</p>
                 {an.actionPlan.doNow.map((d, i) => <p key={i} className="text-sm">✅ {d}</p>)}
               </div>
               <div className="bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800 p-4 space-y-2">
-                <p className="font-display font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1"><TrendingUp className="w-4 h-4" /> Что усилить</p>
+                <p className="font-display font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1"><TrendingUp className="w-4 h-4" /> {tp('planStrengthen')}</p>
                 {an.actionPlan.strengthen.map((s, i) => <p key={i} className="text-sm">💪 {s}</p>)}
               </div>
               <div className="bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-200 dark:border-red-800 p-4 space-y-2">
-                <p className="font-display font-semibold text-red-700 dark:text-red-400 flex items-center gap-1"><Shield className="w-4 h-4" /> Чего избегать</p>
+                <p className="font-display font-semibold text-red-700 dark:text-red-400 flex items-center gap-1"><Shield className="w-4 h-4" /> {tp('planAvoid')}</p>
                 {an.actionPlan.avoid.map((a, i) => <p key={i} className="text-sm">🚫 {a}</p>)}
               </div>
               <div className="bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-200 dark:border-purple-800 p-4 space-y-2">
-                <p className="font-display font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-1"><Sparkles className="w-4 h-4" /> Как раскрыть потенциал</p>
+                <p className="font-display font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-1"><Sparkles className="w-4 h-4" /> {tp('planUnlock')}</p>
                 {an.actionPlan.unlockPotential.map((u, i) => <p key={i} className="text-sm">🔓 {u}</p>)}
               </div>
             </div>
@@ -702,18 +707,19 @@ function DestinyCard({ label, value, name, desc }: { label: string; value: numbe
 }
 
 function ActivationCTA() {
+  const { t } = useTranslation();
+  const tp = (k: string) => t(`lifecod.personal.${k}`);
   return (
     <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/20 rounded-2xl p-6 text-center space-y-4">
       <div className="flex items-center justify-center gap-2">
         <Crown className="w-6 h-6 text-primary" />
-        <h3 className="font-display font-semibold text-xl text-primary">Профессиональный разбор</h3>
+        <h3 className="font-display font-semibold text-xl text-primary">{tp('ctaTitle')}</h3>
       </div>
       <p className="text-muted-foreground text-sm max-w-lg mx-auto">
-        Получите полный доступ ко всем блокам анализа: помесячный прогноз, финансовый код, 
-        психопрофиль, энергокарту и персональный план действий.
+        {tp('ctaDesc')}
       </p>
-      <Button size="lg" className="bg-primary text-primary-foreground" onClick={() => {/* будет подключена оплата */}}>
-        <Crown className="w-4 h-4 mr-2" /> Получить профессиональный разбор
+      <Button size="lg" className="bg-primary text-primary-foreground" onClick={() => {/* payment hook */}}>
+        <Crown className="w-4 h-4 mr-2" /> {tp('ctaButton')}
       </Button>
     </div>
   );
