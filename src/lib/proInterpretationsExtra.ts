@@ -1,6 +1,13 @@
 // Профессиональные интерпретации для модулей: Финансовый код, Родовые программы, Энергия договора, Прогноз на день
 
 import { getArcana } from "@/lib/arcana";
+import i18n from "@/i18n";
+import {
+  getFinancialCodeProLocalized,
+  getAncestralProLocalized,
+  getContractProLocalized,
+  getDailyProLocalized,
+} from "./proInterpretationsExtraI18n";
 
 // ==================== ФИНАНСОВЫЙ КОД ====================
 export interface FinancialCodeProData {
@@ -21,8 +28,11 @@ export interface FinancialCodeProData {
 }
 
 export function getFinancialCodeProData(talent: number, resource: number, mission: number, block: number): FinancialCodeProData {
+  const localized = getFinancialCodeProLocalized(talent, resource, mission, block, i18n.language);
+  if (localized) return localized;
+
   const t = getArcana(talent), r = getArcana(resource), m = getArcana(mission), b = getArcana(block);
-  
+
   return {
     intro: `Ваш финансовый код раскрывает глубинные механизмы вашего отношения к деньгам. Талант (${t?.name || talent}) — это ваш природный способ зарабатывать. Ресурс (${r?.name || resource}) — энергия, которая поддерживает финансовый поток. Миссия (${m?.name || mission}) — высшая цель вашего материального пути. Блок (${b?.name || block}) — то, что бессознательно мешает вам получать деньги в полной мере. Понимание этих четырёх точек — ключ к финансовой свободе.`,
     
@@ -95,9 +105,12 @@ export interface AncestralProData {
 }
 
 export function getAncestralProData(workingNumbers: { first: number; second: number; third: number; fourth: number }, starCounts: { twos: number; fours: number; fives: number; sevens: number; eights: number }): AncestralProData {
+  const localized = getAncestralProLocalized(workingNumbers, starCounts, i18n.language);
+  if (localized) return localized;
+
   const totalKarmic = starCounts.twos + starCounts.fours + starCounts.eights;
   const totalSpiritual = starCounts.fives + starCounts.sevens;
-  
+
   return {
     intro: `Анализ ваших родовых программ раскрывает глубинные паттерны, унаследованные от предков. Рабочие числа (${workingNumbers.first}, ${workingNumbers.second}, ${workingNumbers.third}, ${workingNumbers.fourth}) показывают основные энергетические линии рода. Кармическая звезда выявляет области, где родовая энергия наиболее сильна и где требуется проработка. Понимание этих программ — ключ к освобождению от повторяющихся родовых сценариев.`,
     
@@ -171,9 +184,12 @@ export interface ContractProData {
 }
 
 export function getContractProData(positions: { position: number; arcana: number; description: string }[], contractDate: string, isGood: boolean): ContractProData {
+  const localized = getContractProLocalized(positions, contractDate, isGood, i18n.language);
+  if (localized) return localized;
+
   const pos4 = getArcana(positions[3]?.arcana), pos6 = getArcana(positions[5]?.arcana);
   const pos9 = getArcana(positions[8]?.arcana), pos12 = getArcana(positions[11]?.arcana);
-  
+
   return {
     intro: `Энергетический анализ даты договора раскрывает скрытые влияния, которые будут действовать на протяжении всего срока соглашения. 12-позиционная матрица показывает не только текущую энергию, но и долгосрочные последствия. Дата ${contractDate} несёт ${isGood ? 'благоприятную' : 'напряжённую'} энергию для заключения соглашений.`,
     
@@ -221,9 +237,12 @@ export interface DailyProData {
 }
 
 export function getDailyProData(positions: { position: number; arcana: number; title: string; description: string }[], dateStr: string): DailyProData {
+  const localized = getDailyProLocalized(positions, dateStr, i18n.language);
+  if (localized) return localized;
+
   const mainArcana = getArcana(positions[0]?.arcana);
   const goalArcana = getArcana(positions[3]?.arcana);
-  
+
   return {
     intro: `Подробный энергетический разбор дня ${dateStr}. В этот день активны ${positions.length} энергетических позиций, каждая из которых влияет на определённый аспект. Главная энергия дня — ${mainArcana?.name || positions[0]?.arcana} (${positions[0]?.arcana}). Это определяет общий тон, настроение и потенциал.`,
     
