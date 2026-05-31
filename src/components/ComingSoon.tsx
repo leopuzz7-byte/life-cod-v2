@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ComingSoonProps {
   title: string;
@@ -6,6 +7,7 @@ interface ComingSoonProps {
 }
 
 export function ComingSoon({ title, description }: ComingSoonProps) {
+  const { t } = useTranslation();
   return (
     <div className="w-full max-w-xl mx-auto">
       <div className="gradient-card rounded-2xl p-8 sm:p-12 border border-border text-center">
@@ -18,7 +20,7 @@ export function ComingSoon({ title, description }: ComingSoonProps) {
           {title}
         </h3>
         <p className="text-sm text-muted-foreground mb-1">
-          Скоро будет
+          {t("comingSoon.soon")}
         </p>
         {description && (
           <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
@@ -26,7 +28,7 @@ export function ComingSoon({ title, description }: ComingSoonProps) {
           </p>
         )}
         <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-secondary/50 rounded-full text-xs text-muted-foreground">
-          Раздел в разработке — следите за обновлениями
+          {t("comingSoon.inDevelopment")}
         </div>
       </div>
     </div>

@@ -610,7 +610,8 @@
     "contractDate": "Fecha del contrato",
     "lifecodForecastYear": "Año del pronóstico",
     "nameToCheck": "Nombre a comprobar",
-    "nameToCheckPlaceholder": "Introduce el nombre de la empresa, el producto o un nombre"
+    "nameToCheckPlaceholder": "Introduce el nombre de la empresa, el producto o un nombre",
+    "chooseTierFor": "Elige un plan para «{{name}}»"
   },
   "methodology": {
     "methodology1": "Método 1",
@@ -629,6 +630,10 @@
       "actionNumber": "Número de Acción",
       "realizationNumber": "Número de Realización",
       "outcomeNumber": "Número del Resultado"
+    },
+    "proExtended": {
+      "1": "Método 1 (22 Arcanos): la matriz completa de 12 posiciones, la diagonal, el karma, el código del éxito, los periodos de vida, los programas ancestrales, los pronósticos de día/mes/año, la energía del contrato.",
+      "2": "Método 2 (Clásica): los 4 números del destino, los pináculos, el año/mes/día personal, el código financiero, el psicoperfil, el mapa energético, el plan de acción, los pronósticos."
     }
   },
   "methods": {
@@ -1491,5 +1496,63 @@
       "Compatibilidad con la pareja",
       "Recomendaciones personales"
     ]
+  },
+  "analysisCfg": {
+    "purpose": {
+      "title": "Propósito",
+      "desc": "Tu matriz del destino personal en 12 posiciones"
+    },
+    "compatibility": {
+      "title": "Compatibilidad",
+      "desc": "Un análisis de compatibilidad de dos personas por fecha de nacimiento"
+    },
+    "year": {
+      "title": "Pronóstico del año",
+      "desc": "La energía y los temas clave de tu año"
+    },
+    "month": {
+      "title": "Pronóstico del mes",
+      "desc": "El triángulo energético del mes"
+    },
+    "day": {
+      "title": "Pronóstico del día",
+      "desc": "Un desglose detallado de las energías de un día concreto"
+    },
+    "ancestral": {
+      "title": "Linaje",
+      "desc": "La estrella kármica y los programas ancestrales"
+    },
+    "contract": {
+      "title": "Energía del contrato",
+      "desc": "Un análisis energético de la fecha del contrato"
+    },
+    "classic-full": {
+      "title": "Propósito",
+      "desc": "Los 4 números clave de tu destino"
+    },
+    "lifecod-compatibility": {
+      "title": "Compatibilidad",
+      "desc": "Un análisis de compatibilidad de pareja por numerología clásica"
+    },
+    "business": {
+      "title": "Negocios",
+      "desc": "Un análisis de la asociación de negocios"
+    },
+    "name": {
+      "title": "Energía del nombre",
+      "desc": "Un análisis numerológico de un nombre o título"
+    },
+    "finance": {
+      "title": "Código financiero",
+      "desc": "Tu código de potencial financiero"
+    },
+    "success-path": {
+      "title": "Camino al éxito",
+      "desc": "Un mapa del camino a la autorrealización"
+    }
+  },
+  "comingSoon": {
+    "soon": "Próximamente",
+    "inDevelopment": "Esta sección está en desarrollo — mantente atento"
   }
 }

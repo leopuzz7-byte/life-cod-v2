@@ -21,7 +21,7 @@ import { ContractEnergyResultComponent } from "@/components/ContractEnergyResult
 import { ComingSoon } from "@/components/ComingSoon";
 import { LifeCodInputForm, LifeCodResult, UnifiedPersonalResult } from "@/components/lifecod";
 import { TierSelector } from "@/components/TierSelector";
-import { analysisConfigs, getAnalysisConfig, getConfigsForMethodology, proExtendedDescriptions, type TierType } from "@/lib/analysisConfig";
+import { analysisConfigs, getAnalysisConfig, getConfigsForMethodology, proExtendedDescription, type TierType } from "@/lib/analysisConfig";
 import {
   calculateYearForecast,
   calculateMonthForecast,
@@ -732,7 +732,7 @@ const Index = () => {
                   {currentConfig && !currentConfig.comingSoon && (
                     <div className="max-w-xl mx-auto mb-2">
                       <h3 className="text-sm font-medium text-foreground text-center mb-3">
-                        Выберите тариф для «{currentConfig.title}»
+                        {t("cfg.chooseTierFor", { title: currentConfig.title })}
                       </h3>
                       <TierSelector
                         config={currentConfig}
@@ -745,7 +745,7 @@ const Index = () => {
                       {selectedTier === 'professional' && currentConfig.professional && (
                         <div className="mt-1 mb-4 px-4 py-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-foreground leading-relaxed">
                           <p className="font-medium mb-1 text-primary">{t("res.proExtendedIncluded")}</p>
-                          <p className="text-muted-foreground">{proExtendedDescriptions[selectedMethodology]}</p>
+                          <p className="text-muted-foreground">{proExtendedDescription(selectedMethodology)}</p>
                         </div>
                       )}
                     </div>

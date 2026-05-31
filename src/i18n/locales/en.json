@@ -610,7 +610,8 @@
     "contractDate": "Contract date",
     "lifecodForecastYear": "Forecast year",
     "nameToCheck": "Name to check",
-    "nameToCheckPlaceholder": "Enter a company name, product or name"
+    "nameToCheckPlaceholder": "Enter a company name, product or name",
+    "chooseTierFor": "Choose a tier for \"{{name}}\""
   },
   "methodology": {
     "methodology1": "Method 1",
@@ -629,6 +630,10 @@
       "actionNumber": "Action Number",
       "realizationNumber": "Realization Number",
       "outcomeNumber": "Outcome Number"
+    },
+    "proExtended": {
+      "1": "Method 1 (22 Arcana): the full 12-position matrix, the diagonal, karma, the code of success, life periods, ancestral programs, day/month/year forecasts, contract energy.",
+      "2": "Method 2 (Classic): all 4 destiny numbers, the pinnacles, personal year/month/day, the financial code, the psychological profile, the energy map, the action plan, forecasts."
     }
   },
   "methods": {
@@ -1472,5 +1477,63 @@
       "Compatibility with a partner",
       "Personal recommendations"
     ]
+  },
+  "analysisCfg": {
+    "purpose": {
+      "title": "Purpose",
+      "desc": "Your personal destiny matrix across 12 positions"
+    },
+    "compatibility": {
+      "title": "Compatibility",
+      "desc": "A compatibility analysis of two people by date of birth"
+    },
+    "year": {
+      "title": "Year forecast",
+      "desc": "The energy and key themes of your year"
+    },
+    "month": {
+      "title": "Month forecast",
+      "desc": "The energetic triangle of the month"
+    },
+    "day": {
+      "title": "Day forecast",
+      "desc": "A detailed layout of energies for a specific day"
+    },
+    "ancestral": {
+      "title": "Lineage",
+      "desc": "The karmic star and ancestral programs"
+    },
+    "contract": {
+      "title": "Contract energy",
+      "desc": "An energetic analysis of the contract date"
+    },
+    "classic-full": {
+      "title": "Purpose",
+      "desc": "The 4 core numbers of your destiny"
+    },
+    "lifecod-compatibility": {
+      "title": "Compatibility",
+      "desc": "A couple compatibility analysis by classic numerology"
+    },
+    "business": {
+      "title": "Business",
+      "desc": "A business partnership analysis"
+    },
+    "name": {
+      "title": "Name energy",
+      "desc": "A numerology analysis of a name or title"
+    },
+    "finance": {
+      "title": "Financial code",
+      "desc": "Your code of financial potential"
+    },
+    "success-path": {
+      "title": "Path to success",
+      "desc": "A map of the path to self-realization"
+    }
+  },
+  "comingSoon": {
+    "soon": "Coming soon",
+    "inDevelopment": "This section is in development — stay tuned"
   }
 }
