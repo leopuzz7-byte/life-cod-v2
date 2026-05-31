@@ -1,5 +1,7 @@
 // Блок 3: Личный прогноз — месяц и день
 import { CalcTrace } from './personalAnalysis';
+import i18n from '@/i18n';
+import { getForecastSet, getForecastLabels } from './personalForecastI18n';
 
 function reduceToSingle(num: number): number {
   if (num === 0) return 0;
@@ -60,15 +62,17 @@ export function calculatePersonalMonth(
 ): PersonalMonthModule {
   const rawSum = personalYear + targetMonth;
   const pm = reduceToSingle(rawSum);
-  const desc = monthDescriptions[pm] || monthDescriptions[1]!;
+  const set = getForecastSet(i18n.language);
+  const L = getForecastLabels(i18n.language);
+  const desc = (set?.months ?? monthDescriptions)[pm] || (set?.months ?? monthDescriptions)[1]!;
 
   return {
     month: targetMonth, year: targetYear, personalMonth: pm,
     name: desc.name, energy: desc.energy, risks: desc.risks, opportunities: desc.opportunities,
     calcTrace: {
-      input: `LY = ${personalYear}, Месяц = ${targetMonth}`,
+      input: `${L.ly} = ${personalYear}, ${L.month} = ${targetMonth}`,
       steps: [`${personalYear} + ${targetMonth} = ${rawSum}${rawSum > 9 ? ' → ' + pm : ''}`],
-      result: `Личный месяц: ${pm}`,
+      result: `${L.personalMonth}: ${pm}`,
     },
   };
 }
@@ -79,15 +83,17 @@ export function calculatePersonalDay(
 ): PersonalDayModule {
   const rawSum = personalMonth + targetDay;
   const pd = reduceToSingle(rawSum);
-  const desc = dayDescriptions[pd] || dayDescriptions[1]!;
+  const set = getForecastSet(i18n.language);
+  const L = getForecastLabels(i18n.language);
+  const desc = (set?.days ?? dayDescriptions)[pd] || (set?.days ?? dayDescriptions)[1]!;
 
   return {
     day: targetDay, month: targetMonth, year: targetYear, personalDay: pd,
     name: desc.name, energy: desc.energy,
     calcTrace: {
-      input: `PM = ${personalMonth}, День = ${targetDay}`,
+      input: `${L.pm} = ${personalMonth}, ${L.day} = ${targetDay}`,
       steps: [`${personalMonth} + ${targetDay} = ${rawSum}${rawSum > 9 ? ' → ' + pd : ''}`],
-      result: `Личный день: ${pd}`,
+      result: `${L.personalDay}: ${pd}`,
     },
   };
 }

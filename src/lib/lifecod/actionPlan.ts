@@ -1,5 +1,7 @@
 // План действий — что делать, что усилить, чего избегать
 import { CalcTrace } from './personalAnalysis';
+import i18n from '@/i18n';
+import { getActionSet, getActionLabels } from './actionPlanI18n';
 
 export interface ActionPlanModule {
   doNow: string[];
@@ -64,36 +66,45 @@ export function calculateActionPlan(
   missingDigits: number[],
   strongDigits: number[]
 ): ActionPlanModule {
+  const lang = i18n.language;
+  const set = getActionSet(lang);
+  const L = getActionLabels(lang);
+  const doNowD = set?.doNow ?? doNowByYear;
+  const strengthenD = set?.strengthen ?? strengthenByConsciousness;
+  const avoidD = set?.avoid ?? avoidByAction;
+  const unlockD = set?.unlock ?? unlockByMission;
+  const adviceD = set?.advice;
+
   const doNow: string[] = [
-    doNowByYear[personalYear] || 'Сфокусируйтесь на текущих задачах',
+    doNowD[personalYear] || L.fallbackDoNow,
   ];
   // Add based on missing
   if (missingDigits.length > 0) {
-    doNow.push(`Проработайте энергию ${missingDigits[0]} — ${getShortAdvice(missingDigits[0])}`);
+    doNow.push(L.workEnergy(missingDigits[0], getShortAdvice(missingDigits[0], adviceD)));
   }
 
   const strengthen: string[] = [
-    strengthenByConsciousness[consciousness] || 'Развивайте осознанность',
+    strengthenD[consciousness] || L.fallbackStrengthen,
   ];
   if (strongDigits.length > 0) {
-    strengthen.push(`Используйте вашу сильную ${strongDigits[0]} — это ваш природный ресурс`);
+    strengthen.push(L.useStrong(strongDigits[0]));
   }
 
   const avoid: string[] = [
-    avoidByAction[action] || 'Избегайте крайностей',
+    avoidD[action] || L.fallbackAvoid,
   ];
   if ([7, 8, 9].includes(personalYear)) {
-    avoid.push('Не начинайте крупных проектов в кризисный период');
+    avoid.push(L.crisisAvoid);
   }
 
   const unlockPotential: string[] = [
-    unlockByMission[missionNumber] || 'Следуйте своей миссии',
+    unlockD[missionNumber] || L.fallbackUnlock,
   ];
 
   return { doNow, strengthen, avoid, unlockPotential };
 }
 
-function getShortAdvice(digit: number): string {
+function getShortAdvice(digit: number, localized?: Record<number, string>): string {
   const advice: Record<number, string> = {
     1: 'научитесь принимать решения самостоятельно',
     2: 'развивайте эмпатию и умение слушать',
@@ -105,5 +116,5 @@ function getShortAdvice(digit: number): string {
     8: 'наведите порядок в финансах',
     9: 'научитесь завершать циклы',
   };
-  return advice[digit] || '';
+  return (localized && localized[digit]) || advice[digit] || '';
 }

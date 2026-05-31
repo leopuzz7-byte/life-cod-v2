@@ -1,5 +1,7 @@
 // Блок 4: Финансовый код (Life C⚙D)
 import { CalcTrace } from './personalAnalysis';
+import i18n from '@/i18n';
+import { getFinLCSet, getFinLCLabels } from './financialCodeLCI18n';
 
 function reduceToSingle(num: number): number {
   if (num === 0) return 0;
@@ -79,9 +81,16 @@ export function calculateFinancialCodeLC(day: number, month: number, year: numbe
   const activationRaw = reduceToSingle(day) + reduceToSingle(sumAllDigits(year));
   const activationNumber = reduceToSingle(activationRaw);
 
-  const ch = channelDescriptions[channelNumber] || channelDescriptions[1]!;
-  const bl = blockDescriptions[blockNumber] || blockDescriptions[0]!;
-  const ac = activationDescriptions[activationNumber] || activationDescriptions[1]!;
+  const lang = i18n.language;
+  const set = getFinLCSet(lang);
+  const L = getFinLCLabels(lang);
+  const channelD = set?.channel ?? channelDescriptions;
+  const blockD = set?.block ?? blockDescriptions;
+  const activationD = set?.activation ?? activationDescriptions;
+
+  const ch = channelD[channelNumber] || channelD[1]!;
+  const bl = blockD[blockNumber] || blockD[0]!;
+  const ac = activationD[activationNumber] || activationD[1]!;
 
   return {
     channelNumber, channelName: ch.name, channelDesc: ch.desc,
@@ -92,11 +101,11 @@ export function calculateFinancialCodeLC(day: number, month: number, year: numbe
     calcTrace: {
       input: `${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}.${year}`,
       steps: [
-        `Канал: ${day}${day > 9 ? ' → ' + channelNumber : ''} = ${channelNumber}`,
-        `Блок: |${day} - ${month}| = ${blockRaw}${blockRaw > 9 ? ' → ' + blockNumber : ''}`,
-        `Активация: ${reduceToSingle(day)} + ${reduceToSingle(sumAllDigits(year))} = ${activationRaw}${activationRaw > 9 ? ' → ' + activationNumber : ''}`,
+        `${L.channel}: ${day}${day > 9 ? ' → ' + channelNumber : ''} = ${channelNumber}`,
+        `${L.block}: |${day} - ${month}| = ${blockRaw}${blockRaw > 9 ? ' → ' + blockNumber : ''}`,
+        `${L.activation}: ${reduceToSingle(day)} + ${reduceToSingle(sumAllDigits(year))} = ${activationRaw}${activationRaw > 9 ? ' → ' + activationNumber : ''}`,
       ],
-      result: `Канал: ${channelNumber}, Блок: ${blockNumber}, Активация: ${activationNumber}`,
+      result: `${L.channel}: ${channelNumber}, ${L.block}: ${blockNumber}, ${L.activation}: ${activationNumber}`,
     },
   };
 }

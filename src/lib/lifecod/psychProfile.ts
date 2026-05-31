@@ -1,5 +1,7 @@
 // Блок 5: Психологическая расшифровка
 import { CalcTrace } from './personalAnalysis';
+import i18n from '@/i18n';
+import { getPsychSet, getPsychLabels } from './psychProfileI18n';
 
 function reduceToSingle(num: number): number {
   if (num === 0) return 0;
@@ -92,27 +94,36 @@ export function calculatePsychProfile(
   missingDigits: number[], dominantDigits: number[],
   pinnacleValues: number[]
 ): PsychProfileModule {
-  const key = `${consciousness}-${action}`;
-  const psychotype = psychotypes[key] || { name: `Тип ${consciousness}-${action}`, desc: 'Уникальная комбинация энергий' };
-  const reaction = relationshipReactions[consciousness] || '';
+  const lang = i18n.language;
+  const set = getPsychSet(lang);
+  const L = getPsychLabels(lang);
+  const psychotypesD = set?.psychotypes ?? psychotypes;
+  const reactionsD = set?.reactions ?? relationshipReactions;
+  const fearsD = set?.fears ?? fearsByMissing;
+  const scenariosD = set?.scenarios ?? scenariosByDominant;
+  const cyclesD = set?.cycles ?? cyclesByPinnacle;
 
-  const fears = missingDigits.slice(0, 3).map(d => fearsByMissing[d] || '');
-  const scenarios = dominantDigits.slice(0, 2).map(d => scenariosByDominant[d] || '');
-  
+  const key = `${consciousness}-${action}`;
+  const psychotype = psychotypesD[key] || { name: L.fallbackName(consciousness, action), desc: L.fallbackDesc };
+  const reaction = reactionsD[consciousness] || '';
+
+  const fears = missingDigits.slice(0, 3).map(d => fearsD[d] || '');
+  const scenarios = dominantDigits.slice(0, 2).map(d => scenariosD[d] || '');
+
   // Repeating cycles based on pinnacle dominant value
   const pinnacleSet = [...new Set(pinnacleValues)];
-  const cycles = pinnacleSet.slice(0, 2).map(v => cyclesByPinnacle[v] || '');
+  const cycles = pinnacleSet.slice(0, 2).map(v => cyclesD[v] || '');
 
   return {
     psychotype, relationshipReaction: reaction,
     fears: fears.filter(Boolean), lifeScenarios: scenarios.filter(Boolean),
     repeatingCycles: cycles.filter(Boolean),
     calcTrace: {
-      input: `Сознание: ${consciousness}, Действия: ${action}`,
+      input: `${L.consciousness}: ${consciousness}, ${L.action}: ${action}`,
       steps: [
-        `Психотип: ${consciousness}-${action} → ${psychotype.name}`,
-        `Страхи (по дефицитам): ${missingDigits.join(', ') || 'нет'}`,
-        `Сценарии (по доминантам): ${dominantDigits.join(', ') || 'нет'}`,
+        `${L.psychotype}: ${consciousness}-${action} → ${psychotype.name}`,
+        `${L.fears}: ${missingDigits.join(', ') || L.none}`,
+        `${L.scenarios}: ${dominantDigits.join(', ') || L.none}`,
       ],
       result: psychotype.name,
     },

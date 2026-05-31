@@ -1,5 +1,8 @@
 // Помесячный прогноз по энергии дня + месяца
 
+import i18n from '@/i18n';
+import { getMonthlySet } from './monthlyForecastI18n';
+
 export type MonthRiskLevel = 'resource' | 'neutral' | 'risk';
 
 export interface MonthForecastItem {
@@ -89,13 +92,25 @@ function getRiskLevel(score: number): MonthRiskLevel {
 }
 
 function buildMonthText(activeDigits: number[], riskLevel: MonthRiskLevel): { plus: string[]; minus: string[]; recommendation: string; redFlags?: string[] } {
+  const set = getMonthlySet(i18n.language);
+  const traitsD = set?.traits ?? digitTraits;
+  const rf = set?.redFlags ?? { d7: 'Риск резких обнулений', d8: 'Риск давления и контроля', d9: 'Риск резких расставаний', overload1: 'Перегруз «Я», конфликтность' };
+  const rc = set?.recs ?? {
+    risk7: 'Не решать судьбоносное в импульсе. Месяц для «тихой пересборки».',
+    risk8: 'Власть — только через правила и договор.',
+    riskOverload1: 'Сон, спорт, дисциплина речи. Токсичность усиливается.',
+    riskDefault: 'Замедлиться, не принимать резких решений.',
+    neutral: 'Контролировать импульсы, работать по плану.',
+    resource: 'Ресурсный месяц. Можно начинать новое и договариваться.',
+  };
+
   const uniqueDigits = [...new Set(activeDigits)];
   const plus: string[] = [];
   const minus: string[] = [];
   const redFlags: string[] = [];
 
   uniqueDigits.forEach(d => {
-    const traits = digitTraits[d];
+    const traits = traitsD[d];
     if (traits) {
       plus.push(...traits.plus);
       minus.push(...traits.minus);
@@ -103,22 +118,22 @@ function buildMonthText(activeDigits: number[], riskLevel: MonthRiskLevel): { pl
   });
 
   // Red flags for crisis digits
-  if (activeDigits.includes(7)) redFlags.push('Риск резких обнулений');
-  if (activeDigits.includes(8)) redFlags.push('Риск давления и контроля');
-  if (activeDigits.includes(9)) redFlags.push('Риск резких расставаний');
+  if (activeDigits.includes(7)) redFlags.push(rf.d7);
+  if (activeDigits.includes(8)) redFlags.push(rf.d8);
+  if (activeDigits.includes(9)) redFlags.push(rf.d9);
   const count1 = activeDigits.filter(d => d === 1).length;
-  if (count1 >= 3) redFlags.push('Перегруз «Я», конфликтность');
+  if (count1 >= 3) redFlags.push(rf.overload1);
 
   let recommendation = '';
   if (riskLevel === 'risk') {
-    if (activeDigits.includes(7)) recommendation = 'Не решать судьбоносное в импульсе. Месяц для «тихой пересборки».';
-    else if (activeDigits.includes(8)) recommendation = 'Власть — только через правила и договор.';
-    else if (count1 >= 3) recommendation = 'Сон, спорт, дисциплина речи. Токсичность усиливается.';
-    else recommendation = 'Замедлиться, не принимать резких решений.';
+    if (activeDigits.includes(7)) recommendation = rc.risk7;
+    else if (activeDigits.includes(8)) recommendation = rc.risk8;
+    else if (count1 >= 3) recommendation = rc.riskOverload1;
+    else recommendation = rc.riskDefault;
   } else if (riskLevel === 'neutral') {
-    recommendation = 'Контролировать импульсы, работать по плану.';
+    recommendation = rc.neutral;
   } else {
-    recommendation = 'Ресурсный месяц. Можно начинать новое и договариваться.';
+    recommendation = rc.resource;
   }
 
   return { plus, minus, recommendation, redFlags: redFlags.length > 0 ? redFlags : undefined };
@@ -130,6 +145,7 @@ export function calculateMonthlyForecast(birthDay: number): MonthlyForecastResul
   const isMasterDay = birthDay === 11 || birthDay === 22;
 
   const months: MonthForecastItem[] = [];
+  const monthNames = getMonthlySet(i18n.language)?.monthNames ?? MONTH_NAMES;
 
   for (let m = 1; m <= 12; m++) {
     const monthDigits = getMonthDigits(m);
@@ -140,7 +156,7 @@ export function calculateMonthlyForecast(birthDay: number): MonthlyForecastResul
 
     months.push({
       month: m,
-      monthName: MONTH_NAMES[m - 1],
+      monthName: monthNames[m - 1],
       activeDigits,
       riskScore,
       riskLevel,

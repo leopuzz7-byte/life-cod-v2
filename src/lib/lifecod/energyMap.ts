@@ -1,5 +1,7 @@
 // Блок 6: Энергетическая карта (9 центров)
 import { CalcTrace } from './personalAnalysis';
+import i18n from '@/i18n';
+import { getEnergySet, getEnergyLabels } from './energyMapI18n';
 
 export interface EnergyCenterInfo {
   number: number;
@@ -68,6 +70,14 @@ const strengthDescriptions: Record<number, string> = {
 };
 
 export function calculateEnergyMap(digitPresence: Record<number, number>): EnergyMapModule {
+  const lang = i18n.language;
+  const set = getEnergySet(lang);
+  const L = getEnergyLabels(lang);
+  const namesD = set?.names ?? centerNames;
+  const descD = set?.descriptions ?? centerDescriptions;
+  const leakD = set?.leaks ?? leakDescriptions;
+  const strengthD = set?.strengths ?? strengthDescriptions;
+
   const centers: EnergyCenterInfo[] = [];
   const leaks: { number: number; desc: string }[] = [];
   const strengths: { number: number; desc: string }[] = [];
@@ -78,21 +88,21 @@ export function calculateEnergyMap(digitPresence: Record<number, number>): Energ
     let statusLabel: string;
 
     if (count === 0) {
-      status = 'deficit'; statusLabel = 'Дефицит';
-      leaks.push({ number: i, desc: leakDescriptions[i] || '' });
+      status = 'deficit'; statusLabel = L.status.deficit;
+      leaks.push({ number: i, desc: leakD[i] || '' });
     } else if (count === 1) {
-      status = 'normal'; statusLabel = 'Норма';
+      status = 'normal'; statusLabel = L.status.normal;
     } else if (count === 2) {
-      status = 'strong'; statusLabel = 'Сильная';
-      strengths.push({ number: i, desc: strengthDescriptions[i] || '' });
+      status = 'strong'; statusLabel = L.status.strong;
+      strengths.push({ number: i, desc: strengthD[i] || '' });
     } else {
-      status = 'excess'; statusLabel = 'Избыток';
-      strengths.push({ number: i, desc: strengthDescriptions[i] || '' });
+      status = 'excess'; statusLabel = L.status.excess;
+      strengths.push({ number: i, desc: strengthD[i] || '' });
     }
 
-    const descriptions = centerDescriptions[i] || {};
+    const descriptions = descD[i] || {};
     centers.push({
-      number: i, name: centerNames[i] || `Центр ${i}`,
+      number: i, name: namesD[i] || L.centerFallback(i),
       count, status, statusLabel,
       description: descriptions[status] || '',
     });
@@ -106,22 +116,18 @@ export function calculateEnergyMap(digitPresence: Record<number, number>): Energ
   // Map: stdDev 0 = 100, stdDev 2+ = 0
   const balance = Math.max(0, Math.min(100, Math.round(100 - stdDev * 50)));
 
-  let balanceLabel: string;
-  if (balance >= 75) balanceLabel = 'Гармоничный';
-  else if (balance >= 50) balanceLabel = 'Умеренный';
-  else if (balance >= 25) balanceLabel = 'Несбалансированный';
-  else balanceLabel = 'Критический дисбаланс';
+  const balanceLabel = L.balance(balance);
 
   return {
     centers, balance, balanceLabel, leaks, strengths,
     calcTrace: {
-      input: `Присутствие чисел: ${Object.entries(digitPresence).map(([n, c]) => `${n}×${c}`).join(', ')}`,
+      input: `${L.presence}: ${Object.entries(digitPresence).map(([n, c]) => `${n}×${c}`).join(', ')}`,
       steps: [
-        `Баланс: σ=${stdDev.toFixed(2)} → ${balance}%`,
-        `Дефициты: ${leaks.length > 0 ? leaks.map(l => l.number).join(', ') : 'нет'}`,
-        `Сильные: ${strengths.length > 0 ? strengths.map(s => s.number).join(', ') : 'нет'}`,
+        `${L.balanceWord}: σ=${stdDev.toFixed(2)} → ${balance}%`,
+        `${L.deficits}: ${leaks.length > 0 ? leaks.map(l => l.number).join(', ') : L.none}`,
+        `${L.strong}: ${strengths.length > 0 ? strengths.map(s => s.number).join(', ') : L.none}`,
       ],
-      result: `Баланс: ${balance}% (${balanceLabel})`,
+      result: `${L.balanceWord}: ${balance}% (${balanceLabel})`,
     },
   };
 }
