@@ -29,6 +29,9 @@ import {
   partnerFilters,
 } from './data';
 
+import i18n from '@/i18n';
+import { getCalcStrings } from './calculationsI18n';
+
 // ============= БАЗОВЫЕ ФУНКЦИИ =============
 
 // Редукция числа к 1-9
@@ -136,11 +139,23 @@ export function analyzePersonLifeCod(
 
 export function analyzeYearEntry(personalYear: number): YearEntryAnalysis {
   const yearData = personalYearDescriptions[personalYear];
-  
+  const C = getCalcStrings(i18n.language);
+
   let entryStatus: EntryStatus;
   let entryType: EntryType = null;
   let risks: string[] = [];
-  
+
+  const ruRisks: Record<number, string[]> = {
+    4: ['Если нет готовности — ломается'],
+    5: ['Хаос', 'Треугольники', 'Нестабильность'],
+    9: ['Прошлое должно быть закрыто'],
+    1: ['Эго', 'Партнёр вторичен', 'Фокус на себя'],
+    3: ['Флирт', 'Поверхностность', 'Мало закрепления'],
+    7: ['Пересборка', 'Качели', 'Отстранённость'],
+    8: ['Давление', 'Контроль', 'Токсичный сценарий'],
+  };
+  const risksFor = (y: number) => (C?.yearRisks[y] ?? ruRisks[y] ?? []);
+
   switch (personalYear) {
     case 2:
       entryStatus = 'ALLOWED';
@@ -149,7 +164,7 @@ export function analyzeYearEntry(personalYear: number): YearEntryAnalysis {
     case 4:
       entryStatus = 'CONDITIONAL';
       entryType = 'FORMAL';
-      risks = ['Если нет готовности — ломается'];
+      risks = risksFor(4);
       break;
     case 6:
       entryStatus = 'ALLOWED';
@@ -158,40 +173,43 @@ export function analyzeYearEntry(personalYear: number): YearEntryAnalysis {
     case 5:
       entryStatus = 'CONDITIONAL';
       entryType = 'TRANSITION';
-      risks = ['Хаос', 'Треугольники', 'Нестабильность'];
+      risks = risksFor(5);
       break;
     case 9:
       entryStatus = 'CONDITIONAL';
       entryType = 'EXPERIMENTAL';
-      risks = ['Прошлое должно быть закрыто'];
+      risks = risksFor(9);
       break;
     case 1:
       entryStatus = 'NOT_RECOMMENDED';
-      risks = ['Эго', 'Партнёр вторичен', 'Фокус на себя'];
+      risks = risksFor(1);
       break;
     case 3:
       entryStatus = 'NOT_RECOMMENDED';
-      risks = ['Флирт', 'Поверхностность', 'Мало закрепления'];
+      risks = risksFor(3);
       break;
     case 7:
       entryStatus = 'NOT_RECOMMENDED';
-      risks = ['Пересборка', 'Качели', 'Отстранённость'];
+      risks = risksFor(7);
       break;
     case 8:
       entryStatus = 'NOT_RECOMMENDED';
-      risks = ['Давление', 'Контроль', 'Токсичный сценарий'];
+      risks = risksFor(8);
       break;
     default:
       entryStatus = 'CONDITIONAL';
   }
-  
+
+  const allowedWord = C?.entryAllowed ?? 'Вход разрешён';
+  const notRecWord = C?.entryNotRecommended ?? 'Вход не рекомендуется';
+
   return {
     personalYear,
     entryStatus,
     entryType,
     shortReason: yearData?.forRelationships || '',
     risks,
-    recommendation: yearData?.entryCondition || (yearData?.entryAllowed ? 'Вход разрешён' : 'Вход не рекомендуется'),
+    recommendation: yearData?.entryCondition || (yearData?.entryAllowed ? allowedWord : notRecWord),
   };
 }
 
@@ -206,10 +224,13 @@ export function analyzePairEntry(
   const bothAllowed = allowedYears.includes(person1Year) && allowedYears.includes(person2Year);
   const oneAllowed = allowedYears.includes(person1Year) || allowedYears.includes(person2Year);
   
+  const C = getCalcStrings(i18n.language);
+  const P = C?.pair;
+
   let pairStatus: PairEntryStatus;
   let pairComment: string;
   let stabilizerNeeded = false;
-  
+
   // Лучшие комбинации
   if ((person1Year === 2 && person2Year === 2) ||
       (person1Year === 6 && person2Year === 6) ||
@@ -217,26 +238,26 @@ export function analyzePairEntry(
       (person1Year === 6 && person2Year === 4) ||
       (person1Year === 4 && person2Year === 4)) {
     pairStatus = 'BEST';
-    pairComment = 'Обоюдная готовность к союзу';
+    pairComment = P?.best ?? 'Обоюдная готовность к союзу';
   }
   // Хорошие с оговорками
   else if (bothAllowed) {
     pairStatus = 'OK';
-    pairComment = 'Вход возможен с условиями';
+    pairComment = P?.ok ?? 'Вход возможен с условиями';
     stabilizerNeeded = true;
   }
   // Один готов, другой нет
   else if (oneAllowed) {
     pairStatus = 'TEMP';
-    pairComment = 'Один партнёр не готов. Временный союз';
+    pairComment = P?.temp ?? 'Один партнёр не готов. Временный союз';
     stabilizerNeeded = true;
   }
   // Оба не готовы
   else {
     pairStatus = 'NO';
-    pairComment = 'Оба партнёра в неподходящих годах';
+    pairComment = P?.no ?? 'Оба партнёра в неподходящих годах';
   }
-  
+
   // Абсолютно плохие комбинации
   if ((person1Year === 7 && person2Year === 7) ||
       (person1Year === 8 && person2Year === 8) ||
@@ -244,7 +265,7 @@ export function analyzePairEntry(
       (person1Year === 7 && person2Year === 8) ||
       (person1Year === 8 && person2Year === 7)) {
     pairStatus = 'NO';
-    pairComment = 'Критически несовместимые года';
+    pairComment = P?.critical ?? 'Критически несовместимые года';
   }
   
   return {
@@ -348,9 +369,10 @@ export function analyzeInteraction(
     businessMeaning = data.businessMeaning;
   } else {
     // Дефолтная логика для не прописанных комбинаций
+    const C = getCalcStrings(i18n.language);
     category = 'UNSTABLE';
-    loveMeaning = `Сочетание годов ${person1Year} и ${person2Year} требует внимания`;
-    businessMeaning = `Сочетание годов ${person1Year} и ${person2Year} в бизнесе требует баланса`;
+    loveMeaning = C ? C.interactionDefaultLove(person1Year, person2Year) : `Сочетание годов ${person1Year} и ${person2Year} требует внимания`;
+    businessMeaning = C ? C.interactionDefaultBiz(person1Year, person2Year) : `Сочетание годов ${person1Year} и ${person2Year} в бизнесе требует баланса`;
   }
   
   switch (category) {
@@ -379,7 +401,9 @@ export function analyzeForecast(
   person2: PersonLifeCodAnalysis
 ): YearForecastPoint[] {
   const forecast: YearForecastPoint[] = [];
-  
+  const C = getCalcStrings(i18n.language);
+  const F = C?.forecast;
+
   for (let i = 0; i < 5; i++) {
     const year = person1.personalYears[i].year;
     const p1Year = person1.personalYears[i].personalYear;
@@ -393,25 +417,25 @@ export function analyzeForecast(
     
     if (interaction.category === 'STABLE') {
       type = 'STABLE';
-      description = 'Стабильный период';
+      description = F?.stable ?? 'Стабильный период';
     } else if (interaction.category === 'BREAKDOWN' || (interaction.category === 'CRISIS' && !stabilizer.hasStabilizer)) {
       type = 'BREAKDOWN';
-      description = 'Высокая вероятность разрыва';
+      description = F?.breakdown ?? 'Высокая вероятность разрыва';
     } else if (interaction.category === 'CRISIS') {
       type = 'CRISIS';
-      description = 'Год кризиса и проверки союза';
+      description = F?.crisis ?? 'Год кризиса и проверки союза';
     } else if ((p1Year === 2 || p2Year === 2 || p1Year === 6 || p2Year === 6) && i > 0 && forecast[i-1]?.type === 'CRISIS') {
       type = 'RECOVERY';
-      description = 'Год восстановления и переосмысления';
+      description = F?.recovery ?? 'Год восстановления и переосмысления';
     } else {
       type = 'STABLE';
-      description = 'Нестабильный, но управляемый период';
+      description = F?.manageable ?? 'Нестабильный, но управляемый период';
     }
-    
+
     // Проверка на год нового союза после разрыва
     if (i > 0 && forecast[i-1]?.type === 'BREAKDOWN' && [2, 3, 6].includes(p1Year)) {
       type = 'NEW_UNION';
-      description = 'Готовность к новым отношениям';
+      description = F?.newUnion ?? 'Готовность к новым отношениям';
     }
     
     forecast.push({
@@ -454,37 +478,29 @@ function analyzeConsciousnessCompatibility(
 ): { status: 'COMPATIBLE' | 'TENSE' | 'CONFLICT'; description: string; loveInterpretation: string; businessInterpretation: string } {
   const key = `${person1Cons}-${person2Cons}`;
   const data = consciousnessCompatibility[key];
-  
+  const C = getCalcStrings(i18n.language);
+
   let status: 'COMPATIBLE' | 'TENSE' | 'CONFLICT';
   let description: string;
-  
+
   if (data) {
     status = data.status;
     description = data.description;
   } else {
     // Дефолт для не прописанных комбинаций
     status = 'TENSE';
-    description = `Сознания ${person1Cons} и ${person2Cons} требуют адаптации`;
+    description = C ? C.consDefault(person1Cons, person2Cons) : `Сознания ${person1Cons} и ${person2Cons} требуют адаптации`;
   }
-  
-  let loveInterpretation: string;
-  let businessInterpretation: string;
-  
-  switch (status) {
-    case 'COMPATIBLE':
-      loveInterpretation = 'На уровне мышления союз гармоничен. Партнёры понимают друг друга';
-      businessInterpretation = 'Хорошее понимание бизнес-целей и подходов';
-      break;
-    case 'TENSE':
-      loveInterpretation = 'Напряжённость в понимании. Требуется осознанная работа над отношениями';
-      businessInterpretation = 'Разные подходы к бизнесу. Нужны чёткие договорённости';
-      break;
-    case 'CONFLICT':
-      loveInterpretation = 'Конфликт мировоззрений. Без глубокой работы союз нестабилен';
-      businessInterpretation = 'Высокий риск конфликтов и борьбы за влияние';
-      break;
-  }
-  
+
+  const ruInterp: Record<'COMPATIBLE' | 'TENSE' | 'CONFLICT', { love: string; business: string }> = {
+    COMPATIBLE: { love: 'На уровне мышления союз гармоничен. Партнёры понимают друг друга', business: 'Хорошее понимание бизнес-целей и подходов' },
+    TENSE: { love: 'Напряжённость в понимании. Требуется осознанная работа над отношениями', business: 'Разные подходы к бизнесу. Нужны чёткие договорённости' },
+    CONFLICT: { love: 'Конфликт мировоззрений. Без глубокой работы союз нестабилен', business: 'Высокий риск конфликтов и борьбы за влияние' },
+  };
+  const interp = (C?.consInterp ?? ruInterp)[status];
+  const loveInterpretation = interp.love;
+  const businessInterpretation = interp.business;
+
   return { status, description, loveInterpretation, businessInterpretation };
 }
 
@@ -536,9 +552,11 @@ export function calculateLifeCodCompatibility(
     whoHoldsUnion = 'none';
   }
   
+  const C = getCalcStrings(i18n.language);
+
   let mainRisk = '';
   if (stabilizer.destabilizers.length > 0) {
-    const riskMap: Record<string, string> = {
+    const riskMap: Record<string, string> = C?.riskMap ?? {
       '7_REBUILD': 'Пересборка личности',
       '8_CONTROL': 'Давление и контроль',
       '5_CHAOS': 'Нестабильность и хаос',
@@ -558,19 +576,20 @@ export function calculateLifeCodCompatibility(
     longTermProspect = 'LOW';
   }
   
+  const R = C?.recommendation;
   let recommendation: string;
   if (canBeTogetherNow && longTermProspect === 'HIGH') {
-    recommendation = relationType === 'love' 
-      ? 'Союз имеет высокий потенциал. Рекомендуется развивать отношения'
-      : 'Партнёрство перспективно. Можно масштабировать сотрудничество';
+    recommendation = relationType === 'love'
+      ? (R?.highLove ?? 'Союз имеет высокий потенциал. Рекомендуется развивать отношения')
+      : (R?.highBiz ?? 'Партнёрство перспективно. Можно масштабировать сотрудничество');
   } else if (canBeTogetherNow) {
     recommendation = relationType === 'love'
-      ? 'Союз возможен с условиями. Важно работать над коммуникацией'
-      : 'Партнёрство требует чётких договорённостей и распределения ролей';
+      ? (R?.okLove ?? 'Союз возможен с условиями. Важно работать над коммуникацией')
+      : (R?.okBiz ?? 'Партнёрство требует чётких договорённостей и распределения ролей');
   } else {
     recommendation = relationType === 'love'
-      ? 'Сейчас не лучшее время для серьёзных отношений. Рекомендуется подождать'
-      : 'Партнёрство рискованно. Рекомендуется отложить или пересмотреть условия';
+      ? (R?.noLove ?? 'Сейчас не лучшее время для серьёзных отношений. Рекомендуется подождать')
+      : (R?.noBiz ?? 'Партнёрство рискованно. Рекомендуется отложить или пересмотреть условия');
   }
   
   return {
