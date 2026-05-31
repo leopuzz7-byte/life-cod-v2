@@ -2,6 +2,8 @@
 // Исцеляющие темы, ритуал дня рождения, главный экзамен года
 
 import { getArcana } from "@/lib/arcana";
+import i18n from "@/i18n";
+import { getYearExtraLocalized } from "./yearForecastExtraI18n";
 
 export interface YearExtraSections {
   healingThemes: string[];
@@ -76,6 +78,9 @@ const extraData: Record<number, YearExtraSections> = {
 
 // Генератор для всех арканов
 export function getYearExtraSections(yearArcana: number): YearExtraSections {
+  const localized = getYearExtraLocalized(yearArcana, i18n.language);
+  if (localized) return localized;
+
   if (extraData[yearArcana]) return extraData[yearArcana];
   
   const arcanaName = getArcana(yearArcana)?.name || `Аркан ${yearArcana}`;
