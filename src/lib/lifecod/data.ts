@@ -1,7 +1,17 @@
 // База данных трактовок для Life C⚙D
 
+import {
+  makeLocalized,
+  consciousnessEN, consciousnessES,
+  actionEN, actionES,
+  personalYearEN, personalYearES,
+  interactionEN, interactionES,
+  consCompatEN, consCompatES,
+  partnerFiltersEN, partnerFiltersES,
+} from "./dataI18n";
+
 // ============= МЕТОДИКА 1: СОЗНАНИЕ (1-9) =============
-export const consciousnessDescriptions: Record<number, {
+const consciousnessDescriptionsRU: Record<number, {
   name: string;
   core: string;
   inPlus: string;
@@ -84,7 +94,7 @@ export const consciousnessDescriptions: Record<number, {
 };
 
 // ============= МЕТОДИКА 7: ДЕЙСТВИЯ (0-9) =============
-export const actionDescriptions: Record<number, {
+const actionDescriptionsRU: Record<number, {
   name: string;
   core: string;
   inPlus: string;
@@ -186,7 +196,7 @@ export const actionDescriptions: Record<number, {
 };
 
 // ============= МЕТОДИКА 3: ЛИЧНЫЕ ГОДА =============
-export const personalYearDescriptions: Record<number, {
+const personalYearDescriptionsRU: Record<number, {
   name: string;
   theme: string;
   forRelationships: string;
@@ -263,7 +273,7 @@ export const personalYearDescriptions: Record<number, {
 };
 
 // ============= МЕТОДИКА 6: МАТРИЦА ВЗАИМОДЕЙСТВИЯ =============
-export const interactionMatrix: Record<string, {
+const interactionMatrixRU: Record<string, {
   category: 'STABLE' | 'UNSTABLE' | 'CRISIS' | 'BREAKDOWN';
   loveMeaning: string;
   businessMeaning: string;
@@ -316,7 +326,7 @@ export const interactionMatrix: Record<string, {
 };
 
 // ============= СОВМЕСТИМОСТЬ СОЗНАНИЙ =============
-export const consciousnessCompatibility: Record<string, {
+const consciousnessCompatibilityRU: Record<string, {
   status: 'COMPATIBLE' | 'TENSE' | 'CONFLICT';
   description: string;
 }> = {
@@ -389,7 +399,7 @@ export const typicalScenarios: Record<string, {
 };
 
 // ============= МЕТОДИКА 8: ФИЛЬТРЫ ПОДБОРА ПАРТНЁРА =============
-export const partnerFilters: Record<number, {
+const partnerFiltersRU: Record<number, {
   suitableConsciousness: number[];
   suitableActions: number[];
   bestMonths: number[];
@@ -470,3 +480,11 @@ export const partnerFilters: Record<number, {
     reason: 'Завершающему нужна структура, иначе холодные разрывы'
   },
 };
+
+// ============= ЛОКАЛИЗАЦИЯ (EN/ES поверх русской базы, fallback на русский) =============
+export const consciousnessDescriptions = makeLocalized(consciousnessDescriptionsRU as Record<string, (typeof consciousnessDescriptionsRU)[number]>, consciousnessEN, consciousnessES);
+export const actionDescriptions = makeLocalized(actionDescriptionsRU as Record<string, (typeof actionDescriptionsRU)[number]>, actionEN, actionES);
+export const personalYearDescriptions = makeLocalized(personalYearDescriptionsRU as Record<string, (typeof personalYearDescriptionsRU)[number]>, personalYearEN, personalYearES);
+export const interactionMatrix = makeLocalized(interactionMatrixRU, interactionEN, interactionES);
+export const consciousnessCompatibility = makeLocalized(consciousnessCompatibilityRU, consCompatEN, consCompatES);
+export const partnerFilters = makeLocalized(partnerFiltersRU as Record<string, (typeof partnerFiltersRU)[number]>, partnerFiltersEN, partnerFiltersES);
