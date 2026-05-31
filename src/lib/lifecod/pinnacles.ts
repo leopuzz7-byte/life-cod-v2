@@ -1,5 +1,9 @@
 // Пиннакли (Pinnacles) + Challenges + интеграция с личными годами
 
+import i18n from '@/i18n';
+import { makeLocalized } from './dataI18n';
+import { pinnacleEN, pinnacleES, challengeEN, challengeES, getCrisisStrings, getRecStrings } from './pinnaclesI18n';
+
 export interface PinnacleResult {
   value: number;
   startAge: number;
@@ -147,63 +151,73 @@ export function determineCrisisLevel(pinnacleValue: number, challengeValue: numb
   const isCrisisYear = [7, 8, 9].includes(personalYear);
   const isTenseYear = [5, 6].includes(personalYear);
 
+  const lang = i18n.language;
+  const loc = (key: 'reset' | 'active' | 'tension' | 'lessonCrisis' | 'innerTension' | 'stable') => getCrisisStrings(lang, key);
+
   // Уровень 3: Обнуление
   if (isCrisisPinnacle && personalYear === 9) {
-    return { level: 3, label: 'ОБНУЛЕНИЕ', description: 'Финал. Если не осознанно — через потери.' };
+    const s = loc('reset');
+    return { level: 3, label: s?.label ?? 'ОБНУЛЕНИЕ', description: s?.description ?? 'Финал. Если не осознанно — через потери.' };
   }
 
   // Уровень 2: Активный кризис
   if (isCrisisPinnacle && isCrisisYear) {
-    return { level: 2, label: 'АКТИВНЫЙ КРИЗИС', description: 'Перелом, давление, риск разрушений.' };
+    const s = loc('active');
+    return { level: 2, label: s?.label ?? 'АКТИВНЫЙ КРИЗИС', description: s?.description ?? 'Перелом, давление, риск разрушений.' };
   }
 
   // Уровень 1: Напряжение
   if (isCrisisPinnacle && isTenseYear) {
-    return { level: 1, label: 'НАПРЯЖЕНИЕ', description: 'Старое трещит, но человек ещё держится.' };
+    const s = loc('tension');
+    return { level: 1, label: s?.label ?? 'НАПРЯЖЕНИЕ', description: s?.description ?? 'Старое трещит, но человек ещё держится.' };
   }
 
   // Дополнительная проверка challenge
   if (isCrisisChallenge && isCrisisYear) {
-    return { level: 2, label: 'КРИЗИС УРОКА', description: 'Внутренний конфликт обостряется событиями.' };
+    const s = loc('lessonCrisis');
+    return { level: 2, label: s?.label ?? 'КРИЗИС УРОКА', description: s?.description ?? 'Внутренний конфликт обостряется событиями.' };
   }
 
   if (isCrisisChallenge && isTenseYear) {
-    return { level: 1, label: 'ВНУТРЕННЕЕ НАПРЯЖЕНИЕ', description: 'Урок даёт о себе знать.' };
+    const s = loc('innerTension');
+    return { level: 1, label: s?.label ?? 'ВНУТРЕННЕЕ НАПРЯЖЕНИЕ', description: s?.description ?? 'Урок даёт о себе знать.' };
   }
 
-  return { level: 0, label: 'СТАБИЛЬНО', description: 'Период спокойного развития.' };
+  const s = loc('stable');
+  return { level: 0, label: s?.label ?? 'СТАБИЛЬНО', description: s?.description ?? 'Период спокойного развития.' };
 }
 
 // === Рекомендации по кризисному уровню ===
 
 function getCrisisRecommendation(crisisLevel: CrisisLevel, pinnacleValue: number, personalYear: number): string {
+  const t = getRecStrings(i18n.language);
+  const RU: NonNullable<ReturnType<typeof getRecStrings>> = {
+    level0: 'Благоприятный период для развития и новых начинаний.',
+    fallback: 'Замедлиться и сократить нагрузку.',
+    year9: 'Готовиться к новому циклу.',
+    p7: ['Не начинать новые отношения.', 'Не принимать решения на эмоциях.', 'Завершать старое мягко.'],
+    p8: ['Не давить.', 'Следить за границами.', 'Работать с контролем и деньгами.'],
+    p9: ['Завершать.', 'Не возвращаться в прошлое.', 'Отпускать без мести.'],
+  };
+  const S = t ?? RU;
+
   if (crisisLevel.level === 0) {
-    return 'Благоприятный период для развития и новых начинаний.';
+    return S.level0;
   }
 
   const recs: string[] = [];
 
   if ([7, 8, 9].includes(pinnacleValue)) {
-    if (pinnacleValue === 7) {
-      recs.push('Не начинать новые отношения.');
-      recs.push('Не принимать решения на эмоциях.');
-      recs.push('Завершать старое мягко.');
-    } else if (pinnacleValue === 8) {
-      recs.push('Не давить.');
-      recs.push('Следить за границами.');
-      recs.push('Работать с контролем и деньгами.');
-    } else if (pinnacleValue === 9) {
-      recs.push('Завершать.');
-      recs.push('Не возвращаться в прошлое.');
-      recs.push('Отпускать без мести.');
-    }
+    if (pinnacleValue === 7) recs.push(...S.p7);
+    else if (pinnacleValue === 8) recs.push(...S.p8);
+    else if (pinnacleValue === 9) recs.push(...S.p9);
   }
 
   if (personalYear === 9) {
-    recs.push('Готовиться к новому циклу.');
+    recs.push(S.year9);
   }
 
-  return recs.length > 0 ? recs.join(' ') : 'Замедлиться и сократить нагрузку.';
+  return recs.length > 0 ? recs.join(' ') : S.fallback;
 }
 
 // === Интегрированный анализ года ===
@@ -236,7 +250,7 @@ export function getIntegratedYearAnalysis(
 
 // === Трактовки пиннаклей ===
 
-export const pinnacleDescriptions: Record<number, {
+const pinnacleDescriptionsRU: Record<number, {
   name: string;
   essence: string;
   lovePlus: string[];
@@ -330,7 +344,7 @@ export const pinnacleDescriptions: Record<number, {
 
 // === Трактовки challenges ===
 
-export const challengeDescriptions: Record<number, {
+const challengeDescriptionsRU: Record<number, {
   name: string;
   essence: string;
   inMinus: string[];
@@ -408,3 +422,13 @@ export const challengeDescriptions: Record<number, {
     crisisAdvice: ['Закрывать экологично', 'Не мстить', 'Не исчезать'],
   },
 };
+
+// === Локализация словарей (EN/ES поверх русской базы, fallback на русский) ===
+export const pinnacleDescriptions = makeLocalized(
+  pinnacleDescriptionsRU as Record<string, (typeof pinnacleDescriptionsRU)[number]>,
+  pinnacleEN, pinnacleES,
+);
+export const challengeDescriptions = makeLocalized(
+  challengeDescriptionsRU as Record<string, (typeof challengeDescriptionsRU)[number]>,
+  challengeEN, challengeES,
+);
