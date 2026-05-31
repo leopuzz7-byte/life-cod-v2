@@ -1,5 +1,7 @@
 // Блок 1: Матрица судьбы — уникальность личности
 import { CalcTrace } from './personalAnalysis';
+import i18n from '@/i18n';
+import { getDestinySet, getDestinyLabels } from './destinyMatrixI18n';
 
 function reduceToSingle(num: number): number {
   if (num === 0) return 0;
@@ -136,6 +138,17 @@ const strongEnergyDescriptions: Record<number, string> = {
 };
 
 export function calculateDestinyMatrix(day: number, month: number, year: number): DestinyMatrixModule {
+  const lang = i18n.language;
+  const set = getDestinySet(lang);
+  const L = getDestinyLabels(lang);
+  const soulD = set?.soul ?? soulDescriptions;
+  const missionD = set?.mission ?? missionDescriptions;
+  const realizationD = set?.realization ?? realizationDescriptions;
+  const outcomeD = set?.lifeOutcome ?? lifeOutcomeDescriptions;
+  const karmicD = set?.karmic ?? karmicTaskDescriptions;
+  const shadowD = set?.shadow ?? shadowDescriptions;
+  const strongD = set?.strong ?? strongEnergyDescriptions;
+
   const allDigits = `${day}${month}${year}`.split('').map(Number);
   
   // Soul / Consciousness
@@ -165,12 +178,12 @@ export function calculateDestinyMatrix(day: number, month: number, year: number)
   // Karmic tasks (missing digits)
   const karmicTasks = Object.entries(digitPresence)
     .filter(([_, count]) => count === 0)
-    .map(([num]) => ({ number: parseInt(num), task: karmicTaskDescriptions[parseInt(num)] || '' }));
+    .map(([num]) => ({ number: parseInt(num), task: karmicD[parseInt(num)] || '' }));
 
   // Shadow energy (deficits)
   const shadowEnergy = karmicTasks.map(k => ({
     number: k.number,
-    desc: shadowDescriptions[k.number] || '',
+    desc: shadowD[k.number] || '',
   }));
 
   // Strong energies
@@ -178,23 +191,23 @@ export function calculateDestinyMatrix(day: number, month: number, year: number)
   Object.entries(digitPresence)
     .filter(([_, count]) => count >= 2)
     .forEach(([num, count]) => {
-      strongEnergies.push({ number: parseInt(num), count, desc: strongEnergyDescriptions[parseInt(num)] || '' });
+      strongEnergies.push({ number: parseInt(num), count, desc: strongD[parseInt(num)] || '' });
     });
-  if (hasMaster11) strongEnergies.push({ number: 11, count: 1, desc: strongEnergyDescriptions[11] });
-  if (hasMaster22) strongEnergies.push({ number: 22, count: 1, desc: strongEnergyDescriptions[22] });
+  if (hasMaster11) strongEnergies.push({ number: 11, count: 1, desc: strongD[11] });
+  if (hasMaster22) strongEnergies.push({ number: 22, count: 1, desc: strongD[22] });
 
-  const soul = soulDescriptions[soulNumber] || { name: `Душа ${soulNumber}`, desc: '' };
-  const mission = missionDescriptions[missionNumber] || { name: `Миссия ${missionNumber}`, desc: '' };
-  const realization = realizationDescriptions[realizationNumber] || { name: `Реализация ${realizationNumber}`, desc: '' };
-  const outcome = lifeOutcomeDescriptions[lifeOutcomeNumber] || { name: `Итог ${lifeOutcomeNumber}`, desc: '' };
+  const soul = soulD[soulNumber] || { name: L.soulName(soulNumber), desc: '' };
+  const mission = missionD[missionNumber] || { name: L.missionName(missionNumber), desc: '' };
+  const realization = realizationD[realizationNumber] || { name: L.realizationName(realizationNumber), desc: '' };
+  const outcome = outcomeD[lifeOutcomeNumber] || { name: L.outcomeName(lifeOutcomeNumber), desc: '' };
 
   const steps = [
-    `Душа: ${day} + ${month} = ${soulRaw}${soulRaw > 9 ? ' → ' + soulNumber : ''}`,
-    `Миссия: ${sumAllDigits(day)} + ${sumAllDigits(month)} + ${sumAllDigits(year)} = ${missionRaw}${missionRaw > 9 ? ' → ' + missionNumber : ''}`,
-    `Реализация: ${day}${day > 9 ? ' → ' + realizationNumber : ''}`,
-    `Итог: ${soulNumber} + ${missionNumber} + ${realizationNumber} = ${outcomeRaw}${outcomeRaw > 9 ? ' → ' + lifeOutcomeNumber : ''}`,
-    `Присутствие: ${Object.entries(digitPresence).map(([n, c]) => `${n}×${c}`).join(', ')}`,
-    `Кармические задачи: ${karmicTasks.length > 0 ? karmicTasks.map(k => k.number).join(', ') : 'нет'}`,
+    `${L.soul}: ${day} + ${month} = ${soulRaw}${soulRaw > 9 ? ' → ' + soulNumber : ''}`,
+    `${L.mission}: ${sumAllDigits(day)} + ${sumAllDigits(month)} + ${sumAllDigits(year)} = ${missionRaw}${missionRaw > 9 ? ' → ' + missionNumber : ''}`,
+    `${L.realization}: ${day}${day > 9 ? ' → ' + realizationNumber : ''}`,
+    `${L.outcome}: ${soulNumber} + ${missionNumber} + ${realizationNumber} = ${outcomeRaw}${outcomeRaw > 9 ? ' → ' + lifeOutcomeNumber : ''}`,
+    `${L.presence}: ${Object.entries(digitPresence).map(([n, c]) => `${n}×${c}`).join(', ')}`,
+    `${L.karmicTasks}: ${karmicTasks.length > 0 ? karmicTasks.map(k => k.number).join(', ') : L.none}`,
   ];
 
   return {
@@ -206,7 +219,7 @@ export function calculateDestinyMatrix(day: number, month: number, year: number)
     calcTrace: {
       input: `${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}.${year}`,
       steps,
-      result: `Душа: ${soulNumber}, Миссия: ${missionNumber}, Реализация: ${realizationNumber}, Итог: ${lifeOutcomeNumber}`,
+      result: `${L.soul}: ${soulNumber}, ${L.mission}: ${missionNumber}, ${L.realization}: ${realizationNumber}, ${L.outcome}: ${lifeOutcomeNumber}`,
     },
   };
 }
