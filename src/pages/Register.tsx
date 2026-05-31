@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -32,6 +33,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [agreed, setAgreed] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,7 +162,29 @@ export default function Register() {
               />
             </div>
 
-            <Button type="submit" disabled={submitting} className="w-full h-12 rounded-full text-base">
+            <div className="flex items-start gap-2 pt-1">
+              <Checkbox
+                id="agree-policy"
+                checked={agreed}
+                onCheckedChange={(v) => setAgreed(v === true)}
+                disabled={submitting}
+                className="mt-0.5"
+              />
+              <Label htmlFor="agree-policy" className="text-xs text-muted-foreground font-normal leading-snug cursor-pointer">
+                {t("auth.agreePrefix")}
+                <a
+                  href="/privacy-policy.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline underline-offset-2 hover:text-primary/80"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {t("auth.privacyPolicy")}
+                </a>
+              </Label>
+            </div>
+
+            <Button type="submit" disabled={submitting || !agreed} className="w-full h-12 rounded-full text-base">
               {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {t("auth.createAccount")}
             </Button>

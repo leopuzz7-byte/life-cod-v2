@@ -184,7 +184,9 @@
       "weakPassword": "La contraseña debe tener al menos 6 caracteres",
       "invalidEmail": "Correo no válido",
       "tooManyAttempts": "Demasiados intentos. Espera un minuto e inténtalo de nuevo"
-    }
+    },
+    "agreePrefix": "Al registrarte, aceptas la ",
+    "privacyPolicy": "política de privacidad"
   },
   "payment": {
     "checking": "Verificando tu pago…",
