@@ -1,5 +1,8 @@
 // Глубокие профессиональные интерпретации — ПОЛНЫЙ СТАНДАРТ для всех разборов
 
+import i18n from '@/i18n';
+import { getYearProLocalized } from './proInterpretationsI18n';
+
 // ================== ГОДОВОЙ ПРОГНОЗ ==================
 
 export interface YearProInterpretation {
@@ -635,6 +638,8 @@ function generateMonthlyFocus(arcana: number, name: string): Record<number, stri
 }
 
 export function getYearProInterpretation(arcana: number): YearProInterpretation {
+  const localized = getYearProLocalized(arcana, i18n.language);
+  if (localized) return localized;
   return yearInterpretations[arcana] || generateFullYear(arcana);
 }
 
