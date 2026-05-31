@@ -1,7 +1,7 @@
 // Глубокие профессиональные интерпретации — ПОЛНЫЙ СТАНДАРТ для всех разборов
 
 import i18n from '@/i18n';
-import { getYearProLocalized } from './proInterpretationsI18n';
+import { getYearProLocalized, getCompatibilityProLocalized } from './proInterpretationsI18n';
 
 // ================== ГОДОВОЙ ПРОГНОЗ ==================
 
@@ -701,9 +701,12 @@ export function getCompatibilityProInterpretation(
   karmaArcana: number,
   percent: number
 ): CompatibilityProInterpretation {
+  const localized = getCompatibilityProLocalized(unionArcana, harmonyArcana, karmaArcana, percent, i18n.language);
+  if (localized) return localized;
+
   const intensity = percent >= 70 ? "высокая" : percent >= 50 ? "средняя" : "низкая";
   const unionType = unionArcana <= 7 ? "личная" : unionArcana <= 14 ? "зрелая" : "трансформационная";
-  
+
   return {
     intro: `Перед вами полный профессиональный анализ совместимости, основанный на системе 22 арканов. Совместимость вашей пары — ${percent}% (${intensity}). Это не приговор и не гарантия — это карта территории ваших отношений. Как вы по ней пройдёте, зависит от вас обоих.`,
     

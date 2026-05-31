@@ -7,7 +7,7 @@
 // plus generic templates — mirroring the structure of generateFullYear() in the base file.
 // monthlyFocus is intentionally left empty: it is not rendered anywhere in the UI.
 
-import type { YearProInterpretation } from './proInterpretations';
+import type { YearProInterpretation, CompatibilityProInterpretation } from './proInterpretations';
 
 const NO_MONTHS: Record<number, string> = {};
 
@@ -896,5 +896,308 @@ export function getYearProLocalized(arcana: number, lang: string): YearProInterp
     const theme = themesES[arcana] || DEFAULT_THEME_ES;
     return genericES(arcana, namesES[arcana] || `Arcano ${arcana}`, theme);
   }
+  return null;
+}
+
+// ============================================================
+// COMPATIBILITY — parallel EN/ES of getCompatibilityProInterpretation
+// ============================================================
+function compatEN(unionArcana: number, harmonyArcana: number, karmaArcana: number, percent: number): CompatibilityProInterpretation {
+  const intensity = percent >= 70 ? "high" : percent >= 50 ? "medium" : "low";
+  const unionType = unionArcana <= 7 ? "personal" : unionArcana <= 14 ? "mature" : "transformational";
+  return {
+    intro: `Before you is a full professional compatibility analysis based on the system of 22 arcana. Your couple's compatibility is ${percent}% (${intensity}). This is not a verdict or a guarantee — it is a map of the territory of your relationship. How you walk it depends on both of you.`,
+    pairEnergy: `Your couple carries ${unionType} energy (union arcana ${unionArcana}). ${
+      unionArcana <= 7 ? "This is a partnership with strong individual energy. Each of you strives to express yourself, which creates dynamism and tension at the same time. You need to learn to be a team while keeping your individuality." :
+      unionArcana <= 14 ? "This is a mature union where both are ready to work on themselves and the relationship. Depth and awareness are your main tools." :
+      "This is a transformational partnership that changes both of you on a deep level. You won't be the same after this relationship — and that's good, if you're ready for change."
+    }`,
+    pairDynamics: `Your couple's dynamic is defined by three key arcana: Union (${unionArcana}), Harmony (${harmonyArcana}) and Karma (${karmaArcana}). Each of them affects a particular layer of the relationship. Union is how you look on the outside and what energy you radiate as a couple. Harmony is your emotional and sexual bond. Karma is the lesson you came to work through together. Understanding these three layers gives the full picture.`,
+    unionDeepMeaning: `Union arcana ${unionArcana} shows the core of your relationship — the main theme around which your shared life is built. ${
+      unionArcana <= 5 ? "Your union is built on individuality and mutual respect. The main thing is not to suppress each other but to complement." :
+      unionArcana <= 10 ? "Your union seeks a balance between freedom and responsibility. You teach each other through shared experience." :
+      unionArcana <= 16 ? "Your union carries transformational energy. You will both change through this relationship — sometimes painfully, but always genuinely." :
+      "Your union has a karmic nature. You didn't meet by chance — there's a shared lesson that can only be worked through together."
+    } This arcana also defines how others perceive your couple and what situations you attract into your shared life.`,
+    harmonyDeepMeaning: `Harmony arcana ${harmonyArcana} reveals your emotional and physical bond. ${
+      harmonyArcana <= 7 ? "There's a strong, vivid energy between you. Emotions are lived intensely — both joy and conflict. Your task is to learn to manage this intensity rather than suppress it." :
+      harmonyArcana <= 14 ? "Your bond is mature and deep. You may not 'burn' with passion 24/7, but your closeness is based on trust and acceptance. Over time it only grows stronger." :
+      "There's a transformational bond between you. Every touch, every conversation changes you both. It's powerful, sometimes frightening, but always authentic."
+    } This arcana shows how you sense each other without words and at what depth your interaction takes place.`,
+    karmaDeepMeaning: `Karma arcana ${karmaArcana} is the lesson you came to work through together. ${
+      karmaArcana <= 7 ? "Your karmic lesson is about individuality within the couple: learning to be yourself next to another person, without losing yourself or suppressing your partner." :
+      karmaArcana <= 14 ? "Your karmic lesson is balance. You learn to give and receive in equal measure, without falling into self-sacrifice or selfishness." :
+      "Your karmic lesson is deep transformation. This relationship destroys false notions of love and builds genuine ones."
+    } If the lesson is learned — the relationship becomes a powerful resource. If the lesson is ignored — recurring conflicts are inevitable.`,
+    financialDynamics: `The couple's financial dynamic (arcana ${unionArcana}): ${
+      unionArcana <= 7 ? "Both tend toward independence in finances. The model 'a common pot + personal money for each' works better. A joint budget is possible but requires clear agreements." :
+      unionArcana <= 14 ? "You can successfully run a joint budget. One of you is the strategist, the other the executor. It's important to define the roles and not change them without discussion." :
+      "Money in your couple is a zone of deep work. Different values and approaches to finances can create friction. But it's precisely through resolving financial matters together that you grow as a couple."
+    }`,
+    financialRisks: `The couple's main financial risks: ${
+      percent < 50 ? "different spending priorities, hidden debts, manipulation through money, unequal contribution" :
+      percent < 70 ? "disagreements over large purchases, different attitudes to risk, the 'save vs spend' conflict" :
+      "complacency from abundance, lack of financial discipline, excessive shared spending"
+    }.`,
+    financialRecommendations: "Create a joint financial plan. Define shared goals (housing, travel, a safety cushion). Each of you should have personal money. Discuss large purchases in advance. Once a month — a financial 'council' of the couple.",
+    careerDynamics: `Career compatibility: ${
+      unionArcana <= 7 ? "Both are ambitious. It's important not to compete but to support. A joint business is possible if roles are clearly distributed." :
+      unionArcana <= 14 ? "One of you is the engine, the other the stabilizer. Use this difference as an advantage." :
+      "Career paths may differ radically. That's normal. The main thing is to respect each other's choices."
+    }`,
+    careerRecommendations: "Discuss each other's career plans. Support, don't compete. If you're planning a joint business — clearly define roles and areas of responsibility.",
+    sexualChemistry: `Sexual compatibility (harmony arcana ${harmonyArcana}): ${
+      harmonyArcana <= 7 ? "There's a strong physical attraction between you, especially at the start of the relationship. Passion can be destructive if not channeled constructively. It's important to keep the fire alive through novelty, experimentation and emotional closeness. For you, sex is a way of communicating, not just a physical act." :
+      harmonyArcana <= 14 ? "Your closeness is about trust and depth, not outward passion. Over time the physical bond only strengthens, if you work on emotional closeness. Routine is your main enemy. Create rituals of intimacy: special evenings, trips together, unexpected signs of attention." :
+      "There's transformational energy between you. Intimacy changes you both on a deep level. It's powerful, but can be frightening. Don't avoid the depth — that's exactly where your couple's potential is hidden."
+    }`,
+    sexualRecommendations: "Talk about your desires and boundaries. Create rituals of intimacy. Experiment together. Don't use sex as a tool of manipulation. Quality matters more than quantity.",
+    emotionalDynamics: `Emotional bond: ${
+      harmonyArcana <= 7 ? "Intense emotions on both sides. Conflicts are vivid, and so are reconciliations. You need to learn to manage the emotional swings without suppressing them." :
+      harmonyArcana <= 14 ? "A calm, stable emotional bond. You understand each other without words. But routine can dull the feelings — create emotional 'shake-ups' consciously." :
+      "A deep emotional bond that sometimes frightens with its intensity. You literally feel each other's states. Learn to distinguish your own emotions from your partner's."
+    }`,
+    emotionalRecommendations: "Express feelings in words, don't hope your partner 'already knows'. Create a safe space for difficult conversations. Don't store up resentments. Praise each other daily.",
+    conflictZones: [
+      karmaArcana <= 5 ? "A struggle for leadership — both want to control the situation, which leads to clashes of will" : "Different life values — what matters to one seems insignificant to the other",
+      percent < 60 ? "A different life tempo — one rushes events, the other prefers to wait, which creates constant tension" : "The habit of taking each other for granted — the fading of gratitude and attention",
+      unionArcana % 2 === 0 ? "Emotional distance — it's hard to open up and show vulnerability, which builds a wall between you" : "Excessive emotionality — frequent quarrels over trifles, the inability to stop in time",
+      "Financial disagreements — different attitudes to money, spending and saving",
+      karmaArcana > 15 ? "Karmic patterns — the unconscious reproduction of scenarios from past relationships" : "Childhood traumas — unresolved issues with parents are projected onto the partner",
+      "Different standards of order and household — what's 'normal' for one is chaos or nitpicking for the other",
+    ],
+    growthAreas: [
+      "Developing the skill of active listening — hearing not only the words but the feelings behind them",
+      "Setting goals together for 1-3-5 years — a shared vision of the future strengthens the union",
+      harmonyArcana <= 11 ? "Creating rituals of intimacy — shared dinners without phones, walks, 'dates'" : "Respecting personal space — giving each other freedom without jealousy and control",
+      "Working with projections — learning to see the real person, not your expectations and fantasies",
+      "Practicing gratitude — daily acknowledgment of your partner's contribution to your life",
+      "Learning together — courses, books, travel — anything that broadens your shared horizon",
+    ],
+    synergyPoints: [
+      `Union arcana ${unionArcana} creates powerful shared energy in the area of ${unionArcana <= 7 ? "action and achievement" : unionArcana <= 14 ? "wisdom and depth" : "transformation and renewal"}`,
+      `Harmony arcana ${harmonyArcana} gives you ${harmonyArcana <= 7 ? "a vivid emotional and physical bond" : harmonyArcana <= 14 ? "a stable emotional base" : "a deep understanding of each other"}`,
+      "Your differences are not a weakness but a strength. Where one is weak, the other is strong",
+      "A shared karmic lesson makes you stronger as a couple",
+    ],
+    scenarios: [
+      {
+        title: "✦ Optimistic scenario",
+        description: `With conscious work on the relationship, your union can become ${
+          percent >= 70 ? "one of the strongest and most inspiring of your life. You have all the resources for a deep, mature, supportive partnership that enriches both of you" :
+          percent >= 50 ? "a stable and growing partnership that only strengthens over time. Your differences become a source of growth, not of conflict" :
+          "an important lesson that makes you both stronger, wiser and more honest"
+        }. Key conditions: honest dialogue, willingness to change, respect for differences, shared goals and a daily practice of gratitude.`,
+      },
+      {
+        title: "○ Realistic scenario",
+        description: `Your couple will go through cycles of coming together and drifting apart — that's normal dynamics for arcana ${unionArcana}. Crises are inevitable roughly once every ${Math.max(1, Math.floor(22 / unionArcana))} years. It's important to understand: a crisis is not the end but an opportunity to move to a new level. Average relationships don't survive without work. Good ones require daily attention. Great ones require both.`,
+      },
+      {
+        title: "⚠ Difficult scenario",
+        description: `If the karmic lesson of arcana ${karmaArcana} is ignored, the relationship may become ${
+          karmaArcana > 12 ? "destructive and toxic — manipulation, gaslighting, emotional abuse. In that case the best choice is to leave" : "formal and empty — you live side by side but not together. Boredom, apathy, 'parallel lives'"
+        }. Signs: constant criticism without suggestions, the absence of physical closeness for more than 3 months, avoiding serious conversations, a feeling of loneliness next to your partner. If you recognized your situation — that's a signal to act.`,
+      },
+    ],
+    risks: [
+      "Ignoring conflicts — 'it'll sort itself out' doesn't work",
+      "Trying to change your partner — instead of acceptance and support",
+      "Comparing with 'perfect couples' from social media — the illusion of others' happiness",
+      "Manipulation through guilt — 'if you loved me...'",
+      "Emotional blackmail — threats to leave as a means of control",
+      "Loss of individuality — dissolving into your partner",
+    ],
+    repeatingPatterns: `Note this: if the same conflicts keep repeating in your relationship — that's the karmic lesson of arcana ${karmaArcana}. Until the lesson is learned, the situation will keep returning. The key is not to change your partner but to change your way of reacting.`,
+    opportunities: [
+      "Mutual growth — the relationship as a training ground for development",
+      "Healing childhood traumas through a safe relationship",
+      "Creating a joint project or business",
+      "Deepening closeness to the level of 'we are a team'",
+      "Developing communication skills useful in all areas",
+      "Starting a family / strengthening an existing one",
+    ],
+    dailyLifeTips: [
+      "Every morning — 5 minutes without phones, just for each other. A hug, words of gratitude, the plan for the day",
+      "Once a week — a 'date' outside the home, even if you've been together 20 years. A new place, a new experience",
+      "The 'don't fall asleep in a quarrel' rule — talk conflicts through to the end, but without shouting",
+      "A shared financial plan + personal 'untouchable' money for each — this is not distrust but health",
+      "Once a month — a frank conversation: 'what do I need from us?' Without accusations, only needs",
+      "Praise each other in front of others — it strengthens the bond and raises both of your self-esteem",
+      "Physical contact — at least 8 touches a day. Hugs, kisses, just a hand on the shoulder",
+      "Create a 'jar of happiness' — write down good moments and reread them in hard times",
+    ],
+    whatToAvoid: [
+      "Criticism without suggestions — 'you always/never' — a destructive formula",
+      "The silent treatment — that's emotional abuse, not 'letting things cool down'",
+      "Bringing in third parties (parents, friends) to resolve a couple's conflicts",
+      "Comparing with exes — 'well, my ex used to...' — a forbidden move",
+      "Using children as an argument in a dispute",
+      "Expecting your partner to 'guess' — telepathy doesn't work",
+    ],
+    longTermOutlook: `Long-term forecast for your couple: ${
+      percent >= 80 ? "Excellent. You have all the resources to create a strong, deep and inspiring union. Your task is not to stop developing and not to take the good for granted. A relationship is a living organism that needs care even when everything is fine." :
+      percent >= 60 ? "Good, provided you work consciously. Your differences are not an obstacle but a tool for growth. There will be crises, but they'll make you stronger if you go through them together. Invest in the relationship the way you invest in a career — and the result won't keep you waiting." :
+      percent >= 40 ? "Ambiguous. You'll have to work harder than other couples, but the result can be worth it. The key question: are you both ready to invest? If yes — the chances rise significantly. If only one — the forecast worsens." :
+      "Difficult. This union requires serious effort from both and, perhaps, professional help (a couples' therapist). Ask yourself an honest question: does this union make me better or worse? The answer will show the direction."
+    }`,
+    conclusion: "Your compatibility is not a verdict or a guarantee. It's a map of your relationship that shows the resources, lessons and zones of growth. Use this information as a navigator, not as a limitation. The best relationships are those in which both partners grow together.",
+    keyThought: "Compatibility is not a given but the result of the daily choice to be together consciously.",
+  };
+}
+
+function compatES(unionArcana: number, harmonyArcana: number, karmaArcana: number, percent: number): CompatibilityProInterpretation {
+  const intensity = percent >= 70 ? "alta" : percent >= 50 ? "media" : "baja";
+  const unionType = unionArcana <= 7 ? "personal" : unionArcana <= 14 ? "madura" : "transformadora";
+  return {
+    intro: `Tienes ante ti un análisis profesional completo de compatibilidad, basado en el sistema de los 22 arcanos. La compatibilidad de vuestra pareja es del ${percent}% (${intensity}). No es una sentencia ni una garantía: es un mapa del territorio de vuestra relación. Cómo lo recorráis depende de los dos.`,
+    pairEnergy: `Vuestra pareja porta una energía ${unionType} (arcano de la unión ${unionArcana}). ${
+      unionArcana <= 7 ? "Es una asociación con una fuerte energía individual. Cada uno busca expresarse, lo que crea dinamismo y tensión a la vez. Necesitáis aprender a ser un equipo conservando la individualidad." :
+      unionArcana <= 14 ? "Es una unión madura, donde ambos están dispuestos a trabajar en sí mismos y en la relación. La profundidad y la conciencia son vuestras principales herramientas." :
+      "Es una asociación transformadora que os cambia a ambos a un nivel profundo. No seréis los mismos después de esta relación, y eso es bueno si estáis preparados para el cambio."
+    }`,
+    pairDynamics: `La dinámica de vuestra pareja se define por tres arcanos clave: Unión (${unionArcana}), Armonía (${harmonyArcana}) y Karma (${karmaArcana}). Cada uno influye en una capa determinada de la relación. La Unión es cómo os veis por fuera y qué energía irradiáis como pareja. La Armonía es vuestro vínculo emocional y sexual. El Karma es la lección que vinisteis a trabajar juntos. Comprender estas tres capas da la imagen completa.`,
+    unionDeepMeaning: `El arcano de la unión ${unionArcana} muestra el eje de vuestra relación, el tema principal en torno al cual se construye vuestra vida en común. ${
+      unionArcana <= 5 ? "Vuestra unión se construye sobre la individualidad y el respeto mutuo. Lo importante es no reprimirse, sino complementarse." :
+      unionArcana <= 10 ? "Vuestra unión busca un equilibrio entre libertad y responsabilidad. Os enseñáis mutuamente a través de la experiencia compartida." :
+      unionArcana <= 16 ? "Vuestra unión porta una energía transformadora. Ambos cambiaréis a través de esta relación, a veces de forma dolorosa, pero siempre genuina." :
+      "Vuestra unión tiene una naturaleza kármica. No os conocisteis por casualidad: hay una lección común que solo se puede pasar juntos."
+    } Este arcano también define cómo perciben vuestra pareja los demás y qué situaciones atraéis a vuestra vida en común.`,
+    harmonyDeepMeaning: `El arcano de la armonía ${harmonyArcana} revela vuestro vínculo emocional y físico. ${
+      harmonyArcana <= 7 ? "Entre vosotros hay una energía fuerte y vívida. Las emociones se viven con intensidad, tanto la alegría como los conflictos. Vuestra tarea es aprender a gestionar esa intensidad en lugar de reprimirla." :
+      harmonyArcana <= 14 ? "Vuestro vínculo es maduro y profundo. Puede que no 'ardáis' de pasión 24/7, pero vuestra intimidad se basa en la confianza y la aceptación. Con el tiempo solo se fortalece." :
+      "Entre vosotros hay un vínculo transformador. Cada caricia, cada conversación os cambia a ambos. Es poderoso, a veces aterrador, pero siempre auténtico."
+    } Este arcano muestra cómo os sentís sin palabras y a qué profundidad ocurre vuestra interacción.`,
+    karmaDeepMeaning: `El arcano del karma ${karmaArcana} es la lección que vinisteis a trabajar juntos. ${
+      karmaArcana <= 7 ? "Vuestra lección kármica tiene que ver con la individualidad en la pareja: aprender a ser uno mismo junto a otra persona, sin perderse ni reprimir al otro." :
+      karmaArcana <= 14 ? "Vuestra lección kármica es el equilibrio. Aprendéis a dar y a recibir por igual, sin caer en el sacrificio ni en el egoísmo." :
+      "Vuestra lección kármica es una transformación profunda. Esta relación destruye las falsas ideas sobre el amor y construye las verdaderas."
+    } Si la lección se aprende, la relación se convierte en un poderoso recurso. Si la lección se ignora, los conflictos recurrentes son inevitables.`,
+    financialDynamics: `La dinámica financiera de la pareja (arcano ${unionArcana}): ${
+      unionArcana <= 7 ? "Ambos tienden a la independencia en las finanzas. Funciona mejor el modelo de 'fondo común + dinero personal para cada uno'. Un presupuesto conjunto es posible, pero requiere acuerdos claros." :
+      unionArcana <= 14 ? "Podéis llevar con éxito un presupuesto conjunto. Uno de vosotros es el estratega, el otro el ejecutor. Es importante definir los roles y no cambiarlos sin discutirlo." :
+      "El dinero en vuestra pareja es una zona de trabajo profundo. Valores y enfoques distintos hacia las finanzas pueden crear roces. Pero es precisamente resolviendo juntos las cuestiones financieras como crecéis como pareja."
+    }`,
+    financialRisks: `Los principales riesgos financieros de la pareja: ${
+      percent < 50 ? "prioridades de gasto distintas, deudas ocultas, manipulación a través del dinero, aportación desigual" :
+      percent < 70 ? "desacuerdos en grandes compras, distinta actitud ante el riesgo, el conflicto 'ahorrar vs gastar'" :
+      "relajación por la abundancia, falta de disciplina financiera, gastos comunes excesivos"
+    }.`,
+    financialRecommendations: "Cread un plan financiero conjunto. Definid metas comunes (vivienda, viajes, un colchón). Cada uno debe tener dinero personal. Hablad de las grandes compras por adelantado. Una vez al mes, un 'consejo' financiero de la pareja.",
+    careerDynamics: `Compatibilidad profesional: ${
+      unionArcana <= 7 ? "Ambos sois ambiciosos. Es importante no competir, sino apoyaros. Un negocio conjunto es posible si los roles están claramente repartidos." :
+      unionArcana <= 14 ? "Uno de vosotros es el motor, el otro el estabilizador. Usad esa diferencia como ventaja." :
+      "Los caminos profesionales pueden diferir radicalmente. Es normal. Lo importante es respetar la elección del otro."
+    }`,
+    careerRecommendations: "Hablad de los planes profesionales del otro. Apoyaos, no compitáis. Si planeáis un negocio conjunto, definid con claridad los roles y las áreas de responsabilidad.",
+    sexualChemistry: `Compatibilidad sexual (arcano de la armonía ${harmonyArcana}): ${
+      harmonyArcana <= 7 ? "Entre vosotros hay una fuerte atracción física, sobre todo al inicio de la relación. La pasión puede ser destructiva si no se canaliza de forma creativa. Es importante mantener el fuego mediante la novedad, la experimentación y la cercanía emocional. Para vosotros, el sexo es una forma de comunicación, no solo un acto físico." :
+      harmonyArcana <= 14 ? "Vuestra intimidad va de confianza y profundidad, no de pasión externa. Con el tiempo el vínculo físico solo se intensifica, si trabajáis la cercanía emocional. La rutina es vuestro mayor enemigo. Cread rituales de intimidad: noches especiales, viajes en pareja, gestos de atención inesperados." :
+      "Entre vosotros hay una energía transformadora. La intimidad os cambia a ambos a un nivel profundo. Es poderoso, pero puede dar miedo. No evitéis la profundidad: ahí se esconde el potencial de vuestra pareja."
+    }`,
+    sexualRecommendations: "Hablad de vuestros deseos y límites. Cread rituales de intimidad. Experimentad juntos. No uséis el sexo como herramienta de manipulación. La calidad importa más que la cantidad.",
+    emotionalDynamics: `Vínculo emocional: ${
+      harmonyArcana <= 7 ? "Emociones intensas por ambas partes. Los conflictos son vívidos, y las reconciliaciones también. Tenéis que aprender a gestionar el vaivén emocional sin reprimirlo." :
+      harmonyArcana <= 14 ? "Un vínculo emocional tranquilo y estable. Os entendéis sin palabras. Pero la rutina puede embotar los sentimientos: cread 'sacudidas' emocionales de forma consciente." :
+      "Un vínculo emocional profundo que a veces asusta por su intensidad. Sentís literalmente el estado del otro. Aprended a distinguir vuestras emociones de las de la pareja."
+    }`,
+    emotionalRecommendations: "Expresad los sentimientos con palabras, no esperéis que la pareja 'ya lo sepa'. Cread un espacio seguro para las conversaciones difíciles. No acumuléis rencores. Elogiaos cada día.",
+    conflictZones: [
+      karmaArcana <= 5 ? "Una lucha por el liderazgo: ambos quieren controlar la situación, lo que lleva a choques de voluntad" : "Valores de vida distintos: lo que importa a uno le parece insignificante al otro",
+      percent < 60 ? "Un ritmo de vida distinto: uno apresura los acontecimientos, el otro prefiere esperar, lo que crea tensión constante" : "La costumbre de dar al otro por sentado: el desvanecimiento de la gratitud y la atención",
+      unionArcana % 2 === 0 ? "Distancia emocional: cuesta abrirse y mostrar vulnerabilidad, lo que levanta un muro entre vosotros" : "Emotividad excesiva: peleas frecuentes por nimiedades, la incapacidad de parar a tiempo",
+      "Desacuerdos financieros: distinta actitud hacia el dinero, el gasto y el ahorro",
+      karmaArcana > 15 ? "Patrones kármicos: la reproducción inconsciente de guiones de relaciones pasadas" : "Traumas de la infancia: problemas no resueltos con los padres que se proyectan sobre la pareja",
+      "Distintos estándares de orden y de hogar: lo que para uno es 'normal', para el otro es caos o pesadez",
+    ],
+    growthAreas: [
+      "Desarrollar la escucha activa: oír no solo las palabras, sino los sentimientos detrás de ellas",
+      "Fijar metas juntos a 1-3-5 años: una visión común del futuro fortalece la unión",
+      harmonyArcana <= 11 ? "Crear rituales de intimidad: cenas juntos sin teléfonos, paseos, 'citas'" : "Respetar el espacio personal: daros libertad sin celos ni control",
+      "Trabajar las proyecciones: aprender a ver a la persona real, no vuestras expectativas y fantasías",
+      "Practicar la gratitud: reconocer a diario la aportación de la pareja a vuestra vida",
+      "Aprender juntos: cursos, libros, viajes; todo lo que amplía el horizonte común",
+    ],
+    synergyPoints: [
+      `El arcano de la unión ${unionArcana} crea una poderosa energía común en el ámbito de ${unionArcana <= 7 ? "la acción y los logros" : unionArcana <= 14 ? "la sabiduría y la profundidad" : "la transformación y la renovación"}`,
+      `El arcano de la armonía ${harmonyArcana} os da ${harmonyArcana <= 7 ? "un vínculo emocional y físico vívido" : harmonyArcana <= 14 ? "una base emocional estable" : "una comprensión profunda del otro"}`,
+      "Vuestras diferencias no son una debilidad, sino una fuerza. Donde uno es débil, el otro es fuerte",
+      "Una lección kármica compartida os hace más fuertes como pareja",
+    ],
+    scenarios: [
+      {
+        title: "✦ Escenario optimista",
+        description: `Con un trabajo consciente sobre la relación, vuestra unión puede convertirse en ${
+          percent >= 70 ? "una de las más sólidas e inspiradoras de vuestra vida. Tenéis todos los recursos para una asociación profunda, madura y de apoyo que enriquece a ambos" :
+          percent >= 50 ? "una asociación estable y en crecimiento que solo se fortalece con el tiempo. Vuestras diferencias se vuelven fuente de crecimiento, no de conflicto" :
+          "una lección importante que os hace a ambos más fuertes, sabios y honestos"
+        }. Condiciones clave: diálogo honesto, disposición a cambiar, respeto por las diferencias, metas comunes y una práctica diaria de gratitud.`,
+      },
+      {
+        title: "○ Escenario realista",
+        description: `Vuestra pareja pasará por ciclos de acercamiento y distanciamiento: es una dinámica normal para el arcano ${unionArcana}. Las crisis son inevitables aproximadamente una vez cada ${Math.max(1, Math.floor(22 / unionArcana))} años. Es importante entender: una crisis no es el final, sino una oportunidad de pasar a un nuevo nivel. Las relaciones medias no sobreviven sin trabajo. Las buenas requieren atención diaria. Las grandes requieren ambas cosas.`,
+      },
+      {
+        title: "⚠ Escenario difícil",
+        description: `Si se ignora la lección kármica del arcano ${karmaArcana}, la relación puede volverse ${
+          karmaArcana > 12 ? "destructiva y tóxica: manipulación, luz de gas, maltrato emocional. En ese caso, la mejor elección es marcharse" : "formal y vacía: vivís uno al lado del otro, pero no juntos. Aburrimiento, apatía, 'vidas paralelas'"
+        }. Señales: crítica constante sin propuestas, ausencia de cercanía física durante más de 3 meses, evitar las conversaciones serias, sensación de soledad junto a la pareja. Si has reconocido tu situación, es una señal para actuar.`,
+      },
+    ],
+    risks: [
+      "Ignorar los conflictos: el 'ya se arreglará solo' no funciona",
+      "Intentar cambiar a la pareja en lugar de aceptarla y apoyarla",
+      "Compararse con las 'parejas perfectas' de las redes sociales: la ilusión de la felicidad ajena",
+      "Manipulación a través de la culpa: 'si me quisieras...'",
+      "Chantaje emocional: amenazas de marcharse como medio de control",
+      "Pérdida de individualidad: disolverse en la pareja",
+    ],
+    repeatingPatterns: `Fíjate: si en vuestra relación se repiten los mismos conflictos, esa es la lección kármica del arcano ${karmaArcana}. Hasta que la lección no se aprenda, la situación seguirá volviendo. La clave no es cambiar a la pareja, sino cambiar tu forma de reaccionar.`,
+    opportunities: [
+      "Crecimiento mutuo: la relación como gimnasio para el desarrollo",
+      "Sanar traumas de la infancia a través de una relación segura",
+      "Crear un proyecto o negocio conjunto",
+      "Profundizar la cercanía hasta el nivel de 'somos un equipo'",
+      "Desarrollar habilidades de comunicación útiles en todas las áreas",
+      "Formar una familia / fortalecer la existente",
+    ],
+    dailyLifeTips: [
+      "Cada mañana, 5 minutos sin teléfonos, solo el uno para el otro. Un abrazo, palabras de gratitud, el plan del día",
+      "Una vez por semana, una 'cita' fuera de casa, aunque llevéis 20 años juntos. Un lugar nuevo, una experiencia nueva",
+      "La regla de 'no te duermas enfadado': hablad los conflictos hasta el final, pero sin gritos",
+      "Un plan financiero común + dinero personal 'intocable' para cada uno: no es desconfianza, es salud",
+      "Una vez al mes, una conversación franca: '¿qué necesito de nosotros?' Sin reproches, solo necesidades",
+      "Elogiaos delante de otras personas: fortalece el vínculo y eleva la autoestima de ambos",
+      "Contacto físico: al menos 8 caricias al día. Abrazos, besos, una simple mano en el hombro",
+      "Cread un 'frasco de la felicidad': anotad los buenos momentos y releedlos en los momentos difíciles",
+    ],
+    whatToAvoid: [
+      "Crítica sin propuestas: 'tú siempre/nunca', una fórmula destructiva",
+      "El boicot silencioso: es maltrato emocional, no 'dejar que se enfríe'",
+      "Recurrir a terceros (padres, amigos) para resolver los conflictos de pareja",
+      "Comparar con los ex: 'pues mi ex...', una jugada prohibida",
+      "Usar a los hijos como argumento en una discusión",
+      "Esperar que la pareja 'adivine': la telepatía no funciona",
+    ],
+    longTermOutlook: `Pronóstico a largo plazo de vuestra pareja: ${
+      percent >= 80 ? "Excelente. Tenéis todos los recursos para crear una unión sólida, profunda e inspiradora. Vuestra tarea es no dejar de desarrollaros y no dar lo bueno por sentado. Una relación es un organismo vivo que necesita cuidado incluso cuando todo va bien." :
+      percent >= 60 ? "Bueno, a condición de trabajar conscientemente. Vuestras diferencias no son un obstáculo, sino una herramienta de crecimiento. Habrá crisis, pero os harán más fuertes si las atravesáis juntos. Invertid en la relación como invertís en una carrera, y el resultado no se hará esperar." :
+      percent >= 40 ? "Ambiguo. Tendréis que trabajar más que otras parejas, pero el resultado puede valer la pena. La pregunta clave: ¿estáis dispuestos ambos a invertir? Si es así, las posibilidades aumentan mucho. Si solo uno, el pronóstico empeora." :
+      "Difícil. Esta unión requiere un esfuerzo serio de ambos y, quizá, la ayuda de un profesional (un terapeuta de pareja). Hazte una pregunta honesta: ¿esta unión me hace mejor o peor? La respuesta mostrará la dirección."
+    }`,
+    conclusion: "Vuestra compatibilidad no es una sentencia ni una garantía. Es un mapa de vuestra relación que muestra los recursos, las lecciones y las zonas de crecimiento. Usad esta información como un navegador, no como una limitación. Las mejores relaciones son aquellas en las que ambos miembros crecen juntos.",
+    keyThought: "La compatibilidad no es algo dado, sino el resultado de la elección diaria de estar juntos con conciencia.",
+  };
+}
+
+export function getCompatibilityProLocalized(
+  unionArcana: number,
+  harmonyArcana: number,
+  karmaArcana: number,
+  percent: number,
+  lang: string
+): CompatibilityProInterpretation | null {
+  if (lang === 'en') return compatEN(unionArcana, harmonyArcana, karmaArcana, percent);
+  if (lang === 'es') return compatES(unionArcana, harmonyArcana, karmaArcana, percent);
   return null;
 }
