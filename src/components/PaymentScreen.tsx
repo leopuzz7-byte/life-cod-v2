@@ -3,6 +3,7 @@ import { Crown, CheckCircle, ArrowLeft, Loader2, AlertCircle, CreditCard, Bitcoi
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getAnalysisConfig } from "@/lib/analysisConfig";
+import { useMethodPrice } from "@/hooks/useMethodPrice";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentScreenProps {
@@ -19,6 +20,9 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
   const [processing, setProcessing] = useState<PayMethod | null>(null);
   const [error, setError] = useState<string | null>(null);
   const config = getAnalysisConfig(methodId);
+  const { prices } = useMethodPrice(methodId);
+  const price = tier === "professional" ? prices?.price_pro : prices?.price_basic;
+  const priceText = price == null ? null : price === 0 ? t("cfg.free") : price.toLocaleString("ru-RU") + " ₽";
 
   const startPayment = async (method: PayMethod) => {
     setProcessing(method);
@@ -74,6 +78,9 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
             <p className="text-sm text-muted-foreground">
               {config?.title || t("paymentScreen.detailedAnalysis")}
             </p>
+            {priceText && (
+              <p className="text-3xl font-display font-bold text-primary mt-3">{priceText}</p>
+            )}
           </div>
 
           <div className="text-left space-y-2">
