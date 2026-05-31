@@ -1,5 +1,10 @@
 // Банк паттернов связок и детектор рисков для Life C⚙D
 
+import i18n from '@/i18n';
+import {
+  localizePattern, localizeConflict, localizeRisk, localizeCritical, getVerdictStrings,
+} from './patternsI18n';
+
 // ============= ТИПЫ =============
 
 export type RiskLevel = 'GREEN' | 'YELLOW' | 'RED';
@@ -679,23 +684,23 @@ export function analyzePatterns(numbers: number[]): {
   for (const pattern of behavioralPatterns) {
     const matchCount = pattern.numbers.filter(n => numbers.includes(n)).length;
     if (matchCount >= 2 || (pattern.numbers.length <= 2 && matchCount === pattern.numbers.length)) {
-      matchedPatterns.push(pattern);
+      matchedPatterns.push(localizePattern(pattern));
       pattern.riskTypes.forEach(r => detectedRisks.add(r));
     }
   }
-  
+
   // Проверяем конфликтные сочетания
   for (const conflict of conflictCombinations) {
     if (conflict.numbers.every(n => numbers.includes(n))) {
-      matchedConflicts.push(conflict);
+      matchedConflicts.push(localizeConflict(conflict));
     }
   }
-  
+
   // Проверяем критические комбинации
   for (const critical of criticalCombinations) {
     const matchCount = critical.numbers.filter(n => numbers.includes(n)).length;
     if (matchCount >= 2) {
-      criticalMatches.push(critical.danger);
+      criticalMatches.push(localizeCritical(critical.danger));
     }
   }
   
@@ -726,10 +731,12 @@ export function calculateVerdict(
   
   // Анализируем паттерны
   const analysis = analyzePatterns(expandedNumbers);
-  
+
+  const V = getVerdictStrings(i18n.language);
+
   // Определяем уровень риска
   let status: RiskLevel = 'GREEN';
-  let statusLabel = 'МОЖНО';
+  let statusLabel = V?.statusLabel.GREEN ?? 'МОЖНО';
   
   const criticalRisks: RiskType[] = ['ABUSER', 'TYRANT'];
   const mediumRisks: RiskType[] = ['MANIPULATOR', 'CONTROLLER'];
@@ -740,45 +747,51 @@ export function calculateVerdict(
   
   if (hasCritical || hasCriticalConflicts || analysis.criticalMatches.length >= 2) {
     status = 'RED';
-    statusLabel = 'БЕГИ';
+    statusLabel = V?.statusLabel.RED ?? 'БЕГИ';
   } else if (hasMedium || analysis.matchedConflicts.length > 0 || analysis.criticalMatches.length > 0) {
     status = 'YELLOW';
-    statusLabel = 'ОСТОРОЖНО';
+    statusLabel = V?.statusLabel.YELLOW ?? 'ОСТОРОЖНО';
   }
-  
+
   // Формируем единый паттерн
   let unifiedPattern = '';
   if (analysis.matchedPatterns.length > 0) {
     const mainPattern = analysis.matchedPatterns[0];
     unifiedPattern = mainPattern.essence;
   } else {
-    unifiedPattern = 'Стандартная динамика отношений без выраженных рисков';
+    unifiedPattern = V?.unifiedFallback ?? 'Стандартная динамика отношений без выраженных рисков';
   }
-  
+
   // Формируем плюсовой потенциал
   let plusPotential = '';
   if (analysis.detectedRisks.length > 0 && analysis.detectedRisks[0] !== 'NONE') {
-    const mainRisk = riskProfiles[analysis.detectedRisks[0]];
-    plusPotential = `При осознанности: ${mainRisk.plusPotential.strengths.join(', ')}. Полезно в: ${mainRisk.plusPotential.usefulIn.join(', ')}.`;
+    const mainRisk = localizeRisk(riskProfiles[analysis.detectedRisks[0]]);
+    const strengths = mainRisk.plusPotential.strengths.join(', ');
+    const usefulIn = mainRisk.plusPotential.usefulIn.join(', ');
+    plusPotential = V
+      ? V.plusPotential(strengths, usefulIn)
+      : `При осознанности: ${strengths}. Полезно в: ${usefulIn}.`;
   } else {
-    plusPotential = 'Потенциал для здоровых отношений при взаимном уважении';
+    plusPotential = V?.plusPotentialFallback ?? 'Потенциал для здоровых отношений при взаимном уважении';
   }
-  
+
   // Эффект на партнёра
   const partnerEffect = {
-    inPlus: ['Ощущение поддержки', 'Стабильность', 'Развитие'],
+    inPlus: V?.partnerInPlus ?? ['Ощущение поддержки', 'Стабильность', 'Развитие'],
     inMinus: [] as string[],
   };
-  
+
   analysis.detectedRisks.forEach(risk => {
     if (risk !== 'NONE') {
-      partnerEffect.inMinus.push(...riskProfiles[risk].partnerFeels.slice(0, 2));
+      partnerEffect.inMinus.push(...localizeRisk(riskProfiles[risk]).partnerFeels.slice(0, 2));
     }
   });
-  
+
   // Рекомендация
   let recommendation = '';
-  if (status === 'GREEN') {
+  if (V) {
+    recommendation = V.recommendation[status][relationType];
+  } else if (status === 'GREEN') {
     recommendation = relationType === 'love'
       ? 'Союз имеет здоровый потенциал при взаимном уважении и границах'
       : 'Партнёрство перспективно при чётких договорённостях';
@@ -791,11 +804,11 @@ export function calculateVerdict(
       ? 'Связка несёт разрушительный сценарий. Углубление отношений усиливает ущерб'
       : 'Партнёрство крайне рискованно. Только при жёстких юридических рамках';
   }
-  
+
   // Чек-лист выхода для RED
   let exitChecklist: string[] | undefined;
   if (status === 'RED') {
-    exitChecklist = [
+    exitChecklist = V?.exitChecklist ?? [
       'Финансовая автономия',
       'Прекращение обсуждений',
       'Фиксация фактов',
