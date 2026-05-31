@@ -2,6 +2,8 @@
 // Глубокий разбор каждой позиции треугольника месяца
 
 import { getArcana } from "@/lib/arcana";
+import i18n from "@/i18n";
+import { getMonthProLocalized } from "./proMonthForecastI18n";
 
 export interface MonthProInterpretation {
   yearEnergyAnalysis: string;
@@ -286,6 +288,9 @@ export function generateMonthProInterpretation(
   monthName: string,
   targetYear: number
 ): MonthProInterpretation {
+  const localized = getMonthProLocalized(yearArcana, monthArcana, resultArcana, monthName, targetYear, i18n.language);
+  if (localized) return localized;
+
   const yearData = arcanaMonthDeep[yearArcana] || arcanaMonthDeep[1];
   const monthData = arcanaMonthDeep[monthArcana] || arcanaMonthDeep[1];
   const resultData = arcanaMonthDeep[resultArcana] || arcanaMonthDeep[1];
