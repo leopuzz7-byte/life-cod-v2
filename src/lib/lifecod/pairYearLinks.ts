@@ -1,5 +1,8 @@
 // 81 связка личных годов пары (1-9 × 1-9)
 
+import i18n from '@/i18n';
+import { getPairLinkText, getPairFallback, getPairRatingLabel } from './pairYearLinksI18n';
+
 export type PairYearRating = 'resource' | 'possible' | 'risk';
 
 export interface PairYearLink {
@@ -106,27 +109,32 @@ const links: Record<string, { rating: PairYearRating; dynamics: string; love: st
 export function getPairYearLink(yearA: number, yearB: number): PairYearLink {
   const key = `${yearA}-${yearB}`;
   const data = links[key];
+  const lang = i18n.language;
 
   if (!data) {
+    const fb = getPairFallback(yearA, yearB, lang);
     return {
       yearA, yearB,
       rating: 'possible',
-      dynamics: `Связка ${yearA}–${yearB} требует внимания`,
-      loveContext: 'Индивидуальный анализ',
-      businessContext: 'Индивидуальный анализ',
+      dynamics: fb?.dynamics ?? `Связка ${yearA}–${yearB} требует внимания`,
+      loveContext: fb?.love ?? 'Индивидуальный анализ',
+      businessContext: fb?.biz ?? 'Индивидуальный анализ',
     };
   }
 
+  const loc = getPairLinkText(key, lang);
   return {
     yearA, yearB,
     rating: data.rating,
-    dynamics: data.dynamics,
-    loveContext: data.love,
-    businessContext: data.biz,
+    dynamics: loc?.dynamics ?? data.dynamics,
+    loveContext: loc?.love ?? data.love,
+    businessContext: loc?.biz ?? data.biz,
   };
 }
 
 export function getPairYearRatingLabel(rating: PairYearRating): string {
+  const loc = getPairRatingLabel(rating, i18n.language);
+  if (loc) return loc;
   switch (rating) {
     case 'resource': return '🟢 Ресурсный вход';
     case 'possible': return '🟡 Вход возможен';
