@@ -80,7 +80,7 @@ export function LifeCodInputForm({ onCalculate }: LifeCodInputFormProps) {
             type="number"
             min="1"
             max="31"
-            placeholder="ДД"
+            placeholder={t("common.dd")}
             value={person.day}
             onChange={(e) => setPerson({ ...person, day: e.target.value })}
             className="mt-1"
@@ -93,7 +93,7 @@ export function LifeCodInputForm({ onCalculate }: LifeCodInputFormProps) {
             type="number"
             min="1"
             max="12"
-            placeholder="ММ"
+            placeholder={t("common.mm")}
             value={person.month}
             onChange={(e) => setPerson({ ...person, month: e.target.value })}
             className="mt-1"
@@ -106,7 +106,7 @@ export function LifeCodInputForm({ onCalculate }: LifeCodInputFormProps) {
             type="number"
             min="1900"
             max="2025"
-            placeholder="ГГГГ"
+            placeholder={t("common.yyyy")}
             value={person.year}
             onChange={(e) => setPerson({ ...person, year: e.target.value })}
             className="mt-1"

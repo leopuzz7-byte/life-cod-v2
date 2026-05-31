@@ -137,7 +137,9 @@
     "cacheWarning": "No se pudo actualizar la lista desde el servidor — se muestra una copia local. Comprueba tu conexión a internet.",
     "deleteTitle": "¿Eliminar este análisis?",
     "deleteDesc": "Esta acción no se puede deshacer. El análisis se eliminará permanentemente.",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "deleteFailed": "No se pudo eliminar: ",
+    "deleted": "Análisis eliminado"
   },
   "analysisDetail": {
     "notFound": "Análisis no encontrado",
@@ -172,7 +174,17 @@
     "confirmPassword": "Repite la contraseña",
     "confirmPasswordPlaceholder": "La misma contraseña otra vez",
     "createAccount": "Crear cuenta",
-    "haveProfile": "Ya tengo un perfil."
+    "haveProfile": "Ya tengo un perfil.",
+    "errors": {
+      "network": "Error de red",
+      "createUser": "No se pudo crear el usuario",
+      "noAuth": "Sin autorización",
+      "badCredentials": "Correo o contraseña incorrectos",
+      "emailExists": "Ya existe un usuario con este correo",
+      "weakPassword": "La contraseña debe tener al menos 6 caracteres",
+      "invalidEmail": "Correo no válido",
+      "tooManyAttempts": "Demasiados intentos. Espera un minuto e inténtalo de nuevo"
+    }
   },
   "payment": {
     "checking": "Verificando tu pago…",
@@ -261,7 +273,16 @@
     "payCard": "Pagar con tarjeta",
     "payCrypto": "Pagar con cripto",
     "payNote": "Tarjetas — Robokassa. Cripto — Plisio (USDT).",
-    "acceptOffer": "Al pagar, aceptas la oferta"
+    "acceptOffer": "Al pagar, aceptas la oferta",
+    "waitSeconds": "Espera unos segundos",
+    "checking": "Comprobando el pago...",
+    "successTitle": "¡Pago realizado con éxito!",
+    "successDesc": "El análisis está desbloqueado. Pulsa el botón de abajo para obtener tu resultado.",
+    "getResult": "Obtener el análisis →",
+    "errorTitle": "No se pudo verificar el pago",
+    "errorDesc": "Si se cobró el dinero, contacta con soporte. Si no, intenta pagar de nuevo.",
+    "toHome": "Al inicio",
+    "support": "Soporte"
   },
   "res": {
     "newCalc": "Nuevo cálculo",
@@ -419,15 +440,15 @@
       "timing": "Análisis del momento",
       "proFooter": "El análisis profesional incluye: las 12 posiciones, análisis profundo de las posiciones clave, riesgos ocultos, estrategia óptima, análisis del momento y recomendaciones personalizadas.",
       "pos": {
-        "1": "Inicio / Primera impresión",
-        "2": "Esencia interior del contrato",
+        "1": "Comienzo / Primera impresión",
+        "2": "La esencia interna del contrato",
         "3": "Interacción de las partes",
-        "4": "Meta / Resultado del contrato",
+        "4": "Objetivo / Resultado del contrato",
         "5": "Recursos y oportunidades",
-        "6": "Base de la relación",
-        "7": "Tarea principal",
-        "8": "Forma de resolverlo",
-        "9": "Resultado de la colaboración",
+        "6": "Fundamento de la relación",
+        "7": "La tarea principal",
+        "8": "La forma de resolverlo",
+        "9": "Resultado de la cooperación",
         "10": "Motivos ocultos",
         "11": "Circunstancias externas",
         "12": "Lección kármica"
@@ -478,7 +499,8 @@
       "recHarmonious": "El nombre lleva una energía armoniosa. Atrae clientes y favorece el crecimiento.",
       "recTransform": "El nombre lleva una energía transformadora. Son posibles cambios bruscos e inestabilidad. Conviene considerar alternativas.",
       "recNeutral": "El nombre es neutro. La energía ni ayuda ni estorba. Se puede reforzar cambiando la grafía."
-    }
+    },
+    "proExtendedIncluded": "Qué incluye el análisis profesional ampliado:"
   },
   "matrixGen": {
     "link_1_2": {
@@ -586,7 +608,9 @@
     "calculateFinance": "Calcular el código financiero",
     "forecastDate": "Fecha del pronóstico",
     "contractDate": "Fecha del contrato",
-    "lifecodForecastYear": "Año del pronóstico"
+    "lifecodForecastYear": "Año del pronóstico",
+    "nameToCheck": "Nombre a comprobar",
+    "nameToCheckPlaceholder": "Introduce el nombre de la empresa, el producto o un nombre"
   },
   "methodology": {
     "methodology1": "Método 1",
@@ -965,7 +989,26 @@
     "back": "Atrás",
     "next": "Siguiente",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "months": [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
+    "birthDate": "Fecha de nacimiento",
+    "dd": "DD",
+    "mm": "MM",
+    "yyyy": "AAAA",
+    "imgAlt": "El corazón del peregrino — Life C⚙D"
   },
   "lifecod": {
     "title": "Compatibilidad Life C⚙D",
@@ -1373,5 +1416,80 @@
         "expectedResult": "Siguiendo las recomendaciones, en 1-2 semanas aparecerá la sensación de que la situación está bajo control y de que hay un plan de acción concreto."
       }
     }
+  },
+  "loading": {
+    "default": [
+      "Sumando las cifras de tu destino…",
+      "Reduciendo los números a arcanos…",
+      "Barajando los 22 arcanos…",
+      "Buscando tu arcano del propósito…",
+      "Consultando con el Universo…",
+      "Las estrellas se alinean…"
+    ],
+    "purpose": [
+      "Desplegando la matriz de 12 posiciones…",
+      "Buscando tu arcano del propósito…",
+      "Leyendo el código de tu fecha…",
+      "Las estrellas se alinean…"
+    ],
+    "compatibility": [
+      "Uniendo dos destinos…",
+      "Calculando el arcano de vuestra unión…",
+      "Buscando los puntos de atracción…",
+      "El Universo coteja vuestros códigos…"
+    ],
+    "lifecod-compatibility": [
+      "Uniendo dos destinos…",
+      "Calculando el arcano de vuestra unión…",
+      "Buscando los puntos de atracción…"
+    ],
+    "finance": [
+      "Calculando tu código del dinero…",
+      "Buscando el arcano de la abundancia…",
+      "Revelando el flujo financiero…"
+    ],
+    "ancestral": [
+      "Despertando la memoria del linaje…",
+      "Leyendo la estrella kármica…",
+      "Calculando los programas ancestrales…"
+    ],
+    "year": [
+      "Mirando dentro de tu año…",
+      "Calculando el arcano del periodo…",
+      "Consultando con las estrellas del año…"
+    ],
+    "month": [
+      "Calculando el arcano del mes…",
+      "Mirando dentro de tu mes…"
+    ],
+    "day": [
+      "Calculando la energía del día…",
+      "Consultando con las estrellas…"
+    ],
+    "name": [
+      "Traduciendo el nombre a números…",
+      "Calculando la energía del nombre…"
+    ],
+    "contract": [
+      "Leyendo la energía del contrato…",
+      "Calculando el arcano del acuerdo…"
+    ]
+  },
+  "numres": {
+    "titleNamed": "{{name}}, tu numerología",
+    "titleDefault": "Tu numerología",
+    "classic": "Numerología clásica",
+    "mind": "Mente",
+    "action": "Acción",
+    "realization": "Realización",
+    "total": "Total",
+    "proTitle": "Análisis numerológico profesional",
+    "proDesc": "Un análisis profundo de todos los aspectos de tu personalidad, tus tareas kármicas y tu camino de vida",
+    "proFeatures": [
+      "Un análisis completo de las 22 energías",
+      "Un pronóstico mensual del año",
+      "Compatibilidad con la pareja",
+      "Recomendaciones personales"
+    ]
   }
 }

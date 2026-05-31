@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 // Фразы по умолчанию (общие)
 const DEFAULT_PHRASES = [
@@ -58,9 +59,16 @@ interface LoadingScreenProps {
 }
 
 export function LoadingScreen({ methodId, phrases }: LoadingScreenProps) {
+  const { t } = useTranslation();
+  const loc = (key: string): string[] | null => {
+    const v = t(`loading.${key}`, { returnObjects: true });
+    return Array.isArray(v) && v.length > 0 ? (v as string[]) : null;
+  };
   const list =
     phrases ??
+    (methodId ? loc(methodId) : null) ??
     (methodId && PHRASES_BY_METHOD[methodId]) ??
+    loc('default') ??
     DEFAULT_PHRASES;
 
   const [index, setIndex] = useState(0);

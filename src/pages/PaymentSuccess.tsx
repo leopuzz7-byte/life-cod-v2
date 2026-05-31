@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
@@ -7,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [status, setStatus] = useState<"checking" | "paid" | "pending" | "error">("checking");
 
   useEffect(() => {
@@ -82,9 +84,9 @@ export default function PaymentSuccess() {
             <>
               <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
               <h1 className="font-display text-2xl text-foreground">
-                Проверяем оплату...
+                {t("paymentScreen.checking")}
               </h1>
-              <p className="text-muted-foreground">Подождите несколько секунд</p>
+              <p className="text-muted-foreground">{t("paymentScreen.waitSeconds")}</p>
             </>
           )}
 
@@ -94,13 +96,13 @@ export default function PaymentSuccess() {
                 <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
               <h1 className="font-display text-2xl text-foreground">
-                Оплата прошла успешно!
+                {t("paymentScreen.successTitle")}
               </h1>
               <p className="text-muted-foreground">
-                Разбор разблокирован. Нажмите кнопку ниже чтобы получить результат.
+                {t("paymentScreen.successDesc")}
               </p>
               <Button onClick={handleContinue} className="w-full h-12 text-base rounded-full">
-                Получить разбор →
+                {t("paymentScreen.getResult")}
               </Button>
             </>
           )}
@@ -111,17 +113,17 @@ export default function PaymentSuccess() {
                 <AlertCircle className="w-10 h-10 text-amber-600" />
               </div>
               <h1 className="font-display text-2xl text-foreground">
-                Не удалось проверить оплату
+                {t("paymentScreen.errorTitle")}
               </h1>
               <p className="text-muted-foreground">
-                Если деньги были списаны — свяжитесь с поддержкой. Если нет — попробуйте оплатить снова.
+                {t("paymentScreen.errorDesc")}
               </p>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => navigate("/")} className="flex-1 rounded-full">
-                  На главную
+                  {t("paymentScreen.toHome")}
                 </Button>
                 <Button onClick={() => navigate("/support")} className="flex-1 rounded-full">
-                  Поддержка
+                  {t("paymentScreen.support")}
                 </Button>
               </div>
             </>

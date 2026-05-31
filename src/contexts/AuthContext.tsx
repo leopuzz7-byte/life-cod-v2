@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { withTimeout } from "@/lib/withTimeout";
+import i18n from "@/i18n";
 
 export interface Profile {
   id: string;
@@ -136,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error("[Auth] loadProfile threw:", err);
       // Таймаут или сетевая — оставляем что есть в кеше, показываем ошибку
-      setProfileError(err instanceof Error ? err.message : "Сетевая ошибка");
+      setProfileError(err instanceof Error ? err.message : i18n.t("auth.errors.network"));
       setProfileFetched(true);
     }
   };
@@ -233,7 +234,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("[Auth] signUp failed:", error);
       return { error: humanizeAuthError(error.message) };
     }
-    if (!data.user) return { error: "Не удалось создать пользователя" };
+    if (!data.user) return { error: i18n.t("auth.errors.createUser") };
 
     // Создаём профиль — используем upsert на случай если row уже есть (повторный signup, гонка и т.п.)
     const { error: profileError } = await supabase.from("profiles").upsert({
@@ -277,7 +278,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const updateProfile = async (patch: Partial<Omit<Profile, "id" | "email">>) => {
-    if (!user) return { error: "Нет авторизации" };
+    if (!user) return { error: i18n.t("auth.errors.noAuth") };
     const { error } = await supabase
       .from("profiles")
       .update(patch)
@@ -320,23 +321,23 @@ export function useAuth() {
   return ctx;
 }
 
-// Перевод сообщений Supabase на русский
+// Перевод сообщений Supabase на язык интерфейса
 function humanizeAuthError(msg: string): string {
   const lower = msg.toLowerCase();
   if (lower.includes("invalid login credentials") || lower.includes("invalid_credentials")) {
-    return "Неверный email или пароль";
+    return i18n.t("auth.errors.badCredentials");
   }
   if (lower.includes("user already registered") || lower.includes("already exists")) {
-    return "Пользователь с таким email уже зарегистрирован";
+    return i18n.t("auth.errors.emailExists");
   }
   if (lower.includes("password should be at least")) {
-    return "Пароль должен быть не короче 6 символов";
+    return i18n.t("auth.errors.weakPassword");
   }
   if (lower.includes("invalid email")) {
-    return "Некорректный email";
+    return i18n.t("auth.errors.invalidEmail");
   }
   if (lower.includes("email rate limit") || lower.includes("over_email_send_rate_limit")) {
-    return "Слишком много попыток. Подождите минуту и попробуйте ещё раз";
+    return i18n.t("auth.errors.tooManyAttempts");
   }
   return msg;
 }

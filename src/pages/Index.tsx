@@ -744,7 +744,7 @@ const Index = () => {
                       {/* What's inside Professional extended analysis (per methodology) */}
                       {selectedTier === 'professional' && currentConfig.professional && (
                         <div className="mt-1 mb-4 px-4 py-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-foreground leading-relaxed">
-                          <p className="font-medium mb-1 text-primary">Что входит в Профессиональный расширенный разбор:</p>
+                          <p className="font-medium mb-1 text-primary">{t("res.proExtendedIncluded")}</p>
                           <p className="text-muted-foreground">{proExtendedDescriptions[selectedMethodology]}</p>
                         </div>
                       )}
@@ -764,9 +764,9 @@ const Index = () => {
                       <div className="gradient-card rounded-2xl p-5 sm:p-8 border border-border">
                         <div className="space-y-5">
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">Название для проверки</label>
+                            <label className="text-sm font-medium text-foreground">{t("calculator.nameToCheck")}</label>
                             <Input
-                              placeholder="Введите название компании, продукта или имя"
+                              placeholder={t("calculator.nameToCheckPlaceholder")}
                               value={nameEnergyInput}
                               onChange={(e) => setNameEnergyInput(e.target.value)}
                               className="bg-background border-border focus:border-primary focus:ring-primary/20 h-12 text-foreground placeholder:text-muted-foreground"

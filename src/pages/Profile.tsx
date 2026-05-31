@@ -267,7 +267,7 @@ export default function Profile() {
             </div>
 
             <div className="space-y-2">
-              <Label>Дата рождения</Label>
+              <Label>{t("auth.birthDate")}</Label>
               <div className="grid grid-cols-3 gap-2">
                 <Select value={day} onValueChange={setDay} disabled={saving}>
                   <SelectTrigger><SelectValue placeholder={t("calculator.day")} /></SelectTrigger>

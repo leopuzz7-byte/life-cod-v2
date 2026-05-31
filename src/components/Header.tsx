@@ -28,7 +28,7 @@ export function Header() {
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
             src={logo}
-            alt="Сердце пилигрима — Life C⚙D"
+            alt={t("common.imgAlt")}
             className="h-9 sm:h-10 w-auto"
           />
         </Link>

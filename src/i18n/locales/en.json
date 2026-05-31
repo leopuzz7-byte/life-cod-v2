@@ -137,7 +137,9 @@
     "cacheWarning": "Couldn't refresh the list from the server — showing a local copy. Check your internet connection.",
     "deleteTitle": "Delete this analysis?",
     "deleteDesc": "This action cannot be undone. The analysis will be deleted permanently.",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deleteFailed": "Failed to delete: ",
+    "deleted": "Analysis deleted"
   },
   "analysisDetail": {
     "notFound": "Analysis not found",
@@ -172,7 +174,17 @@
     "confirmPassword": "Repeat password",
     "confirmPasswordPlaceholder": "The same password again",
     "createAccount": "Create account",
-    "haveProfile": "I already have a profile."
+    "haveProfile": "I already have a profile.",
+    "errors": {
+      "network": "Network error",
+      "createUser": "Failed to create user",
+      "noAuth": "Not authorized",
+      "badCredentials": "Invalid email or password",
+      "emailExists": "A user with this email is already registered",
+      "weakPassword": "The password must be at least 6 characters",
+      "invalidEmail": "Invalid email",
+      "tooManyAttempts": "Too many attempts. Wait a minute and try again"
+    }
   },
   "payment": {
     "checking": "Checking your payment…",
@@ -261,7 +273,16 @@
     "payCard": "Pay by card",
     "payCrypto": "Pay with crypto",
     "payNote": "Cards — Robokassa. Crypto — Plisio (USDT).",
-    "acceptOffer": "By paying, you accept the offer"
+    "acceptOffer": "By paying, you accept the offer",
+    "waitSeconds": "Please wait a few seconds",
+    "checking": "Checking the payment...",
+    "successTitle": "Payment successful!",
+    "successDesc": "The analysis is unlocked. Click the button below to get your result.",
+    "getResult": "Get the analysis →",
+    "errorTitle": "Could not verify the payment",
+    "errorDesc": "If the money was charged, contact support. If not, try paying again.",
+    "toHome": "To home",
+    "support": "Support"
   },
   "res": {
     "newCalc": "New calculation",
@@ -420,13 +441,13 @@
       "proFooter": "The professional analysis includes: all 12 positions, deep analysis of key positions, hidden risks, optimal strategy, timing analysis, and personalized recommendations.",
       "pos": {
         "1": "Beginning / First impression",
-        "2": "Inner essence of the contract",
+        "2": "The inner essence of the contract",
         "3": "Interaction of the parties",
         "4": "Goal / Result of the contract",
         "5": "Resources and opportunities",
         "6": "Foundation of the relationship",
-        "7": "Main task",
-        "8": "Way to solve it",
+        "7": "The main task",
+        "8": "The way to resolve it",
         "9": "Outcome of the cooperation",
         "10": "Hidden motives",
         "11": "External circumstances",
@@ -478,7 +499,8 @@
       "recHarmonious": "The name carries harmonious energy. It attracts clients and supports growth.",
       "recTransform": "The name carries transformational energy. Sharp changes and instability are possible. Consider alternative options.",
       "recNeutral": "The name is neutral. The energy neither helps nor hinders. It can be strengthened by changing the spelling."
-    }
+    },
+    "proExtendedIncluded": "What the Professional extended analysis includes:"
   },
   "matrixGen": {
     "link_1_2": {
@@ -586,7 +608,9 @@
     "calculateFinance": "Calculate the financial code",
     "forecastDate": "Forecast date",
     "contractDate": "Contract date",
-    "lifecodForecastYear": "Forecast year"
+    "lifecodForecastYear": "Forecast year",
+    "nameToCheck": "Name to check",
+    "nameToCheckPlaceholder": "Enter a company name, product or name"
   },
   "methodology": {
     "methodology1": "Method 1",
@@ -946,7 +970,26 @@
     "back": "Back",
     "next": "Next",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "birthDate": "Date of birth",
+    "dd": "DD",
+    "mm": "MM",
+    "yyyy": "YYYY",
+    "imgAlt": "Pilgrim's heart — Life C⚙D"
   },
   "onboarding": {
     "step1": {
@@ -1354,5 +1397,80 @@
     "ancestralSubtitle": "Analysis of ancestral programs and karmic connections",
     "consultationTitle": "Want a deep analysis?",
     "consultationText": "Book a personal consultation for a detailed analysis"
+  },
+  "loading": {
+    "default": [
+      "Adding up the digits of your destiny…",
+      "Reducing the numbers to arcana…",
+      "Shuffling the 22 arcana…",
+      "Searching for your purpose arcana…",
+      "Checking with the Universe…",
+      "The stars are aligning…"
+    ],
+    "purpose": [
+      "Laying out the 12-position matrix…",
+      "Searching for your purpose arcana…",
+      "Reading the code of your date…",
+      "The stars are aligning…"
+    ],
+    "compatibility": [
+      "Bringing two destinies together…",
+      "Calculating the arcana of your union…",
+      "Searching for points of attraction…",
+      "The Universe is matching your codes…"
+    ],
+    "lifecod-compatibility": [
+      "Bringing two destinies together…",
+      "Calculating the arcana of your union…",
+      "Searching for points of attraction…"
+    ],
+    "finance": [
+      "Calculating your money code…",
+      "Searching for the arcana of abundance…",
+      "Revealing the financial flow…"
+    ],
+    "ancestral": [
+      "Raising the ancestral memory…",
+      "Reading the karmic star…",
+      "Calculating the ancestral programs…"
+    ],
+    "year": [
+      "Looking into your year…",
+      "Calculating the arcana of the period…",
+      "Checking with the stars of the year…"
+    ],
+    "month": [
+      "Calculating the arcana of the month…",
+      "Looking into your month…"
+    ],
+    "day": [
+      "Calculating the energy of the day…",
+      "Checking with the stars…"
+    ],
+    "name": [
+      "Translating the name into numbers…",
+      "Calculating the energy of the name…"
+    ],
+    "contract": [
+      "Reading the energy of the contract…",
+      "Calculating the arcana of the agreement…"
+    ]
+  },
+  "numres": {
+    "titleNamed": "{{name}}, your numerology",
+    "titleDefault": "Your numerology",
+    "classic": "Classic numerology",
+    "mind": "Mind",
+    "action": "Action",
+    "realization": "Realization",
+    "total": "Total",
+    "proTitle": "Professional numerology analysis",
+    "proDesc": "A deep analysis of all aspects of your personality, your karmic tasks and life path",
+    "proFeatures": [
+      "A full analysis of all 22 energies",
+      "A monthly forecast for the year",
+      "Compatibility with a partner",
+      "Personal recommendations"
+    ]
   }
 }

@@ -79,11 +79,11 @@ export default function MyAnalyses() {
   const handleDelete = async (id: string) => {
     const { error } = await deleteAnalysis(id);
     if (error) {
-      toast.error("Не удалось удалить: " + error);
+      toast.error(t("myAnalyses.deleteFailed") + error);
       return;
     }
     setAnalyses((arr) => arr.filter((a) => a.id !== id));
-    toast.success("Разбор удалён");
+    toast.success(t("myAnalyses.deleted"));
   };
 
   const formatDate = (iso: string) => {

@@ -3,7 +3,8 @@ import { NumberCard } from "./NumberCard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
-import { ru } from "date-fns/locale";
+import { ru, enUS, es } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 import { PDFDownloadButton } from "./PDFDownloadButton";
 import { generatePDF } from "@/lib/pdfGenerator";
 import { InlinePaywall } from "./PaidBlock";
@@ -15,17 +16,19 @@ interface NumerologyResultProps {
 }
 
 export function NumerologyResult({ result, name, onReset }: NumerologyResultProps) {
-  const formattedDate = format(result.birthDate, "d MMMM yyyy", { locale: ru });
-
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language === "en" ? enUS : i18n.language === "es" ? es : ru;
+  const formattedDate = format(result.birthDate, "d MMMM yyyy", { locale: dateLocale });
+  const titleText = name ? t("numres.titleNamed", { name }) : t("numres.titleDefault");
 
   const handleDownloadPDF = async () => {
     const numbers = [
-      { num: result.mindNumber, title: "Ум", key: "mindInterpretation" as const },
-      { num: result.actionNumber, title: "Действие", key: "actionInterpretation" as const },
-      { num: result.realizationNumber, title: "Реализация", key: "realizationInterpretation" as const },
-      { num: result.totalNumber, title: "Итог", key: "totalInterpretation" as const },
+      { num: result.mindNumber, title: t("numres.mind"), key: "mindInterpretation" as const },
+      { num: result.actionNumber, title: t("numres.action"), key: "actionInterpretation" as const },
+      { num: result.realizationNumber, title: t("numres.realization"), key: "realizationInterpretation" as const },
+      { num: result.totalNumber, title: t("numres.total"), key: "totalInterpretation" as const },
     ];
-    
+
     const sections = numbers.map(({ num, title, key }) => {
       const data = numberDescriptions[num];
       return {
@@ -33,10 +36,10 @@ export function NumerologyResult({ result, name, onReset }: NumerologyResultProp
         content: data?.[key] || data?.description || "",
       };
     });
-    
+
     await generatePDF({
-      title: name ? `${name}, ваша нумерология` : "Ваша нумерология",
-      subtitle: "Классическая нумерология",
+      title: titleText,
+      subtitle: t("numres.classic"),
       birthDate: formattedDate,
       name: name || undefined,
       sections,
@@ -52,7 +55,7 @@ export function NumerologyResult({ result, name, onReset }: NumerologyResultProp
           className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Новый расчёт
+          {t("results.newCalculation")}
         </Button>
         <PDFDownloadButton onDownload={handleDownloadPDF} />
       </div>
@@ -60,19 +63,19 @@ export function NumerologyResult({ result, name, onReset }: NumerologyResultProp
       <div className="text-center space-y-4">
         <div className="bg-card rounded-2xl p-8 shadow-card border border-border">
           <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
-            {name ? `${name}, ваша нумерология` : "Ваша нумерология"}
+            {titleText}
           </h2>
           <p className="text-muted-foreground">
-            Дата рождения: <span className="text-primary font-medium">{formattedDate}</span>
+            {t("results.birthDate")}: <span className="text-primary font-medium">{formattedDate}</span>
           </p>
 
           {/* Summary Numbers */}
           <div className="grid grid-cols-4 gap-4 mt-6">
             {[
-              { label: "Ум", value: result.mindNumber, icon: "💭" },
-              { label: "Действие", value: result.actionNumber, icon: "⚡" },
-              { label: "Реализация", value: result.realizationNumber, icon: "🎯" },
-              { label: "Итог", value: result.totalNumber, icon: "✨" },
+              { label: t("numres.mind"), value: result.mindNumber, icon: "💭" },
+              { label: t("numres.action"), value: result.actionNumber, icon: "⚡" },
+              { label: t("numres.realization"), value: result.realizationNumber, icon: "🎯" },
+              { label: t("numres.total"), value: result.totalNumber, icon: "✨" },
             ].map((item, i) => (
               <div key={item.label} className="text-center">
                 <div 
@@ -101,14 +104,9 @@ export function NumerologyResult({ result, name, onReset }: NumerologyResultProp
 
       {/* Inline Paywall */}
       <InlinePaywall
-        title="Профессиональный нумерологический разбор"
-        description="Глубокий анализ всех аспектов вашей личности, кармических задач и жизненного пути"
-        features={[
-          "Полный анализ всех 22 энергий",
-          "Прогноз на год по месяцам",
-          "Совместимость с партнёром",
-          "Персональные рекомендации",
-        ]}
+        title={t("numres.proTitle")}
+        description={t("numres.proDesc")}
+        features={t("numres.proFeatures", { returnObjects: true }) as string[]}
       />
     </div>
   );
