@@ -580,7 +580,13 @@
     "calculateYear": "Calcular pronóstico anual",
     "calculatePurpose": "Descubre tu propósito",
     "calculateAncestral": "Descubre programas ancestrales",
-    "calculate": "Calcular"
+    "calculate": "Calcular",
+    "calculateDay": "Calcular el pronóstico del día",
+    "calculateContract": "Calcular la energía del contrato",
+    "calculateFinance": "Calcular el código financiero",
+    "forecastDate": "Fecha del pronóstico",
+    "contractDate": "Fecha del contrato",
+    "lifecodForecastYear": "Año del pronóstico"
   },
   "methodology": {
     "methodology1": "Método 1",
@@ -1179,7 +1185,8 @@
         "Nov",
         "Dic"
       ]
-    }
+    },
+    "pairLinksTitle": "Vínculos de años personales (matriz de 81)"
   },
   "keyto": {
     "yourCalculation": "tu cálculo numerológico",

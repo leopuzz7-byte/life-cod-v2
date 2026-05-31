@@ -112,7 +112,7 @@ export function LifeCodResult({ result, onReset }: LifeCodResultProps) {
       <div className="bg-card rounded-xl border p-4 md:p-6 space-y-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-primary" />
-          <h3 className="font-display font-semibold text-lg">Связка личных годов (81 матрица)</h3>
+          <h3 className="font-display font-semibold text-lg">{t("lifecod.pairLinksTitle")}</h3>
         </div>
         
         <div className="space-y-3">

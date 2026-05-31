@@ -580,7 +580,13 @@
     "calculateYear": "Рассчитать прогноз на год",
     "calculatePurpose": "Узнать предназначение",
     "calculateAncestral": "Узнать родовую программу",
-    "calculate": "Рассчитать"
+    "calculate": "Рассчитать",
+    "calculateDay": "Рассчитать прогноз на день",
+    "calculateContract": "Рассчитать энергию договора",
+    "calculateFinance": "Рассчитать финансовый код",
+    "forecastDate": "Дата прогноза",
+    "contractDate": "Дата договора",
+    "lifecodForecastYear": "Год прогноза"
   },
   "methodology": {
     "methodology1": "Методика 1",
@@ -1315,6 +1321,7 @@
         "Ноя",
         "Дек"
       ]
-    }
+    },
+    "pairLinksTitle": "Связка личных годов (81 матрица)"
   }
 }

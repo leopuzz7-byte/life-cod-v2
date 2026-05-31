@@ -580,7 +580,13 @@
     "calculateYear": "Calculate year forecast",
     "calculatePurpose": "Discover your purpose",
     "calculateAncestral": "Discover ancestral programs",
-    "calculate": "Calculate"
+    "calculate": "Calculate",
+    "calculateDay": "Calculate the day forecast",
+    "calculateContract": "Calculate the contract energy",
+    "calculateFinance": "Calculate the financial code",
+    "forecastDate": "Forecast date",
+    "contractDate": "Contract date",
+    "lifecodForecastYear": "Forecast year"
   },
   "methodology": {
     "methodology1": "Method 1",
@@ -1313,7 +1319,8 @@
         "Nov",
         "Dec"
       ]
-    }
+    },
+    "pairLinksTitle": "Personal-year links (81 matrix)"
   },
   "keyto": {
     "yourCalculation": "your numerology calculation",
