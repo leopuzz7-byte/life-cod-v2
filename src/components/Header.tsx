@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { HelpCircle, LogIn, User, FolderClock } from "lucide-react";
-import logo from "@/assets/logo.svg";
+import logo from "@/assets/logo.png";
 import { LanguageSelector } from "./LanguageSelector";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -23,13 +23,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full glass-brown border-b border-white/10">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        {/* Logo — цветной SVG как есть, без подложки и без фильтров.
-            Текст бренда уже внутри самого логотипа. */}
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
             src={logo}
             alt={t("common.imgAlt")}
-            className="h-9 sm:h-10 w-auto"
+            className="h-12 sm:h-14 w-auto"
           />
         </Link>
 
