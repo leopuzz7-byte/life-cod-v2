@@ -14,3 +14,5 @@ export * from './financialCodeLC';
 export * from './psychProfile';
 export * from './energyMap';
 export * from './actionPlan';
+export { calculateBusinessBasic, calculateBusinessPro } from './businessAnalysis';
+export { calculateSuccessPath } from './successPath';

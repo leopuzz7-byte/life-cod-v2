@@ -35,13 +35,17 @@ import {
 import { calculateKeyTo, KeyToResult } from "@/lib/keyto";
 import { calculateAncestralPrograms, AncestralResult } from "@/lib/ancestral";
 import { calculateLifeCodCompatibility, LifeCodCompatibilityResult, RelationType, calculateUnifiedPersonalAnalysis, UnifiedPersonalAnalysis } from "@/lib/lifecod";
+import { calculateBusinessBasic, calculateBusinessPro, type BusinessBasicModule, type BusinessProModule } from "@/lib/lifecod/businessAnalysis";
+import { calculateSuccessPath, type SuccessPathModule } from "@/lib/lifecod/successPath";
+import { BusinessResult } from "@/components/BusinessResult";
+import { SuccessPathResult } from "@/components/SuccessPathResult";
 import { calculateDailyForecast, DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
 import { calculateFinancialCode, FinancialCodeResult as FinancialCodeType } from "@/lib/financialCode";
 import { calculateNameEnergy, NameEnergyResult as NameEnergyType } from "@/lib/nameEnergy";
 import { LifeCodPersonalResult } from "@/components/lifecod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, FileText, Building, Type, Wallet, Lock, Calendar, CalendarDays, Compass, Brain, Clock, Sparkles, Check, Heart, Briefcase } from "lucide-react";
+import { Users, FileText, Building, Type, Wallet, Lock, Calendar, CalendarDays, Compass, Brain, Clock, Sparkles, Check, Heart, Briefcase, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMethodPrice } from "@/hooks/useMethodPrice";
 
@@ -73,6 +77,8 @@ const Index = () => {
     | { type: "finance"; data: FinancialCodeType }
     | { type: "name"; data: NameEnergyType }
     | { type: "contract"; data: DailyForecastType }
+    | { type: "business"; data: BusinessBasicModule | BusinessProModule; isPro: boolean }
+    | { type: "success-path"; data: SuccessPathModule }
     | null;
 
   const [selectedMethodology, setSelectedMethodology] = useState<"1" | "2">("1");
@@ -324,6 +330,16 @@ const Index = () => {
         setResult({ type: "ancestral", data: ancestralResult });
         break;
       }
+      case "business": {
+        const isProTier = selectedTier === 'professional';
+        const data = isProTier ? calculateBusinessPro(day, month, year) : calculateBusinessBasic(day, month, year);
+        setResult({ type: "business", data, isPro: isProTier });
+        break;
+      }
+      case "success-path": {
+        setResult({ type: "success-path", data: calculateSuccessPath(day, month, year) });
+        break;
+      }
       case "purpose":
       default: {
         const personalMatrix = calculatePersonalMatrix(day, month, year);
@@ -432,6 +448,14 @@ const Index = () => {
           break;
         case "ancestral":
           setResult({ type: "ancestral", data: calculateAncestralPrograms(day, month, year, gender || 'female') });
+          break;
+        case "business": {
+          const isProTier = selectedTier === 'professional';
+          setResult({ type: "business", data: isProTier ? calculateBusinessPro(day, month, year) : calculateBusinessBasic(day, month, year), isPro: isProTier });
+          break;
+        }
+        case "success-path":
+          setResult({ type: "success-path", data: calculateSuccessPath(day, month, year) });
           break;
         case "purpose":
         default:
@@ -914,6 +938,28 @@ const Index = () => {
                 onReset={handleReset}
                 tier={selectedTier}
               />
+            )}
+            {result.type === "business" && (
+              <div className="space-y-4">
+                <div className="max-w-2xl mx-auto">
+                  <Button variant="ghost" onClick={handleReset} className="text-muted-foreground hover:text-foreground">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    {t("results.newCalculation")}
+                  </Button>
+                </div>
+                <BusinessResult result={result.data} isPro={result.isPro} />
+              </div>
+            )}
+            {result.type === "success-path" && (
+              <div className="space-y-4">
+                <div className="max-w-2xl mx-auto">
+                  <Button variant="ghost" onClick={handleReset} className="text-muted-foreground hover:text-foreground">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    {t("results.newCalculation")}
+                  </Button>
+                </div>
+                <SuccessPathResult result={result.data} />
+              </div>
             )}
           </div>
         )}

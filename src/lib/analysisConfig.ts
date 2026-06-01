@@ -220,11 +220,10 @@ export const analysisConfigs: AnalysisTypeConfig[] = [
     title: 'Бизнес',
     description: 'Бизнес-разбор партнёрства',
     icon: 'Briefcase',
-    basic: { available: true, isFree: true, label: 'Базовый', description: 'Скоро будет' },
-    professional: { available: true, isFree: false, label: 'Профессиональный', description: 'Скоро будет' },
-    inputType: 'none',
+    basic: { available: true, isFree: true, label: 'Базовый', description: 'Числа бизнеса, базовый разбор' },
+    professional: { available: true, isFree: false, label: 'Профессиональный', description: 'Полный профиль, риски, партнёрства, рекомендации' },
+    inputType: 'date',
     methodologies: ['2'],
-    comingSoon: true,
   },
   {
     id: 'name',
@@ -265,10 +264,9 @@ export const analysisConfigs: AnalysisTypeConfig[] = [
     description: 'Карта пути к самореализации',
     icon: 'Sparkles',
     basic: { available: false, isFree: false, label: 'Базовый', description: '' },
-    professional: { available: true, isFree: false, label: 'Профессиональный', description: 'Скоро будет' },
-    inputType: 'none',
+    professional: { available: true, isFree: false, label: 'Профессиональный', description: 'Полная карта пути, годовые точки, шаги' },
+    inputType: 'date',
     methodologies: ['2'],
-    comingSoon: true,
   },
 ];
 

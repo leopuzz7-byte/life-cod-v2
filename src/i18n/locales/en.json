@@ -87,8 +87,8 @@
       "business": {
         "title": "Business",
         "desc": "Business partnership analysis",
-        "basicDesc": "Coming soon",
-        "proDesc": "Coming soon",
+        "basicDesc": "Business numbers, basic analysis",
+        "proDesc": "Full profile, risks, partnerships, recommendations",
         "savedLabel": "Business"
       },
       "name": {
@@ -109,7 +109,7 @@
         "title": "Path to Success",
         "desc": "A map of the path to self-realization",
         "basicDesc": "",
-        "proDesc": "Coming soon",
+        "proDesc": "Full path map, yearly milestones, steps",
         "savedLabel": "Path to Success"
       }
     }
@@ -1537,5 +1537,39 @@
   "comingSoon": {
     "soon": "Coming soon",
     "inDevelopment": "This section is in development — stay tuned"
+  },
+  "business": {
+    "title": "Business Analysis",
+    "subtitleBasic": "Basic analysis — Mind and Action numbers",
+    "subtitlePro": "Full professional analysis",
+    "mindNumber": "Mind Number",
+    "actionNumber": "Action Number",
+    "mindInBusiness": "Your mind in business",
+    "actionInBusiness": "Action style",
+    "strengths": "Strengths",
+    "risks": "Risks",
+    "watchOut": "Watch out",
+    "yourType": "Your business profile",
+    "bestRoles": "Best roles in business",
+    "financialChannel": "Financial channel",
+    "psychotype": "Team psychotype",
+    "partnerCompatibility": "Business partnership"
+  },
+  "successPath": {
+    "title": "Path to Success",
+    "subtitle": "Personal realisation plan",
+    "yourType": "Your entrepreneur type",
+    "strengths": "Strengths",
+    "risks": "Risks",
+    "rightNow": "Right now",
+    "opportunityYear": "This is a year of opportunities — use it to the fullest",
+    "currentPeriod": "Your life period",
+    "businessTip": "Business tip for this period",
+    "threeYears": "Next 3 years",
+    "opportunity": "Opportunities",
+    "caution": "Caution",
+    "strategy": "Strategy right now",
+    "doNow": "Do",
+    "avoid": "Avoid"
   }
 }

@@ -87,8 +87,8 @@
       "business": {
         "title": "Negocios",
         "desc": "Análisis de asociación empresarial",
-        "basicDesc": "Próximamente",
-        "proDesc": "Próximamente",
+        "basicDesc": "Números del negocio, análisis básico",
+        "proDesc": "Perfil completo, riesgos, asociaciones, recomendaciones",
         "savedLabel": "Negocios"
       },
       "name": {
@@ -109,7 +109,7 @@
         "title": "Camino al Éxito",
         "desc": "Un mapa del camino hacia la autorrealización",
         "basicDesc": "",
-        "proDesc": "Próximamente",
+        "proDesc": "Mapa completo del camino, hitos anuales, pasos",
         "savedLabel": "Camino al Éxito"
       }
     }
@@ -1556,5 +1556,39 @@
   "comingSoon": {
     "soon": "Próximamente",
     "inDevelopment": "Esta sección está en desarrollo — mantente atento"
+  },
+  "business": {
+    "title": "Análisis de Negocios",
+    "subtitleBasic": "Análisis básico — números de la Mente y la Acción",
+    "subtitlePro": "Análisis profesional completo",
+    "mindNumber": "Número de la Mente",
+    "actionNumber": "Número de la Acción",
+    "mindInBusiness": "Tu mente en los negocios",
+    "actionInBusiness": "Estilo de acción",
+    "strengths": "Fortalezas",
+    "risks": "Riesgos",
+    "watchOut": "Presta atención",
+    "yourType": "Tu perfil empresarial",
+    "bestRoles": "Mejores roles en negocios",
+    "financialChannel": "Canal financiero",
+    "psychotype": "Psicotipo en el equipo",
+    "partnerCompatibility": "Sociedad empresarial"
+  },
+  "successPath": {
+    "title": "Camino al Éxito",
+    "subtitle": "Plan personal de realización",
+    "yourType": "Tu tipo de emprendedor",
+    "strengths": "Fortalezas",
+    "risks": "Riesgos",
+    "rightNow": "Ahora mismo",
+    "opportunityYear": "Este es un año de oportunidades — aprovéchalo al máximo",
+    "currentPeriod": "Tu período de vida",
+    "businessTip": "Consejo de negocios para este período",
+    "threeYears": "Próximos 3 años",
+    "opportunity": "Oportunidades",
+    "caution": "Precaución",
+    "strategy": "Estrategia ahora mismo",
+    "doNow": "Haz",
+    "avoid": "Evita"
   }
 }
