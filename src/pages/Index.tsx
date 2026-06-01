@@ -122,6 +122,7 @@ const Index = () => {
         localStorage.removeItem("pendingCalcData");
         if (d.methodology) setSelectedMethodology(d.methodology as "1" | "2");
         if (d.method) setSelectedMethod(d.method);
+        if (d.tier) setSelectedTier(d.tier as TierType);
         setPendingCalcArgs(d);
         sessionStorage.removeItem("pending_method_id");
         setPaymentStatus("paid");
@@ -267,7 +268,7 @@ const Index = () => {
     // If professional tier and not yet paid — save data and show payment screen
     if (selectedTier === 'professional' && paymentStatus !== 'paid') {
       setPendingCalcArgs({ day, month, year, name, targetMonth, targetYear, gender, targetDay });
-      localStorage.setItem("pendingCalcData", JSON.stringify({ day, month, year, name, targetMonth, targetYear, gender, targetDay, method: selectedMethod, methodology: selectedMethodology }));
+      localStorage.setItem("pendingCalcData", JSON.stringify({ day, month, year, name, targetMonth, targetYear, gender, targetDay, method: selectedMethod, methodology: selectedMethodology, tier: selectedTier }));
       setPaymentStatus("pending");
       return;
     }
@@ -505,6 +506,7 @@ const Index = () => {
           <div className="container mx-auto px-4 py-6 md:py-8">
             <PaymentScreen
               methodId={selectedMethod}
+              tier={selectedTier}
               onPaid={handlePaymentSuccess}
               onBack={handlePaymentBack}
             />
