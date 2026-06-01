@@ -1,0 +1,21 @@
+name: Claude Deploy
+
+on:
+  repository_dispatch:
+    types: [claude-deploy]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+      
+      - name: Apply changes and push
+        run: |
+          git config user.email "claude@deploy.bot"
+          git config user.name "Claude Deploy Bot"
+          git add -A
+          git diff --staged --quiet || git commit -m "${{ github.event.client_payload.message }}"
+          git push
