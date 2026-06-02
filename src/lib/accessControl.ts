@@ -14,32 +14,20 @@ interface AccessContextType {
   unlock: () => void;
   lock: () => void;
   startPayment: () => void;
-  isDevMode: boolean;
-  toggleDevMode: () => void;
 }
 
 const AccessContext = createContext<AccessContextType | null>(null);
 
 export function AccessProvider({ children }: { children: ReactNode }) {
   const [accessState, setAccessState] = useState<AccessState>('locked');
-  const [isDevMode, setIsDevMode] = useState(() => {
-    return localStorage.getItem('lifecod-dev-mode') === 'true';
-  });
 
   const unlock = useCallback(() => setAccessState('unlocked'), []);
   const lock = useCallback(() => setAccessState('locked'), []);
   const startPayment = useCallback(() => setAccessState('payment_pending'), []);
-  const toggleDevMode = useCallback(() => {
-    setIsDevMode(prev => {
-      const next = !prev;
-      localStorage.setItem('lifecod-dev-mode', String(next));
-      return next;
-    });
-  }, []);
 
   return createElement(
     AccessContext.Provider,
-    { value: { accessState, unlock, lock, startPayment, isDevMode, toggleDevMode } },
+    { value: { accessState, unlock, lock, startPayment } },
     children
   );
 }

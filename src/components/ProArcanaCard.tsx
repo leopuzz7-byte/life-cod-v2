@@ -24,6 +24,21 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
       isReversed && !isMirror && "border-destructive/50 bg-destructive/5",
       !isMirror && !isReversed && "border-border bg-card"
     )}>
+      {/* Вводный блок позиции — всегда виден */}
+      {interpretation.positionIntro && (
+        <div className="px-4 pt-4 pb-3 border-b border-border/50">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wide text-primary">
+              {t("res.arcanaCard.position", { n: interpretation.position })} · {interpretation.positionTitle}
+            </span>
+            {interpretation.ageRange && (
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{interpretation.ageRange}</span>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed">{interpretation.positionIntro}</p>
+        </div>
+      )}
+
       {/* Header */}
       <div className="p-4 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="flex items-start justify-between gap-3">
@@ -38,10 +53,7 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
               <span className="text-[10px] font-normal text-muted-foreground">{interpretation.position}</span>
             </div>
             <div>
-              <div className="text-xs text-muted-foreground mb-0.5">
-                {t("res.arcanaCard.position", { n: interpretation.position })}: {interpretation.positionTitle}
-              </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-display font-semibold text-foreground">{arcana.name}</h3>
                 {isMirror && (
                   <span className="flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full">
@@ -79,6 +91,16 @@ export function ProArcanaCard({ interpretation, isMirror = false, isReversed = f
                 <Target className="w-4 h-4 text-primary" /> {t("res.arcanaCard.lifeManifest")}
               </h4>
               <p className="text-sm text-muted-foreground leading-relaxed">{interpretation.lifeManifestations}</p>
+            </div>
+          )}
+
+          {/* Примеры из жизни */}
+          {interpretation.lifeExamples && (
+            <div className="bg-primary/5 border border-primary/15 rounded-lg p-3">
+              <h4 className="text-sm font-medium text-foreground mb-1 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-primary" /> Как это проявляется у вас
+              </h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">{interpretation.lifeExamples}</p>
             </div>
           )}
 

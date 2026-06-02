@@ -192,8 +192,9 @@ const Index = () => {
       person2Name, person2Day, person2Month, person2Year,
       relationType,
     };
-    // Gate professional tier behind payment
-    if (selectedTier === 'professional' && paymentStatus !== 'paid') {
+    // Показываем оплату если цена > 0 (и не владелец)
+    const lifecodPrice = selectedTier === 'professional' ? methodPrices?.price_pro : methodPrices?.price_basic;
+    if (lifecodPrice != null && lifecodPrice > 0 && paymentStatus !== 'paid' && !isOwner) {
       setPendingLifeCodArgs({ p1Name: person1Name, p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p2Name: person2Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, relationType });
       sessionStorage.setItem("pendingLifeCodData", JSON.stringify({ p1Name: person1Name, p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p2Name: person2Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, relationType, method: selectedMethod, methodology: selectedMethodology }));
       setPaymentStatus("pending");
@@ -266,8 +267,9 @@ const Index = () => {
     // Запоминаем входные данные — используются для сохранения в БД
     lastInputRef.current = { day, month, year, name, targetMonth, targetYear, gender, targetDay };
 
-    // If professional tier and not yet paid — save data and show payment screen
-    if (selectedTier === 'professional' && paymentStatus !== 'paid') {
+    // Показываем экран оплаты если цена > 0 для выбранного тира (и не владелец)
+    const priceForTier = selectedTier === 'professional' ? methodPrices?.price_pro : methodPrices?.price_basic;
+    if (priceForTier != null && priceForTier > 0 && paymentStatus !== 'paid' && !isOwner) {
       setPendingCalcArgs({ day, month, year, name, targetMonth, targetYear, gender, targetDay });
       localStorage.setItem("pendingCalcData", JSON.stringify({ day, month, year, name, targetMonth, targetYear, gender, targetDay, method: selectedMethod, methodology: selectedMethodology, tier: selectedTier }));
       setPaymentStatus("pending");
@@ -367,8 +369,9 @@ const Index = () => {
       person1Day, person1Month, person1Year, person1Name,
       person2Day, person2Month, person2Year, person2Name,
     };
-    // Gate professional tier behind payment
-    if (selectedTier === 'professional' && paymentStatus !== 'paid') {
+    // Показываем оплату если цена > 0 (и не владелец)
+    const compatPrice = selectedTier === 'professional' ? methodPrices?.price_pro : methodPrices?.price_basic;
+    if (compatPrice != null && compatPrice > 0 && paymentStatus !== 'paid' && !isOwner) {
       setPendingCompatArgs({ p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p1Name: person1Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, p2Name: person2Name });
       sessionStorage.setItem("pendingCompatData", JSON.stringify({ p1Day: person1Day, p1Month: person1Month, p1Year: person1Year, p1Name: person1Name, p2Day: person2Day, p2Month: person2Month, p2Year: person2Year, p2Name: person2Name, method: selectedMethod, methodology: selectedMethodology }));
       setPaymentStatus("pending");
@@ -381,7 +384,9 @@ const Index = () => {
     setResult({ type: "compatibility", data: compatResult });
   };
 
-  const { lock, isDevMode, toggleDevMode } = useAccess();
+  const { lock } = useAccess();
+  const OWNER_EMAIL = "leo.puzz7@gmail.com";
+  const isOwner = user?.email === OWNER_EMAIL;
   const { prices: methodPrices } = useMethodPrice(selectedMethod);
 
   const handleReset = () => {
@@ -838,22 +843,7 @@ const Index = () => {
           </>
         ) : (
           <div className="container mx-auto px-4 py-6 md:py-8">
-            {/* Dev mode toggle */}
-            <div className="flex justify-end mb-2">
-              <button
-                type="button"
-                onClick={toggleDevMode}
-                className={cn(
-                  "text-xs px-3 py-1 rounded-full border transition-colors",
-                  isDevMode
-                    ? "bg-primary/10 border-primary text-primary"
-                    : "bg-muted border-border text-muted-foreground hover:border-primary/50"
-                )}
-              >
-                {isDevMode ? "🔧 DEV ON" : "🔧 DEV"}
-              </button>
-            </div>
-            {result.type === "year" && (
+              {result.type === "year" && (
               <YearForecastResult
                 forecast={result.data}
                 name={userName}

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, AlertCircle, LogOut, KeyRound } from "lucide-react";
+import { Loader2, AlertCircle, LogOut, KeyRound, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -157,15 +157,24 @@ function ProfileNotFoundRecovery() {
 export default function Profile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { profile, profileFetched, profileError, signOut, resetPassword, updateProfile, refreshProfile, loading } = useAuth();
+  const { profile, profileFetched, profileError, signOut, updatePassword, updateProfile, refreshProfile, loading } = useAuth();
 
   const [name, setName] = useState(profile?.name || "");
   const [day, setDay] = useState(profile ? String(profile.birth_day) : "");
   const [month, setMonth] = useState(profile ? String(profile.birth_month) : "");
   const [year, setYear] = useState(profile ? String(profile.birth_year) : "");
   const [saving, setSaving] = useState(false);
-  const [sendingReset, setSendingReset] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Смена пароля
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   if (loading || !profileFetched) {
     return (
@@ -206,16 +215,34 @@ export default function Profile() {
     toast.success(t("profile.updated"));
   };
 
-  const handleSendResetLink = async () => {
-    setSendingReset(true);
-    const { error: resetError } = await resetPassword(profile.email);
-    setSendingReset(false);
+  const handleChangePassword = async () => {
+    setPasswordError(null);
+    if (!oldPassword) return setPasswordError("Введите текущий пароль");
+    if (!newPassword) return setPasswordError("Введите новый пароль");
+    if (newPassword.length < 6) return setPasswordError("Новый пароль должен быть минимум 6 символов");
+    if (newPassword !== confirmPassword) return setPasswordError("Новые пароли не совпадают");
+    if (oldPassword === newPassword) return setPasswordError("Новый пароль должен отличаться от текущего");
 
-    if (resetError) {
-      toast.error(resetError);
-      return;
+    setChangingPassword(true);
+    // Проверяем старый пароль через повторный вход
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: profile.email,
+      password: oldPassword,
+    });
+    if (signInError) {
+      setChangingPassword(false);
+      return setPasswordError("Текущий пароль неверный");
     }
-    toast.success(t("profile.resetSent"));
+    // Устанавливаем новый пароль
+    const { error: updateError } = await updatePassword(newPassword);
+    setChangingPassword(false);
+    if (updateError) {
+      return setPasswordError(updateError);
+    }
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    toast.success("Пароль успешно изменён");
   };
 
   const handleSignOut = async () => {
@@ -302,18 +329,72 @@ export default function Profile() {
 
           {/* Security */}
           <div className="gradient-card rounded-2xl p-6 md:p-8 border border-border mb-4 space-y-4">
-            <h2 className="font-display text-xl text-foreground mb-1">{t("profile.security")}</h2>
-            <p className="text-sm text-muted-foreground">
-              {t("profile.resetHint1")} <span className="font-medium text-foreground">{profile.email}</span> {t("profile.resetHint2")}
-            </p>
+            <h2 className="font-display text-xl text-foreground mb-1 flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-primary" /> {t("profile.security")}
+            </h2>
+
+            {passwordError && (
+              <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
+                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>{passwordError}</span>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label>Текущий пароль</Label>
+              <div className="relative">
+                <Input
+                  type={showOld ? "text" : "password"}
+                  value={oldPassword}
+                  onChange={e => setOldPassword(e.target.value)}
+                  disabled={changingPassword}
+                  placeholder="Введите текущий пароль"
+                />
+                <button type="button" onClick={() => setShowOld(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  {showOld ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Новый пароль</Label>
+              <div className="relative">
+                <Input
+                  type={showNew ? "text" : "password"}
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  disabled={changingPassword}
+                  placeholder="Минимум 6 символов"
+                />
+                <button type="button" onClick={() => setShowNew(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Повторите новый пароль</Label>
+              <div className="relative">
+                <Input
+                  type={showConfirm ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  disabled={changingPassword}
+                  placeholder="Повторите новый пароль"
+                />
+                <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
             <Button
-              variant="outline"
-              onClick={handleSendResetLink}
-              disabled={sendingReset}
+              onClick={handleChangePassword}
+              disabled={changingPassword || !oldPassword || !newPassword || !confirmPassword}
               className="w-full h-11 rounded-full"
             >
-              {sendingReset ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <KeyRound className="w-4 h-4 mr-2" />}
-              {t("profile.changePassword")}
+              {changingPassword && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Сменить пароль
             </Button>
           </div>
 

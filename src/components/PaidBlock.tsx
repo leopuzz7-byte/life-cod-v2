@@ -1,4 +1,4 @@
-import { Lock, Crown, Loader2, CheckCircle, ShieldCheck } from "lucide-react";
+import { Lock, Crown, Loader2, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,7 @@ interface PaidBlockProps {
 }
 
 export function PaidBlock({ children, isLocked, title, description, features, className }: PaidBlockProps) {
-  const { accessState, unlock, startPayment, isDevMode } = useAccess();
+  const { accessState, startPayment } = useAccess();
 
   // If not locked OR access is unlocked → show content
   if (!isLocked || accessState === 'unlocked') {
@@ -39,8 +39,6 @@ export function PaidBlock({ children, isLocked, title, description, features, cl
             description={description}
             features={features}
             onPurchase={startPayment}
-            onTestUnlock={unlock}
-            isDevMode={isDevMode}
           />
         </div>
       </div>
@@ -49,16 +47,16 @@ export function PaidBlock({ children, isLocked, title, description, features, cl
 }
 
 /** Блок paywall, встроенный в результат (не overlay, а inline) */
-export function InlinePaywall({ 
-  title, 
-  description, 
+export function InlinePaywall({
+  title,
+  description,
   features,
-}: { 
-  title?: string; 
-  description?: string; 
+}: {
+  title?: string;
+  description?: string;
   features?: string[];
 }) {
-  const { accessState, unlock, startPayment, isDevMode } = useAccess();
+  const { accessState, startPayment } = useAccess();
 
   if (accessState === 'unlocked') return null;
 
@@ -70,8 +68,6 @@ export function InlinePaywall({
         description={description}
         features={features}
         onPurchase={startPayment}
-        onTestUnlock={unlock}
-        isDevMode={isDevMode}
       />
     </div>
   );
@@ -83,16 +79,12 @@ function PaywallContent({
   description,
   features,
   onPurchase,
-  onTestUnlock,
-  isDevMode,
 }: {
   state: AccessState;
   title?: string;
   description?: string;
   features?: string[];
   onPurchase: () => void;
-  onTestUnlock: () => void;
-  isDevMode: boolean;
 }) {
   const { t } = useTranslation();
   if (state === 'payment_pending') {
@@ -147,18 +139,6 @@ function PaywallContent({
         {t("paywall.instant")}
       </p>
 
-      {/* Dev mode test button */}
-      {isDevMode && (
-        <Button
-          onClick={onTestUnlock}
-          variant="outline"
-          size="sm"
-          className="mt-3 border-dashed border-primary/50 text-primary"
-        >
-          <ShieldCheck className="w-3 h-3 mr-1" />
-          {t("paywall.devUnlock")}
-        </Button>
-      )}
     </>
   );
 }
@@ -166,7 +146,7 @@ function PaywallContent({
 /** Маркетинговый CTA-блок */
 export function ActivationBanner({ score = 37 }: { score?: number }) {
   const { t } = useTranslation();
-  const { unlock, startPayment, isDevMode } = useAccess();
+  const { startPayment } = useAccess();
 
   return (
     <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/20 rounded-2xl p-6 text-center space-y-4">
@@ -183,11 +163,6 @@ export function ActivationBanner({ score = 37 }: { score?: number }) {
       <Button size="lg" className="bg-primary text-primary-foreground" onClick={startPayment}>
         <Crown className="w-4 h-4 mr-2" /> {t("paywall.buyFull")}
       </Button>
-      {isDevMode && (
-        <Button variant="outline" size="sm" onClick={unlock} className="border-dashed border-primary/50 text-primary">
-          <ShieldCheck className="w-3 h-3 mr-1" /> {t("paywall.devUnlock")}
-        </Button>
-      )}
     </div>
   );
 }
