@@ -423,6 +423,10 @@ const Index = () => {
       const resolvedMethod = pendingCalcArgs.method || selectedMethod;
       const resolvedMethodology = pendingCalcArgs.methodology || selectedMethodology;
       const resolvedTier = pendingCalcArgs.tier || selectedTier;
+      // Синхронизируем state — нужно чтобы автосохранение записало правильный method_id/tier
+      setSelectedMethod(resolvedMethod);
+      setSelectedMethodology(resolvedMethodology as "1" | "2");
+      setSelectedTier(resolvedTier);
       setUserName(name);
 
       // Methodology 2 — main "Predназначение" (classic-full) routes to keyto/unified
