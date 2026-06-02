@@ -91,6 +91,7 @@ const Index = () => {
   const [pendingCalcArgs, setPendingCalcArgs] = useState<{
     day: number; month: number; year: number; name: string;
     targetMonth?: number; targetYear?: number; gender?: 'male' | 'female'; targetDay?: number;
+    method?: string; methodology?: string; tier?: TierType;
   } | null>(null);
   const [pendingCompatArgs, setPendingCompatArgs] = useState<{
     p1Day: number; p1Month: number; p1Year: number; p1Name: string;
@@ -417,11 +418,16 @@ const Index = () => {
 
     if (pendingCalcArgs) {
       const { day, month, year, name, targetMonth, targetYear, gender, targetDay } = pendingCalcArgs;
+      // Используем method/methodology/tier из сохранённых данных, а не из state —
+      // это защита от гонки useEffect при монтировании страницы после редиректа с оплаты.
+      const resolvedMethod = pendingCalcArgs.method || selectedMethod;
+      const resolvedMethodology = pendingCalcArgs.methodology || selectedMethodology;
+      const resolvedTier = pendingCalcArgs.tier || selectedTier;
       setUserName(name);
 
       // Methodology 2 — main "Predназначение" (classic-full) routes to keyto/unified
-      if (selectedMethodology === "2" && selectedMethod === "classic-full") {
-        if (selectedTier === 'professional') {
+      if (resolvedMethodology === "2" && resolvedMethod === "classic-full") {
+        if (resolvedTier === 'professional') {
           const unifiedResult = calculateUnifiedPersonalAnalysis(name || "Вы", day, month, year, targetYear || new Date().getFullYear());
           setResult({ type: "unified-personal", data: unifiedResult });
           return;
@@ -431,7 +437,7 @@ const Index = () => {
         return;
       }
 
-      switch (selectedMethod) {
+      switch (resolvedMethod) {
         case "year":
           setResult({ type: "year", data: calculateYearForecast(day, month, year, targetYear || new Date().getFullYear()) });
           break;
@@ -451,7 +457,7 @@ const Index = () => {
           setResult({ type: "ancestral", data: calculateAncestralPrograms(day, month, year, gender || 'female') });
           break;
         case "business": {
-          const isProTier = selectedTier === 'professional';
+          const isProTier = resolvedTier === 'professional';
           setResult({ type: "business", data: isProTier ? calculateBusinessPro(day, month, year) : calculateBusinessBasic(day, month, year), isPro: isProTier });
           break;
         }
