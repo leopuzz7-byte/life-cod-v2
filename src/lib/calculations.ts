@@ -31,8 +31,8 @@ export interface CompatibilityResult {
   person1: {
     name: string;
     birthDate: { day: number; month: number; year: number };
-    destinyArcana: number; // Аркан предназначения (позиция 4)
-    soulArcana: number; // Аркан души (позиция 1)
+    destinyArcana: number;
+    soulArcana: number;
   };
   person2: {
     name: string;
@@ -40,13 +40,18 @@ export interface CompatibilityResult {
     destinyArcana: number;
     soulArcana: number;
   };
-  // Арканы совместимости
-  unionArcana: number; // Аркан союза (сумма арканов предназначения)
-  karmaArcana: number; // Кармический аркан (разница арканов)
-  harmonyArcana: number; // Аркан гармонии (сумма арканов души)
-  compatibilityPercent: number; // Процент совместимости
-  strengths: string[]; // Сильные стороны союза
-  challenges: string[]; // Вызовы союза
+  unionArcana: number;
+  karmaArcana: number;
+  harmonyArcana: number;
+  compatibilityPercent: number;
+  strengths: string[];
+  challenges: string[];
+  // 5 матриц для профессионального разбора
+  matrix1?: PersonalMatrix;        // Личная матрица человека 1
+  matrix2?: PersonalMatrix;        // Личная матрица человека 2
+  unionMatrix?: PersonalMatrix;    // Общая матрица союза
+  cross1Matrix?: PersonalMatrix;   // Матрица человека 1 в отношениях
+  cross2Matrix?: PersonalMatrix;   // Матрица человека 2 в отношениях
 }
 
 // Базовые правила приведения числа к аркану (1-22)
@@ -411,6 +416,49 @@ export function calculateCompatibility(
   const strengths = getCompatibilityStrengths(unionArcana, harmonyArcana, destiny1, destiny2);
   const challenges = getCompatibilityChallenges(karmaArcana, soul1, soul2);
 
+  // === 5 МАТРИЦ ===
+  // Общая матрица союза: каждая позиция = нормализованная сумма позиций обоих
+  const unionPositions = matrix1.positions.map((p, i) =>
+    normalizeToArcana(p + matrix2.positions[i])
+  );
+  // Ключевые позиции общей матрицы — арканы союза/гармонии/кармы
+  unionPositions[1] = unionArcana;    // позиция 2 = аркан союза
+  unionPositions[5] = karmaArcana;    // позиция 6 = кармический аркан
+  unionPositions[2] = harmonyArcana;  // позиция 3 = аркан гармонии
+  const unionMatrix: PersonalMatrix = {
+    birthDate: matrix1.birthDate,
+    positions: unionPositions,
+    mirrorArcana: [],
+    reversedArcana: [],
+    successCode: [unionPositions[3], unionPositions[4], unionPositions[6], unionPositions[11]],
+  };
+
+  // Матрица человека 1 в отношениях: личная матрица + влияние партнёра
+  const cross1Positions = [...matrix1.positions];
+  cross1Positions[1] = normalizeToArcana(matrix1.positions[1] + matrix2.positions[3]); // внутр. суть + предназначение партнёра
+  cross1Positions[4] = normalizeToArcana(matrix1.positions[4] + unionArcana);           // проф. путь + аркан союза
+  cross1Positions[6] = normalizeToArcana(matrix1.positions[6] + harmonyArcana);         // цель жизни + гармония
+  const cross1Matrix: PersonalMatrix = {
+    birthDate: matrix1.birthDate,
+    positions: cross1Positions,
+    mirrorArcana: [],
+    reversedArcana: [],
+    successCode: [cross1Positions[3], cross1Positions[4], cross1Positions[6], cross1Positions[11]],
+  };
+
+  // Матрица человека 2 в отношениях: личная матрица + влияние партнёра
+  const cross2Positions = [...matrix2.positions];
+  cross2Positions[1] = normalizeToArcana(matrix2.positions[1] + matrix1.positions[3]);
+  cross2Positions[4] = normalizeToArcana(matrix2.positions[4] + unionArcana);
+  cross2Positions[6] = normalizeToArcana(matrix2.positions[6] + harmonyArcana);
+  const cross2Matrix: PersonalMatrix = {
+    birthDate: matrix2.birthDate,
+    positions: cross2Positions,
+    mirrorArcana: [],
+    reversedArcana: [],
+    successCode: [cross2Positions[3], cross2Positions[4], cross2Positions[6], cross2Positions[11]],
+  };
+
   return {
     person1: {
       name: person1Name || "Партнёр 1",
@@ -430,6 +478,11 @@ export function calculateCompatibility(
     compatibilityPercent,
     strengths,
     challenges,
+    matrix1,
+    matrix2,
+    unionMatrix,
+    cross1Matrix,
+    cross2Matrix,
   };
 }
 

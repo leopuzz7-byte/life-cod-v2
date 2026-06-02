@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Heart, Users, Sparkles, AlertTriangle, TrendingUp, Shield, MessageCircle, Wallet, Flame, CheckCircle, BookOpen, Zap, Brain, Target, ShieldAlert, Lightbulb } from "lucide-react";
-import { CompatibilityResult, formatBirthDate } from "@/lib/calculations";
-import { getArcana } from "@/lib/arcana";
+import { ArrowLeft, Heart, Users, Sparkles, AlertTriangle, TrendingUp, Shield, MessageCircle, Wallet, Flame, CheckCircle, BookOpen, Zap, Brain, Target, ShieldAlert, Lightbulb, Grid3X3 } from "lucide-react";
+import { CompatibilityResult, formatBirthDate, PersonalMatrix } from "@/lib/calculations";
+import { getArcana, positionDescriptions } from "@/lib/arcana";
 import { cn } from "@/lib/utils";
 import { PDFDownloadButton } from "./PDFDownloadButton";
 import { generatePDF, formatBirthDateForPDF } from "@/lib/pdfGenerator";
@@ -19,6 +20,7 @@ interface CompatibilityResultProps {
 export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }: CompatibilityResultProps) {
   const { t } = useTranslation();
   const isPro = tier === 'professional';
+  const [activeTab, setActiveTab] = useState<'analysis' | 'matrices'>('analysis');
 
   const unionArcana = getArcana(result.unionArcana);
   const harmonyArcana = getArcana(result.harmonyArcana);
@@ -94,6 +96,39 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
           {getCompatibilityLabel(result.compatibilityPercent)}
         </p>
       </div>
+
+      {/* Tab switcher — только для PRO */}
+      {isPro && (
+        <div className="flex gap-2 justify-center mb-6">
+          <button
+            onClick={() => setActiveTab('analysis')}
+            className={cn(
+              "px-5 py-2 rounded-full text-sm font-medium transition-all",
+              activeTab === 'analysis' ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+            )}
+          >
+            Разбор
+          </button>
+          <button
+            onClick={() => setActiveTab('matrices')}
+            className={cn(
+              "px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1.5",
+              activeTab === 'matrices' ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+            )}
+          >
+            <Grid3X3 className="w-4 h-4" /> Матрицы
+          </button>
+        </div>
+      )}
+
+      {/* === ВКЛ. МАТРИЦЫ === */}
+      {isPro && activeTab === 'matrices' && (
+        <CompatibilityMatrices result={result} />
+      )}
+
+      {/* === ВКЛ. РАЗБОР (весь существующий контент) === */}
+      {(!isPro || activeTab === 'analysis') && (
+      <>
 
       {/* Partners Info */}
       <div className="grid md:grid-cols-2 gap-4 mb-8">
@@ -365,6 +400,84 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
           </div>
         </>
       )}
+
+      </> /* конец обёртки вкладки "Разбор" */
+      )}
+    </div>
+  );
+}
+
+// ===== Компонент 5 матриц =====
+function MatrixGrid({ matrix, label }: { matrix: PersonalMatrix; label: string }) {
+  return (
+    <div className="gradient-card rounded-xl border border-border p-4">
+      <h3 className="font-display font-semibold text-foreground mb-4 text-center">{label}</h3>
+      <div className="flex flex-col items-center gap-2">
+        <div className="grid grid-cols-3 gap-2">
+          <MatrixCell pos={1} val={matrix.positions[0]} />
+          <MatrixCell pos={2} val={matrix.positions[1]} />
+          <MatrixCell pos={4} val={matrix.positions[3]} />
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <MatrixCell pos={3} val={matrix.positions[2]} />
+          <MatrixCell pos={5} val={matrix.positions[4]} />
+        </div>
+        <div className="flex justify-center">
+          <MatrixCell pos={6} val={matrix.positions[5]} />
+        </div>
+        <div className="grid grid-cols-3 gap-2 mt-2">
+          <MatrixCell pos={7} val={matrix.positions[6]} />
+          <MatrixCell pos={8} val={matrix.positions[7]} />
+          <MatrixCell pos={9} val={matrix.positions[8]} />
+        </div>
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-1.5">
+        {[1,2,3,4,5,6].map(pos => {
+          const arcana = getArcana(matrix.positions[pos - 1]);
+          return (
+            <div key={pos} className="text-center">
+              <span className="text-[10px] text-muted-foreground">{positionDescriptions[pos]?.title}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function MatrixCell({ pos, val }: { pos: number; val: number }) {
+  const arcana = getArcana(val);
+  return (
+    <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex flex-col items-center justify-center">
+      <span className="text-base font-display font-bold text-primary">{val}</span>
+      <span className="text-[9px] text-muted-foreground leading-none">{pos}</span>
+    </div>
+  );
+}
+
+function CompatibilityMatrices({ result }: { result: CompatibilityResult }) {
+  if (!result.matrix1 || !result.matrix2) return null;
+
+  const matrices = [
+    { matrix: result.matrix1, label: `Матрица предназначения — ${result.person1.name}` },
+    { matrix: result.matrix2, label: `Матрица предназначения — ${result.person2.name}` },
+    { matrix: result.unionMatrix!, label: "Общая матрица союза" },
+    { matrix: result.cross1Matrix!, label: `${result.person1.name} в отношениях` },
+    { matrix: result.cross2Matrix!, label: `${result.person2.name} в отношениях` },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-muted-foreground text-center">
+        Профессиональный разбор включает 5 матриц: личная матрица каждого партнёра, общая матрица союза и индивидуальная матрица каждого в контексте ваших отношений.
+      </p>
+      <div className="grid md:grid-cols-2 gap-4">
+        {matrices.map((m, i) => (
+          <div key={i} className={i === 2 ? "md:col-span-2" : ""}>
+            <MatrixGrid matrix={m.matrix} label={m.label} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
