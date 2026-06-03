@@ -631,7 +631,7 @@ function UnionMatrixBlock({ matrix, result }: { matrix: PersonalMatrix; result: 
       {result.cross1Matrix && result.cross2Matrix && (
         <div className="border-t border-amber-500/20 pt-4 space-y-3">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">🔄 Каждый в этих отношениях</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { matrix: result.cross1Matrix, name: result.person1.name },
               { matrix: result.cross2Matrix, name: result.person2.name },
