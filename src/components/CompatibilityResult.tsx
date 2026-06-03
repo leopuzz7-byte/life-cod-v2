@@ -409,65 +409,208 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
 
 // ===== Компонент 5 матриц =====
 
-function CMatrixCell({ position, value }: { position: number; value: number }) {
+function CMatrixCell({ position, value, highlight = false }: { position: number; value: number; highlight?: boolean }) {
   return (
-    <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-muted border border-border flex flex-col items-center justify-center">
-      <span className="text-xl font-display font-bold text-foreground">{value}</span>
+    <div className={cn(
+      "w-14 h-14 md:w-16 md:h-16 rounded-xl flex flex-col items-center justify-center transition-all",
+      highlight ? "bg-amber-500/20 border-2 border-amber-500/60" : "bg-muted border border-border"
+    )}>
+      <span className={cn("text-xl font-display font-bold", highlight ? "text-amber-600" : "text-foreground")}>{value}</span>
       <span className="text-[10px] text-muted-foreground">{position}</span>
     </div>
   );
 }
 
-function MatrixGrid({ matrix, label, subtitle, description }: {
+function PersonMatrix({ matrix, name, color, emoji, intro }: {
   matrix: PersonalMatrix;
-  label: string;
-  subtitle?: string;
-  description?: string;
+  name: string;
+  color: 'primary' | 'rose' | 'violet';
+  emoji: string;
+  intro: string;
 }) {
   const p = matrix.positions;
+  const borderClass = color === 'primary' ? 'border-primary/30' : color === 'rose' ? 'border-rose-400/30' : 'border-violet-400/30';
+  const bgClass = color === 'primary' ? 'bg-primary/5' : color === 'rose' ? 'bg-rose-500/5' : 'bg-violet-500/5';
+  const textClass = color === 'primary' ? 'text-primary' : color === 'rose' ? 'text-rose-500' : 'text-violet-500';
+  const badgeBg = color === 'primary' ? 'bg-primary/10 text-primary' : color === 'rose' ? 'bg-rose-500/10 text-rose-500' : 'bg-violet-500/10 text-violet-500';
+
+  const keyPositions = [
+    { pos: 2, label: "Внутренняя суть", icon: "✦" },
+    { pos: 4, label: "Цель мудрости", icon: "◈" },
+    { pos: 5, label: "Призвание", icon: "◉" },
+    { pos: 7, label: "Цель жизни", icon: "★" },
+  ];
+
   return (
-    <div className="gradient-card rounded-2xl border border-border p-5 space-y-4">
-      {/* Заголовок */}
-      <div className="text-center">
-        <h3 className="font-display font-semibold text-lg text-foreground">{label}</h3>
-        {subtitle && <p className="text-sm text-primary font-medium">{subtitle}</p>}
-        {description && <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{description}</p>}
+    <div className={cn("gradient-card rounded-2xl border p-5 md:p-6 space-y-5", borderClass)}>
+      {/* Шапка */}
+      <div className="flex items-center gap-3">
+        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-xl", bgClass)}>
+          {emoji}
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Матрица предназначения</p>
+          <h3 className={cn("font-display font-bold text-lg", textClass)}>{name}</h3>
+        </div>
       </div>
 
-      {/* Матрица — точно как в предназначении */}
-      <div className="flex flex-col items-center gap-2 py-2">
-        <div className="grid grid-cols-3 gap-2 md:gap-3">
-          <CMatrixCell position={1} value={p[0]} />
-          <CMatrixCell position={2} value={p[1]} />
-          <CMatrixCell position={4} value={p[3]} />
-        </div>
-        <div className="grid grid-cols-2 gap-2 md:gap-3">
-          <CMatrixCell position={3} value={p[2]} />
-          <CMatrixCell position={5} value={p[4]} />
-        </div>
-        <div className="flex justify-center">
+      <p className="text-sm text-muted-foreground leading-relaxed">{intro}</p>
+
+      {/* Матрица */}
+      <div className={cn("rounded-xl p-4 border", bgClass, borderClass)}>
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex gap-2">
+            <CMatrixCell position={1} value={p[0]} />
+            <CMatrixCell position={2} value={p[1]} />
+            <CMatrixCell position={4} value={p[3]} highlight />
+          </div>
+          <div className="flex gap-2">
+            <CMatrixCell position={3} value={p[2]} />
+            <CMatrixCell position={5} value={p[4]} />
+          </div>
           <CMatrixCell position={6} value={p[5]} />
-        </div>
-        <div className="w-full h-px bg-border/50 my-1" />
-        <div className="grid grid-cols-3 gap-2 md:gap-3">
-          <CMatrixCell position={7} value={p[6]} />
-          <CMatrixCell position={8} value={p[7]} />
-          <CMatrixCell position={9} value={p[8]} />
+          <div className="w-full h-px bg-border/40 my-1" />
+          <div className="flex gap-2">
+            <CMatrixCell position={7} value={p[6]} highlight />
+            <CMatrixCell position={8} value={p[7]} />
+            <CMatrixCell position={9} value={p[8]} />
+          </div>
         </div>
       </div>
 
-      {/* Легенда позиций */}
-      <div className="border-t border-border/50 pt-3 grid grid-cols-2 gap-x-4 gap-y-1">
-        {[1,2,3,4,5,6,7,8,9].map(pos => {
-          const arcana = getArcana(p[pos - 1]);
-          return (
-            <div key={pos} className="flex items-center gap-1.5 text-xs">
-              <span className="w-5 h-5 rounded bg-muted flex items-center justify-center text-foreground font-bold text-[10px] shrink-0">{pos}</span>
-              <span className="text-muted-foreground truncate">{positionDescriptions[pos]?.title} — <span className="text-foreground">{arcana?.name}</span></span>
-            </div>
-          );
-        })}
+      {/* Ключевые позиции */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">🔑 Ключевые позиции</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {keyPositions.map(({ pos, label, icon }) => {
+            const arcana = getArcana(p[pos - 1]);
+            return (
+              <div key={pos} className={cn("rounded-lg px-3 py-2 border flex items-center gap-2", bgClass, borderClass)}>
+                <span className={cn("text-base shrink-0", textClass)}>{icon}</span>
+                <div className="min-w-0">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{label}</p>
+                  <p className="text-sm font-medium text-foreground truncate">{p[pos - 1]} — {arcana?.name}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
+
+      {/* Профессии */}
+      {(() => {
+        const destinyArcana = getArcana(p[3]);
+        return destinyArcana?.professions?.length ? (
+          <div>
+            <p className="text-xs text-muted-foreground mb-2">💼 Сферы реализации</p>
+            <div className="flex flex-wrap gap-1.5">
+              {destinyArcana.professions.slice(0, 5).map((prof, i) => (
+                <span key={i} className={cn("text-xs px-2 py-0.5 rounded-full border", badgeBg, borderClass)}>{prof}</span>
+              ))}
+            </div>
+          </div>
+        ) : null;
+      })()}
+    </div>
+  );
+}
+
+function UnionMatrixBlock({ matrix, result }: { matrix: PersonalMatrix; result: CompatibilityResult }) {
+  const p = matrix.positions;
+  const unionArcana = getArcana(result.unionArcana);
+  const harmonyArcana = getArcana(result.harmonyArcana);
+  const karmaArcana = getArcana(result.karmaArcana);
+
+  return (
+    <div className="gradient-card rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 md:p-6 space-y-5">
+      {/* Шапка */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-xl">💫</div>
+        <div>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Общая матрица</p>
+          <h3 className="font-display font-bold text-lg text-amber-600">{result.person1.name} & {result.person2.name}</h3>
+        </div>
+      </div>
+
+      <p className="text-sm text-muted-foreground leading-relaxed">
+        Это не сложение двух матриц — это новая энергия, которая возникает между вами. То, чего нет у каждого по отдельности, но что рождается в этом союзе.
+      </p>
+
+      {/* Матрица */}
+      <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex gap-2">
+            <CMatrixCell position={1} value={p[0]} />
+            <CMatrixCell position={2} value={p[1]} highlight />
+            <CMatrixCell position={4} value={p[3]} />
+          </div>
+          <div className="flex gap-2">
+            <CMatrixCell position={3} value={p[2]} />
+            <CMatrixCell position={5} value={p[4]} />
+          </div>
+          <CMatrixCell position={6} value={p[5]} highlight />
+          <div className="w-full h-px bg-border/40 my-1" />
+          <div className="flex gap-2">
+            <CMatrixCell position={7} value={p[6]} />
+            <CMatrixCell position={8} value={p[7]} />
+            <CMatrixCell position={9} value={p[8]} />
+          </div>
+        </div>
+      </div>
+
+      {/* 3 ключевых аркана союза */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="rounded-xl bg-primary/10 border border-primary/20 p-3 text-center">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">❤️ Аркан союза</p>
+          <p className="text-2xl font-display font-bold text-primary">{result.unionArcana}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{unionArcana?.name}</p>
+        </div>
+        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3 text-center">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">🌿 Аркан гармонии</p>
+          <p className="text-2xl font-display font-bold text-emerald-600">{result.harmonyArcana}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{harmonyArcana?.name}</p>
+        </div>
+        <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 text-center">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">⚖️ Кармический аркан</p>
+          <p className="text-2xl font-display font-bold text-destructive">{result.karmaArcana}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{karmaArcana?.name}</p>
+        </div>
+      </div>
+
+      {/* Дополнительные матрицы в отношениях */}
+      {result.cross1Matrix && result.cross2Matrix && (
+        <div className="border-t border-amber-500/20 pt-4 space-y-3">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">🔄 Каждый в этих отношениях</p>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { matrix: result.cross1Matrix, name: result.person1.name },
+              { matrix: result.cross2Matrix, name: result.person2.name },
+            ].map(({ matrix: m, name }, idx) => (
+              <div key={idx} className="rounded-xl bg-amber-500/5 border border-amber-500/20 p-3">
+                <p className="text-xs font-medium text-amber-600 mb-2 text-center">{name}</p>
+                <div className="flex flex-col items-center gap-1.5">
+                  <div className="flex gap-1.5">
+                    <CMatrixCell position={1} value={m.positions[0]} />
+                    <CMatrixCell position={2} value={m.positions[1]} />
+                    <CMatrixCell position={4} value={m.positions[3]} />
+                  </div>
+                  <div className="flex gap-1.5">
+                    <CMatrixCell position={3} value={m.positions[2]} />
+                    <CMatrixCell position={5} value={m.positions[4]} />
+                  </div>
+                  <CMatrixCell position={6} value={m.positions[5]} />
+                  <div className="w-full h-px bg-border/30 my-0.5" />
+                  <div className="flex gap-1.5">
+                    <CMatrixCell position={7} value={m.positions[6]} />
+                    <CMatrixCell position={8} value={m.positions[7]} />
+                    <CMatrixCell position={9} value={m.positions[8]} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -475,50 +618,52 @@ function MatrixGrid({ matrix, label, subtitle, description }: {
 function CompatibilityMatrices({ result }: { result: CompatibilityResult }) {
   if (!result.matrix1 || !result.matrix2) return null;
 
+  const p1 = result.person1;
+  const p2 = result.person2;
+
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-1">
+      {/* Вводный текст */}
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-center">
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Профессиональный разбор включает <strong className="text-foreground">5 матриц</strong>: личное предназначение каждого партнёра, общая матрица союза и то, как каждый раскрывается именно в этих отношениях.
+          ✨ <strong className="text-foreground">5 матриц</strong> — это полный энергетический портрет вашей пары. Начнём с каждого по отдельности, потом посмотрим что рождается между вами.
         </p>
       </div>
 
-      {/* 1-2: Личные матрицы */}
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Личные матрицы предназначения</p>
-        <div className="grid md:grid-cols-2 gap-4">
-          <MatrixGrid matrix={result.matrix1} label="Матрица предназначения" subtitle={result.person1.name} description="Личная энергетическая карта — базовые качества, таланты и жизненный путь" />
-          <MatrixGrid matrix={result.matrix2} label="Матрица предназначения" subtitle={result.person2.name} description="Личная энергетическая карта — базовые качества, таланты и жизненный путь" />
-        </div>
+      {/* 1. Матрица первого */}
+      <PersonMatrix
+        matrix={result.matrix1}
+        name={p1.name}
+        color="primary"
+        emoji="🌟"
+        intro={`Матрица предназначения ${p1.name} показывает, кто этот человек на самом деле — его внутреннюю суть, таланты, жизненный путь и то, к чему он движется. Именно это он несёт в ваши отношения.`}
+      />
+
+      {/* Разделитель */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-muted-foreground text-sm px-2">и</span>
+        <div className="flex-1 h-px bg-border" />
       </div>
 
-      {/* 3: Общая матрица */}
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Общая матрица союза</p>
-        <MatrixGrid
-          matrix={result.unionMatrix!}
-          label="Общая матрица союза"
-          subtitle={`${result.person1.name} & ${result.person2.name}`}
-          description="Объединённая энергетика пары — то, что рождается между вами, чего нет у каждого по отдельности"
-        />
+      {/* 2. Матрица второго */}
+      <PersonMatrix
+        matrix={result.matrix2}
+        name={p2.name}
+        color="rose"
+        emoji="🌹"
+        intro={`Матрица предназначения ${p2.name} — энергетика, характер, путь этого человека. То, как он воспринимает мир, что ищет, к чему стремится и что привносит в эти отношения.`}
+      />
+
+      {/* Разделитель */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-muted-foreground text-sm px-2">вместе</span>
+        <div className="flex-1 h-px bg-border" />
       </div>
 
-      {/* 4-5: Матрицы в отношениях */}
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Индивидуальные матрицы в паре</p>
-        <div className="grid md:grid-cols-2 gap-4">
-          <MatrixGrid
-            matrix={result.cross1Matrix!}
-            label={`${result.person1.name} в этих отношениях`}
-            description="Как личность и энергия раскрывается именно в этой паре"
-          />
-          <MatrixGrid
-            matrix={result.cross2Matrix!}
-            label={`${result.person2.name} в этих отношениях`}
-            description="Как личность и энергия раскрывается именно в этой паре"
-          />
-        </div>
-      </div>
+      {/* 3. Общая матрица + кросс-матрицы */}
+      <UnionMatrixBlock matrix={result.unionMatrix!} result={result} />
     </div>
   );
 }
