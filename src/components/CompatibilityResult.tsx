@@ -421,31 +421,33 @@ function CMatrixCell({ position, value, highlight = false }: { position: number;
   );
 }
 
-function PersonMatrix({ matrix, name, color, emoji, intro }: {
+function PersonMatrix({ matrix, name, color, emoji }: {
   matrix: PersonalMatrix;
   name: string;
-  color: 'primary' | 'rose' | 'violet';
+  color: 'primary' | 'rose';
   emoji: string;
-  intro: string;
 }) {
   const p = matrix.positions;
-  const borderClass = color === 'primary' ? 'border-primary/30' : color === 'rose' ? 'border-rose-400/30' : 'border-violet-400/30';
-  const bgClass = color === 'primary' ? 'bg-primary/5' : color === 'rose' ? 'bg-rose-500/5' : 'bg-violet-500/5';
-  const textClass = color === 'primary' ? 'text-primary' : color === 'rose' ? 'text-rose-500' : 'text-violet-500';
-  const badgeBg = color === 'primary' ? 'bg-primary/10 text-primary' : color === 'rose' ? 'bg-rose-500/10 text-rose-500' : 'bg-violet-500/10 text-violet-500';
+  const isRose = color === 'rose';
+  const borderClass = isRose ? 'border-rose-300/30' : 'border-primary/30';
+  const bgClass = isRose ? 'bg-rose-400/5' : 'bg-primary/5';
+  const textClass = isRose ? 'text-rose-400' : 'text-primary';
+  const badgeBg = isRose ? 'bg-rose-400/10 text-rose-400' : 'bg-primary/10 text-primary';
 
-  const keyPositions = [
-    { pos: 2, label: "Внутренняя суть", icon: "✦" },
-    { pos: 4, label: "Цель мудрости", icon: "◈" },
-    { pos: 5, label: "Призвание", icon: "◉" },
-    { pos: 7, label: "Цель жизни", icon: "★" },
-  ];
+  const soulArcana = getArcana(p[0]);       // поз. 1 — детство/душа
+  const innerArcana = getArcana(p[1]);      // поз. 2 — внутренняя суть
+  const socialArcana = getArcana(p[2]);     // поз. 3 — таланты/социум
+  const destinyArcana = getArcana(p[3]);    // поз. 4 — цель мудрости
+  const profArcana = getArcana(p[4]);       // поз. 5 — призвание
+  const supportArcana = getArcana(p[5]);    // поз. 6 — точка опоры
+  const goalArcana = getArcana(p[6]);       // поз. 7 — цель жизни
+  const toolArcana = getArcana(p[7]);       // поз. 8 — инструмент
 
   return (
     <div className={cn("gradient-card rounded-2xl border p-5 md:p-6 space-y-5", borderClass)}>
       {/* Шапка */}
       <div className="flex items-center gap-3">
-        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-xl", bgClass)}>
+        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0", bgClass)}>
           {emoji}
         </div>
         <div>
@@ -454,23 +456,35 @@ function PersonMatrix({ matrix, name, color, emoji, intro }: {
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground leading-relaxed">{intro}</p>
+      {/* Живой вводный текст — конкретный */}
+      <div className={cn("rounded-xl p-4 border text-sm text-muted-foreground leading-relaxed space-y-2", bgClass, borderClass)}>
+        <p>
+          В основе личности {name} — аркан <strong className="text-foreground">{p[1]} «{innerArcana?.name}»</strong> (внутренняя суть). {innerArcana?.personalDescription?.split('.')[0]}.
+        </p>
+        <p>
+          Главная цель жизни — аркан <strong className="text-foreground">{p[6]} «{goalArcana?.name}»</strong>. {goalArcana?.personalDescription?.split('.')[0]}.
+        </p>
+        <p>
+          В отношения {name} привносит энергию аркана <strong className="text-foreground">{p[2]} «{socialArcana?.name}»</strong> — именно так этот человек проявляется в контакте с другими.
+        </p>
+      </div>
 
       {/* Матрица */}
       <div className={cn("rounded-xl p-4 border", bgClass, borderClass)}>
+        <p className="text-[11px] text-muted-foreground text-center mb-3 uppercase tracking-wide">Матрица позиций</p>
         <div className="flex flex-col items-center gap-2">
-          <div className="flex gap-2">
+          <div className="flex gap-2 md:gap-3">
             <CMatrixCell position={1} value={p[0]} />
-            <CMatrixCell position={2} value={p[1]} />
-            <CMatrixCell position={4} value={p[3]} highlight />
+            <CMatrixCell position={2} value={p[1]} highlight />
+            <CMatrixCell position={4} value={p[3]} />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 md:gap-3">
             <CMatrixCell position={3} value={p[2]} />
             <CMatrixCell position={5} value={p[4]} />
           </div>
           <CMatrixCell position={6} value={p[5]} />
           <div className="w-full h-px bg-border/40 my-1" />
-          <div className="flex gap-2">
+          <div className="flex gap-2 md:gap-3">
             <CMatrixCell position={7} value={p[6]} highlight />
             <CMatrixCell position={8} value={p[7]} />
             <CMatrixCell position={9} value={p[8]} />
@@ -478,39 +492,49 @@ function PersonMatrix({ matrix, name, color, emoji, intro }: {
         </div>
       </div>
 
-      {/* Ключевые позиции */}
+      {/* 4 ключевые позиции с конкретными описаниями */}
       <div className="space-y-2">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">🔑 Ключевые позиции</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {keyPositions.map(({ pos, label, icon }) => {
-            const arcana = getArcana(p[pos - 1]);
-            return (
-              <div key={pos} className={cn("rounded-lg px-3 py-2 border flex items-center gap-2", bgClass, borderClass)}>
-                <span className={cn("text-base shrink-0", textClass)}>{icon}</span>
-                <div className="min-w-0">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{label}</p>
-                  <p className="text-sm font-medium text-foreground truncate">{p[pos - 1]} — {arcana?.name}</p>
-                </div>
+        <div className="space-y-2">
+          {[
+            { pos: 2, label: "Внутренняя суть", icon: "✦", arcana: innerArcana, val: p[1] },
+            { pos: 4, label: "Цель накопления мудрости", icon: "◈", arcana: destinyArcana, val: p[3] },
+            { pos: 5, label: "Профессиональное призвание", icon: "◉", arcana: profArcana, val: p[4] },
+            { pos: 7, label: "Главная цель жизни", icon: "★", arcana: goalArcana, val: p[6] },
+          ].map(({ pos, label, icon, arcana, val }) => (
+            <div key={pos} className={cn("rounded-xl px-4 py-3 border", bgClass, borderClass)}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className={cn("text-sm shrink-0", textClass)}>{icon}</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">{label}</span>
+                <span className={cn("ml-auto text-sm font-display font-bold", textClass)}>{val} — {arcana?.name}</span>
               </div>
-            );
-          })}
+              <p className="text-xs text-muted-foreground leading-relaxed pl-5">
+                {arcana?.personalDescription?.split('.').slice(0, 2).join('. ')}.
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Профессии */}
-      {(() => {
-        const destinyArcana = getArcana(p[3]);
-        return destinyArcana?.professions?.length ? (
-          <div>
-            <p className="text-xs text-muted-foreground mb-2">💼 Сферы реализации</p>
-            <div className="flex flex-wrap gap-1.5">
-              {destinyArcana.professions.slice(0, 5).map((prof, i) => (
-                <span key={i} className={cn("text-xs px-2 py-0.5 rounded-full border", badgeBg, borderClass)}>{prof}</span>
-              ))}
-            </div>
+      {destinyArcana?.professions?.length ? (
+        <div>
+          <p className="text-xs text-muted-foreground mb-2">💼 Сферы реализации</p>
+          <div className="flex flex-wrap gap-1.5">
+            {destinyArcana.professions.slice(0, 5).map((prof, i) => (
+              <span key={i} className={cn("text-xs px-2.5 py-1 rounded-full border", badgeBg, borderClass)}>{prof}</span>
+            ))}
           </div>
-        ) : null;
-      })()}
+        </div>
+      ) : null}
+
+      {/* Точка опоры */}
+      <div className={cn("rounded-xl p-3 border", bgClass, borderClass)}>
+        <p className="text-xs text-muted-foreground mb-1">⚓ Точка опоры — аркан {p[5]} «{supportArcana?.name}»</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {supportArcana?.personalDescription?.split('.')[0]}. Это зона комфорта — то, на что {name} опирается в трудные моменты, но от чего важно постепенно двигаться дальше.
+        </p>
+      </div>
     </div>
   );
 }
@@ -532,9 +556,12 @@ function UnionMatrixBlock({ matrix, result }: { matrix: PersonalMatrix; result: 
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground leading-relaxed">
-        Это не сложение двух матриц — это новая энергия, которая возникает между вами. То, чего нет у каждого по отдельности, но что рождается в этом союзе.
-      </p>
+      <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4 text-sm text-muted-foreground leading-relaxed space-y-2">
+        <p>
+          Когда {result.person1.name} и {result.person2.name} встречаются — рождается новая энергия. Аркан союза <strong className="text-foreground">{result.unionArcana} «{unionArcana?.name}»</strong> описывает саму суть этих отношений.
+        </p>
+        <p>{unionArcana?.compatibilityDescription?.split('.').slice(0, 2).join('. ')}.</p>
+      </div>
 
       {/* Матрица */}
       <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
@@ -558,22 +585,45 @@ function UnionMatrixBlock({ matrix, result }: { matrix: PersonalMatrix; result: 
         </div>
       </div>
 
-      {/* 3 ключевых аркана союза */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="rounded-xl bg-primary/10 border border-primary/20 p-3 text-center">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">❤️ Аркан союза</p>
-          <p className="text-2xl font-display font-bold text-primary">{result.unionArcana}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{unionArcana?.name}</p>
+      {/* 3 ключевых аркана союза с описаниями */}
+      <div className="space-y-3">
+        <div className="rounded-xl bg-primary/10 border border-primary/20 p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-xl">❤️</span>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Аркан союза</p>
+              <p className="font-display font-bold text-primary">{result.unionArcana} — {unionArcana?.name}</p>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {unionArcana?.compatibilityDescription?.split('.').slice(2, 4).join('. ')}.
+          </p>
         </div>
-        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3 text-center">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">🌿 Аркан гармонии</p>
-          <p className="text-2xl font-display font-bold text-emerald-600">{result.harmonyArcana}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{harmonyArcana?.name}</p>
+
+        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-xl">🌿</span>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Аркан гармонии — как вам хорошо вместе</p>
+              <p className="font-display font-bold text-emerald-600">{result.harmonyArcana} — {harmonyArcana?.name}</p>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {harmonyArcana?.compatibilityDescription?.split('.').slice(0, 2).join('. ')}.
+          </p>
         </div>
-        <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 text-center">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">⚖️ Кармический аркан</p>
-          <p className="text-2xl font-display font-bold text-destructive">{result.karmaArcana}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{karmaArcana?.name}</p>
+
+        <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-xl">⚖️</span>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Кармический аркан — что нужно проработать</p>
+              <p className="font-display font-bold text-destructive">{result.karmaArcana} — {karmaArcana?.name}</p>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {karmaArcana?.personalDescription?.split('.').slice(0, 2).join('. ')}.
+          </p>
         </div>
       </div>
 
@@ -636,7 +686,6 @@ function CompatibilityMatrices({ result }: { result: CompatibilityResult }) {
         name={p1.name}
         color="primary"
         emoji="🌟"
-        intro={`Матрица предназначения ${p1.name} показывает, кто этот человек на самом деле — его внутреннюю суть, таланты, жизненный путь и то, к чему он движется. Именно это он несёт в ваши отношения.`}
       />
 
       {/* Разделитель */}
@@ -652,7 +701,6 @@ function CompatibilityMatrices({ result }: { result: CompatibilityResult }) {
         name={p2.name}
         color="rose"
         emoji="🌹"
-        intro={`Матрица предназначения ${p2.name} — энергетика, характер, путь этого человека. То, как он воспринимает мир, что ищет, к чему стремится и что привносит в эти отношения.`}
       />
 
       {/* Разделитель */}
