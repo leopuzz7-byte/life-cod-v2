@@ -515,7 +515,7 @@ const Index = () => {
   }));
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <Header />
 
       <main className="relative z-10">
@@ -576,15 +576,15 @@ const Index = () => {
             <section className="py-8 md:py-12 lg:py-16">
               <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-display text-primary mb-6 md:mb-8 text-center flex items-center justify-center gap-2" style={{fontStyle:'italic',fontWeight:400,letterSpacing:'-0.01em'}}>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-display mb-6 md:mb-8 text-center flex items-center justify-center gap-2" style={{fontWeight:600,letterSpacing:'-0.02em',color:'#1a1a1a'}}>
                     {t("calculator.title")}
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block flex-shrink-0">
-                      <path d="M14 23.5C14 23.5 3.5 17.5 3.5 10.5C3.5 7.46 5.96 5 9 5C10.96 5 12.68 6.02 13.75 7.56C13.88 7.74 14.12 7.74 14.25 7.56C15.32 6.02 17.04 5 19 5C22.04 5 24.5 7.46 24.5 10.5C24.5 17.5 14 23.5 14 23.5Z" fill="url(#goldHeart)" stroke="#B8860B" strokeWidth="0.8"/>
+                      <path d="M14 23.5C14 23.5 3.5 17.5 3.5 10.5C3.5 7.46 5.96 5 9 5C10.96 5 12.68 6.02 13.75 7.56C13.88 7.74 14.12 7.74 14.25 7.56C15.32 6.02 17.04 5 19 5C22.04 5 24.5 7.46 24.5 10.5C24.5 17.5 14 23.5 14 23.5Z" fill="url(#brownHeart)" stroke="#7A3E20" strokeWidth="0.6"/>
                       <defs>
-                        <linearGradient id="goldHeart" x1="3.5" y1="5" x2="24.5" y2="23.5" gradientUnits="userSpaceOnUse">
-                          <stop offset="0%" stopColor="#F5DFA0"/>
-                          <stop offset="50%" stopColor="#C9973A"/>
-                          <stop offset="100%" stopColor="#8B5E1A"/>
+                        <linearGradient id="brownHeart" x1="3.5" y1="5" x2="24.5" y2="23.5" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stopColor="#C9703A"/>
+                          <stop offset="50%" stopColor="#A0522D"/>
+                          <stop offset="100%" stopColor="#7A3E20"/>
                         </linearGradient>
                       </defs>
                     </svg>
@@ -631,7 +631,7 @@ const Index = () => {
                               {t("methodology.arcana22")}
                             </span>
                           </div>
-                          <p className="text-xs md:text-sm mb-3" style={{color:'#4A2800'}}>
+                          <p className="text-xs md:text-sm mb-3" style={{color:'#6b6b6b'}}>
                             {t("methodology.arcanaDescription")}
                           </p>
                           <div className="flex flex-wrap gap-1">
@@ -679,10 +679,10 @@ const Index = () => {
                                 </div>
                               </div>
                               <div>
-                                <h4 className="font-display font-semibold text-base md:text-lg" style={{color:'#2D1A00'}}>
+                                <h4 className="font-display font-semibold text-base md:text-lg" style={{color:'#1a1a1a'}}>
                                   {method.name}
                                 </h4>
-                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#4A2800',fontFamily:"'Raleway',sans-serif",fontWeight:400}}>
+                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#6b6b6b'}}>
                                   {method.description}
                                 </p>
                               </div>
@@ -717,14 +717,14 @@ const Index = () => {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="font-display font-semibold text-base md:text-lg" style={{color:'#2D1A00'}}>
+                            <h3 className="font-display font-semibold text-base md:text-lg" style={{color:'#1a1a1a'}}>
                               {t("methodology.methodology2")}
                             </h3>
                             <span className="text-xs px-2 py-0.5 rounded-full" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>
                               {t("methodology.classic")}
                             </span>
                           </div>
-                          <p className="text-xs md:text-sm mb-3" style={{color:'#4A2800'}}>
+                          <p className="text-xs md:text-sm mb-3" style={{color:'#6b6b6b'}}>
                             {t("methodology.classicDescription")}
                           </p>
                           <div className="flex flex-wrap gap-1">
@@ -772,10 +772,10 @@ const Index = () => {
                                 </div>
                               </div>
                               <div>
-                                <h4 className="font-display font-semibold text-base md:text-lg" style={{color:'#2D1A00'}}>
+                                <h4 className="font-display font-semibold text-base md:text-lg" style={{color:'#1a1a1a'}}>
                                   {method.name}
                                 </h4>
-                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#4A2800',fontFamily:"'Raleway',sans-serif",fontWeight:400}}>
+                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#6b6b6b'}}>
                                   {method.description}
                                 </p>
                               </div>
@@ -789,7 +789,7 @@ const Index = () => {
                   {/* Tier Selector — hidden for coming-soon methods */}
                   {currentConfig && !currentConfig.comingSoon && (
                     <div className="max-w-xl mx-auto mb-2">
-                      <h3 className="text-sm font-medium text-center mb-3" style={{color:'#4A2800'}}>
+                      <h3 className="text-sm font-medium text-center mb-3" style={{color:'#6b6b6b'}}>
                         {t("cfg.chooseTierFor", { title: currentConfig.title })}
                       </h3>
                       <TierSelector
@@ -803,7 +803,7 @@ const Index = () => {
                       {selectedTier === 'professional' && currentConfig.professional && (
                         <div className="mt-1 mb-4 px-4 py-3 rounded-lg text-xs leading-relaxed" style={{background:'rgba(196,152,90,0.08)',border:'1px solid rgba(196,152,90,0.3)'}}>
                           <p className="font-medium mb-1" style={{color:'#8B5E1A'}}>{t("res.proExtendedIncluded")}</p>
-                          <p style={{color:'#4A2800'}}>{proExtendedDescription(selectedMethodology)}</p>
+                          <p style={{color:'#6b6b6b'}}>{proExtendedDescription(selectedMethodology)}</p>
                         </div>
                       )}
                     </div>
