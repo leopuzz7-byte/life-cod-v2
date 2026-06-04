@@ -22,6 +22,7 @@ import { ComingSoon } from "@/components/ComingSoon";
 import { LifeCodInputForm, LifeCodResult, UnifiedPersonalResult } from "@/components/lifecod";
 import { TierSelector } from "@/components/TierSelector";
 import { analysisConfigs, getAnalysisConfig, getConfigsForMethodology, proExtendedDescription, type TierType } from "@/lib/analysisConfig";
+import { GOLDEN_ICONS } from "@/components/GoldenIcons";
 import {
   calculateYearForecast,
   calculateMonthForecast,
@@ -500,6 +501,7 @@ const Index = () => {
     available: !cfg.comingSoon,
     comingSoon: !!cfg.comingSoon,
     icon: iconMap[cfg.icon] || Compass,
+    iconName: cfg.icon,
   }));
 
   const methodology2Methods = getConfigsForMethodology('2').map(cfg => ({
@@ -509,6 +511,7 @@ const Index = () => {
     available: !cfg.comingSoon,
     comingSoon: !!cfg.comingSoon,
     icon: iconMap[cfg.icon] || Compass,
+    iconName: cfg.icon,
   }));
 
   return (
@@ -664,7 +667,7 @@ const Index = () => {
                             <div className="flex flex-col gap-2.5">
                               <div className="flex items-start justify-between">
                                 <div style={{width:'42px',height:'42px',borderRadius:'12px',background:'linear-gradient(135deg,#F5DFA0 0%,rgba(201,151,58,0.25) 100%)',border:'1px solid rgba(201,151,58,0.5)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                                  <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />
+                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />; })()}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {selectedMethod === method.id && (
@@ -759,7 +762,7 @@ const Index = () => {
                             <div className="flex flex-col gap-2.5">
                               <div className="flex items-start justify-between">
                                 <div style={{width:'42px',height:'42px',borderRadius:'12px',background:'linear-gradient(135deg,#F5DFA0 0%,rgba(201,151,58,0.25) 100%)',border:'1px solid rgba(201,151,58,0.5)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                                  <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />
+                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />; })()}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {selectedMethod === method.id && (

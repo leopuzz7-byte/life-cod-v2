@@ -28,7 +28,7 @@ export function Header() {
           <img
             src={logo}
             alt={t("common.imgAlt")}
-            className="h-[76px] w-auto object-contain"
+            className="h-11 w-auto object-contain"
           />
         </Link>
 
