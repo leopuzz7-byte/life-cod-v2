@@ -6,8 +6,38 @@ interface MethodPrice {
   price_pro: number;
 }
 
-// Кеш цен в памяти — чтобы не дёргать БД при каждом переключении методики
+// Кеш всех цен — заполняется одним запросом при первом обращении
 const priceCache: Record<string, MethodPrice> = {};
+let allPricesLoaded = false;
+let loadingPromise: Promise<void> | null = null;
+
+// Загружаем все цены одним запросом
+function loadAllPrices(): Promise<void> {
+  if (allPricesLoaded) return Promise.resolve();
+  if (loadingPromise) return loadingPromise;
+
+  loadingPromise = supabase
+    .from("method_prices")
+    .select("method_id, price_basic, price_pro")
+    .then(({ data, error }) => {
+      if (!error && data) {
+        data.forEach((row) => {
+          priceCache[row.method_id] = {
+            price_basic: Number(row.price_basic),
+            price_pro: Number(row.price_pro),
+          };
+        });
+        allPricesLoaded = true;
+      } else {
+        loadingPromise = null; // сброс — чтобы следующий вызов попробовал снова
+      }
+    })
+    .catch(() => {
+      loadingPromise = null; // сброс при сетевой ошибке
+    });
+
+  return loadingPromise;
+}
 
 export function useMethodPrice(methodId: string) {
   const [prices, setPrices] = useState<MethodPrice | null>(() => priceCache[methodId] ?? null);
@@ -21,18 +51,13 @@ export function useMethodPrice(methodId: string) {
     }
 
     setLoading(true);
-    supabase
-      .from("method_prices")
-      .select("price_basic, price_pro")
-      .eq("method_id", methodId)
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (!error && data) {
-          const p = { price_basic: Number(data.price_basic), price_pro: Number(data.price_pro) };
-          priceCache[methodId] = p;
-          setPrices(p);
-        }
+    loadAllPrices()
+      .then(() => {
+        setPrices(priceCache[methodId] ?? null);
         setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false); // не зависаем при ошибке
       });
   }, [methodId]);
 

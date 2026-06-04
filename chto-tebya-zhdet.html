@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Что тебя ждёт</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #f4ecdc;
+    font-family: Georgia, 'Times New Roman', serif;
+    padding: 2.5rem 1.5rem 3rem;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { max-width: 660px; width: 100%; }
+  .divider {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; margin-bottom: 8px;
+  }
+  .divider span {
+    height: 1px; width: 60px;
+  }
+  .divider .left { background: linear-gradient(to right, transparent, #b8954f); }
+  .divider .right { background: linear-gradient(to left, transparent, #b8954f); }
+  .eyebrow {
+    text-align: center; letter-spacing: 5px; font-size: 13px;
+    color: #a8853f; margin: 0 0 2.2rem; text-transform: uppercase;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    position: relative;
+    background: #efe4cd;
+    border: 1.5px solid #9a7333;
+    border-radius: 14px;
+    padding: 26px 24px;
+    box-shadow: inset 0 0 0 1px rgba(154,115,51,0.25);
+  }
+  .card .inner-frame {
+    position: absolute; inset: 5px;
+    border: 1px solid rgba(154,115,51,0.3);
+    border-radius: 10px; pointer-events: none;
+  }
+  .card svg { margin-bottom: 18px; }
+  .num { font-size: 13px; color: #bda05c; margin: 0 0 6px; }
+  .card h3 {
+    font-size: 21px; color: #5a3d1e; margin: 0 0 10px;
+    font-weight: normal;
+  }
+  .card p.desc {
+    font-size: 14px; line-height: 1.65; color: #8a6b3e; margin: 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="divider">
+    <span class="left"></span>
+    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+      <path d="M11 1 L12.4 9.6 L21 11 L12.4 12.4 L11 21 L9.6 12.4 L1 11 L9.6 9.6 Z" fill="#c9a24b"/>
+    </svg>
+    <span class="right"></span>
+  </div>
+  <p class="eyebrow">Что тебя ждёт</p>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="inner-frame"></div>
+      <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="9" fill="none" stroke="#bd9038" stroke-width="1.6"/>
+        <circle cx="24" cy="24" r="5" fill="none" stroke="#d8b35a" stroke-width="1"/>
+        <g stroke="#bd9038" stroke-width="1.6" stroke-linecap="round">
+          <line x1="24" y1="3" x2="24" y2="11"/><line x1="24" y1="37" x2="24" y2="45"/>
+          <line x1="3" y1="24" x2="11" y2="24"/><line x1="37" y1="24" x2="45" y2="24"/>
+          <line x1="9" y1="9" x2="14.6" y2="14.6"/><line x1="33.4" y1="33.4" x2="39" y2="39"/>
+          <line x1="39" y1="9" x2="33.4" y2="14.6"/><line x1="14.6" y1="33.4" x2="9" y2="39"/>
+        </g>
+        <g stroke="#d8b35a" stroke-width="1" stroke-linecap="round">
+          <line x1="24" y1="6" x2="24" y2="2"/><line x1="6" y1="6" x2="3.5" y2="3.5"/>
+        </g>
+      </svg>
+      <p class="num">01</p>
+      <h3>Предназначение</h3>
+      <p class="desc">Внутренняя суть, таланты и цель жизни по матрице 22 Арканов</p>
+    </div>
+
+    <div class="card">
+      <div class="inner-frame"></div>
+      <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="18" cy="24" r="12" fill="none" stroke="#bd9038" stroke-width="1.6"/>
+        <circle cx="30" cy="24" r="12" fill="none" stroke="#bd9038" stroke-width="1.6"/>
+        <path d="M24 14.5 a12 12 0 0 1 0 19 a12 12 0 0 1 0 -19 Z" fill="#d8b35a" fill-opacity="0.55"/>
+        <circle cx="18" cy="24" r="2.4" fill="#bd9038"/>
+        <circle cx="30" cy="24" r="2.4" fill="#bd9038"/>
+      </svg>
+      <p class="num">02</p>
+      <h3>Совместимость</h3>
+      <p class="desc">5 матриц пары: личная энергетика каждого и матрица союза</p>
+    </div>
+
+    <div class="card">
+      <div class="inner-frame"></div>
+      <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M30 6 a17 17 0 1 0 12 27 a14 14 0 1 1 -12 -27 Z" fill="none" stroke="#bd9038" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M14 9 l1.1 3.2 l3.2 1.1 l-3.2 1.1 l-1.1 3.2 l-1.1 -3.2 l-3.2 -1.1 l3.2 -1.1 Z" fill="#d8b35a"/>
+        <path d="M37 18 l0.8 2.3 l2.3 0.8 l-2.3 0.8 l-0.8 2.3 l-0.8 -2.3 l-2.3 -0.8 l2.3 -0.8 Z" fill="#d8b35a"/>
+        <circle cx="20" cy="30" r="1.4" fill="#d8b35a"/>
+      </svg>
+      <p class="num">03</p>
+      <h3>Прогнозы</h3>
+      <p class="desc">Энергия года, месяца и дня — что несёт каждый период</p>
+    </div>
+
+    <div class="card">
+      <div class="inner-frame"></div>
+      <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M24 5 L42 39 L6 39 Z" fill="none" stroke="#bd9038" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="24" cy="14" r="4" fill="none" stroke="#d8b35a" stroke-width="1.2"/>
+        <circle cx="16" cy="32" r="3.2" fill="none" stroke="#d8b35a" stroke-width="1.2"/>
+        <circle cx="32" cy="32" r="3.2" fill="none" stroke="#d8b35a" stroke-width="1.2"/>
+        <line x1="24" y1="18" x2="16" y2="29" stroke="#bd9038" stroke-width="1"/>
+        <line x1="24" y1="18" x2="32" y2="29" stroke="#bd9038" stroke-width="1"/>
+        <line x1="19" y1="32" x2="29" y2="32" stroke="#bd9038" stroke-width="1"/>
+        <circle cx="24" cy="14" r="1.4" fill="#bd9038"/>
+      </svg>
+      <p class="num">04</p>
+      <h3>Периоды жизни</h3>
+      <p class="desc">Кармические задачи и жизненные циклы по возрастам</p>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

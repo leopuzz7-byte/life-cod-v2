@@ -21,8 +21,9 @@ export function Header() {
   const isMyAnalysesActive = location.pathname.startsWith("/my-analyses");
 
   return (
-    <header className="sticky top-0 z-50 w-full glass-brown border-b border-white/10">
-      <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 w-full pt-2.5 px-2.5 bg-transparent">
+      <div className="glass-brown rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,3,0,0.38)]">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
             src={logo}
@@ -128,10 +129,4 @@ export function Header() {
                 : "text-white/70"
             )}
           >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-    </header>
-  );
-}
+ 

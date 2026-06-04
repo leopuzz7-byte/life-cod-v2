@@ -46,35 +46,36 @@ export function TierSelector({
           className={cn(
             "relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
             selectedTier === "basic"
-              ? "border-primary bg-primary/5 shadow-md"
-              : "border-border bg-card hover:border-primary/40"
+              ? "bg-[#faf4e8] shadow-[0_4px_16px_rgba(139,94,26,0.18)]"
+              : "bg-[#fdfaf5] hover:border-[#8B5E1A]"
           )}
+          style={{borderColor: selectedTier === "basic" ? '#8B5E1A' : '#C4985A'}}
         >
           <div className="flex items-start gap-3">
             <div className={cn(
               "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-              selectedTier === "basic" ? "border-primary bg-primary" : "border-muted-foreground/30"
+              selectedTier === "basic" ? "border-[#8B5E1A] bg-[#8B5E1A]" : "border-[#C4985A]/40"
             )}>
-              {selectedTier === "basic" && <Check className="w-3 h-3 text-primary-foreground" />}
+              {selectedTier === "basic" && <Check className="w-3 h-3 text-[#FFF8E7]" />}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <Zap className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="font-display font-semibold text-foreground text-sm">
+                <Zap className="w-4 h-4 flex-shrink-0" style={{color:'#C9973A'}} />
+                <span className="font-display font-semibold text-sm" style={{color:'#2D1A00'}}>
                   {config.basic.label}
                 </span>
                 <span className={cn(
                   "text-[10px] px-2 py-0.5 rounded-full font-medium",
                   priceBasic === 0 || config.basic.isFree
                     ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                    : "bg-primary/10 text-primary"
-                )}>
+                    : ""
+                )} style={!(priceBasic === 0 || config.basic.isFree) ? {background:'rgba(196,152,90,0.15)',color:'#8B5E1A'} : {}}>
                   {priceBasic != null
                     ? formatPrice(priceBasic)
                     : config.basic.isFree ? t("cfg.free") : "..."}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed" style={{color:'#7A5C2E'}}>
                 {config.basic.description}
               </p>
             </div>
@@ -89,33 +90,22 @@ export function TierSelector({
         className={cn(
           "relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
           selectedTier === "professional"
-            ? "border-primary bg-primary/5 shadow-md"
-            : "border-border bg-card hover:border-primary/40"
+            ? "bg-[#faf4e8] shadow-[0_4px_16px_rgba(139,94,26,0.18)]"
+            : "bg-[#fdfaf5] hover:border-[#8B5E1A]"
         )}
+        style={{borderColor: selectedTier === "professional" ? '#8B5E1A' : '#C4985A'}}
       >
         <div className="flex items-start gap-3">
           <div className={cn(
             "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-            selectedTier === "professional" ? "border-primary bg-primary" : "border-muted-foreground/30"
+            selectedTier === "professional" ? "border-[#8B5E1A] bg-[#8B5E1A]" : "border-[#C4985A]/40"
           )}>
-            {selectedTier === "professional" && <Check className="w-3 h-3 text-primary-foreground" />}
+            {selectedTier === "professional" && <Check className="w-3 h-3 text-[#FFF8E7]" />}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <Crown className="w-4 h-4 text-primary flex-shrink-0" />
-              <span className="font-display font-semibold text-foreground text-sm">
+              <Crown className="w-4 h-4 flex-shrink-0" style={{color:'#C9973A'}} />
+              <span className="font-display font-semibold text-sm" style={{color:'#2D1A00'}}>
                 {config.professional.label}
               </span>
-              <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary rounded-full font-medium">
-                {pricePro != null ? formatPrice(pricePro) : "..."}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {config.professional.description}
-            </p>
-          </div>
-        </div>
-      </button>
-    </div>
-  );
-}
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}

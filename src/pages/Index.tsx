@@ -512,7 +512,7 @@ const Index = () => {
   }));
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#f8f3ea]">
       <Header />
 
       <main className="relative z-10">
@@ -533,8 +533,8 @@ const Index = () => {
               <section className="pt-8 md:pt-12 lg:pt-16 pb-2">
                 <div className="container mx-auto px-4">
                   <div className="max-w-2xl mx-auto text-center">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-6">
-                      <Sparkles className="w-6 h-6 text-foreground" />
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-6" style={{background:'linear-gradient(135deg,#F5DFA0,rgba(201,151,58,0.3))',border:'1px solid rgba(201,151,58,0.5)'}}>
+                      <Sparkles className="w-6 h-6" style={{color:'#8B5E1A'}} />
                     </div>
                     <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-primary mb-5 leading-tight">
                       Персональная диагностика Life C⚙D
@@ -573,8 +573,18 @@ const Index = () => {
             <section className="py-8 md:py-12 lg:py-16">
               <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-display text-primary mb-6 md:mb-8 text-center">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-display text-primary mb-6 md:mb-8 text-center flex items-center justify-center gap-2">
                     {t("calculator.title")}
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block flex-shrink-0">
+                      <path d="M14 23.5C14 23.5 3.5 17.5 3.5 10.5C3.5 7.46 5.96 5 9 5C10.96 5 12.68 6.02 13.75 7.56C13.88 7.74 14.12 7.74 14.25 7.56C15.32 6.02 17.04 5 19 5C22.04 5 24.5 7.46 24.5 10.5C24.5 17.5 14 23.5 14 23.5Z" fill="url(#goldHeart)" stroke="#B8860B" strokeWidth="0.8"/>
+                      <defs>
+                        <linearGradient id="goldHeart" x1="3.5" y1="5" x2="24.5" y2="23.5" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stopColor="#F5DFA0"/>
+                          <stop offset="50%" stopColor="#C9973A"/>
+                          <stop offset="100%" stopColor="#8B5E1A"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
                   </h2>
 
                   <p className="text-sm text-muted-foreground text-center mb-4 md:mb-6">
@@ -588,11 +598,11 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "1"
-                          ? "bg-primary/5 border-primary shadow-warm"
-                          : "bg-card border-border hover:border-primary/50"
+                          ? "bg-[#faf4e8] border-[#8B5E1A] shadow-[0_4px_20px_rgba(139,94,26,0.2)]"
+                          : "bg-[#fdfaf5] border-[#C4985A] hover:border-[#8B5E1A]"
                       )}
                     >
-                      <div className="absolute -top-3 left-4 md:left-1/2 md:-translate-x-1/2 px-2 md:px-3 py-1 bg-primary text-primary-foreground text-xs font-medium rounded-full flex items-center gap-1">
+                      <div className="absolute -top-3 left-4 md:left-1/2 md:-translate-x-1/2 px-2 md:px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1" style={{background:'linear-gradient(135deg,#8B5E1A,#C9973A)',color:'#FFF8E7'}}>
                         <Sparkles className="w-3 h-3" />
                         {t("methodology.moreAccurate")}
                       </div>
@@ -601,11 +611,11 @@ const Index = () => {
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
                           selectedMethodology === "1"
-                            ? "border-primary bg-primary"
-                            : "border-muted-foreground/30"
+                            ? "border-[#8B5E1A] bg-[#8B5E1A]"
+                            : "border-[#C4985A]/40"
                         )}>
                           {selectedMethodology === "1" && (
-                            <Check className="w-3 h-3 md:w-4 md:h-4 text-primary-foreground" />
+                            <Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />
                           )}
                         </div>
 
@@ -614,11 +624,11 @@ const Index = () => {
                             <h3 className="font-display font-semibold text-foreground text-base md:text-lg">
                               {t("methodology.methodology1")}
                             </h3>
-                            <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded">
+                            <span className="text-xs px-2 py-0.5 rounded-full" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>
                               {t("methodology.arcana22")}
                             </span>
                           </div>
-                          <p className="text-xs md:text-sm text-muted-foreground mb-3">
+                          <p className="text-xs md:text-sm mb-3" style={{color:'#7A5C2E'}}>
                             {t("methodology.arcanaDescription")}
                           </p>
                           <div className="flex flex-wrap gap-1">
@@ -628,7 +638,7 @@ const Index = () => {
                               t("methodology.features.forecasts"),
                               t("methodology.features.lifePeriods"),
                             ].map((feature, i) => (
-                              <span key={i} className="text-xs px-2 py-1 bg-secondary/50 rounded-full text-muted-foreground">
+                              <span key={i} className="text-xs px-2 py-1 rounded-full" style={{background:'rgba(196,152,90,0.12)',color:'#8B5E1A'}}>
                                 {feature}
                               </span>
                             ))}
@@ -645,29 +655,33 @@ const Index = () => {
                             key={method.id}
                             onClick={() => handleMethodSelect(method.id)}
                             className={cn(
-                              "relative p-3 md:p-4 rounded-xl border transition-all duration-300 text-left",
+                              "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-primary/10 border-primary shadow-warm"
-                                : "bg-card border-border hover:border-primary/50"
+                                ? "bg-[#faf4e8] border-[#8B5E1A] shadow-[0_4px_16px_rgba(139,94,26,0.18)]"
+                                : "bg-[#fdfaf5] border-[#C4985A] hover:border-[#8B5E1A] hover:shadow-[0_2px_10px_rgba(139,94,26,0.1)]"
                             )}
                           >
-                            <div className="flex flex-col gap-2">
-                              <div className="flex items-center gap-2">
-                                <method.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                                {selectedMethod === method.id && (
-                                  <Sparkles className="w-3 h-3 text-primary" />
-                                )}
-                                {method.comingSoon && (
-                                  <span className="text-[9px] md:text-[10px] px-1.5 py-0.5 bg-secondary text-muted-foreground rounded-full font-medium ml-auto">
-                                    Скоро
-                                  </span>
-                                )}
+                            <div className="flex flex-col gap-2.5">
+                              <div className="flex items-start justify-between">
+                                <div className="icon-royal">
+                                  <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  {selectedMethod === method.id && (
+                                    <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />
+                                  )}
+                                  {method.comingSoon && (
+                                    <span className="text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>
+                                      Скоро
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <div>
-                                <h4 className="font-display font-semibold text-foreground text-xs md:text-sm">
+                                <h4 className="font-display font-semibold text-sm md:text-base" style={{color:'#2D1A00'}}>
                                   {method.name}
                                 </h4>
-                                <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                                <p className="text-[10px] md:text-xs mt-0.5 line-clamp-2" style={{color:'#7A5C2E'}}>
                                   {method.description}
                                 </p>
                               </div>
@@ -685,31 +699,31 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "2"
-                          ? "bg-primary/5 border-primary shadow-warm"
-                          : "bg-card border-border hover:border-primary/50"
+                          ? "bg-[#faf4e8] border-[#8B5E1A] shadow-[0_4px_20px_rgba(139,94,26,0.2)]"
+                          : "bg-[#fdfaf5] border-[#C4985A] hover:border-[#8B5E1A]"
                       )}
                     >
                       <div className="flex items-start gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
                           selectedMethodology === "2"
-                            ? "border-primary bg-primary"
-                            : "border-muted-foreground/30"
+                            ? "border-[#8B5E1A] bg-[#8B5E1A]"
+                            : "border-[#C4985A]/40"
                         )}>
                           {selectedMethodology === "2" && (
-                            <Check className="w-3 h-3 md:w-4 md:h-4 text-primary-foreground" />
+                            <Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />
                           )}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="font-display font-semibold text-foreground text-base md:text-lg">
+                            <h3 className="font-display font-semibold text-base md:text-lg" style={{color:'#2D1A00'}}>
                               {t("methodology.methodology2")}
                             </h3>
-                            <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded">
+                            <span className="text-xs px-2 py-0.5 rounded-full" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>
                               {t("methodology.classic")}
                             </span>
                           </div>
-                          <p className="text-xs md:text-sm text-muted-foreground mb-3">
+                          <p className="text-xs md:text-sm mb-3" style={{color:'#7A5C2E'}}>
                             {t("methodology.classicDescription")}
                           </p>
                           <div className="flex flex-wrap gap-1">
@@ -719,7 +733,7 @@ const Index = () => {
                               t("methodology.features.realizationNumber"),
                               t("methodology.features.outcomeNumber"),
                             ].map((feature, i) => (
-                              <span key={i} className="text-xs px-2 py-1 bg-secondary/50 rounded-full text-muted-foreground">
+                              <span key={i} className="text-xs px-2 py-1 rounded-full" style={{background:'rgba(196,152,90,0.12)',color:'#8B5E1A'}}>
                                 {feature}
                               </span>
                             ))}
@@ -736,29 +750,33 @@ const Index = () => {
                             key={method.id}
                             onClick={() => handleMethodSelect(method.id)}
                             className={cn(
-                              "relative p-3 md:p-4 rounded-xl border transition-all duration-300 text-left",
+                              "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-primary/10 border-primary shadow-warm"
-                                : "bg-card border-border hover:border-primary/50"
+                                ? "bg-[#faf4e8] border-[#8B5E1A] shadow-[0_4px_16px_rgba(139,94,26,0.18)]"
+                                : "bg-[#fdfaf5] border-[#C4985A] hover:border-[#8B5E1A] hover:shadow-[0_2px_10px_rgba(139,94,26,0.1)]"
                             )}
                           >
-                            <div className="flex flex-col gap-2">
-                              <div className="flex items-center gap-2">
-                                <method.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                                {selectedMethod === method.id && (
-                                  <Sparkles className="w-3 h-3 text-primary" />
-                                )}
-                                {method.comingSoon && (
-                                  <span className="text-[9px] md:text-[10px] px-1.5 py-0.5 bg-secondary text-muted-foreground rounded-full font-medium ml-auto">
-                                    Скоро
-                                  </span>
-                                )}
+                            <div className="flex flex-col gap-2.5">
+                              <div className="flex items-start justify-between">
+                                <div className="icon-royal">
+                                  <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  {selectedMethod === method.id && (
+                                    <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />
+                                  )}
+                                  {method.comingSoon && (
+                                    <span className="text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>
+                                      Скоро
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <div>
-                                <h4 className="font-display font-semibold text-foreground text-xs md:text-sm">
+                                <h4 className="font-display font-semibold text-sm md:text-base" style={{color:'#2D1A00'}}>
                                   {method.name}
                                 </h4>
-                                <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                                <p className="text-[10px] md:text-xs mt-0.5 line-clamp-2" style={{color:'#7A5C2E'}}>
                                   {method.description}
                                 </p>
                               </div>
@@ -772,7 +790,7 @@ const Index = () => {
                   {/* Tier Selector — hidden for coming-soon methods */}
                   {currentConfig && !currentConfig.comingSoon && (
                     <div className="max-w-xl mx-auto mb-2">
-                      <h3 className="text-sm font-medium text-foreground text-center mb-3">
+                      <h3 className="text-sm font-medium text-center mb-3" style={{color:'#7A5C2E'}}>
                         {t("cfg.chooseTierFor", { title: currentConfig.title })}
                       </h3>
                       <TierSelector
@@ -784,9 +802,9 @@ const Index = () => {
                       />
                       {/* What's inside Professional extended analysis (per methodology) */}
                       {selectedTier === 'professional' && currentConfig.professional && (
-                        <div className="mt-1 mb-4 px-4 py-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-foreground leading-relaxed">
-                          <p className="font-medium mb-1 text-primary">{t("res.proExtendedIncluded")}</p>
-                          <p className="text-muted-foreground">{proExtendedDescription(selectedMethodology)}</p>
+                        <div className="mt-1 mb-4 px-4 py-3 rounded-lg text-xs leading-relaxed" style={{background:'rgba(196,152,90,0.08)',border:'1px solid rgba(196,152,90,0.3)'}}>
+                          <p className="font-medium mb-1" style={{color:'#8B5E1A'}}>{t("res.proExtendedIncluded")}</p>
+                          <p style={{color:'#7A5C2E'}}>{proExtendedDescription(selectedMethodology)}</p>
                         </div>
                       )}
                     </div>
@@ -802,7 +820,7 @@ const Index = () => {
                   ) : selectedMethod === "name" ? (
                     /* Name energy input (text field, not date) */
                     <div className="w-full max-w-xl mx-auto">
-                      <div className="gradient-card rounded-2xl p-5 sm:p-8 border border-border">
+                      <div className="rounded-2xl p-5 sm:p-8" style={{background:'#fdfaf5',border:'1.5px solid #C4985A'}}>
                         <div className="space-y-5">
                           <div className="space-y-2">
                             <label className="text-sm font-medium text-foreground">{t("calculator.nameToCheck")}</label>
@@ -912,62 +930,4 @@ const Index = () => {
               />
             )}
             {result.type === "day" && (
-              <DailyForecastResultComponent
-                result={result.data}
-                name={userName}
-                onReset={handleReset}
-                tier={selectedTier}
-              />
-            )}
-            {result.type === "finance" && (
-              <FinancialCodeResultComponent
-                result={result.data}
-                name={userName}
-                onReset={handleReset}
-                tier={selectedTier}
-              />
-            )}
-            {result.type === "name" && (
-              <NameEnergyResultComponent
-                result={result.data}
-                onReset={handleReset}
-              />
-            )}
-            {result.type === "contract" && (
-              <ContractEnergyResultComponent
-                result={result.data}
-                personName={userName}
-                onReset={handleReset}
-                tier={selectedTier}
-              />
-            )}
-            {result.type === "business" && (
-              <div className="space-y-4">
-                <div className="max-w-2xl mx-auto">
-                  <Button variant="ghost" onClick={handleReset} className="text-muted-foreground hover:text-foreground">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    {t("results.newCalculation")}
-                  </Button>
-                </div>
-                <BusinessResult result={result.data} isPro={result.isPro} />
-              </div>
-            )}
-            {result.type === "success-path" && (
-              <div className="space-y-4">
-                <div className="max-w-2xl mx-auto">
-                  <Button variant="ghost" onClick={handleReset} className="text-muted-foreground hover:text-foreground">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    {t("results.newCalculation")}
-                  </Button>
-                </div>
-                <SuccessPathResult result={result.data} />
-              </div>
-            )}
-          </div>
-        )}
-      </main>
-    </div>
-  );
-};
-
-export default Index;
+         
