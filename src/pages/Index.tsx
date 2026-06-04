@@ -515,7 +515,7 @@ const Index = () => {
   }));
 
   return (
-    <div className="min-h-screen bg-[#f8f3ea]">
+    <div className="min-h-screen bg-white">
       <Header />
 
       <main className="relative z-10">
@@ -666,9 +666,7 @@ const Index = () => {
                           >
                             <div className="flex flex-col gap-2.5">
                               <div className="flex items-start justify-between">
-                                <div style={{width:'42px',height:'42px',borderRadius:'12px',background:'linear-gradient(135deg,#F5DFA0 0%,rgba(201,151,58,0.25) 100%)',border:'1px solid rgba(201,151,58,0.5)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />; })()}
-                                </div>
+                                {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-7 h-7" style={{color:'#C9973A'}} />; })()}
                                 <div className="flex items-center gap-1">
                                   {selectedMethod === method.id && (
                                     <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />
@@ -681,10 +679,10 @@ const Index = () => {
                                 </div>
                               </div>
                               <div>
-                                <h4 className="font-display font-semibold text-sm md:text-base" style={{color:'#2D1A00'}}>
+                                <h4 className="font-display font-semibold text-base md:text-lg" style={{color:'#2D1A00'}}>
                                   {method.name}
                                 </h4>
-                                <p className="text-[10px] md:text-xs mt-0.5 line-clamp-2" style={{color:'#7A5C2E'}}>
+                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#7A5C2E',fontFamily:"'Raleway',sans-serif",fontWeight:300}}>
                                   {method.description}
                                 </p>
                               </div>
@@ -761,9 +759,7 @@ const Index = () => {
                           >
                             <div className="flex flex-col gap-2.5">
                               <div className="flex items-start justify-between">
-                                <div style={{width:'42px',height:'42px',borderRadius:'12px',background:'linear-gradient(135deg,#F5DFA0 0%,rgba(201,151,58,0.25) 100%)',border:'1px solid rgba(201,151,58,0.5)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />; })()}
-                                </div>
+                                {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-7 h-7" style={{color:'#C9973A'}} />; })()}
                                 <div className="flex items-center gap-1">
                                   {selectedMethod === method.id && (
                                     <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />
@@ -776,10 +772,10 @@ const Index = () => {
                                 </div>
                               </div>
                               <div>
-                                <h4 className="font-display font-semibold text-sm md:text-base" style={{color:'#2D1A00'}}>
+                                <h4 className="font-display font-semibold text-base md:text-lg" style={{color:'#2D1A00'}}>
                                   {method.name}
                                 </h4>
-                                <p className="text-[10px] md:text-xs mt-0.5 line-clamp-2" style={{color:'#7A5C2E'}}>
+                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#7A5C2E',fontFamily:"'Raleway',sans-serif",fontWeight:300}}>
                                   {method.description}
                                 </p>
                               </div>
