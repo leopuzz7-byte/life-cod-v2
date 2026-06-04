@@ -7,8 +7,8 @@ interface TierSelectorProps {
   config: AnalysisTypeConfig;
   selectedTier: TierType;
   onSelectTier: (tier: TierType) => void;
-  priceBasic?: number | null;   // цена из БД, 0 = бесплатно, null = загружается
-  pricePro?: number | null;     // цена из БД
+  priceBasic?: number | null;
+  pricePro?: number | null;
 }
 
 export function TierSelector({
@@ -28,17 +28,14 @@ export function TierSelector({
 
   if (!config.professional) return null;
 
-  // Показываем базовый только если он доступен в конфиге
   const showBasic = config.basic?.available !== false;
 
-  // Если базового нет — переключаем на проф автоматически
   if (!showBasic && selectedTier === "basic") {
     onSelectTier("professional");
   }
 
   return (
     <div className={cn("grid gap-3 mb-6", showBasic ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1")}>
-      {/* Базовый тариф — только если available */}
       {showBasic && (
         <button
           type="button"
@@ -64,12 +61,15 @@ export function TierSelector({
                 <span className="font-display font-semibold text-sm" style={{color:'#2D1A00'}}>
                   {config.basic.label}
                 </span>
-                <span className={cn(
-                  "text-[10px] px-2 py-0.5 rounded-full font-medium",
-                  priceBasic === 0 || config.basic.isFree
-                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                    : ""
-                )} style={!(priceBasic === 0 || config.basic.isFree) ? {background:'rgba(196,152,90,0.15)',color:'#8B5E1A'} : {}}>
+                <span
+                  className={cn(
+                    "text-[10px] px-2 py-0.5 rounded-full font-medium",
+                    priceBasic === 0 || config.basic.isFree
+                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                      : ""
+                  )}
+                  style={!(priceBasic === 0 || config.basic.isFree) ? {background:'rgba(196,152,90,0.15)',color:'#8B5E1A'} : {}}
+                >
                   {priceBasic != null
                     ? formatPrice(priceBasic)
                     : config.basic.isFree ? t("cfg.free") : "..."}
@@ -83,7 +83,6 @@ export function TierSelector({
         </button>
       )}
 
-      {/* Профессиональный тариф */}
       <button
         type="button"
         onClick={() => onSelectTier("professional")}
@@ -108,4 +107,16 @@ export function TierSelector({
               <span className="font-display font-semibold text-sm" style={{color:'#2D1A00'}}>
                 {config.professional.label}
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>
+                {pricePro != null ? formatPrice(pricePro) : "..."}
+              </span>
+            </div>
+            <p className="text-xs leading-relaxed" style={{color:'#7A5C2E'}}>
+              {config.professional.description}
+            </p>
+          </div>
+        </div>
+      </button>
+    </div>
+  );
+}
