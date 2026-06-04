@@ -43,8 +43,8 @@ export function TierSelector({
           className={cn(
             "relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
             selectedTier === "basic"
-              ? "bg-[#faf4e8] shadow-[0_4px_16px_rgba(139,94,26,0.18)]"
-              : "bg-[#fdfaf5] hover:border-[#8B5E1A]"
+              ? "bg-[#f5f1ec] shadow-[0_4px_16px_rgba(30,8,0,0.12)]"
+              : "bg-white hover:border-[#8B5E1A]"
           )}
           style={{borderColor: selectedTier === "basic" ? '#2C1200' : '#3D1A00'}}
         >
@@ -89,8 +89,8 @@ export function TierSelector({
         className={cn(
           "relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
           selectedTier === "professional"
-            ? "bg-[#faf4e8] shadow-[0_4px_16px_rgba(139,94,26,0.18)]"
-            : "bg-[#fdfaf5] hover:border-[#8B5E1A]"
+            ? "bg-[#f5f1ec] shadow-[0_4px_16px_rgba(30,8,0,0.12)]"
+            : "bg-white hover:border-[#8B5E1A]"
         )}
         style={{borderColor: selectedTier === "professional" ? '#2C1200' : '#3D1A00'}}
       >

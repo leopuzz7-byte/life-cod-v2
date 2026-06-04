@@ -576,7 +576,7 @@ const Index = () => {
             <section className="py-8 md:py-12 lg:py-16">
               <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-display text-primary mb-6 md:mb-8 text-center flex items-center justify-center gap-2">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-display text-primary mb-6 md:mb-8 text-center flex items-center justify-center gap-2" style={{fontStyle:'italic',fontWeight:400,letterSpacing:'-0.01em'}}>
                     {t("calculator.title")}
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block flex-shrink-0">
                       <path d="M14 23.5C14 23.5 3.5 17.5 3.5 10.5C3.5 7.46 5.96 5 9 5C10.96 5 12.68 6.02 13.75 7.56C13.88 7.74 14.12 7.74 14.25 7.56C15.32 6.02 17.04 5 19 5C22.04 5 24.5 7.46 24.5 10.5C24.5 17.5 14 23.5 14 23.5Z" fill="url(#goldHeart)" stroke="#B8860B" strokeWidth="0.8"/>
@@ -601,11 +601,11 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "1"
-                          ? "bg-[#faf4e8] border-[#1A0800] shadow-[0_4px_20px_rgba(30,8,0,0.22)]"
-                          : "bg-[#fdfaf5] border-[#3D1A00] hover:border-[#1A0800]"
+                          ? "bg-[#f5f1ec] border-[#1A0800] shadow-[0_4px_20px_rgba(30,8,0,0.15)]"
+                          : "bg-white border-[#3D1A00] hover:border-[#1A0800]"
                       )}
                     >
-                      <div className="absolute -top-3 left-4 md:left-1/2 md:-translate-x-1/2 px-2 md:px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1" style={{background:'linear-gradient(135deg,#8B5E1A,#C9973A)',color:'#FFF8E7'}}>
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap" style={{background:'#fff',border:'1px solid #C9973A',borderRadius:'4px',color:'#8B5E1A',letterSpacing:'0.08em',textTransform:'uppercase'}}>
                         <Sparkles className="w-3 h-3" />
                         {t("methodology.moreAccurate")}
                       </div>
@@ -660,8 +660,8 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-[#faf4e8] border-[#1A0800] shadow-[0_4px_16px_rgba(30,8,0,0.2)]"
-                                : "bg-[#fdfaf5] border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.12)]"
+                                ? "bg-[#f5f1ec] border-[#1A0800] shadow-[0_4px_16px_rgba(30,8,0,0.15)]"
+                                : "bg-white border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
                             <div className="flex flex-col gap-2.5">
@@ -700,8 +700,8 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "2"
-                          ? "bg-[#faf4e8] border-[#1A0800] shadow-[0_4px_20px_rgba(30,8,0,0.22)]"
-                          : "bg-[#fdfaf5] border-[#3D1A00] hover:border-[#1A0800]"
+                          ? "bg-[#f5f1ec] border-[#1A0800] shadow-[0_4px_20px_rgba(30,8,0,0.15)]"
+                          : "bg-white border-[#3D1A00] hover:border-[#1A0800]"
                       )}
                     >
                       <div className="flex items-start gap-3">
@@ -753,8 +753,8 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-[#faf4e8] border-[#1A0800] shadow-[0_4px_16px_rgba(30,8,0,0.2)]"
-                                : "bg-[#fdfaf5] border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.12)]"
+                                ? "bg-[#f5f1ec] border-[#1A0800] shadow-[0_4px_16px_rgba(30,8,0,0.15)]"
+                                : "bg-white border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
                             <div className="flex flex-col gap-2.5">
