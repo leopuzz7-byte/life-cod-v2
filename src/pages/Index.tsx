@@ -601,8 +601,8 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "1"
-                          ? "bg-[#faf4e8] border-[#8B5E1A] shadow-[0_4px_20px_rgba(139,94,26,0.2)]"
-                          : "bg-[#fdfaf5] border-[#C4985A] hover:border-[#8B5E1A]"
+                          ? "bg-[#faf4e8] border-[#1A0800] shadow-[0_4px_20px_rgba(30,8,0,0.22)]"
+                          : "bg-[#fdfaf5] border-[#3D1A00] hover:border-[#1A0800]"
                       )}
                     >
                       <div className="absolute -top-3 left-4 md:left-1/2 md:-translate-x-1/2 px-2 md:px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1" style={{background:'linear-gradient(135deg,#8B5E1A,#C9973A)',color:'#FFF8E7'}}>
@@ -614,8 +614,8 @@ const Index = () => {
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
                           selectedMethodology === "1"
-                            ? "border-[#8B5E1A] bg-[#8B5E1A]"
-                            : "border-[#C4985A]/40"
+                            ? "border-[#2C1200] bg-[#2C1200]"
+                            : "border-[#3D1A00]/50"
                         )}>
                           {selectedMethodology === "1" && (
                             <Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />
@@ -631,7 +631,7 @@ const Index = () => {
                               {t("methodology.arcana22")}
                             </span>
                           </div>
-                          <p className="text-xs md:text-sm mb-3" style={{color:'#7A5C2E'}}>
+                          <p className="text-xs md:text-sm mb-3" style={{color:'#4A2800'}}>
                             {t("methodology.arcanaDescription")}
                           </p>
                           <div className="flex flex-wrap gap-1">
@@ -660,8 +660,8 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-[#faf4e8] border-[#8B5E1A] shadow-[0_4px_16px_rgba(139,94,26,0.18)]"
-                                : "bg-[#fdfaf5] border-[#C4985A] hover:border-[#8B5E1A] hover:shadow-[0_2px_10px_rgba(139,94,26,0.1)]"
+                                ? "bg-[#faf4e8] border-[#1A0800] shadow-[0_4px_16px_rgba(30,8,0,0.2)]"
+                                : "bg-[#fdfaf5] border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.12)]"
                             )}
                           >
                             <div className="flex flex-col gap-2.5">
@@ -682,7 +682,7 @@ const Index = () => {
                                 <h4 className="font-display font-semibold text-base md:text-lg" style={{color:'#2D1A00'}}>
                                   {method.name}
                                 </h4>
-                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#7A5C2E',fontFamily:"'Raleway',sans-serif",fontWeight:300}}>
+                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#4A2800',fontFamily:"'Raleway',sans-serif",fontWeight:400}}>
                                   {method.description}
                                 </p>
                               </div>
@@ -700,16 +700,16 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "2"
-                          ? "bg-[#faf4e8] border-[#8B5E1A] shadow-[0_4px_20px_rgba(139,94,26,0.2)]"
-                          : "bg-[#fdfaf5] border-[#C4985A] hover:border-[#8B5E1A]"
+                          ? "bg-[#faf4e8] border-[#1A0800] shadow-[0_4px_20px_rgba(30,8,0,0.22)]"
+                          : "bg-[#fdfaf5] border-[#3D1A00] hover:border-[#1A0800]"
                       )}
                     >
                       <div className="flex items-start gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
                           selectedMethodology === "2"
-                            ? "border-[#8B5E1A] bg-[#8B5E1A]"
-                            : "border-[#C4985A]/40"
+                            ? "border-[#2C1200] bg-[#2C1200]"
+                            : "border-[#3D1A00]/50"
                         )}>
                           {selectedMethodology === "2" && (
                             <Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />
@@ -724,7 +724,7 @@ const Index = () => {
                               {t("methodology.classic")}
                             </span>
                           </div>
-                          <p className="text-xs md:text-sm mb-3" style={{color:'#7A5C2E'}}>
+                          <p className="text-xs md:text-sm mb-3" style={{color:'#4A2800'}}>
                             {t("methodology.classicDescription")}
                           </p>
                           <div className="flex flex-wrap gap-1">
@@ -753,8 +753,8 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-[#faf4e8] border-[#8B5E1A] shadow-[0_4px_16px_rgba(139,94,26,0.18)]"
-                                : "bg-[#fdfaf5] border-[#C4985A] hover:border-[#8B5E1A] hover:shadow-[0_2px_10px_rgba(139,94,26,0.1)]"
+                                ? "bg-[#faf4e8] border-[#1A0800] shadow-[0_4px_16px_rgba(30,8,0,0.2)]"
+                                : "bg-[#fdfaf5] border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.12)]"
                             )}
                           >
                             <div className="flex flex-col gap-2.5">
@@ -775,7 +775,7 @@ const Index = () => {
                                 <h4 className="font-display font-semibold text-base md:text-lg" style={{color:'#2D1A00'}}>
                                   {method.name}
                                 </h4>
-                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#7A5C2E',fontFamily:"'Raleway',sans-serif",fontWeight:300}}>
+                                <p className="text-xs md:text-sm mt-1 line-clamp-2" style={{color:'#4A2800',fontFamily:"'Raleway',sans-serif",fontWeight:400}}>
                                   {method.description}
                                 </p>
                               </div>
@@ -789,7 +789,7 @@ const Index = () => {
                   {/* Tier Selector — hidden for coming-soon methods */}
                   {currentConfig && !currentConfig.comingSoon && (
                     <div className="max-w-xl mx-auto mb-2">
-                      <h3 className="text-sm font-medium text-center mb-3" style={{color:'#7A5C2E'}}>
+                      <h3 className="text-sm font-medium text-center mb-3" style={{color:'#4A2800'}}>
                         {t("cfg.chooseTierFor", { title: currentConfig.title })}
                       </h3>
                       <TierSelector
@@ -803,7 +803,7 @@ const Index = () => {
                       {selectedTier === 'professional' && currentConfig.professional && (
                         <div className="mt-1 mb-4 px-4 py-3 rounded-lg text-xs leading-relaxed" style={{background:'rgba(196,152,90,0.08)',border:'1px solid rgba(196,152,90,0.3)'}}>
                           <p className="font-medium mb-1" style={{color:'#8B5E1A'}}>{t("res.proExtendedIncluded")}</p>
-                          <p style={{color:'#7A5C2E'}}>{proExtendedDescription(selectedMethodology)}</p>
+                          <p style={{color:'#4A2800'}}>{proExtendedDescription(selectedMethodology)}</p>
                         </div>
                       )}
                     </div>

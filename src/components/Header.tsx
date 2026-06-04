@@ -21,7 +21,7 @@ export function Header() {
   const isMyAnalysesActive = location.pathname.startsWith("/my-analyses");
 
   return (
-    <header className="sticky top-0 z-50 w-full pt-3 px-5 bg-transparent">
+    <header className="sticky top-0 z-50 w-full pt-3 px-10 bg-transparent">
       <div className="glass-brown rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,3,0,0.38)]">
       <div className="container mx-auto px-4 h-[68px] flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center flex-shrink-0">
