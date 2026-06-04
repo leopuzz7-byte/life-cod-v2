@@ -663,7 +663,7 @@ const Index = () => {
                           >
                             <div className="flex flex-col gap-2.5">
                               <div className="flex items-start justify-between">
-                                <div className="icon-royal">
+                                <div style={{width:'42px',height:'42px',borderRadius:'12px',background:'linear-gradient(135deg,#F5DFA0 0%,rgba(201,151,58,0.25) 100%)',border:'1px solid rgba(201,151,58,0.5)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                                   <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />
                                 </div>
                                 <div className="flex items-center gap-1">
@@ -758,7 +758,7 @@ const Index = () => {
                           >
                             <div className="flex flex-col gap-2.5">
                               <div className="flex items-start justify-between">
-                                <div className="icon-royal">
+                                <div style={{width:'42px',height:'42px',borderRadius:'12px',background:'linear-gradient(135deg,#F5DFA0 0%,rgba(201,151,58,0.25) 100%)',border:'1px solid rgba(201,151,58,0.5)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                                   <method.icon className="w-5 h-5" style={{color:'#8B5E1A'}} />
                                 </div>
                                 <div className="flex items-center gap-1">
@@ -930,4 +930,62 @@ const Index = () => {
               />
             )}
             {result.type === "day" && (
-         
+              <DailyForecastResultComponent
+                result={result.data}
+                name={userName}
+                onReset={handleReset}
+                tier={selectedTier}
+              />
+            )}
+            {result.type === "finance" && (
+              <FinancialCodeResultComponent
+                result={result.data}
+                name={userName}
+                onReset={handleReset}
+                tier={selectedTier}
+              />
+            )}
+            {result.type === "name" && (
+              <NameEnergyResultComponent
+                result={result.data}
+                onReset={handleReset}
+              />
+            )}
+            {result.type === "contract" && (
+              <ContractEnergyResultComponent
+                result={result.data}
+                personName={userName}
+                onReset={handleReset}
+                tier={selectedTier}
+              />
+            )}
+            {result.type === "business" && (
+              <div className="space-y-4">
+                <div className="max-w-2xl mx-auto">
+                  <Button variant="ghost" onClick={handleReset} className="text-muted-foreground hover:text-foreground">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    {t("results.newCalculation")}
+                  </Button>
+                </div>
+                <BusinessResult result={result.data} isPro={result.isPro} />
+              </div>
+            )}
+            {result.type === "success-path" && (
+              <div className="space-y-4">
+                <div className="max-w-2xl mx-auto">
+                  <Button variant="ghost" onClick={handleReset} className="text-muted-foreground hover:text-foreground">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    {t("results.newCalculation")}
+                  </Button>
+                </div>
+                <SuccessPathResult result={result.data} />
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default Index;

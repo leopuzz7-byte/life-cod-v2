@@ -263,17 +263,4 @@
       radial-gradient(circle at 80% 20%, hsl(14 100% 4% / 0.02) 0%, transparent 40%),
       radial-gradient(circle at 40% 80%, hsl(14 100% 4% / 0.02) 0%, transparent 40%);
   }
-
-}
-
-.icon-royal {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #F5DFA0 0%, #C9973A40 100%);
-  border: 1px solid #C9973A80;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
