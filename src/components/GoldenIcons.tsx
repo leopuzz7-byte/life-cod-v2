@@ -157,4 +157,73 @@ export const GoldenIconFileText = () => (
 
 export const GoldenIconHeart = () => (
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-    <path d="M16 27 C16 27 4 19.5 4 11 C4 8 6.5 5.5 10 5.5 C12.3 5.5 14.2 6.7 15.3 8.5 C15.6 9 16.4 9 16.7 8.5 C17.8 6.7 19.7 5.5 22 5.5 C25.5 5.5 28 8 28 11 C28 19.5 16 27 16 27Z" stroke="#C9973A" strokeWidth="1.2" strokeLinej
+    <path d="M16 27 C16 27 4 19.5 4 11 C4 8 6.5 5.5 10 5.5 C12.3 5.5 14.2 6.7 15.3 8.5 C15.6 9 16.4 9 16.7 8.5 C17.8 6.7 19.7 5.5 22 5.5 C25.5 5.5 28 8 28 11 C28 19.5 16 27 16 27Z" fill="url(#redHeart)" stroke="#6B0020" strokeWidth="0.5"/>
+    <path d="M16 24 C16 24 8 18 8 12.5 C8 10.8 9 9.5 10.5 9" stroke="#A31328" strokeWidth="0.6" strokeLinecap="round"/>
+    <circle cx="22" cy="10.5" r="1.5" stroke="#8B0020" strokeWidth="0.9"/>
+    <defs>
+      <linearGradient id="redHeart" x1="3.5" y1="5" x2="24.5" y2="23.5" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#C41E3A"/>
+        <stop offset="50%" stopColor="#A31328"/>
+        <stop offset="100%" stopColor="#7B0D1E"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+export const GoldenIconBriefcase = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect x="4" y="12" width="24" height="16" rx="2" stroke="#C9973A" strokeWidth="1.1"/>
+    <path d="M11 12 L11 10 C11 8.3 12.3 7 14 7 L18 7 C19.7 7 21 8.3 21 10 L21 12" stroke="#C9973A" strokeWidth="1.1"/>
+    <line x1="4" y1="19" x2="28" y2="19" stroke="#C9973A" strokeWidth="0.8"/>
+    <rect x="13" y="17" width="6" height="4" rx="1.5" stroke="#8B5E1A" strokeWidth="1"/>
+    <circle cx="16" cy="19" r="1" stroke="#C9973A" strokeWidth="0.7"/>
+  </svg>
+);
+
+export const GoldenIconType = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <path d="M6 9.5 L16 5.5 L26 9.5" stroke="#C9973A" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+    <line x1="16" y1="5.5" x2="16" y2="26.5" stroke="#8B5E1A" strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="10.5" y1="26.5" x2="21.5" y2="26.5" stroke="#C9973A" strokeWidth="1.3" strokeLinecap="round"/>
+    <circle cx="6" cy="9.5" r="1.5" stroke="#C9973A" strokeWidth="0.8"/>
+    <circle cx="26" cy="9.5" r="1.5" stroke="#C9973A" strokeWidth="0.8"/>
+  </svg>
+);
+
+export const GoldenIconWallet = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect x="3" y="9.5" width="26" height="17" rx="2" stroke="#C9973A" strokeWidth="1.1"/>
+    <path d="M3 15 L29 15" stroke="#C9973A" strokeWidth="0.8"/>
+    <rect x="19" y="17.5" width="9" height="6" rx="1.5" stroke="#C9973A" strokeWidth="0.9"/>
+    <circle cx="23.5" cy="20.5" r="1.8" stroke="#8B5E1A" strokeWidth="1"/>
+    <path d="M7 9.5 L7 8 C7 6.3 8.3 5 10 5 L22 5 C23.7 5 25 6.3 25 8 L25 9.5" stroke="#C9973A" strokeWidth="1"/>
+  </svg>
+);
+
+export const GoldenIconSparkles = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <path d="M16 4 L17.7 11.5 L24.5 9 L20 15 L25.5 20 L17.7 18.5 L16 26 L14.3 18.5 L6.5 20 L12 15 L7.5 9 L14.3 11.5Z" stroke="#C9973A" strokeWidth="1.1" strokeLinejoin="round"/>
+    <circle cx="16" cy="15" r="2.5" stroke="#8B5E1A" strokeWidth="1.1"/>
+    <circle cx="25" cy="6" r="1.8" stroke="#C9973A" strokeWidth="0.9"/>
+    <line x1="25" y1="3.5" x2="25" y2="5" stroke="#C9973A" strokeWidth="0.8" strokeLinecap="round"/>
+    <line x1="25" y1="7" x2="25" y2="8.5" stroke="#C9973A" strokeWidth="0.8" strokeLinecap="round"/>
+    <line x1="22.5" y1="6" x2="24" y2="6" stroke="#C9973A" strokeWidth="0.8" strokeLinecap="round"/>
+    <line x1="26" y1="6" x2="27.5" y2="6" stroke="#C9973A" strokeWidth="0.8" strokeLinecap="round"/>
+  </svg>
+);
+
+export const GOLDEN_ICONS: Record<string, React.ComponentType> = {
+  Compass: GoldenIconCompass,
+  Users: GoldenIconUsers,
+  CalendarDays: GoldenIconCalendarDays,
+  Calendar: GoldenIconCalendar,
+  Clock: GoldenIconClock,
+  Brain: GoldenIconBrain,
+  Building: GoldenIconBuilding,
+  FileText: GoldenIconFileText,
+  Heart: GoldenIconHeart,
+  Briefcase: GoldenIconBriefcase,
+  Type: GoldenIconType,
+  Wallet: GoldenIconWallet,
+  Sparkles: GoldenIconSparkles,
+};
