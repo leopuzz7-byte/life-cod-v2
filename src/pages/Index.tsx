@@ -579,12 +579,12 @@ const Index = () => {
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-display mb-6 md:mb-8 text-center flex items-center justify-center gap-2" style={{fontWeight:600,letterSpacing:'-0.02em',color:'#1a1a1a'}}>
                     {t("calculator.title")}
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block flex-shrink-0">
-                      <path d="M14 23.5C14 23.5 3.5 17.5 3.5 10.5C3.5 7.46 5.96 5 9 5C10.96 5 12.68 6.02 13.75 7.56C13.88 7.74 14.12 7.74 14.25 7.56C15.32 6.02 17.04 5 19 5C22.04 5 24.5 7.46 24.5 10.5C24.5 17.5 14 23.5 14 23.5Z" fill="url(#brownHeart)" stroke="#7A3E20" strokeWidth="0.6"/>
+                      <path d="M14 23.5C14 23.5 3.5 17.5 3.5 10.5C3.5 7.46 5.96 5 9 5C10.96 5 12.68 6.02 13.75 7.56C13.88 7.74 14.12 7.74 14.25 7.56C15.32 6.02 17.04 5 19 5C22.04 5 24.5 7.46 24.5 10.5C24.5 17.5 14 23.5 14 23.5Z" fill="url(#redHeart)" stroke="#6B0020" strokeWidth="0.5"/>
                       <defs>
-                        <linearGradient id="brownHeart" x1="3.5" y1="5" x2="24.5" y2="23.5" gradientUnits="userSpaceOnUse">
-                          <stop offset="0%" stopColor="#C9703A"/>
-                          <stop offset="50%" stopColor="#A0522D"/>
-                          <stop offset="100%" stopColor="#7A3E20"/>
+                        <linearGradient id="redHeart" x1="3.5" y1="5" x2="24.5" y2="23.5" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stopColor="#C41E3A"/>
+                          <stop offset="50%" stopColor="#A31328"/>
+                          <stop offset="100%" stopColor="#7B0D1E"/>
                         </linearGradient>
                       </defs>
                     </svg>
@@ -601,7 +601,7 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "1"
-                          ? "bg-[#f5f1ec] border-[#1A0800] shadow-[0_4px_20px_rgba(30,8,0,0.15)]"
+                          ? "bg-[#edebe4] border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
                           : "bg-white border-[#3D1A00] hover:border-[#1A0800]"
                       )}
                     >
@@ -627,7 +627,7 @@ const Index = () => {
                             <h3 className="font-display font-semibold text-foreground text-base md:text-lg">
                               {t("methodology.methodology1")}
                             </h3>
-                            <span className="text-xs px-2 py-0.5 rounded-full" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>
+                            <span className="text-xs px-2 py-0.5" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'5px',fontWeight:500}}>
                               {t("methodology.arcana22")}
                             </span>
                           </div>
@@ -641,7 +641,7 @@ const Index = () => {
                               t("methodology.features.forecasts"),
                               t("methodology.features.lifePeriods"),
                             ].map((feature, i) => (
-                              <span key={i} className="text-xs px-2 py-1 rounded-full" style={{background:'rgba(196,152,90,0.12)',color:'#8B5E1A'}}>
+                              <span key={i} className="text-xs px-2 py-1" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'6px',fontWeight:500}}>
                                 {feature}
                               </span>
                             ))}
@@ -660,7 +660,7 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-[#f5f1ec] border-[#1A0800] shadow-[0_4px_16px_rgba(30,8,0,0.15)]"
+                                ? "bg-[#edebe4] border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
                                 : "bg-white border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
@@ -700,7 +700,7 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "2"
-                          ? "bg-[#f5f1ec] border-[#1A0800] shadow-[0_4px_20px_rgba(30,8,0,0.15)]"
+                          ? "bg-[#edebe4] border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
                           : "bg-white border-[#3D1A00] hover:border-[#1A0800]"
                       )}
                     >
@@ -720,7 +720,7 @@ const Index = () => {
                             <h3 className="font-display font-semibold text-base md:text-lg" style={{color:'#1a1a1a'}}>
                               {t("methodology.methodology2")}
                             </h3>
-                            <span className="text-xs px-2 py-0.5 rounded-full" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>
+                            <span className="text-xs px-2 py-0.5" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'5px',fontWeight:500}}>
                               {t("methodology.classic")}
                             </span>
                           </div>
@@ -734,7 +734,7 @@ const Index = () => {
                               t("methodology.features.realizationNumber"),
                               t("methodology.features.outcomeNumber"),
                             ].map((feature, i) => (
-                              <span key={i} className="text-xs px-2 py-1 rounded-full" style={{background:'rgba(196,152,90,0.12)',color:'#8B5E1A'}}>
+                              <span key={i} className="text-xs px-2 py-1" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'6px',fontWeight:500}}>
                                 {feature}
                               </span>
                             ))}
@@ -753,7 +753,7 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-[#f5f1ec] border-[#1A0800] shadow-[0_4px_16px_rgba(30,8,0,0.15)]"
+                                ? "bg-[#edebe4] border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
                                 : "bg-white border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
