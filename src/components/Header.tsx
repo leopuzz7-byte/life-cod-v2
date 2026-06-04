@@ -55,8 +55,6 @@ export function Header() {
 
         {/* Right side: My Analyses, language, support, auth */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Мои разборы — заметная кнопка, видна всегда для залогиненных
-              (и на десктопе, и на мобильных — без прокрутки меню) */}
           {user && (
             <Link
               to="/my-analyses"
@@ -115,8 +113,7 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile navigation — только основные разделы.
-          "Мои разборы" вынесены в кнопку справа сверху, листать не нужно. */}
+      {/* Mobile navigation */}
       <nav className="md:hidden flex items-center justify-start gap-1 pb-2 pt-1 px-3 border-t border-white/10 overflow-x-auto scrollbar-hide">
         {baseNavItems.map((item) => (
           <Link
@@ -129,4 +126,11 @@ export function Header() {
                 : "text-white/70"
             )}
           >
- 
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+      </div>
+    </header>
+  );
+}
