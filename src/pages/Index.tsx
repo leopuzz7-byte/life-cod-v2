@@ -660,8 +660,8 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-[#edebe4] border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                                : "bg-white border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
+                                ? "gradient-card border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
+                                : "gradient-card border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
                             <div className="flex flex-col gap-2.5">
@@ -753,8 +753,8 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left",
                               selectedMethod === method.id
-                                ? "bg-[#edebe4] border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                                : "bg-white border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
+                                ? "gradient-card border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
+                                : "gradient-card border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
                             <div className="flex flex-col gap-2.5">
@@ -988,3 +988,4 @@ const Index = () => {
 };
 
 export default Index;
+ault Index;

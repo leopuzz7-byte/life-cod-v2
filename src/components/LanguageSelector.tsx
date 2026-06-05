@@ -33,7 +33,7 @@ export function LanguageSelector({ variant = 'default' }: LanguageSelectorProps)
         className={cn(
           "flex items-center gap-2 rounded-full transition-colors focus:outline-none",
           variant === 'header'
-            ? "w-10 h-10 justify-center bg-white/10 hover:bg-white/20 text-white/80 border border-white/20"
+            ? "w-10 h-10 justify-center bg-transparent hover:bg-[hsl(14,100%,4%)]/8 text-[hsl(14,100%,4%)] border border-[hsl(14,100%,4%)]"
             : "px-3 py-2 bg-secondary hover:bg-secondary/80 text-foreground"
         )}
       >
