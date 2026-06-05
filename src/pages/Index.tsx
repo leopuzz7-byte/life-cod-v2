@@ -520,13 +520,8 @@ const Index = () => {
       {/* Mobile: fullscreen background behind header */}
       {!user && (
         <div
-          className="md:hidden absolute inset-0"
-          style={{
-            backgroundImage: `url(${heroMobileImg})`,
-            backgroundSize: '110% auto',
-            backgroundPosition: 'top center',
-            backgroundRepeat: 'no-repeat',
-          }}
+          className="md:hidden absolute inset-0 bg-cover bg-top"
+          style={{ backgroundImage: `url(${heroMobileImg})` }}
         />
       )}
       <Header />
@@ -547,12 +542,11 @@ const Index = () => {
             {/* Hero block — shown only to non-authenticated visitors */}
             {!user && (
               <section className="relative">
-                {/* ── MOBILE: full-screen image hero (bg is set on page root) ── */}
+                {/* ── MOBILE: text content only (bg is set on page root) ── */}
                 <div
-                  className="md:hidden flex flex-col justify-between"
+                  className="md:hidden"
                   style={{ minHeight: 'calc(100vh - 80px)' }}
                 >
-                  {/* Text — top area */}
                   <div className="pt-6 px-6 text-center">
                     <h1 className="font-display text-4xl leading-tight mb-4" style={{color:'hsl(14,100%,4%)'}}>
                       Life Cod: ключ к осознанной жизни
@@ -564,31 +558,31 @@ const Index = () => {
                       Ответ уже записан в вашей дате рождения.
                     </p>
                   </div>
+                </div>
 
-                  {/* Button — raised higher, transparent with thin brown border */}
-                  <div className="flex flex-col items-center gap-3 pb-32 px-6">
-                    <Link to="/register" className="w-full max-w-xs">
-                      <Button
-                        className="w-full h-14 rounded-full text-base font-medium text-[hsl(14,100%,4%)]"
-                        style={{
-                          background: 'rgba(245, 242, 236, 0.55)',
-                          backdropFilter: 'blur(20px)',
-                          WebkitBackdropFilter: 'blur(20px)',
-                          border: '1px solid hsl(14, 100%, 4%)',
-                          boxShadow: 'none',
-                        }}
-                      >
-                        Начать разбор →
-                      </Button>
-                    </Link>
-                    <Link
-                      to="/login"
-                      className="text-sm font-medium underline transition-colors"
-                      style={{color:'hsl(14,100%,4%)'}}
+                {/* ── MOBILE: fixed bottom CTA ── */}
+                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col items-center gap-3 px-6 pb-8 pt-3">
+                  <Link to="/register" className="w-full max-w-xs">
+                    <Button
+                      className="w-full h-14 rounded-full text-base font-medium text-[hsl(14,100%,4%)]"
+                      style={{
+                        background: 'rgba(245, 242, 236, 0.55)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid hsl(14, 100%, 4%)',
+                        boxShadow: 'none',
+                      }}
                     >
-                      Уже есть аккаунт? Войти
-                    </Link>
-                  </div>
+                      Начать разбор →
+                    </Button>
+                  </Link>
+                  <Link
+                    to="/login"
+                    className="text-sm font-medium underline transition-colors"
+                    style={{color:'hsl(14,100%,4%)'}}
+                  >
+                    Уже есть аккаунт? Войти
+                  </Link>
                 </div>
 
                 {/* ── DESKTOP: text only (unchanged) ── */}
