@@ -520,8 +520,13 @@ const Index = () => {
       {/* Mobile: fullscreen background behind header */}
       {!user && (
         <div
-          className="md:hidden absolute inset-0 bg-cover bg-top"
-          style={{ backgroundImage: `url(${heroMobileImg})` }}
+          className="md:hidden absolute inset-0"
+          style={{
+            backgroundImage: `url(${heroMobileImg})`,
+            backgroundSize: '110% auto',
+            backgroundPosition: 'top center',
+            backgroundRepeat: 'no-repeat',
+          }}
         />
       )}
       <Header />
@@ -563,11 +568,24 @@ const Index = () => {
                   {/* Button — raised higher, transparent with thin brown border */}
                   <div className="flex flex-col items-center gap-3 pb-32 px-6">
                     <Link to="/register" className="w-full max-w-xs">
-                      <Button className="w-full h-14 rounded-full text-base font-medium bg-transparent border border-[hsl(14,100%,4%)] text-[hsl(14,100%,4%)]">
+                      <Button
+                        className="w-full h-14 rounded-full text-base font-medium text-[hsl(14,100%,4%)]"
+                        style={{
+                          background: 'rgba(245, 242, 236, 0.55)',
+                          backdropFilter: 'blur(20px)',
+                          WebkitBackdropFilter: 'blur(20px)',
+                          border: '1px solid hsl(14, 100%, 4%)',
+                          boxShadow: 'none',
+                        }}
+                      >
                         Начать разбор →
                       </Button>
                     </Link>
-                    <Link to="/login" className="text-sm transition-colors" style={{color:'hsl(14,60%,25%)'}}>
+                    <Link
+                      to="/login"
+                      className="text-sm font-medium underline transition-colors"
+                      style={{color:'hsl(14,100%,4%)'}}
+                    >
                       Уже есть аккаунт? Войти
                     </Link>
                   </div>
