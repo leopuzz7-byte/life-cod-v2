@@ -659,7 +659,7 @@ const Index = () => {
                             <div className="md:hidden min-h-[90px] pb-14">
                               {method.comingSoon && <span className="inline-block text-[8px] px-1 py-0.5 rounded-full font-medium mb-1" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
                               <h4 className="font-display font-semibold text-sm leading-snug" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                              <p className="text-[11px] mt-1 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
+                              <p className="text-xs mt-1 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
                             </div>
                             {/* Icon 52×52 absolute bottom-right — same position on every card */}
                             <div className="md:hidden absolute bottom-2 right-2 flex items-center justify-center pointer-events-none" style={{width:52,height:52}}>
@@ -753,7 +753,7 @@ const Index = () => {
                             <div className="md:hidden min-h-[90px] pb-14">
                               {method.comingSoon && <span className="inline-block text-[8px] px-1 py-0.5 rounded-full font-medium mb-1" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
                               <h4 className="font-display font-semibold text-sm leading-snug" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                              <p className="text-[11px] mt-1 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
+                              <p className="text-xs mt-1 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
                             </div>
                             {/* Icon 52×52 absolute bottom-right — same position on every card */}
                             <div className="md:hidden absolute bottom-2 right-2 flex items-center justify-center pointer-events-none" style={{width:52,height:52}}>
