@@ -20,6 +20,8 @@ export function Header() {
 
   const isMyAnalysesActive = location.pathname.startsWith("/my-analyses");
 
+  const brown = "hsl(14,100%,4%)";
+
   return (
     <header className="sticky top-0 z-50 w-full pt-3 px-10 bg-transparent">
       <div className="glass-brown rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,3,0,0.38)]">
@@ -32,7 +34,6 @@ export function Header() {
           />
         </Link>
 
-        {/* Desktop navigation */}
         <nav className="hidden md:flex items-center gap-6 flex-1 justify-center">
           {baseNavItems.map((item) => (
             <Link
@@ -53,7 +54,6 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Right side: My Analyses, language, support, auth */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {user && (
             <Link
@@ -113,12 +113,23 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile navigation */}
-      <nav className="md:hidden flex items-center justify-start gap-1 pb-2 pt-1 px-3 border-t border-white/10 overflow-x-auto scrollbar-hide">
+      <nav className="md:hidden flex items-center justify-start gap-1 pb-2 pt-1 px-3 border-t border-black/10 overflow-x-auto scrollbar-hide">
         {baseNavItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}
             className={cn(
               "text-[11px] font-medium transition-colors whitespace-nowrap px-2.5 py-1.5 rounded-full flex-shrink-0",
-         
+              location.pathname === item.path
+                ? "text-[hsl(14,100%,4%)] bg-[hsl(14,100%,4%)]/10"
+                : "text-[hsl(14,100%,4%)]/60"
+            )}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+      </div>
+    </header>
+  );
+}
