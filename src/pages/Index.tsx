@@ -988,4 +988,3 @@ const Index = () => {
 };
 
 export default Index;
-ault Index;
