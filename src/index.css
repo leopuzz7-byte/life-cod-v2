@@ -163,6 +163,13 @@
     from { transform: translateX(100%); opacity: 0.5; }
     to   { transform: translateX(0);    opacity: 1; }
   }
+  .animate-slide-right-out {
+    animation: slide-right-out 0.22s ease-in forwards;
+  }
+  @keyframes slide-right-out {
+    from { transform: translateX(0);    opacity: 1; }
+    to   { transform: translateX(100%); opacity: 0.5; }
+  }
 
   .text-brown {
     color: hsl(var(--brown));

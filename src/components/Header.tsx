@@ -22,6 +22,12 @@ export function Header() {
   const isMyAnalysesActive = location.pathname.startsWith("/my-analyses");
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
+
+  const closeMenu = () => {
+    setMenuClosing(true);
+    setTimeout(() => { setMenuOpen(false); setMenuClosing(false); }, 220);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full pt-3 px-3 sm:px-10 bg-transparent">
@@ -126,21 +132,21 @@ export function Header() {
 
       {/* Mobile drawer */}
       {menuOpen && (
-        <div className="fixed inset-0 z-[100] md:hidden" onClick={() => setMenuOpen(false)}>
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-[100] md:hidden" onClick={closeMenu}>
+          <div className={`absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-[220ms] ${menuClosing ? 'opacity-0' : 'opacity-100'}`} />
           <div
-            className="absolute top-0 right-0 h-full w-72 flex flex-col glass-brown shadow-2xl animate-slide-right"
+            className={`absolute top-0 right-0 h-full w-72 flex flex-col glass-brown shadow-2xl ${menuClosing ? 'animate-slide-right-out' : 'animate-slide-right'}`}
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-[hsl(14,100%,4%)]/15">
               <img src={logo} alt="logo" className="h-9 w-auto" />
-              <button onClick={() => setMenuOpen(false)} className="w-9 h-9 flex items-center justify-center rounded-full border border-[hsl(14,100%,4%)]/40 text-[hsl(14,100%,4%)] transition-all active:scale-95">
+              <button onClick={closeMenu} className="w-9 h-9 flex items-center justify-center rounded-full border border-[hsl(14,100%,4%)]/40 text-[hsl(14,100%,4%)] transition-all active:scale-95">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <nav className="flex flex-col px-4 pt-3 pb-1 gap-0.5">
               {baseNavItems.map((item) => (
-                <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
+                <Link key={item.path} to={item.path} onClick={closeMenu}
                   className={cn("px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                     location.pathname === item.path
                       ? "bg-[hsl(14,100%,4%)]/10 text-[hsl(14,100%,4%)]"
@@ -152,18 +158,18 @@ export function Header() {
             <div className="mx-4 my-2 border-t border-[hsl(14,100%,4%)]/15" />
             <div className="flex flex-col px-4 gap-2">
               {user && (
-                <Link to="/my-analyses" onClick={() => setMenuOpen(false)}
+                <Link to="/my-analyses" onClick={closeMenu}
                   className={cn("flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors",
                     isMyAnalysesActive ? "bg-[hsl(14,100%,4%)] text-white border-[hsl(14,100%,4%)]" : "border-[hsl(14,100%,4%)] text-[hsl(14,100%,4%)]"
                   )}
                 ><FolderClock className="w-4 h-4" />{t("nav.myAnalyses")}</Link>
               )}
               {!loading && (user ? (
-                <Link to="/profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[hsl(14,100%,4%)] text-white text-sm font-medium">
+                <Link to="/profile" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[hsl(14,100%,4%)] text-white text-sm font-medium">
                   <User className="w-4 h-4" />{t("nav.profile")}
                 </Link>
               ) : (
-                <Link to="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[hsl(14,100%,4%)] text-white text-sm font-medium">
+                <Link to="/login" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[hsl(14,100%,4%)] text-white text-sm font-medium">
                   <LogIn className="w-4 h-4" />{t("nav.login")}
                 </Link>
               ))}
@@ -171,7 +177,7 @@ export function Header() {
             <div className="mx-4 my-2 border-t border-[hsl(14,100%,4%)]/15" />
             <div className="flex items-center gap-4 px-5 py-3">
               <LanguageSelector variant="default" />
-              <Link to="/support" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 text-sm text-[hsl(14,100%,4%)]/60 hover:text-[hsl(14,100%,4%)] transition-colors">
+              <Link to="/support" onClick={closeMenu} className="flex items-center gap-2 text-sm text-[hsl(14,100%,4%)]/60 hover:text-[hsl(14,100%,4%)] transition-colors">
                 <HelpCircle className="w-4 h-4" />{t("nav.support")}
               </Link>
             </div>
