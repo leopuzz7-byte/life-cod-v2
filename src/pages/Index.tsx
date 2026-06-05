@@ -605,7 +605,7 @@ const Index = () => {
                           : "bg-white border-[#3D1A00] hover:border-[#1A0800]"
                       )}
                     >
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap" style={{background:'#fff',border:'1px solid #C9973A',borderRadius:'4px',color:'#8B5E1A',letterSpacing:'0.08em',textTransform:'uppercase'}}>
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap" style={{background:'#fdfaf5',border:'1px solid hsl(14,100%,4%)',borderRadius:'20px',color:'hsl(14,100%,4%)',letterSpacing:'0.08em',textTransform:'uppercase'}}>
                         <Sparkles className="w-3 h-3" />
                         {t("methodology.moreAccurate")}
                       </div>
