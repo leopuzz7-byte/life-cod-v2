@@ -41,13 +41,13 @@ export function Header() {
               className={cn(
                 "text-sm font-medium transition-colors relative py-1",
                 location.pathname === item.path
-                  ? "text-white"
-                  : "text-white/70 hover:text-white"
+                  ? "text-[hsl(14,100%,4%)]"
+                  : "text-[hsl(14,100%,4%)]/60 hover:text-[hsl(14,100%,4%)]"
               )}
             >
               {item.label}
               {location.pathname === item.path && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/50 rounded-full" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[hsl(14,100%,4%)]/40 rounded-full" />
               )}
             </Link>
           ))}
@@ -61,8 +61,8 @@ export function Header() {
               className={cn(
                 "h-10 px-3 sm:px-4 rounded-full flex items-center gap-1.5 transition-colors border text-sm font-medium",
                 isMyAnalysesActive
-                  ? "bg-white text-primary border-white"
-                  : "bg-white/15 hover:bg-white/25 text-white border-white/25"
+                  ? "bg-[hsl(14,100%,4%)] text-white border-[hsl(14,100%,4%)]"
+                  : "bg-transparent hover:bg-[hsl(14,100%,4%)]/8 text-[hsl(14,100%,4%)] border-[hsl(14,100%,4%)]"
               )}
               aria-label={t("nav.myAnalyses")}
             >
@@ -78,8 +78,8 @@ export function Header() {
             className={cn(
               "w-10 h-10 rounded-full hidden sm:flex items-center justify-center transition-colors border",
               location.pathname === "/support"
-                ? "bg-white/20 text-white border-white/30"
-                : "bg-white/10 hover:bg-white/20 text-white/80 border-white/20"
+                ? "bg-[hsl(14,100%,4%)] text-white border-[hsl(14,100%,4%)]"
+                : "bg-transparent hover:bg-[hsl(14,100%,4%)]/8 text-[hsl(14,100%,4%)] border-[hsl(14,100%,4%)]"
             )}
             aria-label={t("nav.support")}
           >
@@ -93,8 +93,8 @@ export function Header() {
                 className={cn(
                   "h-10 px-3 sm:px-4 rounded-full flex items-center gap-2 transition-colors border text-sm font-medium",
                   location.pathname === "/profile"
-                    ? "bg-white/20 text-white border-white/30"
-                    : "bg-white/10 hover:bg-white/20 text-white border-white/20"
+                    ? "bg-[hsl(14,100%,4%)] text-white border-[hsl(14,100%,4%)]"
+                    : "bg-transparent hover:bg-[hsl(14,100%,4%)]/8 text-[hsl(14,100%,4%)] border-[hsl(14,100%,4%)]"
                 )}
               >
                 <User className="w-4 h-4" />
@@ -103,7 +103,7 @@ export function Header() {
             ) : (
               <Link
                 to="/login"
-                className="h-10 px-4 rounded-full flex items-center gap-2 transition-colors border bg-white/10 hover:bg-white/20 text-white border-white/20 text-sm font-medium"
+                className="h-10 px-4 rounded-full flex items-center gap-2 transition-colors border bg-transparent hover:bg-[hsl(14,100%,4%)]/8 text-[hsl(14,100%,4%)] border-[hsl(14,100%,4%)] text-sm font-medium"
               >
                 <LogIn className="w-4 h-4" />
                 <span>{t("nav.login")}</span>
@@ -121,16 +121,4 @@ export function Header() {
             to={item.path}
             className={cn(
               "text-[11px] font-medium transition-colors whitespace-nowrap px-2.5 py-1.5 rounded-full flex-shrink-0",
-              location.pathname === item.path
-                ? "text-white bg-white/15"
-                : "text-white/70"
-            )}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      </div>
-    </header>
-  );
-}
+         
