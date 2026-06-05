@@ -321,7 +321,7 @@
       "lifeManifest": "How it manifests in life",
       "money": "💰 Money and finances",
       "work": "💼 Work and realization",
-      "relationships": "❤️ Relationships",
+      "relationships": "🧡 Relationships",
       "health": "🏥 Health",
       "innerState": "🧠 Inner state",
       "energyInteractions": "Energy interactions",
@@ -481,7 +481,7 @@
       "synergyConflict": "Synergy and conflicts of energies",
       "money": "💰 Money and finances",
       "career": "💼 Career and work",
-      "relationships": "❤️ Relationships",
+      "relationships": "🧡 Relationships",
       "health": "🏥 Health",
       "innerState": "🧠 Inner state",
       "weekly": "📅 Week-by-week forecast",
@@ -590,7 +590,7 @@
     "harmony": "Harmony"
   },
   "calculator": {
-    "title": "Your journey begins here ❤️",
+    "title": "Your journey begins here",
     "selectMethodology": "Select calculation method",
     "yourName": "Your name",
     "namePlaceholder": "Enter your name",
@@ -1056,7 +1056,7 @@
     "personalAnalysis": "Personal analysis",
     "areas": {
       "relationships": {
-        "title": "❤️ Relationships"
+        "title": "🧡 Relationships"
       },
       "career": {
         "title": "💼 Self-realization / work"
