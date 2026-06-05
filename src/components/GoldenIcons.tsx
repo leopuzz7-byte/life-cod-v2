@@ -14,7 +14,7 @@ import iconWallet        from '@/assets/icons/icon_wallet.png';
 import iconStar          from '@/assets/icons/icon_star.png';
 
 const Ico = ({ src, className }: { src: string; className?: string }) => (
-  <img src={src} alt="" style={{ width: 36, height: 36, objectFit: 'contain', display: 'inline-block' }} className={className} />
+  <img src={src} alt="" style={{ width: 64, height: 64, objectFit: 'contain', display: 'inline-block', flexShrink: 0 }} className={className} />
 );
 
 export const GoldenIconCompass      = (p: { className?: string }) => <Ico src={iconCompass}       {...p} />;
