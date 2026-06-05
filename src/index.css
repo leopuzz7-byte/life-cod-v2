@@ -156,6 +156,14 @@
     box-shadow: none;
   }
 
+  .animate-slide-right {
+    animation: slide-right 0.22s ease-out;
+  }
+  @keyframes slide-right {
+    from { transform: translateX(100%); opacity: 0.5; }
+    to   { transform: translateX(0);    opacity: 1; }
+  }
+
   .text-brown {
     color: hsl(var(--brown));
   }

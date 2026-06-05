@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { HelpCircle, LogIn, User, FolderClock } from "lucide-react";
+import { HelpCircle, LogIn, User, FolderClock, Menu, X } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { LanguageSelector } from "./LanguageSelector";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,11 +21,11 @@ export function Header() {
 
   const isMyAnalysesActive = location.pathname.startsWith("/my-analyses");
 
-  const brown = "hsl(14,100%,4%)";
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full pt-3 px-10 bg-transparent">
-      <div className="glass-brown rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,3,0,0.38)]">
+    <header className="sticky top-0 z-50 w-full pt-2 sm:pt-3 px-0 sm:px-10 bg-transparent">
+      <div className="glass-brown rounded-b-3xl sm:rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,3,0,0.38)]">
       <div className="container mx-auto px-4 h-[68px] flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
@@ -54,7 +55,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="hidden md:flex items-center gap-2 flex-shrink-0">
           {user && (
             <Link
               to="/my-analyses"
@@ -111,25 +112,72 @@ export function Header() {
             )
           )}
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[hsl(14,100%,4%)] text-[hsl(14,100%,4%)] transition-all active:scale-95"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Меню"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+      </div>
       </div>
 
-      <nav className="md:hidden flex items-center justify-start gap-1 pb-2 pt-1 px-3 border-t border-black/10 overflow-x-auto scrollbar-hide">
-        {baseNavItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "text-[11px] font-medium transition-colors whitespace-nowrap px-2.5 py-1.5 rounded-full flex-shrink-0",
-              location.pathname === item.path
-                ? "text-[hsl(14,100%,4%)] bg-[hsl(14,100%,4%)]/10"
-                : "text-[hsl(14,100%,4%)]/60"
-            )}
+      {/* Mobile drawer */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[100] md:hidden" onClick={() => setMenuOpen(false)}>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <div
+            className="absolute top-0 right-0 h-full w-72 flex flex-col glass-brown shadow-2xl animate-slide-right"
+            onClick={e => e.stopPropagation()}
           >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      </div>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[hsl(14,100%,4%)]/15">
+              <img src={logo} alt="logo" className="h-9 w-auto" />
+              <button onClick={() => setMenuOpen(false)} className="w-9 h-9 flex items-center justify-center rounded-full border border-[hsl(14,100%,4%)]/40 text-[hsl(14,100%,4%)] transition-all active:scale-95">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <nav className="flex flex-col px-4 pt-3 pb-1 gap-0.5">
+              {baseNavItems.map((item) => (
+                <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
+                  className={cn("px-4 py-3 rounded-xl text-sm font-medium transition-colors",
+                    location.pathname === item.path
+                      ? "bg-[hsl(14,100%,4%)]/10 text-[hsl(14,100%,4%)]"
+                      : "text-[hsl(14,100%,4%)]/60 hover:text-[hsl(14,100%,4%)] hover:bg-[hsl(14,100%,4%)]/5"
+                  )}
+                >{item.label}</Link>
+              ))}
+            </nav>
+            <div className="mx-4 my-2 border-t border-[hsl(14,100%,4%)]/15" />
+            <div className="flex flex-col px-4 gap-2">
+              {user && (
+                <Link to="/my-analyses" onClick={() => setMenuOpen(false)}
+                  className={cn("flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors",
+                    isMyAnalysesActive ? "bg-[hsl(14,100%,4%)] text-white border-[hsl(14,100%,4%)]" : "border-[hsl(14,100%,4%)] text-[hsl(14,100%,4%)]"
+                  )}
+                ><FolderClock className="w-4 h-4" />{t("nav.myAnalyses")}</Link>
+              )}
+              {!loading && (user ? (
+                <Link to="/profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[hsl(14,100%,4%)] text-white text-sm font-medium">
+                  <User className="w-4 h-4" />{t("nav.profile")}
+                </Link>
+              ) : (
+                <Link to="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[hsl(14,100%,4%)] text-white text-sm font-medium">
+                  <LogIn className="w-4 h-4" />{t("nav.login")}
+                </Link>
+              ))}
+            </div>
+            <div className="mx-4 my-2 border-t border-[hsl(14,100%,4%)]/15" />
+            <div className="flex items-center gap-4 px-5 py-3">
+              <LanguageSelector variant="default" />
+              <Link to="/support" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 text-sm text-[hsl(14,100%,4%)]/60 hover:text-[hsl(14,100%,4%)] transition-colors">
+                <HelpCircle className="w-4 h-4" />{t("nav.support")}
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
