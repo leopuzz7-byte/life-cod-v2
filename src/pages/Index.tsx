@@ -536,25 +536,19 @@ const Index = () => {
               <section className="pt-8 md:pt-12 lg:pt-16 pb-2">
                 <div className="container mx-auto px-4">
                   <div className="max-w-2xl mx-auto text-center">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-6" style={{background:'linear-gradient(135deg,#F5DFA0,rgba(201,151,58,0.3))',border:'1px solid rgba(201,151,58,0.5)'}}>
-                      <Sparkles className="w-6 h-6" style={{color:'#8B5E1A'}} />
-                    </div>
                     <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-primary mb-5 leading-tight">
-                      Персональная диагностика Life C⚙D
+                      Life Cod: ключ к осознанной жизни
                     </h1>
-                    <p className="text-base md:text-lg text-muted-foreground mb-4 leading-relaxed">
-                      Понимание себя, своих жизненных циклов, сильных и слабых сторон, а также текущего периода жизни.
+                    <p className="text-base md:text-lg text-muted-foreground mb-3 leading-relaxed">
+                      Вы чувствуете, что что-то идёт не так — но не понимаете почему?
                     </p>
-                    <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
-                      Этот инструмент помогает увидеть, как ты принимаешь решения, где твоя опора и на что сейчас важно обратить внимание.
-                    </p>
-                    <p className="text-sm text-muted-foreground/70 italic mb-8">
-                      Без мистики. Без обещаний изменить тебя. Только структура и логика.
+                    <p className="text-base md:text-lg text-muted-foreground mb-8 leading-relaxed">
+                      Ответ уже записан в вашей дате рождения.
                     </p>
                     <div className="flex flex-col items-center gap-3">
                       <Link to="/register">
                         <Button className="h-14 px-8 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary">
-                          Начать диагностику
+                          Начать разбор
                           <span className="ml-2">→</span>
                         </Button>
                       </Link>
@@ -597,7 +591,6 @@ const Index = () => {
                       )}
                     >
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap" style={{background:'#fdfaf5',border:'1px solid hsl(14,100%,4%)',borderRadius:'20px',color:'hsl(14,100%,4%)',letterSpacing:'0.08em',textTransform:'uppercase'}}>
-                        <Sparkles className="w-3 h-3" />
                         {t("methodology.moreAccurate")}
                       </div>
 
@@ -670,7 +663,6 @@ const Index = () => {
                               <div className="flex items-start justify-between">
                                 {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-7 h-7" style={{color:'#C9973A'}} />; })()}
                                 <div className="flex items-center gap-1">
-                                  {selectedMethod === method.id && <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />}
                                   {method.comingSoon && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
                                 </div>
                               </div>
@@ -764,7 +756,6 @@ const Index = () => {
                               <div className="flex items-start justify-between">
                                 {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-7 h-7" style={{color:'#C9973A'}} />; })()}
                                 <div className="flex items-center gap-1">
-                                  {selectedMethod === method.id && <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />}
                                   {method.comingSoon && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
                                 </div>
                               </div>
