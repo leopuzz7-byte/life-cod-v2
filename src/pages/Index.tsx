@@ -516,7 +516,14 @@ const Index = () => {
   }));
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      {/* Mobile: fullscreen background behind header */}
+      {!user && (
+        <div
+          className="md:hidden absolute inset-0 bg-cover bg-top"
+          style={{ backgroundImage: `url(${heroMobileImg})` }}
+        />
+      )}
       <Header />
 
       <main className="relative z-10">
@@ -535,28 +542,28 @@ const Index = () => {
             {/* Hero block — shown only to non-authenticated visitors */}
             {!user && (
               <section className="relative">
-                {/* ── MOBILE: full-screen image hero ── */}
+                {/* ── MOBILE: full-screen image hero (bg is set on page root) ── */}
                 <div
-                  className="md:hidden min-h-screen flex flex-col justify-between bg-cover bg-top"
-                  style={{ backgroundImage: `url(${heroMobileImg})` }}
+                  className="md:hidden flex flex-col justify-between"
+                  style={{ minHeight: 'calc(100vh - 80px)' }}
                 >
-                  {/* Text — top area (naturally light cream in image) */}
+                  {/* Text — top area */}
                   <div className="pt-6 px-6 text-center">
-                    <h1 className="font-display text-3xl leading-tight mb-4" style={{color:'hsl(14,100%,4%)'}}>
+                    <h1 className="font-display text-4xl leading-tight mb-4" style={{color:'hsl(14,100%,4%)'}}>
                       Life Cod: ключ к осознанной жизни
                     </h1>
-                    <p className="text-sm leading-relaxed mb-2" style={{color:'hsl(14,60%,20%)'}}>
+                    <p className="text-lg leading-relaxed mb-2" style={{color:'hsl(14,60%,20%)'}}>
                       Вы чувствуете, что что-то идёт не так — но не понимаете почему?
                     </p>
-                    <p className="text-sm leading-relaxed" style={{color:'hsl(14,60%,20%)'}}>
+                    <p className="text-lg leading-relaxed" style={{color:'hsl(14,60%,20%)'}}>
                       Ответ уже записан в вашей дате рождения.
                     </p>
                   </div>
 
-                  {/* Button — bottom, above the tree */}
-                  <div className="flex flex-col items-center gap-3 pb-14 px-6">
+                  {/* Button — raised higher, transparent with thin brown border */}
+                  <div className="flex flex-col items-center gap-3 pb-32 px-6">
                     <Link to="/register" className="w-full max-w-xs">
-                      <Button className="w-full h-14 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary">
+                      <Button className="w-full h-14 rounded-full text-base font-medium bg-transparent border border-[hsl(14,100%,4%)] text-[hsl(14,100%,4%)]">
                         Начать разбор →
                       </Button>
                     </Link>
