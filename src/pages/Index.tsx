@@ -578,16 +578,7 @@ const Index = () => {
                 <div className="max-w-4xl mx-auto">
                   <h2 className="text-xl sm:text-2xl md:text-4xl font-display mb-6 md:mb-8 text-center flex items-center justify-center gap-2 whitespace-nowrap" style={{fontWeight:600,letterSpacing:'-0.02em',color:'#1a1a1a'}}>
                     {t("calculator.title")}
-                    <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block flex-shrink-0">
-                      <path d="M14 23.5C14 23.5 3.5 17.5 3.5 10.5C3.5 7.46 5.96 5 9 5C10.96 5 12.68 6.02 13.75 7.56C13.88 7.74 14.12 7.74 14.25 7.56C15.32 6.02 17.04 5 19 5C22.04 5 24.5 7.46 24.5 10.5C24.5 17.5 14 23.5 14 23.5Z" fill="url(#goldHeart)" stroke="#8B5E1A" strokeWidth="0.5"/>
-                      <defs>
-                        <linearGradient id="goldHeart" x1="3.5" y1="5" x2="24.5" y2="23.5" gradientUnits="userSpaceOnUse">
-                          <stop offset="0%" stopColor="#F0C060"/>
-                          <stop offset="50%" stopColor="#C9973A"/>
-                          <stop offset="100%" stopColor="#8B5E1A"/>
-                        </linearGradient>
-                      </defs>
-                    </svg>
+                    {(() => { const H = GOLDEN_ICONS['Heart']; return H ? <H className="!w-7 !h-7 inline-block flex-shrink-0" /> : null; })()}
                   </h2>
 
                   <p className="text-base md:text-lg font-medium text-center mb-4 md:mb-6" style={{color:'#3D1A00'}}>
@@ -652,7 +643,7 @@ const Index = () => {
 
                     {/* Methods grid - shown when Methodology 1 is selected */}
                     {selectedMethodology === "1" && (
-                      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+                      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                         {methodology1Methods.map((method) => (
                           <button
                             key={method.id}
@@ -664,34 +655,25 @@ const Index = () => {
                                 : "gradient-card border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
-                            <div>
-                              {/* Mobile: text left, icon right */}
-                              <div className="flex items-center gap-3 md:hidden">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1 mb-0.5">
-                                    {selectedMethod === method.id && <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />}
-                                    {method.comingSoon && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                                  </div>
-                                  <h4 className="font-display font-semibold text-sm leading-snug" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                                  <p className="text-[11px] mt-0.5 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
+                            <div className="flex flex-col items-center gap-1.5 md:items-start md:gap-2.5">
+                              {/* Icon — centered on mobile, top-left on desktop */}
+                              <div className="flex items-center justify-center md:justify-between md:w-full">
+                                <div className="flex items-center justify-center w-11 h-11 md:w-auto md:h-auto">
+                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-10 !h-10 md:!w-auto md:!h-auto" /> : <method.icon className="w-8 h-8 md:w-7 md:h-7" style={{color:'#C9973A'}} />; })()}
                                 </div>
-                                <div className="flex-shrink-0 w-14 h-14 flex items-center justify-center">
-                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-12 !h-12" /> : <method.icon className="w-10 h-10" style={{color:'#C9973A'}} />; })()}
+                                <div className="hidden md:flex items-center gap-1">
+                                  {selectedMethod === method.id && <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />}
+                                  {method.comingSoon && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
                                 </div>
                               </div>
-                              {/* Desktop: icon top, text below */}
-                              <div className="hidden md:flex flex-col gap-2.5">
-                                <div className="flex items-start justify-between">
-                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-7 h-7" style={{color:'#C9973A'}} />; })()}
-                                  <div className="flex items-center gap-1">
-                                    {selectedMethod === method.id && <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />}
-                                    {method.comingSoon && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                                  </div>
+                              {/* Text */}
+                              <div className="text-center md:text-left w-full">
+                                <div className="flex items-center justify-center md:hidden gap-1 mb-0.5">
+                                  {selectedMethod === method.id && <Sparkles className="w-2.5 h-2.5" style={{color:'#C9973A'}} />}
+                                  {method.comingSoon && <span className="text-[8px] px-1 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
                                 </div>
-                                <div>
-                                  <h4 className="font-display font-semibold text-lg" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                                  <p className="text-sm mt-1 line-clamp-2" style={{color:'#6b6b6b'}}>{method.description}</p>
-                                </div>
+                                <h4 className="font-display font-semibold text-xs md:text-lg leading-tight" style={{color:'#1a1a1a'}}>{method.name}</h4>
+                                <p className="hidden md:block text-sm mt-1 line-clamp-2" style={{color:'#6b6b6b'}}>{method.description}</p>
                               </div>
                             </div>
                           </button>
@@ -752,7 +734,7 @@ const Index = () => {
 
                     {/* Methods grid - shown when Methodology 2 is selected */}
                     {selectedMethodology === "2" && (
-                      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+                      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                         {methodology2Methods.map((method) => (
                           <button
                             key={method.id}
@@ -764,34 +746,25 @@ const Index = () => {
                                 : "gradient-card border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
-                            <div>
-                              {/* Mobile: text left, icon right */}
-                              <div className="flex items-center gap-3 md:hidden">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1 mb-0.5">
-                                    {selectedMethod === method.id && <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />}
-                                    {method.comingSoon && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                                  </div>
-                                  <h4 className="font-display font-semibold text-sm leading-snug" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                                  <p className="text-[11px] mt-0.5 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
+                            <div className="flex flex-col items-center gap-1.5 md:items-start md:gap-2.5">
+                              {/* Icon — centered on mobile, top-left on desktop */}
+                              <div className="flex items-center justify-center md:justify-between md:w-full">
+                                <div className="flex items-center justify-center w-11 h-11 md:w-auto md:h-auto">
+                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-10 !h-10 md:!w-auto md:!h-auto" /> : <method.icon className="w-8 h-8 md:w-7 md:h-7" style={{color:'#C9973A'}} />; })()}
                                 </div>
-                                <div className="flex-shrink-0 w-14 h-14 flex items-center justify-center">
-                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-12 !h-12" /> : <method.icon className="w-10 h-10" style={{color:'#C9973A'}} />; })()}
+                                <div className="hidden md:flex items-center gap-1">
+                                  {selectedMethod === method.id && <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />}
+                                  {method.comingSoon && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
                                 </div>
                               </div>
-                              {/* Desktop: icon top, text below */}
-                              <div className="hidden md:flex flex-col gap-2.5">
-                                <div className="flex items-start justify-between">
-                                  {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-7 h-7" style={{color:'#C9973A'}} />; })()}
-                                  <div className="flex items-center gap-1">
-                                    {selectedMethod === method.id && <Sparkles className="w-3 h-3" style={{color:'#C9973A'}} />}
-                                    {method.comingSoon && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                                  </div>
+                              {/* Text */}
+                              <div className="text-center md:text-left w-full">
+                                <div className="flex items-center justify-center md:hidden gap-1 mb-0.5">
+                                  {selectedMethod === method.id && <Sparkles className="w-2.5 h-2.5" style={{color:'#C9973A'}} />}
+                                  {method.comingSoon && <span className="text-[8px] px-1 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
                                 </div>
-                                <div>
-                                  <h4 className="font-display font-semibold text-lg" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                                  <p className="text-sm mt-1 line-clamp-2" style={{color:'#6b6b6b'}}>{method.description}</p>
-                                </div>
+                                <h4 className="font-display font-semibold text-xs md:text-lg leading-tight" style={{color:'#1a1a1a'}}>{method.name}</h4>
+                                <p className="hidden md:block text-sm mt-1 line-clamp-2" style={{color:'#6b6b6b'}}>{method.description}</p>
                               </div>
                             </div>
                           </button>
