@@ -24,8 +24,8 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full pt-2 sm:pt-3 px-0 sm:px-10 bg-transparent">
-      <div className="glass-brown rounded-b-3xl sm:rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,3,0,0.38)]">
+    <header className="sticky top-0 z-50 w-full pt-3 px-3 sm:px-10 bg-transparent">
+      <div className="glass-brown rounded-3xl sm:rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,3,0,0.38)]">
       <div className="container mx-auto px-4 h-[68px] flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
