@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import heroMobileImg from "@/assets/hero-mobile.png";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
 import { useAccess } from "@/lib/accessControl";
@@ -533,31 +534,61 @@ const Index = () => {
           <>
             {/* Hero block — shown only to non-authenticated visitors */}
             {!user && (
-              <section className="pt-8 md:pt-12 lg:pt-16 pb-2">
-                <div className="container mx-auto px-4">
-                  <div className="max-w-2xl mx-auto text-center">
-                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-primary mb-5 leading-tight">
+              <section className="relative">
+                {/* ── MOBILE: full-screen image hero ── */}
+                <div
+                  className="md:hidden min-h-screen flex flex-col justify-between bg-cover bg-top"
+                  style={{ backgroundImage: `url(${heroMobileImg})` }}
+                >
+                  {/* Text — top area (naturally light cream in image) */}
+                  <div className="pt-6 px-6 text-center">
+                    <h1 className="font-display text-3xl leading-tight mb-4" style={{color:'hsl(14,100%,4%)'}}>
                       Life Cod: ключ к осознанной жизни
                     </h1>
-                    <p className="text-base md:text-lg text-muted-foreground mb-3 leading-relaxed">
+                    <p className="text-sm leading-relaxed mb-2" style={{color:'hsl(14,60%,20%)'}}>
                       Вы чувствуете, что что-то идёт не так — но не понимаете почему?
                     </p>
-                    <p className="text-base md:text-lg text-muted-foreground mb-8 leading-relaxed">
+                    <p className="text-sm leading-relaxed" style={{color:'hsl(14,60%,20%)'}}>
                       Ответ уже записан в вашей дате рождения.
                     </p>
-                    <div className="flex flex-col items-center gap-3">
-                      <Link to="/register">
-                        <Button className="h-14 px-8 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary">
-                          Начать разбор
-                          <span className="ml-2">→</span>
-                        </Button>
-                      </Link>
-                      <Link
-                        to="/login"
-                        className="text-sm text-muted-foreground hover:text-primary transition-colors mt-1"
-                      >
-                        Уже есть аккаунт? Войти в калькулятор
-                      </Link>
+                  </div>
+
+                  {/* Button — bottom, above the tree */}
+                  <div className="flex flex-col items-center gap-3 pb-14 px-6">
+                    <Link to="/register" className="w-full max-w-xs">
+                      <Button className="w-full h-14 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary">
+                        Начать разбор →
+                      </Button>
+                    </Link>
+                    <Link to="/login" className="text-sm transition-colors" style={{color:'hsl(14,60%,25%)'}}>
+                      Уже есть аккаунт? Войти
+                    </Link>
+                  </div>
+                </div>
+
+                {/* ── DESKTOP: text only (unchanged) ── */}
+                <div className="hidden md:block pt-12 lg:pt-16 pb-2">
+                  <div className="container mx-auto px-4">
+                    <div className="max-w-2xl mx-auto text-center">
+                      <h1 className="font-display text-4xl md:text-5xl text-primary mb-5 leading-tight">
+                        Life Cod: ключ к осознанной жизни
+                      </h1>
+                      <p className="text-lg text-muted-foreground mb-3 leading-relaxed">
+                        Вы чувствуете, что что-то идёт не так — но не понимаете почему?
+                      </p>
+                      <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                        Ответ уже записан в вашей дате рождения.
+                      </p>
+                      <div className="flex flex-col items-center gap-3">
+                        <Link to="/register">
+                          <Button className="h-14 px-8 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary">
+                            Начать разбор →
+                          </Button>
+                        </Link>
+                        <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors mt-1">
+                          Уже есть аккаунт? Войти в калькулятор
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
