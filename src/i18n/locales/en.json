@@ -30,7 +30,7 @@
       },
       "compatibility": {
         "title": "Compatibility",
-        "desc": "Compatibility analysis of two people by birth date",
+        "desc": "Compatibility analysis of two people",
         "basicDesc": "Compatibility percentage, union arcana, brief conclusions",
         "proDesc": "Full analysis: harmony, karma, strengths/weaknesses, recommendations",
         "savedLabel": "Compatibility"
@@ -51,7 +51,7 @@
       },
       "day": {
         "title": "Day Forecast",
-        "desc": "A detailed breakdown of energies for a specific day",
+        "desc": "A detailed breakdown of daily energies",
         "basicDesc": "",
         "proDesc": "All 12 positions of the day with full descriptions",
         "savedLabel": "Day Forecast"
@@ -65,7 +65,7 @@
       },
       "contract": {
         "title": "Contract Energy",
-        "desc": "Energy analysis of the contract signing date",
+        "desc": "Analysis of the contract signing date",
         "basicDesc": "",
         "proDesc": "All 12 positions: resources, hidden motives, karmic lesson",
         "savedLabel": "Contract Energy"

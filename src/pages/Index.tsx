@@ -651,22 +651,19 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left w-full",
                               selectedMethod === method.id
-                                ? "gradient-card border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                                : "gradient-card border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
+                                ? "gradient-card border-[#3D1A00] md:border-[#1A0800] shadow-[0_0_0_2px_rgba(201,151,58,0.45),0_0_10px_rgba(201,151,58,0.12)] md:shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
+                                : "gradient-card border-[#3D1A00] md:hover:border-[#1A0800] md:hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
                             {/* Mobile: text left + icon absolute top-right */}
-                            <div className="md:hidden min-h-[88px] pr-14">
-                              <div className="flex items-center gap-1 mb-1">
-                                {selectedMethod === method.id && <Sparkles className="w-2.5 h-2.5" style={{color:'#C9973A'}} />}
-                                {method.comingSoon && <span className="text-[8px] px-1 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                              </div>
-                              <h4 className="font-display font-semibold text-xs leading-tight" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                              <p className="text-[10px] mt-1 line-clamp-3 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
+                            <div className="md:hidden min-h-[80px] pr-12">
+                              {method.comingSoon && <span className="inline-block text-[8px] px-1 py-0.5 rounded-full font-medium mb-1" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
+                              <h4 className="font-display font-semibold text-xs truncate" style={{color:'#1a1a1a'}}>{method.name}</h4>
+                              <p className="text-[10px] mt-1 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
                             </div>
-                            {/* Icon fixed 52×52 absolute top-right on mobile */}
-                            <div className="md:hidden absolute top-2 right-2 w-13 h-13 flex items-center justify-center pointer-events-none" style={{width:52,height:52}}>
-                              {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-full !h-full" /> : <method.icon style={{width:44,height:44,color:'#C9973A'}} />; })()}
+                            {/* Icon fixed 44×44 absolute top-right on mobile — uniform box */}
+                            <div className="md:hidden absolute top-2 right-2 flex items-center justify-center pointer-events-none" style={{width:44,height:44}}>
+                              {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-full !h-full" /> : <method.icon style={{width:38,height:38,color:'#C9973A'}} />; })()}
                             </div>
                             {/* Desktop: icon top, text below */}
                             <div className="hidden md:flex flex-col gap-2.5">
@@ -748,22 +745,19 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left w-full",
                               selectedMethod === method.id
-                                ? "gradient-card border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                                : "gradient-card border-[#3D1A00] hover:border-[#1A0800] hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
+                                ? "gradient-card border-[#3D1A00] md:border-[#1A0800] shadow-[0_0_0_2px_rgba(201,151,58,0.45),0_0_10px_rgba(201,151,58,0.12)] md:shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
+                                : "gradient-card border-[#3D1A00] md:hover:border-[#1A0800] md:hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
                             )}
                           >
                             {/* Mobile: text left + icon absolute top-right */}
-                            <div className="md:hidden min-h-[88px] pr-14">
-                              <div className="flex items-center gap-1 mb-1">
-                                {selectedMethod === method.id && <Sparkles className="w-2.5 h-2.5" style={{color:'#C9973A'}} />}
-                                {method.comingSoon && <span className="text-[8px] px-1 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                              </div>
-                              <h4 className="font-display font-semibold text-xs leading-tight" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                              <p className="text-[10px] mt-1 line-clamp-3 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
+                            <div className="md:hidden min-h-[80px] pr-12">
+                              {method.comingSoon && <span className="inline-block text-[8px] px-1 py-0.5 rounded-full font-medium mb-1" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
+                              <h4 className="font-display font-semibold text-xs truncate" style={{color:'#1a1a1a'}}>{method.name}</h4>
+                              <p className="text-[10px] mt-1 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
                             </div>
-                            {/* Icon fixed 52×52 absolute top-right on mobile */}
-                            <div className="md:hidden absolute top-2 right-2 w-13 h-13 flex items-center justify-center pointer-events-none" style={{width:52,height:52}}>
-                              {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-full !h-full" /> : <method.icon style={{width:44,height:44,color:'#C9973A'}} />; })()}
+                            {/* Icon fixed 44×44 absolute top-right on mobile — uniform box */}
+                            <div className="md:hidden absolute top-2 right-2 flex items-center justify-center pointer-events-none" style={{width:44,height:44}}>
+                              {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-full !h-full" /> : <method.icon style={{width:38,height:38,color:'#C9973A'}} />; })()}
                             </div>
                             {/* Desktop: icon top, text below */}
                             <div className="hidden md:flex flex-col gap-2.5">

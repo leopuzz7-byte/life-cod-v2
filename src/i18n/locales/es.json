@@ -30,7 +30,7 @@
       },
       "compatibility": {
         "title": "Compatibilidad",
-        "desc": "Análisis de compatibilidad de dos personas por fecha de nacimiento",
+        "desc": "Análisis de compatibilidad de dos personas",
         "basicDesc": "Porcentaje de compatibilidad, arcano de unión, conclusiones breves",
         "proDesc": "Análisis completo: armonía, karma, fortalezas/debilidades, recomendaciones",
         "savedLabel": "Compatibilidad"
@@ -51,7 +51,7 @@
       },
       "day": {
         "title": "Pronóstico Diario",
-        "desc": "Un desglose detallado de las energías de un día concreto",
+        "desc": "Un desglose detallado de las energías diarias",
         "basicDesc": "",
         "proDesc": "Las 12 posiciones del día con descripciones completas",
         "savedLabel": "Pronóstico Diario"
@@ -65,7 +65,7 @@
       },
       "contract": {
         "title": "Energía del Contrato",
-        "desc": "Análisis energético de la fecha de firma del contrato",
+        "desc": "Análisis de la fecha de firma del contrato",
         "basicDesc": "",
         "proDesc": "Las 12 posiciones: recursos, motivos ocultos, lección kármica",
         "savedLabel": "Energía del Contrato"
