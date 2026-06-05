@@ -159,7 +159,7 @@ export const analysisConfigs: AnalysisTypeConfig[] = [
     methodId: 'contract',
     title: 'Энергия договора',
     description: 'Энергетический анализ даты заключения договора',
-    icon: 'Building',
+    icon: 'FileText',
     basic: { available: false, isFree: false, label: 'Базовый', description: '' },
     professional: {
       available: true,
@@ -177,7 +177,7 @@ export const analysisConfigs: AnalysisTypeConfig[] = [
     methodId: 'classic-full',
     title: 'Предназначение',
     description: '4 главных числа вашей судьбы',
-    icon: 'FileText',
+    icon: 'Compass',
     basic: {
       available: true,
       isFree: true,
