@@ -17,6 +17,10 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Downloaded source images (not needed in repo)
+карты/
+copy-arcana.ps1
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
