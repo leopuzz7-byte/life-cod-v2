@@ -425,11 +425,9 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
 
 /* === Sub-components === */
 
-// Lazy-loaded arcana images via Vite glob (WebP for performance)
-const arcanaModules = import.meta.glob('/src/assets/arcana/arcana-*.webp', { eager: true });
+// Images served from public/arcana/ — no import needed
 function getArcanaImage(n: number): string {
-  const key = `/src/assets/arcana/arcana-${n}.webp`;
-  return (arcanaModules[key] as { default: string })?.default ?? '';
+  return `/arcana/arcana-${n}.webp`;
 }
 
 function MatrixCell({ position, value, isMirror = false, isReversed = false, isHighlight = false }: { position: number; value: number; isMirror?: boolean; isReversed?: boolean; isHighlight?: boolean }) {
