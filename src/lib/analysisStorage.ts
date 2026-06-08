@@ -66,8 +66,8 @@ export async function saveAnalysis(data: CreateAnalysisInput): Promise<{ id: str
       "Сохранение разбора"
     );
     if (error) return { id: null, error: error.message };
-    // Инвалидируем кеш списка — при следующем заходе подтянется свежий
-    // (а до этого сразу покажется кеш без новой записи — допустимо)
+    // Инвалидируем кеш списка — при следующем открытии «Мои разборы» подтянется свежий
+    try { localStorage.removeItem(LIST_CACHE_KEY); } catch {}
     return { id: row?.id || null, error: null };
   } catch (e) {
     return { id: null, error: e instanceof Error ? e.message : "Ошибка сохранения" };

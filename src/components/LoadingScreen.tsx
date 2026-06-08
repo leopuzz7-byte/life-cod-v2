@@ -104,8 +104,7 @@ export function LoadingScreen({ methodId, phrases }: LoadingScreenProps) {
       {/* Крутящиеся фразы */}
       <p
         className="text-center text-sm sm:text-base font-display max-w-xs leading-relaxed transition-opacity duration-300"
-        style={{ color: "#0F2044CC" }}
-        style={{ opacity: visible ? 1 : 0, minHeight: "2.5rem" }}
+        style={{ color: "#0F2044CC", opacity: visible ? 1 : 0, minHeight: "2.5rem" }}
       >
         {list[index]}
       </p>

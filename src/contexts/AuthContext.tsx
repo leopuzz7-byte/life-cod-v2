@@ -164,14 +164,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         setSession(session);
         setUser(session?.user ?? null);
+        // Снимаем loading сразу — сессия уже известна, кнопка профиля появится мгновенно.
+        // Профиль подгружается параллельно и обновит UI когда придёт.
+        if (!cancelled) setLoading(false);
         if (session?.user) {
           loadProfile(session.user.id)
-            .catch((e) => console.error("[Auth] loadProfile failed:", e))
-            .finally(() => {
-              if (!cancelled) setLoading(false);
-            });
-        } else {
-          setLoading(false);
+            .catch((e) => console.error("[Auth] loadProfile failed:", e));
         }
       })
       .catch((e) => {
