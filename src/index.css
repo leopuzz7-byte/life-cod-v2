@@ -20,13 +20,13 @@
     --secondary-foreground: 20 40% 25%;
     --muted: 35 18% 85%;
     --muted-foreground: 20 20% 45%;
-    --accent: 30 50% 45%;
-    --accent-foreground: 35 30% 95%;
+    --accent: 221 40% 92%;
+    --accent-foreground: 221 64% 16%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 30 20% 80%;
-    --input: 35 18% 88%;
-    --ring: 30 50% 45%;
+    --border: 221 20% 80%;
+    --input: 221 25% 84%;
+    --ring: 221 64% 16%;
     --radius: 0.75rem;
     --sidebar-background: 30 25% 90%;
     --sidebar-foreground: 20 40% 20%;

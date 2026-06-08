@@ -57,7 +57,7 @@ export function TierSelector({
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <Zap className="w-4 h-4 flex-shrink-0" style={{color:'#C9973A'}} />
+                <Zap className="w-4 h-4 flex-shrink-0" style={{color:'#0F2044'}} />
                 <span className="font-display font-semibold text-sm" style={{color:'#2D1A00'}}>
                   {config.basic.label}
                 </span>
@@ -68,7 +68,7 @@ export function TierSelector({
                       ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                       : ""
                   )}
-                  style={!(priceBasic === 0 || config.basic.isFree) ? {background:'rgba(196,152,90,0.15)',color:'#8B5E1A'} : {}}
+                  style={!(priceBasic === 0 || config.basic.isFree) ? {background:'#dbeafe',color:'#1e40af',fontWeight:600} : {}}
                 >
                   {priceBasic != null
                     ? formatPrice(priceBasic)
@@ -103,11 +103,11 @@ export function TierSelector({
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <Crown className="w-4 h-4 flex-shrink-0" style={{color:'#C9973A'}} />
+              <Crown className="w-4 h-4 flex-shrink-0" style={{color:'#0F2044'}} />
               <span className="font-display font-semibold text-sm" style={{color:'#2D1A00'}}>
                 {config.professional.label}
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{background:'#0F2044',color:'#ffffff',fontWeight:600}}>
                 {pricePro != null ? formatPrice(pricePro) : "..."}
               </span>
             </div>

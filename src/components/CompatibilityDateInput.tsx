@@ -84,12 +84,12 @@ export function CompatibilityDateInput({ onCalculate }: CompatibilityDateInputPr
               </label>
               <div className="grid grid-cols-3 gap-2 md:gap-3">
                 <Select value={day1} onValueChange={setDay1}>
-                  <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                  <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                     <SelectValue placeholder={t("calculator.day")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border max-h-60">
+                  <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                     {days.map((d) => (
-                      <SelectItem key={d.value} value={d.value} className="focus:bg-secondary">
+                      <SelectItem key={d.value} value={d.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                         {d.label}
                       </SelectItem>
                     ))}
@@ -97,12 +97,12 @@ export function CompatibilityDateInput({ onCalculate }: CompatibilityDateInputPr
                 </Select>
 
                 <Select value={month1} onValueChange={setMonth1}>
-                  <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                  <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                     <SelectValue placeholder={t("calculator.month")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border max-h-60">
+                  <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                     {months.map((m) => (
-                      <SelectItem key={m.value} value={m.value} className="focus:bg-secondary">
+                      <SelectItem key={m.value} value={m.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                         {m.label}
                       </SelectItem>
                     ))}
@@ -110,12 +110,12 @@ export function CompatibilityDateInput({ onCalculate }: CompatibilityDateInputPr
                 </Select>
 
                 <Select value={year1} onValueChange={setYear1}>
-                  <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                  <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                     <SelectValue placeholder={t("calculator.year")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border max-h-60">
+                  <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                     {years.map((y) => (
-                      <SelectItem key={y.value} value={y.value} className="focus:bg-secondary">
+                      <SelectItem key={y.value} value={y.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                         {y.label}
                       </SelectItem>
                     ))}
@@ -157,12 +157,12 @@ export function CompatibilityDateInput({ onCalculate }: CompatibilityDateInputPr
               </label>
               <div className="grid grid-cols-3 gap-2 md:gap-3">
                 <Select value={day2} onValueChange={setDay2}>
-                  <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                  <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                     <SelectValue placeholder={t("calculator.day")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border max-h-60">
+                  <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                     {days.map((d) => (
-                      <SelectItem key={d.value} value={d.value} className="focus:bg-secondary">
+                      <SelectItem key={d.value} value={d.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                         {d.label}
                       </SelectItem>
                     ))}
@@ -170,12 +170,12 @@ export function CompatibilityDateInput({ onCalculate }: CompatibilityDateInputPr
                 </Select>
 
                 <Select value={month2} onValueChange={setMonth2}>
-                  <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                  <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                     <SelectValue placeholder={t("calculator.month")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border max-h-60">
+                  <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                     {months.map((m) => (
-                      <SelectItem key={m.value} value={m.value} className="focus:bg-secondary">
+                      <SelectItem key={m.value} value={m.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                         {m.label}
                       </SelectItem>
                     ))}
@@ -183,12 +183,12 @@ export function CompatibilityDateInput({ onCalculate }: CompatibilityDateInputPr
                 </Select>
 
                 <Select value={year2} onValueChange={setYear2}>
-                  <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                  <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                     <SelectValue placeholder={t("calculator.year")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border max-h-60">
+                  <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                     {years.map((y) => (
-                      <SelectItem key={y.value} value={y.value} className="focus:bg-secondary">
+                      <SelectItem key={y.value} value={y.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                         {y.label}
                       </SelectItem>
                     ))}

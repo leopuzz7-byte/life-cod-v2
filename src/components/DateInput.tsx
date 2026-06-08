@@ -109,12 +109,12 @@ export function DateInput({ selectedMethod, onCalculate }: DateInputProps) {
             </label>
             <div className="grid grid-cols-3 gap-3">
               <Select value={day} onValueChange={setDay}>
-                <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                   <SelectValue placeholder={t("calculator.day")} />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-border max-h-60">
+                <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                   {days.map((d) => (
-                    <SelectItem key={d.value} value={d.value} className="focus:bg-secondary">
+                    <SelectItem key={d.value} value={d.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                       {d.label}
                     </SelectItem>
                   ))}
@@ -122,12 +122,12 @@ export function DateInput({ selectedMethod, onCalculate }: DateInputProps) {
               </Select>
 
               <Select value={month} onValueChange={setMonth}>
-                <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                   <SelectValue placeholder={t("calculator.month")} />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-border max-h-60">
+                <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                   {months.map((m) => (
-                    <SelectItem key={m.value} value={m.value} className="focus:bg-secondary">
+                    <SelectItem key={m.value} value={m.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                       {m.label}
                     </SelectItem>
                   ))}
@@ -135,12 +135,12 @@ export function DateInput({ selectedMethod, onCalculate }: DateInputProps) {
               </Select>
 
               <Select value={year} onValueChange={setYear}>
-                <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                   <SelectValue placeholder={t("calculator.year")} />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-border max-h-60">
+                <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                   {years.map((y) => (
-                    <SelectItem key={y.value} value={y.value} className="focus:bg-secondary">
+                    <SelectItem key={y.value} value={y.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                       {y.label}
                     </SelectItem>
                   ))}
@@ -157,12 +157,12 @@ export function DateInput({ selectedMethod, onCalculate }: DateInputProps) {
               <div className={`grid gap-3 ${(selectedMethod === "month" || selectedMethod === "day" || selectedMethod === "contract") ? "grid-cols-3" : (selectedMethod === "year" || selectedMethod === "lifecod-personal") ? "grid-cols-1" : "grid-cols-1"}`}>
                 {(selectedMethod === "day" || selectedMethod === "contract") && (
                   <Select value={targetDay} onValueChange={setTargetDay}>
-                    <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                    <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                       <SelectValue placeholder={t("calculator.day")} />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-border max-h-60">
+                    <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                       {days.map((d) => (
-                        <SelectItem key={d.value} value={d.value} className="focus:bg-secondary">
+                        <SelectItem key={d.value} value={d.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                           {d.label}
                         </SelectItem>
                       ))}
@@ -171,12 +171,12 @@ export function DateInput({ selectedMethod, onCalculate }: DateInputProps) {
                 )}
                 {(selectedMethod === "month" || selectedMethod === "day" || selectedMethod === "contract") && (
                   <Select value={targetMonth} onValueChange={setTargetMonth}>
-                    <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                    <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                       <SelectValue placeholder={t("calculator.month")} />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-border max-h-60">
+                    <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                       {months.map((m) => (
-                        <SelectItem key={m.value} value={m.value} className="focus:bg-secondary">
+                        <SelectItem key={m.value} value={m.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                           {m.label}
                         </SelectItem>
                       ))}
@@ -185,12 +185,12 @@ export function DateInput({ selectedMethod, onCalculate }: DateInputProps) {
                 )}
 
                 <Select value={targetYear} onValueChange={setTargetYear}>
-                  <SelectTrigger className="bg-background border-border focus:border-primary h-12">
+                  <SelectTrigger className="bg-background border-[#0F2044]/40 focus:border-[#0F2044] focus:ring-[#0F2044]/20 h-12">
                     <SelectValue placeholder={t("calculator.year")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border max-h-60">
+                  <SelectContent className="border-[#0F2044]/30 bg-white/90 backdrop-blur-md max-h-60">
                     {forecastYears.map((y) => (
-                      <SelectItem key={y.value} value={y.value} className="focus:bg-secondary">
+                      <SelectItem key={y.value} value={y.value} className="focus:bg-[#0F2044]/10 focus:text-[#0F2044]">
                         {y.label}
                       </SelectItem>
                     ))}

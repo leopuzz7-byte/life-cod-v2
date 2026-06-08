@@ -74,9 +74,6 @@ export default function Register() {
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
               {t("auth.registerSubtitle")}
             </p>
-            <p className="text-xs text-accent mt-2 font-medium">
-              ✶ {t("auth.registerBonus")}
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="gradient-card rounded-2xl p-6 md:p-8 border border-border space-y-4">
@@ -116,20 +113,20 @@ export default function Register() {
               <Label>{t("auth.birthDate")}</Label>
               <div className="grid grid-cols-3 gap-2">
                 <Select value={day} onValueChange={setDay} disabled={submitting}>
-                  <SelectTrigger><SelectValue placeholder={t("calculator.day")} /></SelectTrigger>
-                  <SelectContent className="max-h-60">
+                  <SelectTrigger className="border-[#0F2044]/40 focus:border-[#0F2044] h-11"><SelectValue placeholder={t("calculator.day")} /></SelectTrigger>
+                  <SelectContent className="max-h-60 border-[#0F2044]/30 bg-white/90 backdrop-blur-md">
                     {days.map((d) => <SelectItem key={d} value={String(d)}>{d}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={month} onValueChange={setMonth} disabled={submitting}>
-                  <SelectTrigger><SelectValue placeholder={t("calculator.month")} /></SelectTrigger>
-                  <SelectContent className="max-h-60">
+                  <SelectTrigger className="border-[#0F2044]/40 focus:border-[#0F2044] h-11"><SelectValue placeholder={t("calculator.month")} /></SelectTrigger>
+                  <SelectContent className="max-h-60 border-[#0F2044]/30 bg-white/90 backdrop-blur-md">
                     {months.map((_, i) => <SelectItem key={i} value={String(i + 1)}>{t(`forecast.months.${i + 1}`)}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={year} onValueChange={setYear} disabled={submitting}>
-                  <SelectTrigger><SelectValue placeholder={t("calculator.year")} /></SelectTrigger>
-                  <SelectContent className="max-h-60">
+                  <SelectTrigger className="border-[#0F2044]/40 focus:border-[#0F2044] h-11"><SelectValue placeholder={t("calculator.year")} /></SelectTrigger>
+                  <SelectContent className="max-h-60 border-[#0F2044]/30 bg-white/90 backdrop-blur-md">
                     {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
                   </SelectContent>
                 </Select>
