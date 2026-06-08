@@ -625,7 +625,7 @@ const Index = () => {
                     {(() => { const H = GOLDEN_ICONS['Heart']; return H ? <H className="!w-11 !h-11 inline-block flex-shrink-0" /> : null; })()}
                   </h2>
 
-                  <p className="text-base md:text-lg font-medium text-center mb-4 md:mb-6" style={{color:'#3D1A00'}}>
+                  <p className="text-base md:text-lg font-medium text-center mb-4 md:mb-6" style={{color:'#1a3060'}}>
                     {t("calculator.selectMethodology")}
                   </p>
 

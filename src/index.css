@@ -14,7 +14,7 @@
     --card-foreground: 20 40% 20%;
     --popover: 30 25% 90%;
     --popover-foreground: 20 40% 20%;
-    --primary: 14 100% 4%;
+    --primary: 221 64% 16%;
     --primary-foreground: 35 30% 95%;
     --secondary: 35 20% 88%;
     --secondary-foreground: 20 40% 25%;
@@ -47,7 +47,7 @@
     --warm-gray: 25 15% 55%;
     --gradient-warm: linear-gradient(180deg, hsl(14 100% 4%) 0%, hsl(14 80% 12%) 50%, hsl(20 50% 25%) 100%);
     --gradient-warm-subtle: linear-gradient(180deg, hsl(35 30% 95%) 0%, hsl(32 28% 90%) 50%, hsl(30 25% 85%) 100%);
-    --gradient-brown: linear-gradient(135deg, hsl(14 100% 4%) 0%, hsl(14 80% 12%) 100%);
+    --gradient-brown: linear-gradient(135deg, hsl(221 64% 16%) 0%, hsl(221 55% 24%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(35 25% 94%) 0%, hsl(32 22% 88%) 100%);
   }
 

@@ -46,12 +46,12 @@ export function TierSelector({
               ? "bg-[#f5f1ec] shadow-[0_4px_16px_rgba(30,8,0,0.12)]"
               : "bg-white hover:border-[#8B5E1A]"
           )}
-          style={{borderColor: selectedTier === "basic" ? '#2C1200' : '#3D1A00'}}
+          style={{borderColor: selectedTier === "basic" ? '#0F2044' : '#1a3060'}}
         >
           <div className="flex items-start gap-3">
             <div className={cn(
               "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-              selectedTier === "basic" ? "border-[#2C1200] bg-[#2C1200]" : "border-[#3D1A00]/50"
+              selectedTier === "basic" ? "border-[#0F2044] bg-[#0F2044]" : "border-[#1a3060]/50"
             )}>
               {selectedTier === "basic" && <Check className="w-3 h-3 text-[#FFF8E7]" />}
             </div>
@@ -92,12 +92,12 @@ export function TierSelector({
             ? "bg-[#f5f1ec] shadow-[0_4px_16px_rgba(30,8,0,0.12)]"
             : "bg-white hover:border-[#8B5E1A]"
         )}
-        style={{borderColor: selectedTier === "professional" ? '#2C1200' : '#3D1A00'}}
+        style={{borderColor: selectedTier === "professional" ? '#0F2044' : '#1a3060'}}
       >
         <div className="flex items-start gap-3">
           <div className={cn(
             "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-            selectedTier === "professional" ? "border-[#2C1200] bg-[#2C1200]" : "border-[#3D1A00]/50"
+            selectedTier === "professional" ? "border-[#0F2044] bg-[#0F2044]" : "border-[#1a3060]/50"
           )}>
             {selectedTier === "professional" && <Check className="w-3 h-3 text-[#FFF8E7]" />}
           </div>
