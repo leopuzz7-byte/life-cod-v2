@@ -108,7 +108,7 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
           {processing ? (
             <div className="space-y-3 py-2">
               <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
-              <p className="text-sm text-muted-foreground">{t("paymentScreen.redirecting")}</p>
+              <p className="text-sm text-center" style={{color:"#0F2044CC"}}>{t("paymentScreen.redirecting")}</p>
             </div>
           ) : (
             <div className="space-y-3">

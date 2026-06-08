@@ -47,7 +47,7 @@ export function Header() {
               key={item.path}
               to={item.path}
               className={cn(
-                "text-sm font-semibold relative py-1 transition-all duration-200 hover:scale-[1.04]",
+                "text-sm font-semibold relative py-1 transition-all duration-200",
                 "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:transition-transform after:duration-200 after:origin-center",
                 location.pathname === item.path
                   ? "text-[#0F2044] after:bg-[#0F2044]/50 after:scale-x-100"
@@ -64,10 +64,10 @@ export function Header() {
             <Link
               to="/my-analyses"
               className={cn(
-                "h-10 px-3 sm:px-4 rounded-full flex items-center gap-1.5 transition-colors border text-sm font-medium",
+                "h-10 px-3 sm:px-4 rounded-full flex items-center gap-1.5 transition-all duration-200 border text-sm font-medium",
                 isMyAnalysesActive
-                  ? "bg-[#0F2044] text-white border-[#0F2044]"
-                  : "bg-transparent hover:bg-[#0F2044]/8 text-[#0F2044] border-[#0F2044]"
+                  ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm"
+                  : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044]"
               )}
               aria-label={t("nav.myAnalyses")}
             >
@@ -81,10 +81,10 @@ export function Header() {
           <Link
             to="/support"
             className={cn(
-              "w-10 h-10 rounded-full hidden sm:flex items-center justify-center transition-colors border",
+              "w-10 h-10 rounded-full hidden sm:flex items-center justify-center transition-all duration-200 border",
               location.pathname === "/support"
-                ? "bg-[#0F2044] text-white border-[#0F2044]"
-                : "bg-transparent hover:bg-[#0F2044]/8 text-[#0F2044] border-[#0F2044]"
+                ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm"
+                : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044]"
             )}
             aria-label={t("nav.support")}
           >
@@ -96,10 +96,10 @@ export function Header() {
               <Link
                 to="/profile"
                 className={cn(
-                  "h-10 px-3 sm:px-4 rounded-full flex items-center gap-2 transition-colors border text-sm font-medium",
+                  "h-10 px-3 sm:px-4 rounded-full flex items-center gap-2 transition-all duration-200 border text-sm font-medium",
                   location.pathname === "/profile"
-                    ? "bg-[#0F2044] text-white border-[#0F2044]"
-                    : "bg-transparent hover:bg-[#0F2044]/8 text-[#0F2044] border-[#0F2044]"
+                    ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm"
+                    : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044]"
                 )}
               >
                 <User className="w-4 h-4" />
@@ -108,7 +108,7 @@ export function Header() {
             ) : (
               <Link
                 to="/login"
-                className="h-10 px-4 rounded-full flex items-center gap-2 transition-colors border bg-transparent hover:bg-[#0F2044]/8 text-[#0F2044] border-[#0F2044] text-sm font-medium"
+                className="h-10 px-4 rounded-full flex items-center gap-2 transition-all duration-200 border bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] text-sm font-medium"
               >
                 <LogIn className="w-4 h-4" />
                 <span>{t("nav.login")}</span>

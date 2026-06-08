@@ -90,12 +90,12 @@ export function LoadingScreen({ methodId, phrases }: LoadingScreenProps) {
       {/* Созвездие: дышащая звезда + расходящиеся кольца */}
       <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
         {/* расходящиеся кольца */}
-        <span className="absolute inset-0 rounded-full border border-accent/40 animate-[ringPulse_2.4s_ease-out_infinite]" />
-        <span className="absolute inset-0 rounded-full border border-accent/40 animate-[ringPulse_2.4s_ease-out_infinite_1.2s]" />
+        <span className="absolute inset-0 rounded-full border border-[#0F2044]/35 animate-[ringPulse_2.4s_ease-out_infinite]" />
+        <span className="absolute inset-0 rounded-full border border-[#0F2044]/35 animate-[ringPulse_2.4s_ease-out_infinite_1.2s]" />
         {/* центральная звезда */}
         <span
           className="text-3xl sm:text-4xl animate-[starBreathe_2.4s_ease-in-out_infinite]"
-          style={{ color: "hsl(var(--gold))" }}
+          style={{ color: "#0F2044" }}
         >
           ✶
         </span>
@@ -103,7 +103,8 @@ export function LoadingScreen({ methodId, phrases }: LoadingScreenProps) {
 
       {/* Крутящиеся фразы */}
       <p
-        className="text-center text-muted-foreground text-sm sm:text-base font-display max-w-xs leading-relaxed transition-opacity duration-300"
+        className="text-center text-sm sm:text-base font-display max-w-xs leading-relaxed transition-opacity duration-300"
+        style={{ color: "#0F2044CC" }}
         style={{ opacity: visible ? 1 : 0, minHeight: "2.5rem" }}
       >
         {list[index]}
