@@ -835,9 +835,9 @@ const Index = () => {
                       />
                       {/* What's inside Professional extended analysis (per methodology) */}
                       {selectedTier === 'professional' && currentConfig.professional && (
-                        <div className="mt-1 mb-4 px-4 py-3 rounded-lg text-xs leading-relaxed" style={{background:'rgba(196,152,90,0.08)',border:'1px solid rgba(196,152,90,0.3)'}}>
-                          <p className="font-medium mb-1" style={{color:'#8B5E1A'}}>{t("res.proExtendedIncluded")}</p>
-                          <p style={{color:'#6b6b6b'}}>{proExtendedDescription(selectedMethodology)}</p>
+                        <div className="mt-1 mb-4 px-4 py-3 rounded-xl text-xs leading-relaxed" style={{background:'rgba(15,32,68,0.04)',border:'1px solid rgba(15,32,68,0.12)'}}>
+                          <p className="font-semibold mb-1 text-[#0F2044]">{t("res.proExtendedIncluded")}</p>
+                          <p className="text-[#0F2044]/70">{proExtendedDescription(selectedMethodology)}</p>
                         </div>
                       )}
                     </div>

@@ -47,16 +47,14 @@ export function Header() {
               key={item.path}
               to={item.path}
               className={cn(
-                "text-sm font-medium transition-colors relative py-1",
+                "text-sm font-semibold relative py-1 transition-all duration-200 hover:scale-[1.04]",
+                "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:transition-transform after:duration-200 after:origin-center",
                 location.pathname === item.path
-                  ? "text-[#0F2044]"
-                  : "text-[#0F2044]/60 hover:text-[#0F2044]"
+                  ? "text-[#0F2044] after:bg-[#0F2044]/50 after:scale-x-100"
+                  : "text-[#0F2044]/80 hover:text-[#0F2044] after:bg-[#0F2044]/35 after:scale-x-0 hover:after:scale-x-100"
               )}
             >
               {item.label}
-              {location.pathname === item.path && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0F2044]/40 rounded-full" />
-              )}
             </Link>
           ))}
         </nav>
@@ -150,7 +148,7 @@ export function Header() {
                   className={cn("px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                     location.pathname === item.path
                       ? "bg-[#0F2044]/10 text-[#0F2044]"
-                      : "text-[#0F2044]/60 hover:text-[#0F2044] hover:bg-[#0F2044]/5"
+                      : "text-[#0F2044]/80 hover:text-[#0F2044] hover:bg-[#0F2044]/5"
                   )}
                 >{item.label}</Link>
               ))}

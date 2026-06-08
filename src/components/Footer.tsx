@@ -5,59 +5,36 @@ export function Footer() {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
 
-  return (
-    <footer className="w-full border-t border-border bg-background/80 backdrop-blur-sm mt-auto">
-      <div className="container mx-auto px-4 py-4 md:py-5">
-        {/* Десктоп — одна строка */}
-        <div className="hidden md:flex items-center justify-between gap-4 text-xs text-muted-foreground">
-          <span>© {year} Life COD — Ковалева Серина Надежда Владимировна. {t("footer.rights")}</span>
+  const linkClass = "flex items-center gap-1 text-[#0F2044]/55 hover:text-[#0F2044] transition-colors duration-200 hover:underline underline-offset-2";
 
+  return (
+    <footer className="w-full border-t border-[#0F2044]/10 bg-background/80 backdrop-blur-sm mt-auto">
+      <div className="container mx-auto px-4 py-4 md:py-5">
+        {/* Десктоп */}
+        <div className="hidden md:flex items-center justify-between gap-4 text-xs text-[#0F2044]/50">
+          <span>© {year} Life COD — Ковалева Серина Надежда Владимировна. {t("footer.rights")}</span>
           <div className="flex items-center gap-4">
-            <a
-              href="/oferta-life-cod.pdf"
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-primary transition-colors"
-            >
+            <a href="/oferta-life-cod.pdf" download target="_blank" rel="noopener noreferrer" className={linkClass}>
               <Download className="w-3 h-3" />
               {t("footer.offer")}
             </a>
-            <span className="text-border">|</span>
-            <a
-              href="/privacy-policy.pdf"
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-primary transition-colors"
-            >
+            <span className="text-[#0F2044]/20">|</span>
+            <a href="/privacy-policy.pdf" download target="_blank" rel="noopener noreferrer" className={linkClass}>
               <Download className="w-3 h-3" />
               {t("footer.privacy")}
             </a>
           </div>
         </div>
 
-        {/* Мобилка — две строки */}
-        <div className="md:hidden flex flex-col items-center gap-3 text-xs text-muted-foreground text-center">
+        {/* Мобилка */}
+        <div className="md:hidden flex flex-col items-center gap-3 text-xs text-[#0F2044]/50 text-center">
           <div className="flex items-center gap-4">
-            <a
-              href="/oferta-life-cod.pdf"
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-primary transition-colors"
-            >
+            <a href="/oferta-life-cod.pdf" download target="_blank" rel="noopener noreferrer" className={linkClass}>
               <Download className="w-3 h-3" />
               {t("footer.offerShort")}
             </a>
-            <span className="text-border">|</span>
-            <a
-              href="/privacy-policy.pdf"
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-primary transition-colors"
-            >
+            <span className="text-[#0F2044]/20">|</span>
+            <a href="/privacy-policy.pdf" download target="_blank" rel="noopener noreferrer" className={linkClass}>
               <Download className="w-3 h-3" />
               {t("footer.privacy")}
             </a>
