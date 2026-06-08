@@ -152,7 +152,7 @@
     background: rgba(245, 242, 236, 0.55);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid hsl(14, 100%, 4%);
+    border: 1px solid #0F2044;
     box-shadow: none;
   }
 

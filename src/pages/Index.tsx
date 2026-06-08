@@ -548,7 +548,7 @@ const Index = () => {
                   style={{ minHeight: 'calc(100vh - 80px)' }}
                 >
                   <div className="pt-6 px-6 text-center">
-                    <h1 className="font-display text-4xl leading-tight mb-4" style={{color:'hsl(14,100%,4%)'}}>
+                    <h1 className="font-display text-4xl leading-tight mb-4" style={{color:'#0F2044'}}>
                       Life Cod: ключ к осознанной жизни
                     </h1>
                     <p className="text-lg leading-relaxed mb-2" style={{color:'hsl(14,60%,20%)'}}>
@@ -564,12 +564,12 @@ const Index = () => {
                 <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col items-center gap-3 px-6 pb-8 pt-3">
                   <Link to="/register" className="w-full max-w-xs">
                     <Button
-                      className="w-full h-14 rounded-full text-base font-medium text-[hsl(14,100%,4%)]"
+                      className="w-full h-14 rounded-full text-base font-medium text-[#0F2044]"
                       style={{
                         background: 'rgba(245, 242, 236, 0.55)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid hsl(14, 100%, 4%)',
+                        border: '1px solid #0F2044',
                         boxShadow: 'none',
                       }}
                     >
@@ -579,7 +579,7 @@ const Index = () => {
                   <Link
                     to="/login"
                     className="text-sm font-medium underline transition-colors"
-                    style={{color:'hsl(14,100%,4%)'}}
+                    style={{color:'#0F2044'}}
                   >
                     Уже есть аккаунт? Войти
                   </Link>
@@ -636,11 +636,11 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "1"
-                          ? "bg-[#edebe4] border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                          : "bg-white border-[#3D1A00] hover:border-[#1A0800]"
+                          ? "bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
+                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044]"
                       )}
                     >
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap" style={{background:'#fdfaf5',border:'1px solid hsl(14,100%,4%)',borderRadius:'20px',color:'hsl(14,100%,4%)',letterSpacing:'0.08em',textTransform:'uppercase'}}>
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap" style={{background:'#fdfaf5',border:'1px solid #0F2044',borderRadius:'20px',color:'#0F2044',letterSpacing:'0.08em',textTransform:'uppercase'}}>
                         {t("methodology.moreAccurate")}
                       </div>
 
@@ -648,8 +648,8 @@ const Index = () => {
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
                           selectedMethodology === "1"
-                            ? "border-[#2C1200] bg-[#2C1200]"
-                            : "border-[#3D1A00]/50"
+                            ? "border-[#0F2044] bg-[#0F2044]"
+                            : "border-[#0F2044]/40"
                         )}>
                           {selectedMethodology === "1" && (
                             <Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />
@@ -694,8 +694,8 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left w-full",
                               selectedMethod === method.id
-                                ? "gradient-card border-[#3D1A00] md:border-[#1A0800] shadow-[0_0_0_2px_rgba(201,151,58,0.45),0_0_10px_rgba(201,151,58,0.12)] md:shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                                : "gradient-card border-[#3D1A00] md:hover:border-[#1A0800] md:hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
+                                ? "gradient-card border-[#0F2044] md:border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.5),0_0_14px_rgba(15,32,68,0.25)] md:shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
+                                : "gradient-card border-[#0F2044]/30 md:hover:border-[#0F2044] md:hover:shadow-[0_2px_10px_rgba(15,32,68,0.12)]"
                             )}
                           >
                             {/* Mobile: full-width text + icon absolute bottom-right */}
@@ -734,16 +734,16 @@ const Index = () => {
                       className={cn(
                         "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "2"
-                          ? "bg-[#edebe4] border-[#1A0800] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                          : "bg-white border-[#3D1A00] hover:border-[#1A0800]"
+                          ? "bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
+                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044]"
                       )}
                     >
                       <div className="flex items-start gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
                           selectedMethodology === "2"
-                            ? "border-[#2C1200] bg-[#2C1200]"
-                            : "border-[#3D1A00]/50"
+                            ? "border-[#0F2044] bg-[#0F2044]"
+                            : "border-[#0F2044]/40"
                         )}>
                           {selectedMethodology === "2" && (
                             <Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />
@@ -787,8 +787,8 @@ const Index = () => {
                             className={cn(
                               "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left w-full",
                               selectedMethod === method.id
-                                ? "gradient-card border-[#3D1A00] md:border-[#1A0800] shadow-[0_0_0_2px_rgba(201,151,58,0.45),0_0_10px_rgba(201,151,58,0.12)] md:shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                                : "gradient-card border-[#3D1A00] md:hover:border-[#1A0800] md:hover:shadow-[0_2px_10px_rgba(30,8,0,0.08)]"
+                                ? "gradient-card border-[#0F2044] md:border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.5),0_0_14px_rgba(15,32,68,0.25)] md:shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
+                                : "gradient-card border-[#0F2044]/30 md:hover:border-[#0F2044] md:hover:shadow-[0_2px_10px_rgba(15,32,68,0.12)]"
                             )}
                           >
                             {/* Mobile: full-width text + icon absolute bottom-right */}

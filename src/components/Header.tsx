@@ -49,13 +49,13 @@ export function Header() {
               className={cn(
                 "text-sm font-medium transition-colors relative py-1",
                 location.pathname === item.path
-                  ? "text-[hsl(14,100%,4%)]"
-                  : "text-[hsl(14,100%,4%)]/60 hover:text-[hsl(14,100%,4%)]"
+                  ? "text-[#0F2044]"
+                  : "text-[#0F2044]/60 hover:text-[#0F2044]"
               )}
             >
               {item.label}
               {location.pathname === item.path && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[hsl(14,100%,4%)]/40 rounded-full" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0F2044]/40 rounded-full" />
               )}
             </Link>
           ))}
@@ -68,8 +68,8 @@ export function Header() {
               className={cn(
                 "h-10 px-3 sm:px-4 rounded-full flex items-center gap-1.5 transition-colors border text-sm font-medium",
                 isMyAnalysesActive
-                  ? "bg-[hsl(14,100%,4%)] text-white border-[hsl(14,100%,4%)]"
-                  : "bg-transparent hover:bg-[hsl(14,100%,4%)]/8 text-[hsl(14,100%,4%)] border-[hsl(14,100%,4%)]"
+                  ? "bg-[#0F2044] text-white border-[#0F2044]"
+                  : "bg-transparent hover:bg-[#0F2044]/8 text-[#0F2044] border-[#0F2044]"
               )}
               aria-label={t("nav.myAnalyses")}
             >
@@ -85,8 +85,8 @@ export function Header() {
             className={cn(
               "w-10 h-10 rounded-full hidden sm:flex items-center justify-center transition-colors border",
               location.pathname === "/support"
-                ? "bg-[hsl(14,100%,4%)] text-white border-[hsl(14,100%,4%)]"
-                : "bg-transparent hover:bg-[hsl(14,100%,4%)]/8 text-[hsl(14,100%,4%)] border-[hsl(14,100%,4%)]"
+                ? "bg-[#0F2044] text-white border-[#0F2044]"
+                : "bg-transparent hover:bg-[#0F2044]/8 text-[#0F2044] border-[#0F2044]"
             )}
             aria-label={t("nav.support")}
           >
@@ -100,8 +100,8 @@ export function Header() {
                 className={cn(
                   "h-10 px-3 sm:px-4 rounded-full flex items-center gap-2 transition-colors border text-sm font-medium",
                   location.pathname === "/profile"
-                    ? "bg-[hsl(14,100%,4%)] text-white border-[hsl(14,100%,4%)]"
-                    : "bg-transparent hover:bg-[hsl(14,100%,4%)]/8 text-[hsl(14,100%,4%)] border-[hsl(14,100%,4%)]"
+                    ? "bg-[#0F2044] text-white border-[#0F2044]"
+                    : "bg-transparent hover:bg-[#0F2044]/8 text-[#0F2044] border-[#0F2044]"
                 )}
               >
                 <User className="w-4 h-4" />
@@ -110,7 +110,7 @@ export function Header() {
             ) : (
               <Link
                 to="/login"
-                className="h-10 px-4 rounded-full flex items-center gap-2 transition-colors border bg-transparent hover:bg-[hsl(14,100%,4%)]/8 text-[hsl(14,100%,4%)] border-[hsl(14,100%,4%)] text-sm font-medium"
+                className="h-10 px-4 rounded-full flex items-center gap-2 transition-colors border bg-transparent hover:bg-[#0F2044]/8 text-[#0F2044] border-[#0F2044] text-sm font-medium"
               >
                 <LogIn className="w-4 h-4" />
                 <span>{t("nav.login")}</span>
@@ -121,7 +121,7 @@ export function Header() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[hsl(14,100%,4%)] text-[hsl(14,100%,4%)] transition-all active:scale-95"
+          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#0F2044] text-[#0F2044] transition-all active:scale-95"
           onClick={() => setMenuOpen(true)}
           aria-label="Меню"
         >
@@ -138,9 +138,9 @@ export function Header() {
             className={`absolute top-0 right-0 h-full w-72 flex flex-col glass-brown shadow-2xl ${menuClosing ? 'animate-slide-right-out' : 'animate-slide-right'}`}
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[hsl(14,100%,4%)]/15">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#0F2044]/15">
               <img src={logo} alt="logo" className="h-9 w-auto" />
-              <button onClick={closeMenu} className="w-9 h-9 flex items-center justify-center rounded-full border border-[hsl(14,100%,4%)]/40 text-[hsl(14,100%,4%)] transition-all active:scale-95">
+              <button onClick={closeMenu} className="w-9 h-9 flex items-center justify-center rounded-full border border-[#0F2044]/40 text-[#0F2044] transition-all active:scale-95">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -149,35 +149,35 @@ export function Header() {
                 <Link key={item.path} to={item.path} onClick={closeMenu}
                   className={cn("px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                     location.pathname === item.path
-                      ? "bg-[hsl(14,100%,4%)]/10 text-[hsl(14,100%,4%)]"
-                      : "text-[hsl(14,100%,4%)]/60 hover:text-[hsl(14,100%,4%)] hover:bg-[hsl(14,100%,4%)]/5"
+                      ? "bg-[#0F2044]/10 text-[#0F2044]"
+                      : "text-[#0F2044]/60 hover:text-[#0F2044] hover:bg-[#0F2044]/5"
                   )}
                 >{item.label}</Link>
               ))}
             </nav>
-            <div className="mx-4 my-2 border-t border-[hsl(14,100%,4%)]/15" />
+            <div className="mx-4 my-2 border-t border-[#0F2044]/15" />
             <div className="flex flex-col px-4 gap-2">
               {user && (
                 <Link to="/my-analyses" onClick={closeMenu}
                   className={cn("flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors",
-                    isMyAnalysesActive ? "bg-[hsl(14,100%,4%)] text-white border-[hsl(14,100%,4%)]" : "border-[hsl(14,100%,4%)] text-[hsl(14,100%,4%)]"
+                    isMyAnalysesActive ? "bg-[#0F2044] text-white border-[#0F2044]" : "border-[#0F2044] text-[#0F2044]"
                   )}
                 ><FolderClock className="w-4 h-4" />{t("nav.myAnalyses")}</Link>
               )}
               {!loading && (user ? (
-                <Link to="/profile" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[hsl(14,100%,4%)] text-white text-sm font-medium">
+                <Link to="/profile" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0F2044] text-white text-sm font-medium">
                   <User className="w-4 h-4" />{t("nav.profile")}
                 </Link>
               ) : (
-                <Link to="/login" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[hsl(14,100%,4%)] text-white text-sm font-medium">
+                <Link to="/login" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0F2044] text-white text-sm font-medium">
                   <LogIn className="w-4 h-4" />{t("nav.login")}
                 </Link>
               ))}
             </div>
-            <div className="mx-4 my-2 border-t border-[hsl(14,100%,4%)]/15" />
+            <div className="mx-4 my-2 border-t border-[#0F2044]/15" />
             <div className="flex items-center gap-4 px-5 py-3">
               <LanguageSelector variant="default" />
-              <Link to="/support" onClick={closeMenu} className="flex items-center gap-2 text-sm text-[hsl(14,100%,4%)]/60 hover:text-[hsl(14,100%,4%)] transition-colors">
+              <Link to="/support" onClick={closeMenu} className="flex items-center gap-2 text-sm text-[#0F2044]/60 hover:text-[#0F2044] transition-colors">
                 <HelpCircle className="w-4 h-4" />{t("nav.support")}
               </Link>
             </div>
