@@ -4,8 +4,8 @@ import { positionDescriptions, successCodePositions, lifePeriods, getArcanaName,
 import { ArcanaCard } from "./ArcanaCard";
 import { ProArcanaCard } from "./ProArcanaCard";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Compass, Star, Clock, Link2, FileText, TrendingUp, AlertTriangle, Lightbulb } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Compass, Star, Clock, Link2, FileText, TrendingUp, AlertTriangle, Lightbulb, X } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { PDFDownloadButton } from "./PDFDownloadButton";
 import { generatePDF, formatBirthDateForPDF } from "@/lib/pdfGenerator";
@@ -430,55 +430,120 @@ function getArcanaImage(n: number): string {
   return `/arcana/arcana-${n}.webp`;
 }
 
-function MatrixCell({ position, value, isMirror = false, isReversed = false, isHighlight = false }: { position: number; value: number; isMirror?: boolean; isReversed?: boolean; isHighlight?: boolean }) {
+/* === Arcana Modal === */
+function ArcanaModal({ value, onClose }: { value: number; onClose: () => void }) {
   const imgSrc = getArcanaImage(value);
 
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  // Lock scroll
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
   return (
-    <div className={cn(
-      "relative rounded-xl overflow-hidden transition-all duration-200 hover:scale-105",
-      // portrait 2:3 ratio: w-12 h-18 / w-14 h-21
-      "w-12 h-[72px] md:w-14 md:h-[84px]",
-      isMirror && "ring-2 ring-primary shadow-[0_0_8px_2px] shadow-primary/40",
-      isReversed && !isMirror && "ring-2 ring-destructive shadow-[0_0_8px_2px] shadow-destructive/30",
-      isHighlight && !isMirror && !isReversed && "ring-2 ring-amber-400 shadow-[0_0_8px_2px] shadow-amber-400/40",
-      !isMirror && !isReversed && !isHighlight && "ring-1 ring-border/60"
-    )}>
-      {/* Card image */}
-      {imgSrc ? (
+    <div
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+      {/* Card container */}
+      <div
+        className={cn(
+          "relative z-10",
+          // Mobile: bottom sheet, card takes natural height up to 80vh
+          "w-full sm:w-auto",
+          "flex flex-col items-center",
+          "pb-6 pt-4 sm:pb-0 sm:pt-0",
+        )}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-4 sm:-top-10 sm:right-0 z-20 w-9 h-9 rounded-full bg-white/20 hover:bg-white/35 transition-colors flex items-center justify-center text-white"
+          aria-label="Закрыть"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* Card image */}
         <img
           src={imgSrc}
           alt={`Аркан ${value}`}
-          className="w-full h-full object-cover"
           draggable={false}
+          className={cn(
+            "rounded-2xl shadow-2xl object-contain",
+            // Mobile: tall but fits screen
+            "max-h-[78vh] w-auto",
+            // Desktop: fixed comfortable size
+            "sm:max-h-[80vh] sm:h-[520px] sm:w-auto",
+          )}
         />
-      ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center">
-          <span className="text-lg font-display font-bold text-foreground">{value}</span>
-        </div>
-      )}
-
-      {/* Bottom overlay: arcana number */}
-      <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center py-[2px]">
-        <span className={cn(
-          "text-[10px] font-bold leading-none",
-          isMirror && "text-primary",
-          isReversed && !isMirror && "text-red-400",
-          isHighlight && !isMirror && !isReversed && "text-amber-300",
-          !isMirror && !isReversed && !isHighlight && "text-white/90"
-        )}>{value}</span>
-      </div>
-
-      {/* Position badge top-right */}
-      <div className={cn(
-        "absolute top-[3px] right-[3px] w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold leading-none",
-        isMirror && "bg-primary text-primary-foreground",
-        isReversed && !isMirror && "bg-destructive text-white",
-        isHighlight && !isMirror && !isReversed && "bg-amber-400 text-black",
-        !isMirror && !isReversed && !isHighlight && "bg-black/50 text-white/80"
-      )}>
-        {position}
       </div>
     </div>
+  );
+}
+
+function MatrixCell({ position, value, isMirror = false, isReversed = false, isHighlight = false }: { position: number; value: number; isMirror?: boolean; isReversed?: boolean; isHighlight?: boolean }) {
+  const imgSrc = getArcanaImage(value);
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleClose = useCallback(() => setModalOpen(false), []);
+
+  return (
+    <>
+      <div
+        className={cn(
+          "relative rounded-xl overflow-hidden transition-all duration-200 hover:scale-105 cursor-pointer",
+          "w-12 h-[72px] md:w-14 md:h-[84px]",
+          isMirror && "ring-2 ring-primary shadow-[0_0_8px_2px] shadow-primary/40",
+          isReversed && !isMirror && "ring-2 ring-destructive shadow-[0_0_8px_2px] shadow-destructive/30",
+          isHighlight && !isMirror && !isReversed && "ring-2 ring-amber-400 shadow-[0_0_8px_2px] shadow-amber-400/40",
+          !isMirror && !isReversed && !isHighlight && "ring-1 ring-border/60"
+        )}
+        onClick={() => setModalOpen(true)}
+      >
+        {imgSrc ? (
+          <img src={imgSrc} alt={`Аркан ${value}`} className="w-full h-full object-cover" draggable={false} />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <span className="text-lg font-display font-bold text-foreground">{value}</span>
+          </div>
+        )}
+
+        {/* Bottom overlay */}
+        <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center py-[2px]">
+          <span className={cn(
+            "text-[10px] font-bold leading-none",
+            isMirror && "text-primary",
+            isReversed && !isMirror && "text-red-400",
+            isHighlight && !isMirror && !isReversed && "text-amber-300",
+            !isMirror && !isReversed && !isHighlight && "text-white/90"
+          )}>{value}</span>
+        </div>
+
+        {/* Position badge */}
+        <div className={cn(
+          "absolute top-[3px] right-[3px] w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold leading-none",
+          isMirror && "bg-primary text-primary-foreground",
+          isReversed && !isMirror && "bg-destructive text-white",
+          isHighlight && !isMirror && !isReversed && "bg-amber-400 text-black",
+          !isMirror && !isReversed && !isHighlight && "bg-black/50 text-white/80"
+        )}>
+          {position}
+        </div>
+      </div>
+
+      {modalOpen && <ArcanaModal value={value} onClose={handleClose} />}
+    </>
   );
 }
 
