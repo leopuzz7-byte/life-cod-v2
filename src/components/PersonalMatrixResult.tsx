@@ -117,43 +117,49 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
         </div>
 
         {isPro ? (
-          <div className="flex flex-col items-center gap-3 mb-6">
-            <div className="grid grid-cols-3 gap-2 md:gap-4">
+          <div className="flex flex-col items-start gap-4 mb-6">
+            {/* Кармический треугольник */}
+            <div className="flex gap-3 md:gap-5">
               <MatrixCell position={10} value={matrix.positions[9]} />
               <MatrixCell position={11} value={matrix.positions[10]} />
               <MatrixCell position={12} value={matrix.positions[11]} isHighlight />
             </div>
-            <div className="w-full h-px bg-border/50 my-2" />
-            <div className="grid grid-cols-3 gap-2 md:gap-4">
+            <div className="w-full h-px bg-border/40 my-1" />
+            {/* Основной треугольник — пирамида: каждая следующая строка смещается на (ширина_карты+gap)/2 */}
+            <div className="flex gap-3 md:gap-5">
               <MatrixCell position={1} value={matrix.positions[0]} isMirror={isMirrorPosition(1)} isReversed={isReversedPosition(1)} />
               <MatrixCell position={2} value={matrix.positions[1]} isMirror={isMirrorPosition(2)} isReversed={isReversedPosition(2)} />
               <MatrixCell position={4} value={matrix.positions[3]} isMirror={isMirrorPosition(4)} isReversed={isReversedPosition(4)} />
             </div>
-            <div className="grid grid-cols-2 gap-2 md:gap-4">
+            {/* смещение = (48+12)/2=30px mobile, (56+20)/2=38px md */}
+            <div className="flex gap-3 md:gap-5 ml-[30px] md:ml-[38px]">
               <MatrixCell position={3} value={matrix.positions[2]} isMirror={isMirrorPosition(3)} isReversed={isReversedPosition(3)} />
               <MatrixCell position={5} value={matrix.positions[4]} isMirror={isMirrorPosition(5)} isReversed={isReversedPosition(5)} />
             </div>
-            <div className="flex justify-center">
+            {/* смещение = 48+12=60px mobile, 56+20=76px md */}
+            <div className="ml-[60px] md:ml-[76px]">
               <MatrixCell position={6} value={matrix.positions[5]} isMirror={isMirrorPosition(6)} isReversed={isReversedPosition(6)} />
             </div>
-            <div className="grid grid-cols-3 gap-2 md:gap-4 mt-4">
+            <div className="w-full h-px bg-border/40 mt-1" />
+            {/* Диагональный ряд */}
+            <div className="flex gap-3 md:gap-5">
               <MatrixCell position={7} value={matrix.positions[6]} />
               <MatrixCell position={8} value={matrix.positions[7]} />
               <MatrixCell position={9} value={matrix.positions[8]} />
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-3 mb-6">
-            <div className="grid grid-cols-3 gap-2 md:gap-4">
+          <div className="flex flex-col items-start gap-4 mb-6">
+            <div className="flex gap-3 md:gap-5">
               <MatrixCell position={1} value={matrix.positions[0]} isMirror={isMirrorPosition(1)} isReversed={isReversedPosition(1)} />
               <MatrixCell position={2} value={matrix.positions[1]} isMirror={isMirrorPosition(2)} isReversed={isReversedPosition(2)} />
               <MatrixCell position={4} value={matrix.positions[3]} isMirror={isMirrorPosition(4)} isReversed={isReversedPosition(4)} />
             </div>
-            <div className="grid grid-cols-2 gap-2 md:gap-4">
+            <div className="flex gap-3 md:gap-5 ml-[30px] md:ml-[38px]">
               <MatrixCell position={3} value={matrix.positions[2]} isMirror={isMirrorPosition(3)} isReversed={isReversedPosition(3)} />
               <MatrixCell position={5} value={matrix.positions[4]} isMirror={isMirrorPosition(5)} isReversed={isReversedPosition(5)} />
             </div>
-            <div className="flex justify-center">
+            <div className="ml-[60px] md:ml-[76px]">
               <MatrixCell position={6} value={matrix.positions[5]} isMirror={isMirrorPosition(6)} isReversed={isReversedPosition(6)} />
             </div>
           </div>
@@ -416,23 +422,61 @@ export function PersonalMatrixResult({ matrix, name, onReset, tier = 'basic' }: 
 
 /* === Sub-components === */
 
+// Lazy-loaded arcana images via Vite glob
+const arcanaModules = import.meta.glob('/src/assets/arcana/arcana-*.png', { eager: true });
+function getArcanaImage(n: number): string {
+  const key = `/src/assets/arcana/arcana-${n}.png`;
+  return (arcanaModules[key] as { default: string })?.default ?? '';
+}
+
 function MatrixCell({ position, value, isMirror = false, isReversed = false, isHighlight = false }: { position: number; value: number; isMirror?: boolean; isReversed?: boolean; isHighlight?: boolean }) {
+  const imgSrc = getArcanaImage(value);
+
   return (
     <div className={cn(
-      "w-14 h-14 md:w-16 md:h-16 rounded-xl flex flex-col items-center justify-center transition-all",
-      isMirror && "bg-primary/20 border-2 border-primary",
-      isReversed && !isMirror && "bg-destructive/20 border-2 border-destructive",
-      isHighlight && !isMirror && !isReversed && "bg-amber-500/20 border-2 border-amber-500",
-      !isMirror && !isReversed && !isHighlight && "bg-muted border border-border"
+      "relative rounded-xl overflow-hidden transition-all duration-200 hover:scale-105",
+      // portrait 2:3 ratio: w-12 h-18 / w-14 h-21
+      "w-12 h-[72px] md:w-14 md:h-[84px]",
+      isMirror && "ring-2 ring-primary shadow-[0_0_8px_2px] shadow-primary/40",
+      isReversed && !isMirror && "ring-2 ring-destructive shadow-[0_0_8px_2px] shadow-destructive/30",
+      isHighlight && !isMirror && !isReversed && "ring-2 ring-amber-400 shadow-[0_0_8px_2px] shadow-amber-400/40",
+      !isMirror && !isReversed && !isHighlight && "ring-1 ring-border/60"
     )}>
-      <span className={cn(
-        "text-xl font-display font-bold",
-        isMirror && "text-primary",
-        isReversed && !isMirror && "text-destructive",
-        isHighlight && !isMirror && !isReversed && "text-amber-600",
-        !isMirror && !isReversed && !isHighlight && "text-foreground"
-      )}>{value}</span>
-      <span className="text-[10px] text-muted-foreground">{position}</span>
+      {/* Card image */}
+      {imgSrc ? (
+        <img
+          src={imgSrc}
+          alt={`Аркан ${value}`}
+          className="w-full h-full object-cover"
+          draggable={false}
+        />
+      ) : (
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          <span className="text-lg font-display font-bold text-foreground">{value}</span>
+        </div>
+      )}
+
+      {/* Bottom overlay: arcana number */}
+      <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center py-[2px]">
+        <span className={cn(
+          "text-[10px] font-bold leading-none",
+          isMirror && "text-primary",
+          isReversed && !isMirror && "text-red-400",
+          isHighlight && !isMirror && !isReversed && "text-amber-300",
+          !isMirror && !isReversed && !isHighlight && "text-white/90"
+        )}>{value}</span>
+      </div>
+
+      {/* Position badge top-right */}
+      <div className={cn(
+        "absolute top-[3px] right-[3px] w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold leading-none",
+        isMirror && "bg-primary text-primary-foreground",
+        isReversed && !isMirror && "bg-destructive text-white",
+        isHighlight && !isMirror && !isReversed && "bg-amber-400 text-black",
+        !isMirror && !isReversed && !isHighlight && "bg-black/50 text-white/80"
+      )}>
+        {position}
+      </div>
     </div>
   );
 }
