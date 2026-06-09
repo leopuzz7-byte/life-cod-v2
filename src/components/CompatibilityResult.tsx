@@ -387,13 +387,13 @@ function SectionHeader({
   subtitle?: string;
 }) {
   return (
-    <div className="flex items-start gap-3 pb-3 border-b border-border/60">
-      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary/10">
-        <Icon className="w-4 h-4 text-primary" />
+    <div className="flex items-start gap-4 pb-4 border-b border-border/60">
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 mt-0.5 bg-primary/10">
+        <Icon className="w-6 h-6 text-primary" />
       </div>
       <div>
-        <h3 className="font-display font-semibold text-base text-foreground">{title}</h3>
-        {subtitle && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{subtitle}</p>}
+        <h3 className="font-display font-bold text-xl md:text-2xl text-foreground">{title}</h3>
+        {subtitle && <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{subtitle}</p>}
       </div>
     </div>
   );
@@ -424,12 +424,12 @@ function TriangleSection({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-          <span className="text-sm font-display font-bold text-primary">{triangleNum}</span>
+        <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <span className="text-lg font-display font-bold text-primary">{triangleNum}</span>
         </div>
         <div>
-          <h4 className="font-display font-semibold text-foreground">Треугольник {triangleNum} · {label}</h4>
-          <p className="text-xs text-muted-foreground mt-0.5">{intro}</p>
+          <h4 className="font-display font-bold text-lg text-foreground">Треугольник {triangleNum} · {label}</h4>
+          <p className="text-sm text-muted-foreground mt-0.5">{intro}</p>
         </div>
       </div>
 
@@ -490,12 +490,15 @@ function ScoreBar({ percent }: { percent: number }) {
   const color = percent >= 80 ? "bg-emerald-500" : percent >= 60 ? "bg-primary" : percent >= 40 ? "bg-amber-500" : "bg-red-400";
   const label = percent >= 80 ? "Высокая совместимость" : percent >= 60 ? "Хорошая совместимость" : percent >= 40 ? "Средняя совместимость" : "Сложный союз";
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+    <div className="space-y-1.5">
+      <div className="relative h-3 bg-muted rounded-full overflow-hidden">
         <div className={cn("h-full rounded-full transition-all", color)} style={{ width: `${percent}%` }} />
       </div>
-      <span className="text-sm font-display font-bold text-foreground shrink-0">{percent}%</span>
-      <span className="text-xs text-muted-foreground shrink-0">{label}</span>
+      <div className="flex justify-between items-center">
+        <span className="text-xs text-muted-foreground">0%</span>
+        <span className="text-sm font-medium text-muted-foreground">{label}</span>
+        <span className="text-xs text-muted-foreground">100%</span>
+      </div>
     </div>
   );
 }
@@ -720,7 +723,10 @@ function PartnerTab({
       {/* Основной треугольник */}
       {destTab === 'main' && (
         <div className="space-y-4">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide">Позиции 1–6 · детство, личность, таланты, точка опоры</p>
+          <div className="gradient-card rounded-xl border border-border px-4 py-3 bg-muted/20">
+            <p className="text-sm font-semibold text-foreground">Личность и начало пути</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Позиции 1–6 · детство, суть, таланты, точка опоры</p>
+          </div>
           {[1, 2, 3, 4, 5, 6].map(pos => (
             <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor} />
           ))}
@@ -730,7 +736,10 @@ function PartnerTab({
       {/* Цели */}
       {destTab === 'goals' && (
         <div className="space-y-4">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide">Позиции 7–9 · цель, инструмент, зона комфорта</p>
+          <div className="gradient-card rounded-xl border border-border px-4 py-3 bg-muted/20">
+            <p className="text-sm font-semibold text-foreground">Цели и реализация</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Позиции 7–9 · жизненная цель, инструмент, зона комфорта</p>
+          </div>
           {[7, 8, 9].map(pos => (
             <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor} />
           ))}
@@ -740,7 +749,10 @@ function PartnerTab({
       {/* Карма */}
       {destTab === 'karma' && (
         <div className="space-y-4">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide">Позиции 10–12 · кармические задачи</p>
+          <div className="gradient-card rounded-xl border border-border px-4 py-3 bg-muted/20">
+            <p className="text-sm font-semibold text-foreground">Кармические задачи</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Позиции 10–12 · ошибки прошлого, задачи, главная миссия</p>
+          </div>
           {[10, 11, 12].map(pos => (
             <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor} />
           ))}
@@ -1057,7 +1069,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               matrix={result.matrix2}
               crossMatrix={result.cross2Matrix}
               name={result.person2.name}
-              accentColor="violet"
+              accentColor="primary"
               otherName={result.person1.name}
             />
           )}
