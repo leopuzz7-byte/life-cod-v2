@@ -92,7 +92,7 @@ function ArcanaModal({ value, onClose }: { value: number; onClose: () => void })
       <div className="relative z-10 w-full sm:w-auto flex flex-col items-center pb-6 pt-4 sm:pb-0 sm:pt-0" onClick={e => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute top-2 right-4 sm:-top-10 sm:right-0 z-20 w-9 h-9 rounded-full bg-white/20 hover:bg-white/35 transition-colors flex items-center justify-center text-white"
+          className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 transition-colors flex items-center justify-center text-white shadow-lg"
         >
           <X className="w-5 h-5" />
         </button>
