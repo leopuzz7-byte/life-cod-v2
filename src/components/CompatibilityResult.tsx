@@ -3,18 +3,18 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Heart, Compass, Clock, TrendingUp, Star, Anchor,
-  Target, ShieldAlert, CheckCircle, Users, X, Layers, ChevronDown, ChevronUp
+  Target, ShieldAlert, CheckCircle, Users, X, Layers,
+  ChevronDown, ChevronUp, Sparkles, Key
 } from "lucide-react";
 import { CompatibilityResult, PersonalMatrix } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
-import { getPositionInterpretation, PositionInterpretation } from "@/lib/matrixInterpretation";
-import { ProArcanaCard } from "./ProArcanaCard";
+import { getPositionInterpretation } from "@/lib/matrixInterpretation";
 import { cn } from "@/lib/utils";
 import { PDFDownloadButton } from "./PDFDownloadButton";
 import { generatePDF, formatBirthDateForPDF } from "@/lib/pdfGenerator";
 import type { TierType } from "@/lib/analysisConfig";
 
-// ─── Совместимостные переопределения ──────────────────────────────────────────
+// ─── Совместимостные тексты ────────────────────────────────────────────────────
 
 const compatPositionTitles: Record<number, string> = {
   1: "Начало союза",
@@ -32,63 +32,64 @@ const compatPositionTitles: Record<number, string> = {
 };
 
 const compatPositionIntros: Record<number, string> = {
-  1: "Первое что объединило этих двух людей — первоначальный импульс, энергия притяжения, тот самый момент когда что-то щёлкнуло. Аркан первой позиции описывает саму природу этой встречи и то, как всё начиналось.",
-  2: "Аркан союза — ядро матрицы. Вся остальная структура строится вокруг этой позиции. Это не характеристика кого-то одного — это энергия, рождающаяся между ними. Именно она определяет характер и судьбу союза на самом глубоком уровне.",
-  3: "Аркан гармонии показывает, как пара воспринимается снаружи — друзьями, семьёй, обществом. Это общий «социальный образ» отношений, то, как они выглядят в мире и что транслируют другим людям.",
-  4: "Позиция, которая раскрывается в зрелых отношениях. Здесь лежит та мудрость, к которой пара приходит, пройдя через опыт первых двух периодов. Это не «награда за терпение» — это потенциал, который растёт с годами.",
-  5: "Как эти двое могут поддерживать амбиции и социальную реализацию друг друга. Совместимость в профессиональной и общественной сфере — насколько они могут расти в одном направлении или уважать пути друг друга.",
-  6: "В матрице совместимости шестая позиция занята кармическим арканом. Это не просто точка опоры — это то, что нужно трансформировать обоим. Здесь живёт ключевой вызов пары, но также и скрытый ресурс роста.",
-  7: "Зачем эти два человека встретились на уровне жизненных целей. Какое совместное движение, какие общие смыслы рождаются из этих отношений — то, к чему они идут вместе осознанно или нет.",
-  8: "Конкретный способ, через который пара реализует свою общую цель. Это методы, инструменты и подходы, которые работают именно для этого союза — путь, а не только назначение.",
-  9: "Общее ресурсное состояние пары. Место, куда оба партнёра возвращаются за восстановлением, что приносит покой и заряжает снова. Важно уметь находить это состояние вместе — и не застревать в нём.",
-  10: "Кармические паттерны из прошлого, которые оба принесли в эти отношения. Ситуации, которые будут повторяться снова и снова, пока не будут проработаны обоими — не по отдельности, а вместе.",
-  11: "Автоматические сценарии, запускающиеся в этих отношениях. «Снова наступаем на одни и те же грабли» — именно про эту позицию. Осознание этого паттерна обоими уже наполовину его снимает.",
-  12: "Главная кармическая задача всего союза. То ради чего эти два человека встретились на самом глубинном уровне. Когда эта задача решается — многое другое в отношениях начинает рассасываться само собой.",
+  1: "Первый импульс, с которого всё началось. Эта позиция описывает природу встречи — что притянуло двух людей друг к другу, какую энергию они почувствовали в самом начале. Это не обязательно «счастливое начало» — это честный портрет первого периода отношений.",
+  2: "Самая важная позиция в матрице союза — аркан союза. Это не характеристика кого-то одного: это энергия, которая рождается между ними. Она определяет характер и глубинный смысл этих отношений на всём протяжении.",
+  3: "Как пара выглядит снаружи — что видят друзья, семья, коллеги. Это общий социальный образ, то, что они транслируют миру, то, за что их знают как пару.",
+  4: "Это позиция зрелых отношений. Мудрость, к которой пара приходит со временем — если оба готовы учиться у своего союза. Не «награда за терпение», а потенциал, который накапливается в живых отношениях.",
+  5: "Профессиональная и социальная совместимость — могут ли они расти в одну сторону или хотя бы поддерживать пути друг друга. Как их амбиции взаимодействуют: дополняют, конкурируют или вдохновляют.",
+  6: "В матрице совместимости эта позиция занята кармическим арканом. Это ключевой вызов пары — то, что будет возникать снова и снова, пока оба не проработают это вместе. Но это и скрытый ресурс: именно здесь спрятана точка глубокого роста.",
+  7: "Зачем эти двое встретились с точки зрения жизненных целей. Какое движение рождается из союза — куда они идут вместе, осознанно или нет.",
+  8: "Конкретный способ, которым пара реализует свою общую цель. Методы, инструменты, подходы — то, что работает именно для этого союза.",
+  9: "Состояние, в котором оба партнёра восстанавливаются — то, что заряжает их вместе. Важно уметь находить это состояние и не застревать в нём.",
+  10: "Кармические паттерны из прошлого, которые оба принесли в эти отношения. Ситуации, которые будут повторяться, пока их не проработают вместе — не по отдельности.",
+  11: "Автоматические сценарии этих отношений. «Снова наступаем на одни грабли» — именно про эту позицию. Осознание паттерна обоими уже наполовину его снимает.",
+  12: "Главная кармическая задача всего союза. То, ради чего эти двое встретились на глубинном уровне. Когда задача решается — многое в отношениях начинает рассасываться само собой.",
 };
 
-/** Возвращает PositionInterpretation с текстами, адаптированными для совместимости */
-function getCompatInterpretation(position: number, arcanaNumber: number): PositionInterpretation {
-  const base = getPositionInterpretation(position, arcanaNumber);
-  return {
-    ...base,
-    positionTitle: compatPositionTitles[position] || base.positionTitle,
-    positionIntro: compatPositionIntros[position] || base.positionIntro,
-    ageRange: undefined, // убираем возрастные рамки в контексте совместимости
-  };
-}
+const TRIANGLES = [
+  {
+    num: 1,
+    label: "Начало отношений",
+    positions: [1, 2, 3] as const,
+    intro: "Первый треугольник — это сама встреча. Первый период отношений: почему притянулись, как начинали, что стало фундаментом. Три позиции здесь составляют основной тон союза.",
+  },
+  {
+    num: 2,
+    label: "Динамика отношений",
+    positions: [2, 3, 5] as const,
+    intro: "Второй треугольник показывает, как пара живёт внутри союза — суть и образ отношений встречаются с совместным путём в мире.",
+  },
+  {
+    num: 3,
+    label: "Зрелость союза",
+    positions: [2, 4, 5] as const,
+    intro: "Третий треугольник — это куда ведут отношения при долгом развитии. Суть союза соединяется с накопленной мудростью и совместным путём.",
+  },
+];
 
-// ─── Arcana image helper ───────────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function getArcanaImage(n: number): string {
   return `/arcana/arcana-${n}.webp`;
 }
 
-// ─── Arcana Modal ──────────────────────────────────────────────────────────────
+// ─── ArcanaModal ───────────────────────────────────────────────────────────────
 
 function ArcanaModal({ value, onClose }: { value: number; onClose: () => void }) {
   const imgSrc = getArcanaImage(value);
-
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [onClose]);
-
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
   }, []);
-
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-      <div
-        className="relative z-10 w-full sm:w-auto flex flex-col items-center pb-6 pt-4 sm:pb-0 sm:pt-0"
-        onClick={e => e.stopPropagation()}
-      >
+      <div className="relative z-10 w-full sm:w-auto flex flex-col items-center pb-6 pt-4 sm:pb-0 sm:pt-0" onClick={e => e.stopPropagation()}>
         <button
           onClick={onClose}
           className="absolute top-2 right-4 sm:-top-10 sm:right-0 z-20 w-9 h-9 rounded-full bg-white/20 hover:bg-white/35 transition-colors flex items-center justify-center text-white"
@@ -99,49 +100,38 @@ function ArcanaModal({ value, onClose }: { value: number; onClose: () => void })
           src={imgSrc}
           alt={`Аркан ${value}`}
           draggable={false}
-          className="rounded-2xl shadow-2xl object-contain max-h-[78vh] w-auto sm:max-h-[80vh] sm:h-[520px] sm:w-auto"
+          className="rounded-2xl shadow-2xl object-contain max-h-[78vh] w-auto sm:max-h-[80vh] sm:h-[520px]"
         />
       </div>
     </div>
   );
 }
 
-// ─── Matrix Cell (card style, clickable) ──────────────────────────────────────
+// ─── MatrixCell (card style, clickable) ────────────────────────────────────────
 
-function MatrixCell({
-  position, value, isHighlight = false
-}: { position: number; value: number; isHighlight?: boolean }) {
+function MatrixCell({ position, value, isHighlight = false }: { position: number; value: number; isHighlight?: boolean }) {
   const imgSrc = getArcanaImage(value);
   const [modalOpen, setModalOpen] = useState(false);
   const handleClose = useCallback(() => setModalOpen(false), []);
-
   return (
     <>
       <div
         className={cn(
           "relative rounded-xl overflow-hidden transition-all duration-200 hover:scale-105 cursor-pointer",
           "w-12 h-[72px] md:w-14 md:h-[84px]",
-          isHighlight
-            ? "ring-2 ring-amber-400 shadow-[0_0_8px_2px] shadow-amber-400/40"
-            : "ring-1 ring-border/60"
+          isHighlight ? "ring-2 ring-primary shadow-[0_0_8px_2px] shadow-primary/30" : "ring-1 ring-border/60"
         )}
         onClick={() => setModalOpen(true)}
       >
-        {imgSrc ? (
-          <img src={imgSrc} alt={`Аркан ${value}`} className="w-full h-full object-cover" draggable={false} />
-        ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            <span className="text-lg font-display font-bold text-foreground">{value}</span>
-          </div>
-        )}
+        <img src={imgSrc} alt={`Аркан ${value}`} className="w-full h-full object-cover" draggable={false} />
         <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center py-[2px]">
-          <span className={cn("text-[10px] font-bold leading-none", isHighlight ? "text-amber-300" : "text-white/90")}>
+          <span className={cn("text-[10px] font-bold leading-none", isHighlight ? "text-primary-foreground" : "text-white/90")}>
             {value}
           </span>
         </div>
         <div className={cn(
           "absolute top-[3px] right-[3px] w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold leading-none",
-          isHighlight ? "bg-amber-400 text-black" : "bg-black/50 text-white/80"
+          isHighlight ? "bg-primary text-primary-foreground" : "bg-black/50 text-white/80"
         )}>
           {position}
         </div>
@@ -151,20 +141,18 @@ function MatrixCell({
   );
 }
 
-// ─── Visual Matrix Grid ────────────────────────────────────────────────────────
+// ─── MatrixGrid ─────────────────────────────────────────────────────────────────
 
 function MatrixGrid({ matrix, accentPos2 = false }: { matrix: PersonalMatrix; accentPos2?: boolean }) {
   const p = matrix.positions;
   return (
     <div className="flex flex-col items-center gap-2">
-      {/* Кармический треугольник */}
       <div className="flex gap-2 md:gap-3">
         <MatrixCell position={10} value={p[9]} />
         <MatrixCell position={11} value={p[10]} />
         <MatrixCell position={12} value={p[11]} isHighlight />
       </div>
       <div className="w-full h-px bg-border/40 my-0.5" />
-      {/* Основной треугольник */}
       <div className="flex flex-col items-start gap-2 md:gap-3">
         <div className="flex gap-2 md:gap-3">
           <MatrixCell position={1} value={p[0]} />
@@ -180,7 +168,6 @@ function MatrixGrid({ matrix, accentPos2 = false }: { matrix: PersonalMatrix; ac
         </div>
       </div>
       <div className="w-full h-px bg-border/40 my-0.5" />
-      {/* Диагональный ряд */}
       <div className="flex gap-2 md:gap-3">
         <MatrixCell position={7} value={p[6]} />
         <MatrixCell position={8} value={p[7]} />
@@ -190,49 +177,284 @@ function MatrixGrid({ matrix, accentPos2 = false }: { matrix: PersonalMatrix; ac
   );
 }
 
-// ─── Section Header ────────────────────────────────────────────────────────────
+// ─── CompCard — главная карта аркана для разбора ────────────────────────────────
+
+interface CompCardProps {
+  position: number;
+  value: number;
+  positionTitle: string;
+  contextIntro: string;
+  accentColor?: 'primary' | 'rose';
+  highlight?: boolean;
+}
+
+function CompCard({ position, value, positionTitle, contextIntro, accentColor = 'primary', highlight = false }: CompCardProps) {
+  const arcana = getArcana(value);
+  if (!arcana) return null;
+  const imgSrc = getArcanaImage(value);
+  const [expanded, setExpanded] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const isRose = accentColor === 'rose';
+  const accentText = isRose ? "text-rose-500" : "text-primary";
+  const accentBorder = isRose ? "border-rose-300/40" : "border-primary/30";
+  const accentBg = isRose ? "bg-rose-400/8" : "bg-primary/8";
+
+  return (
+    <div className={cn(
+      "gradient-card rounded-2xl overflow-hidden",
+      highlight ? `border ${accentBorder}` : "border border-border"
+    )}>
+      {/* Top: image + position info */}
+      <div className="flex items-start gap-4 p-4">
+        {/* Arcana card image */}
+        <button
+          className="relative w-[50px] h-[75px] rounded-xl overflow-hidden shrink-0 ring-1 ring-border/60 hover:scale-105 transition-transform cursor-pointer"
+          onClick={() => setModalOpen(true)}
+          aria-label={`Открыть аркан ${value}`}
+        >
+          <img src={imgSrc} alt={`Аркан ${value}`} className="w-full h-full object-cover" draggable={false} />
+          <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[2px]">
+            <span className={cn("text-[9px] font-bold leading-none", highlight ? accentText : "text-white/90")}>{value}</span>
+          </div>
+        </button>
+
+        {/* Position + arcana info */}
+        <div className="flex-1 min-w-0 py-0.5">
+          <div className="text-[10px] uppercase tracking-wide font-medium text-muted-foreground mb-0.5">
+            Поз. {position} · {positionTitle}
+          </div>
+          <div className={cn("font-display font-bold text-xl leading-tight", highlight ? accentText : "text-foreground")}>
+            {arcana.name}
+          </div>
+          <div className="text-xs text-muted-foreground mt-0.5">{arcana.planet} · {arcana.element}</div>
+        </div>
+      </div>
+
+      {/* Context intro */}
+      <div className="px-4 pb-3 text-sm text-muted-foreground leading-relaxed border-t border-border/30 pt-3">
+        {contextIntro}
+      </div>
+
+      {/* Arcana description — expandable */}
+      <div className="px-4 pb-4">
+        <button
+          onClick={() => setExpanded(e => !e)}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+        >
+          {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          <span>{expanded ? 'Скрыть' : 'Энергия аркана'}</span>
+        </button>
+        {expanded && (
+          <div className={cn("mt-2 rounded-xl p-3 text-sm text-muted-foreground leading-relaxed", highlight ? `${accentBg} border ${accentBorder}` : "bg-muted/25")}>
+            {arcana.compatibilityDescription || arcana.personalDescription}
+          </div>
+        )}
+      </div>
+
+      {modalOpen && <ArcanaModal value={value} onClose={() => setModalOpen(false)} />}
+    </div>
+  );
+}
+
+// Обёртка для совместимости
+function CompatCard({ position, value, highlight = false }: { position: number; value: number; highlight?: boolean }) {
+  return (
+    <CompCard
+      position={position}
+      value={value}
+      positionTitle={compatPositionTitles[position] || `Позиция ${position}`}
+      contextIntro={compatPositionIntros[position] || ''}
+      highlight={highlight}
+    />
+  );
+}
+
+// Обёртка для личной матрицы
+function PersonalCard({ position, value, accentColor = 'primary' as const }: { position: number; value: number; accentColor?: 'primary' | 'rose' }) {
+  const interp = getPositionInterpretation(position, value);
+  return (
+    <CompCard
+      position={position}
+      value={value}
+      positionTitle={interp.positionTitle || `Позиция ${position}`}
+      contextIntro={interp.positionIntro || ''}
+      accentColor={accentColor}
+    />
+  );
+}
+
+// ─── TriangleMiniRow — мини-ряд карт для заголовка треугольника ────────────────
+
+function TriangleMiniRow({ positions, matrix }: { positions: readonly number[]; matrix: PersonalMatrix }) {
+  const p = matrix.positions;
+  const [modalVal, setModalVal] = useState<number | null>(null);
+  return (
+    <>
+      <div className="flex items-end gap-3">
+        {positions.map(pos => {
+          const val = p[pos - 1];
+          const arcana = getArcana(val);
+          return (
+            <button key={pos} onClick={() => setModalVal(val)} className="flex flex-col items-center gap-1 group">
+              <div className="relative w-11 h-[66px] rounded-xl overflow-hidden ring-1 ring-border/60 group-hover:scale-105 transition-transform">
+                <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
+                  <span className="text-[8px] text-white/80 font-bold">{val}</span>
+                </div>
+              </div>
+              <span className="text-[10px] text-muted-foreground">Поз. {pos}</span>
+              {arcana && <span className="text-[9px] text-muted-foreground/50 -mt-0.5 max-w-[46px] truncate">{arcana.name}</span>}
+            </button>
+          );
+        })}
+      </div>
+      {modalVal !== null && <ArcanaModal value={modalVal} onClose={() => setModalVal(null)} />}
+    </>
+  );
+}
+
+// ─── KeyArcanaBlock — Ключ союза ───────────────────────────────────────────────
+
+function KeyArcanaBlock({ matrix }: { matrix: PersonalMatrix }) {
+  const keyPositions = [1, 2, 3, 4, 5, 12];
+  const p = matrix.positions;
+  const [modalVal, setModalVal] = useState<number | null>(null);
+
+  return (
+    <>
+      <div className="gradient-card rounded-2xl border border-primary/20 p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Key className="w-4 h-4 text-primary" />
+          <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Ключ союза</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {keyPositions.map((pos, idx) => {
+            const val = p[pos - 1];
+            const arcana = getArcana(val);
+            return (
+              <button
+                key={pos}
+                onClick={() => setModalVal(val)}
+                className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary/6 border border-primary/15 hover:bg-primary/12 transition-colors group"
+              >
+                <div className="relative w-6 h-9 rounded-md overflow-hidden shrink-0 ring-1 ring-primary/20">
+                  <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
+                </div>
+                <div className="text-left">
+                  <div className="text-[9px] text-muted-foreground/60">Поз. {pos}</div>
+                  <div className="text-xs font-medium text-foreground group-hover:text-primary transition-colors leading-tight">
+                    {arcana?.name ?? val}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {modalVal !== null && <ArcanaModal value={modalVal} onClose={() => setModalVal(null)} />}
+    </>
+  );
+}
+
+// ─── SectionHeader ─────────────────────────────────────────────────────────────
 
 function SectionHeader({
   icon: Icon,
   title,
   subtitle,
-  variant = 'default'
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   subtitle?: string;
-  variant?: 'default' | 'amber' | 'subtle';
 }) {
   return (
-    <div className={cn(
-      "flex items-start gap-3 pb-3 border-b",
-      variant === 'amber' ? "border-amber-500/30" : "border-border/60"
-    )}>
-      <div className={cn(
-        "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5",
-        variant === 'amber' ? "bg-amber-500/15" : "bg-primary/10"
-      )}>
-        <Icon className={cn("w-4.5 h-4.5", variant === 'amber' ? "text-amber-600" : "text-primary")} />
+    <div className="flex items-start gap-3 pb-3 border-b border-border/60">
+      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary/10">
+        <Icon className="w-4 h-4 text-primary" />
       </div>
       <div>
-        <h3 className={cn(
-          "font-display font-semibold text-base",
-          variant === 'amber' ? "text-amber-700" : "text-foreground"
-        )}>{title}</h3>
+        <h3 className="font-display font-semibold text-base text-foreground">{title}</h3>
         {subtitle && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{subtitle}</p>}
       </div>
     </div>
   );
 }
 
-// ─── Mini Arcana Ref (компактная ссылка на уже показанную позицию) ─────────────
+// ─── TriangleSection ── секция треугольника ────────────────────────────────────
+
+function TriangleSection({
+  triangleNum,
+  label,
+  intro,
+  positions,
+  matrix,
+  shownPositions,
+}: {
+  triangleNum: number;
+  label: string;
+  intro: string;
+  positions: readonly number[];
+  matrix: PersonalMatrix;
+  shownPositions: Set<number>;
+}) {
+  const p = matrix.positions;
+  const newPositions = positions.filter(pos => !shownPositions.has(pos));
+  const repeatedPositions = positions.filter(pos => shownPositions.has(pos));
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <span className="text-sm font-display font-bold text-primary">{triangleNum}</span>
+        </div>
+        <div>
+          <h4 className="font-display font-semibold text-foreground">Треугольник {triangleNum} · {label}</h4>
+          <p className="text-xs text-muted-foreground mt-0.5">{intro}</p>
+        </div>
+      </div>
+
+      {/* Mini-cards row */}
+      <TriangleMiniRow positions={positions} matrix={matrix} />
+
+      {/* Repeated positions — compact refs */}
+      {repeatedPositions.length > 0 && (
+        <div className="space-y-1.5">
+          {repeatedPositions.map(pos => {
+            const val = p[pos - 1];
+            const arcana = getArcana(val);
+            return (
+              <div key={pos} className="flex items-center gap-3 px-3 py-2 rounded-xl bg-muted/30 border border-border/40">
+                <div className="relative w-7 h-[42px] rounded-lg overflow-hidden shrink-0 ring-1 ring-border/50">
+                  <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">Поз. {pos}: {arcana?.name}</span>
+                  {" · "}{compatPositionTitles[pos]} — разобрано выше
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* New positions — full CompCards */}
+      {newPositions.map(pos => (
+        <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 2} />
+      ))}
+    </div>
+  );
+}
+
+// ─── MiniArcanaRef ─────────────────────────────────────────────────────────────
 
 function MiniArcanaRef({ position, value, note }: { position: number; value: number; note: string }) {
   const arcana = getArcana(value);
   return (
     <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/40 border border-border/40">
-      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-        <span className="text-sm font-display font-bold text-primary">{value}</span>
+      <div className="relative w-7 h-[42px] rounded-lg overflow-hidden shrink-0 ring-1 ring-border/50">
+        <img src={getArcanaImage(value)} alt="" className="w-full h-full object-cover" />
       </div>
       <div className="min-w-0">
         <p className="text-xs text-muted-foreground">
@@ -244,7 +466,7 @@ function MiniArcanaRef({ position, value, note }: { position: number; value: num
   );
 }
 
-// ─── Compact Score Bar ─────────────────────────────────────────────────────────
+// ─── ScoreBar ──────────────────────────────────────────────────────────────────
 
 function ScoreBar({ percent }: { percent: number }) {
   const color = percent >= 80 ? "bg-emerald-500" : percent >= 60 ? "bg-primary" : percent >= 40 ? "bg-amber-500" : "bg-red-400";
@@ -260,7 +482,7 @@ function ScoreBar({ percent }: { percent: number }) {
   );
 }
 
-// ─── Expandable Block ──────────────────────────────────────────────────────────
+// ─── ExpandableBlock ───────────────────────────────────────────────────────────
 
 function ExpandableBlock({ title, children, defaultOpen = true }: {
   title: string;
@@ -286,46 +508,25 @@ function ExpandableBlock({ title, children, defaultOpen = true }: {
 
 function UnionTab({ result }: { result: CompatibilityResult }) {
   const unionArcana = getArcana(result.unionArcana);
-  const harmonyArcana = getArcana(result.harmonyArcana);
-  const karmaArcana = getArcana(result.karmaArcana);
   const matrix = result.unionMatrix;
   if (!matrix) return null;
   const p = matrix.positions;
 
-  return (
-    <div className="space-y-6">
+  // Треугольники — отслеживаем уже показанные позиции
+  const shownSets: Set<number>[] = [new Set(), new Set(), new Set()];
+  TRIANGLES.forEach((tri, idx) => {
+    if (idx > 0) tri.positions.forEach(pos => {
+      if (TRIANGLES.slice(0, idx).some(prev => prev.positions.includes(pos as never))) {
+        shownSets[idx].add(pos);
+      }
+    });
+  });
 
-      {/* 3 ключевых аркана — вводный блок */}
-      <div className="gradient-card rounded-2xl border border-primary/25 p-5 space-y-4">
-        <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium text-center">Три ключевых аркана союза</p>
-        <div className="grid grid-cols-3 gap-3">
-          {/* Аркан союза */}
-          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-primary/8 border border-primary/20">
-            <Heart className="w-4 h-4 text-primary" />
-            <span className="text-[10px] text-muted-foreground text-center uppercase tracking-wide">Аркан союза</span>
-            <span className="text-2xl font-display font-bold text-primary">{result.unionArcana}</span>
-            <span className="text-xs text-foreground text-center font-medium leading-tight">{unionArcana?.name}</span>
-          </div>
-          {/* Аркан гармонии */}
-          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-emerald-500/8 border border-emerald-500/20">
-            <Star className="w-4 h-4 text-emerald-600" />
-            <span className="text-[10px] text-muted-foreground text-center uppercase tracking-wide">Гармония</span>
-            <span className="text-2xl font-display font-bold text-emerald-600">{result.harmonyArcana}</span>
-            <span className="text-xs text-foreground text-center font-medium leading-tight">{harmonyArcana?.name}</span>
-          </div>
-          {/* Аркан кармы */}
-          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-amber-500/8 border border-amber-500/20">
-            <ShieldAlert className="w-4 h-4 text-amber-600" />
-            <span className="text-[10px] text-muted-foreground text-center uppercase tracking-wide">Карма</span>
-            <span className="text-2xl font-display font-bold text-amber-600">{result.karmaArcana}</span>
-            <span className="text-xs text-foreground text-center font-medium leading-tight">{karmaArcana?.name}</span>
-          </div>
-        </div>
-        {/* Вводный текст об аркане союза */}
-        <div className="text-sm text-muted-foreground leading-relaxed bg-primary/5 rounded-xl p-4 border border-primary/10">
-          <p>{unionArcana?.compatibilityDescription || unionArcana?.personalDescription}</p>
-        </div>
-      </div>
+  return (
+    <div className="space-y-8">
+
+      {/* Ключ союза */}
+      <KeyArcanaBlock matrix={matrix} />
 
       {/* Визуальная матрица */}
       <div className="gradient-card rounded-2xl border border-border p-5">
@@ -336,61 +537,50 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
         <div className="flex justify-center">
           <MatrixGrid matrix={matrix} accentPos2 />
         </div>
-        <p className="text-xs text-muted-foreground text-center mt-4">Нажмите на карту чтобы рассмотреть аркан</p>
+        <p className="text-xs text-muted-foreground text-center mt-3">Нажмите на карту чтобы рассмотреть аркан</p>
       </div>
 
-      {/* ═══ ПЕРИОД 1: Начало отношений ══════════════════════════════════════ */}
-      <div className="space-y-4">
+      {/* Общая энергия — вводный текст */}
+      <div className="gradient-card rounded-2xl border border-primary/20 p-5 bg-primary/3">
+        <div className="flex items-center gap-2 mb-3">
+          <Heart className="w-4 h-4 text-primary" />
+          <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Общая энергия союза</span>
+        </div>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
+        </p>
+      </div>
+
+      {/* ═══ ТРЕУГОЛЬНИКИ ══════════════════════════════════════════════════════ */}
+      <div className="space-y-6">
         <SectionHeader
           icon={Clock}
-          title="Начало отношений"
-          subtitle="Первый треугольник (позиции 1 · 2 · 3) — энергия первого контакта, притяжения и начального периода."
+          title="Три периода отношений"
+          subtitle="Матрица строится вокруг трёх треугольников. Каждый описывает отдельный слой отношений — от начала до глубинных задач."
         />
-        {[1, 2, 3].map(pos => (
-          <ProArcanaCard
-            key={pos}
-            interpretation={getCompatInterpretation(pos, p[pos - 1])}
-          />
+
+        {TRIANGLES.map((tri, idx) => (
+          <div key={tri.num} className="gradient-card rounded-2xl border border-border p-5 space-y-5">
+            <TriangleSection
+              triangleNum={tri.num}
+              label={tri.label}
+              intro={tri.intro}
+              positions={tri.positions}
+              matrix={matrix}
+              shownPositions={shownSets[idx]}
+            />
+          </div>
         ))}
       </div>
 
-      {/* ═══ ПЕРИОД 2: Середина отношений ═══════════════════════════════════ */}
-      <div className="space-y-4">
-        <SectionHeader
-          icon={TrendingUp}
-          title="Середина отношений"
-          subtitle="Второй треугольник (позиции 2 · 3 · 5) — к сути союза и внешнему образу добавляется совместный путь."
-        />
-        <div className="space-y-2">
-          <MiniArcanaRef position={2} value={p[1]} note="суть союза — присутствует во всех трёх периодах" />
-          <MiniArcanaRef position={3} value={p[2]} note="внешний образ пары — см. начало отношений" />
-        </div>
-        <ProArcanaCard interpretation={getCompatInterpretation(5, p[4])} />
-      </div>
-
-      {/* ═══ ПЕРИОД 3: Дальнейшее развитие ══════════════════════════════════ */}
-      <div className="space-y-4">
-        <SectionHeader
-          icon={Star}
-          title="Дальнейшее развитие"
-          subtitle="Третий треугольник (позиции 2 · 4 · 5) — мудрость, которая накапливается в зрелых отношениях."
-        />
-        <div className="space-y-2">
-          <MiniArcanaRef position={2} value={p[1]} note="суть союза" />
-          <MiniArcanaRef position={5} value={p[4]} note="совместный путь — см. середину отношений" />
-        </div>
-        <ProArcanaCard interpretation={getCompatInterpretation(4, p[3])} />
-      </div>
-
-      {/* ═══ ТОЧКА ОПОРЫ ══════════════════════════════════════════════════════ */}
+      {/* ═══ ТОЧКА ОПОРЫ — позиция 6 ══════════════════════════════════════════ */}
       <div className="space-y-4">
         <SectionHeader
           icon={Anchor}
           title="Кармическая ось"
           subtitle="Позиция 6 — в матрице совместимости здесь стоит кармический аркан. Ключевой вызов и скрытый ресурс пары."
-          variant="amber"
         />
-        <ProArcanaCard interpretation={getCompatInterpretation(6, p[5])} />
+        <CompatCard position={6} value={p[5]} />
       </div>
 
       {/* ═══ ЦЕЛИ В ОТНОШЕНИЯХ ════════════════════════════════════════════════ */}
@@ -398,10 +588,10 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
         <SectionHeader
           icon={Target}
           title="Цели в отношениях"
-          subtitle="Позиции 7 · 8 · 9 — куда идёт эта пара, через что достигает и где восстанавливается."
+          subtitle="Позиции 7 · 8 · 9 — куда идёт пара, через что достигает и где восстанавливается."
         />
         {[7, 8, 9].map(pos => (
-          <ProArcanaCard key={pos} interpretation={getCompatInterpretation(pos, p[pos - 1])} />
+          <CompatCard key={pos} position={pos} value={p[pos - 1]} />
         ))}
       </div>
 
@@ -410,14 +600,13 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
         <SectionHeader
           icon={ShieldAlert}
           title="Кармические задачи союза"
-          subtitle="Позиции 10 · 11 · 12 — что нужно проработать обоим, повторяющиеся паттерны и главная задача этого союза."
-          variant="amber"
+          subtitle="Позиции 10 · 11 · 12 — кармические паттерны, повторяющиеся сценарии и главная задача этого союза."
         />
-        <div className="gradient-card rounded-2xl border border-amber-500/25 bg-amber-500/5 p-4 text-sm text-muted-foreground leading-relaxed">
-          Эти три позиции показывают кармическую программу отношений. Они не «плохие» — они точки трансформации. Пара, осознавшая свои кармические задачи, превращает их из источника конфликтов в источник роста.
+        <div className="gradient-card rounded-2xl border border-border p-4 text-sm text-muted-foreground leading-relaxed bg-muted/20">
+          Кармические позиции — не приговор и не плохой знак. Это точки трансформации: то, что будет провоцировать конфликты, пока пара не осознает их вместе. Именно здесь — самый глубокий рост.
         </div>
         {[10, 11, 12].map(pos => (
-          <ProArcanaCard key={pos} interpretation={getCompatInterpretation(pos, p[pos - 1])} />
+          <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} />
         ))}
       </div>
 
@@ -425,7 +614,7 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
   );
 }
 
-// ─── Partner Tab (предназначение партнёра + крест-матрица) ──────────────────────
+// ─── Partner Tab ───────────────────────────────────────────────────────────────
 
 function PartnerTab({
   matrix,
@@ -444,21 +633,22 @@ function PartnerTab({
   const colorClass = isRose ? "text-rose-500" : "text-primary";
   const borderClass = isRose ? "border-rose-300/30" : "border-primary/30";
   const bgClass = isRose ? "bg-rose-400/5" : "bg-primary/5";
-  const [destTab, setDestTab] = useState<'triangle' | 'goals' | 'karma'>('triangle');
+  const [destTab, setDestTab] = useState<'main' | 'goals' | 'karma'>('main');
 
   const p = matrix.positions;
   const crossP = crossMatrix?.positions;
-
-  // Позиции которые изменились в кросс-матрице: 2, 5, 7 (по calculations.ts)
   const changedPositions = [2, 5, 7];
+
+  // Ключевые арканы личной матрицы
+  const keyPositions = [1, 2, 3, 7, 12];
 
   return (
     <div className="space-y-6">
 
-      {/* Шапка партнёра */}
-      <div className={cn("gradient-card rounded-2xl border p-5", borderClass)}>
+      {/* Шапка */}
+      <div className={cn("gradient-card rounded-2xl border p-5", borderClass, bgClass)}>
         <div className="flex items-center gap-3 mb-3">
-          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", bgClass)}>
+          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", isRose ? "bg-rose-400/15" : "bg-primary/10")}>
             <Users className={cn("w-5 h-5", colorClass)} />
           </div>
           <div>
@@ -466,12 +656,25 @@ function PartnerTab({
             <h3 className={cn("font-display font-bold text-lg", colorClass)}>{name}</h3>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          Полная матрица предназначения {name} — все 12 позиций в контексте личности, а не совместимости. Ниже — как {name} проявляется именно в этих отношениях с {otherName}.
-        </p>
+        {/* Ключевые арканы */}
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {keyPositions.map(pos => {
+            const val = p[pos - 1];
+            const arcana = getArcana(val);
+            return (
+              <div key={pos} className={cn("flex items-center gap-1.5 px-2 py-1 rounded-full text-xs border", isRose ? "border-rose-300/30 bg-rose-400/5" : "border-primary/20 bg-primary/5")}>
+                <div className="relative w-4 h-6 rounded overflow-hidden shrink-0">
+                  <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
+                </div>
+                <span className="text-muted-foreground">Поз.{pos}:</span>
+                <span className={cn("font-medium", colorClass)}>{arcana?.name ?? val}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Матрица партнёра */}
+      {/* Матрица */}
       <div className={cn("gradient-card rounded-2xl border p-5", borderClass)}>
         <div className="flex items-center gap-2 mb-4">
           <Compass className={cn("w-5 h-5", colorClass)} />
@@ -480,14 +683,15 @@ function PartnerTab({
         <div className="flex justify-center">
           <MatrixGrid matrix={matrix} />
         </div>
+        <p className="text-xs text-muted-foreground text-center mt-3">Нажмите на карту чтобы рассмотреть аркан</p>
       </div>
 
-      {/* Вкладки предназначения */}
+      {/* Sub-tabs */}
       <div className="flex gap-2 flex-wrap">
         {[
-          { id: 'triangle' as const, label: 'Основной треугольник' },
-          { id: 'goals' as const, label: 'Цели и карьера' },
-          { id: 'karma' as const, label: 'Кармический блок' },
+          { id: 'main' as const, label: 'Основной треугольник' },
+          { id: 'goals' as const, label: 'Цели' },
+          { id: 'karma' as const, label: 'Карма' },
         ].map(tab => (
           <button
             key={tab.id}
@@ -504,50 +708,41 @@ function PartnerTab({
         ))}
       </div>
 
-      {/* Основной треугольник (поз. 1-6) */}
-      {destTab === 'triangle' && (
+      {/* Основной треугольник */}
+      {destTab === 'main' && (
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">Позиции 1–6 — основа личности, детство, таланты, цели и точка опоры.</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Позиции 1–6 · детство, личность, таланты, точка опоры</p>
           {[1, 2, 3, 4, 5, 6].map(pos => (
-            <ProArcanaCard
-              key={pos}
-              interpretation={getPositionInterpretation(pos, p[pos - 1])}
-            />
+            <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor} />
           ))}
         </div>
       )}
 
-      {/* Цели и карьера (поз. 7-9) */}
+      {/* Цели */}
       {destTab === 'goals' && (
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">Позиции 7–9 — цель жизни, инструмент достижения и зона комфорта.</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Позиции 7–9 · цель, инструмент, зона комфорта</p>
           {[7, 8, 9].map(pos => (
-            <ProArcanaCard
-              key={pos}
-              interpretation={getPositionInterpretation(pos, p[pos - 1])}
-            />
+            <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor} />
           ))}
         </div>
       )}
 
-      {/* Кармический блок (поз. 10-12) */}
+      {/* Карма */}
       {destTab === 'karma' && (
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">Позиции 10–12 — кармические задачи, ошибки прошлого и главная задача жизни.</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Позиции 10–12 · кармические задачи</p>
           {[10, 11, 12].map(pos => (
-            <ProArcanaCard
-              key={pos}
-              interpretation={getPositionInterpretation(pos, p[pos - 1])}
-            />
+            <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor} />
           ))}
         </div>
       )}
 
-      {/* Кросс-матрица — как партнёр проявляется в этих конкретных отношениях */}
+      {/* Крест-матрица */}
       {crossMatrix && crossP && (
-        <ExpandableBlock title={`Как ${name} меняется в этих отношениях`} defaultOpen={true}>
+        <ExpandableBlock title={`${name} в этих отношениях`} defaultOpen={true}>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Кросс-матрица показывает, как именно отношения с {otherName} трансформируют {name}. Изменены позиции 2, 5 и 7 — внутренняя суть, профессиональный путь и цель жизни.
+            Кросс-матрица показывает, как отношения с {otherName} меняют {name}. Изменены три ключевые позиции — внутренняя суть (2), совместный путь (5) и жизненная цель (7).
           </p>
 
           {/* Визуальная матрица кросс */}
@@ -560,7 +755,7 @@ function PartnerTab({
 
           {/* Изменённые позиции */}
           <div className="space-y-3">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Что изменилось</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Что меняется в союзе</p>
             {changedPositions.map(pos => {
               const orig = p[pos - 1];
               const cross = crossP[pos - 1];
@@ -569,27 +764,25 @@ function PartnerTab({
               if (orig === cross) return null;
               return (
                 <div key={pos} className={cn("rounded-xl p-4 border", bgClass, borderClass)}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-medium text-muted-foreground uppercase">Поз. {pos}: {compatPositionTitles[pos]}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-center">
-                      <div className="text-xs text-muted-foreground mb-1">Обычно</div>
-                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                        <span className="font-display font-bold text-sm text-foreground">{orig}</span>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-3">Поз. {pos} · {compatPositionTitles[pos]}</p>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-[10px] text-muted-foreground">Обычно</span>
+                      <div className="relative w-10 h-[60px] rounded-lg overflow-hidden ring-1 ring-border/50">
+                        <img src={getArcanaImage(orig)} alt="" className="w-full h-full object-cover" />
                       </div>
-                      <div className="text-[10px] text-muted-foreground mt-1">{origArcana?.name}</div>
+                      <span className="text-[9px] text-muted-foreground/70">{origArcana?.name}</span>
                     </div>
                     <div className={cn("flex-1 h-px", isRose ? "bg-rose-300/40" : "bg-primary/30")} />
-                    <div className="text-center">
-                      <div className="text-xs text-muted-foreground mb-1">В союзе</div>
-                      <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", isRose ? "bg-rose-400/20" : "bg-primary/20")}>
-                        <span className={cn("font-display font-bold text-sm", colorClass)}>{cross}</span>
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-[10px] text-muted-foreground">В союзе</span>
+                      <div className={cn("relative w-10 h-[60px] rounded-lg overflow-hidden ring-2", isRose ? "ring-rose-400/60" : "ring-primary/60")}>
+                        <img src={getArcanaImage(cross)} alt="" className="w-full h-full object-cover" />
                       </div>
-                      <div className="text-[10px] text-muted-foreground mt-1">{crossArcana?.name}</div>
+                      <span className={cn("text-[9px] font-medium", colorClass)}>{crossArcana?.name}</span>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     {getPositionInterpretation(pos, cross).positionIntro}
                   </p>
                 </div>
@@ -602,7 +795,7 @@ function PartnerTab({
   );
 }
 
-// ─── Matrices Tab (only visual, 5 matrices) ────────────────────────────────────
+// ─── Matrices Tab ──────────────────────────────────────────────────────────────
 
 function MatricesTab({ result }: { result: CompatibilityResult }) {
   if (!result.matrix1 || !result.matrix2 || !result.unionMatrix) return null;
@@ -610,7 +803,7 @@ function MatricesTab({ result }: { result: CompatibilityResult }) {
   const matrices = [
     { label: `Предназначение — ${result.person1.name}`, matrix: result.matrix1, accent: 'primary' as const },
     { label: `Предназначение — ${result.person2.name}`, matrix: result.matrix2, accent: 'rose' as const },
-    { label: "Матрица союза", matrix: result.unionMatrix, accent: 'amber' as const },
+    { label: "Матрица союза", matrix: result.unionMatrix, accent: 'primary' as const },
     ...(result.cross1Matrix ? [{ label: `${result.person1.name} в отношениях`, matrix: result.cross1Matrix, accent: 'primary' as const }] : []),
     ...(result.cross2Matrix ? [{ label: `${result.person2.name} в отношениях`, matrix: result.cross2Matrix, accent: 'rose' as const }] : []),
   ];
@@ -623,14 +816,14 @@ function MatricesTab({ result }: { result: CompatibilityResult }) {
       {matrices.map(({ label, matrix, accent }) => (
         <div key={label} className={cn(
           "gradient-card rounded-2xl border p-5",
-          accent === 'rose' ? "border-rose-300/25" : accent === 'amber' ? "border-amber-500/25" : "border-primary/25"
+          accent === 'rose' ? "border-rose-300/25" : "border-primary/25"
         )}>
           <p className={cn(
             "text-xs font-medium uppercase tracking-wide mb-4 text-center",
-            accent === 'rose' ? "text-rose-500" : accent === 'amber' ? "text-amber-600" : "text-primary"
+            accent === 'rose' ? "text-rose-500" : "text-primary"
           )}>{label}</p>
           <div className="flex justify-center">
-            <MatrixGrid matrix={matrix} accentPos2={accent === 'amber'} />
+            <MatrixGrid matrix={matrix} accentPos2={label === "Матрица союза"} />
           </div>
         </div>
       ))}
@@ -654,8 +847,6 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
   const [activeTab, setActiveTab] = useState<TabType>('union');
 
   const unionArcana = getArcana(result.unionArcana);
-  const harmonyArcana = getArcana(result.harmonyArcana);
-  const karmaArcana = getArcana(result.karmaArcana);
 
   const handleDownloadPDF = async () => {
     const person1Date = formatBirthDateForPDF(result.person1.birthDate.day, result.person1.birthDate.month, result.person1.birthDate.year);
@@ -729,7 +920,6 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
       {/* ═══ BASIC TIER ═══════════════════════════════════════════════════════ */}
       {!isPro && (
         <div className="space-y-6">
-          {/* Union arcana */}
           <div className="gradient-card rounded-xl p-5 border border-primary/30">
             <div className="flex items-center gap-2 mb-3">
               <Heart className="w-5 h-5 text-primary" />
@@ -741,8 +931,6 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               {unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
             </p>
           </div>
-
-          {/* Strengths & challenges */}
           <div className="grid md:grid-cols-2 gap-4">
             <div className="gradient-card rounded-xl p-5 border border-border">
               <h3 className="text-base font-display text-primary mb-3 flex items-center gap-2">
@@ -798,9 +986,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
           </div>
 
           {/* Tab content */}
-          {activeTab === 'union' && (
-            <UnionTab result={result} />
-          )}
+          {activeTab === 'union' && <UnionTab result={result} />}
           {activeTab === 'person1' && result.matrix1 && (
             <PartnerTab
               matrix={result.matrix1}
@@ -819,9 +1005,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               otherName={result.person1.name}
             />
           )}
-          {activeTab === 'matrices' && (
-            <MatricesTab result={result} />
-          )}
+          {activeTab === 'matrices' && <MatricesTab result={result} />}
         </>
       )}
 
