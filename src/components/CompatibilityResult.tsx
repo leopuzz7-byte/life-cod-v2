@@ -525,6 +525,491 @@ function ExpandableBlock({ title, children, defaultOpen = true }: {
   );
 }
 
+
+// ─── CommonArcanaBlock ─────────────────────────────────────────────────────────
+function CommonArcanaBlock({ matrix1, matrix2, name1, name2 }: {
+  matrix1: PersonalMatrix; matrix2: PersonalMatrix; name1: string; name2: string;
+}) {
+  const p1 = matrix1.positions;
+  const p2 = matrix2.positions;
+  const map1 = new Map<number, number[]>();
+  p1.forEach((val, idx) => {
+    if (!map1.has(val)) map1.set(val, []);
+    map1.get(val)!.push(idx + 1);
+  });
+  const commonItems: { arcana: number; pos1: number[]; pos2: number[] }[] = [];
+  const seen = new Set<number>();
+  p2.forEach((val, idx) => {
+    if (map1.has(val) && !seen.has(val)) {
+      seen.add(val);
+      const allPos2: number[] = [];
+      p2.forEach((v2, i2) => { if (v2 === val) allPos2.push(i2 + 1); });
+      commonItems.push({ arcana: val, pos1: map1.get(val)!, pos2: allPos2 });
+    }
+  });
+  if (commonItems.length === 0) {
+    return (
+      <div className="gradient-card rounded-2xl border border-border p-4 text-sm text-muted-foreground text-center">
+        У партнёров нет совпадающих арканов — энергии разные и дополняют друг друга.
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      {commonItems.map(item => {
+        const arcana = getArcana(item.arcana);
+        if (!arcana) return null;
+        const tags: string[] = [
+          arcana.isChildArcana ? 'Детский' : '',
+          arcana.isFinancialArcana ? 'Финансовый' : '',
+          arcana.isMaleArcana ? 'Мужской' : '',
+          arcana.isFemaleArcana ? 'Женский' : '',
+        ].filter(Boolean);
+        return (
+          <div key={item.arcana} className="gradient-card rounded-2xl border border-primary/20 p-4">
+            <div className="flex items-start gap-3">
+              <div className="relative w-10 h-[60px] rounded-xl overflow-hidden shrink-0 ring-1 ring-primary/20">
+                <img src={getArcanaImage(item.arcana)} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
+                  <span className="text-[8px] text-white/80 font-bold">{item.arcana}</span>
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-display font-bold text-base text-foreground">{arcana.name}</div>
+                <div className="text-xs text-muted-foreground mt-0.5 mb-2">
+                  <span className="text-primary">{name1}:</span> поз. {item.pos1.join(', ')}
+                  {' · '}
+                  <span className="text-violet-500">{name2}:</span> поз. {item.pos2.join(', ')}
+                </div>
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {tags.map(tag => (
+                      <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/8 text-primary border border-primary/15">{tag}</span>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground leading-relaxed">{arcana.compatibilityDescription}</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── SuccessCodeCompare ────────────────────────────────────────────────────────
+function SuccessCodeCompare({ matrix1, matrix2, name1, name2 }: {
+  matrix1: PersonalMatrix; matrix2: PersonalMatrix; name1: string; name2: string;
+}) {
+  const scLabels = ['Мудрость', 'Профессия', 'Цель жизни', 'Карма'];
+  const scPositions = [4, 5, 7, 12];
+  const sc1 = matrix1.successCode;
+  const sc2 = matrix2.successCode;
+  const common = sc1.filter(v => sc2.includes(v));
+
+  const renderRow = (code: number[], colorClass: string, borderClass: string, name: string) => (
+    <div>
+      <p className={cn("text-xs uppercase tracking-wide font-medium mb-2", colorClass)}>{name}</p>
+      <div className="flex gap-3 flex-wrap">
+        {code.map((val, i) => {
+          const arcana = getArcana(val);
+          return (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <div className={cn("relative w-11 h-[66px] rounded-xl overflow-hidden ring-2", borderClass)}>
+                <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
+                  <span className="text-[8px] text-white/80 font-bold">{val}</span>
+                </div>
+                <div className={cn("absolute top-[3px] right-[3px] w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white", colorClass.replace('text-', 'bg-'))}>
+                  {scPositions[i]}
+                </div>
+              </div>
+              <span className="text-[9px] text-muted-foreground/60 text-center leading-tight">{scLabels[i]}</span>
+              <span className={cn("text-[9px] font-medium text-center leading-tight max-w-[44px]", colorClass)}>{arcana?.name}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-5">
+      {renderRow(sc1, "text-primary", "ring-primary/30", name1)}
+      {renderRow(sc2, "text-violet-500", "ring-violet-400/30", name2)}
+      {common.length > 0 && (
+        <div className="gradient-card rounded-xl border border-primary/20 bg-primary/3 p-3">
+          <p className="text-xs text-primary font-medium mb-1.5">Общие арканы кода успеха</p>
+          <div className="flex gap-2 flex-wrap mb-2">
+            {common.map(val => (
+              <span key={val} className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-primary/8 border border-primary/15">
+                <span className="font-medium text-primary">{val}</span>
+                <span className="text-muted-foreground">{getArcana(val)?.name}</span>
+              </span>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">Общие арканы в коде успеха — вы смотрите в одном направлении. Это создаёт взаимопонимание на уровне целей и поддерживает союз в движении вперёд.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── KeyEnergiesBlock ─────────────────────────────────────────────────────────
+function KeyEnergiesBlock({ matrix }: { matrix: PersonalMatrix }) {
+  const keyPositions = [4, 5, 7, 12];
+  const [active, setActive] = useState<number | null>(null);
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground leading-relaxed">
+        Четыре ключевые позиции — через них проходит главная энергия отношений. В плюсе они усиливают союз, в минусе — создают точки напряжения.
+      </p>
+      {keyPositions.map(pos => {
+        const val = matrix.positions[pos - 1];
+        const arcana = getArcana(val);
+        if (!arcana) return null;
+        const isOpen = active === pos;
+        return (
+          <div key={pos} className="gradient-card rounded-2xl border border-border overflow-hidden">
+            <button
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/20 transition-colors text-left"
+              onClick={() => setActive(isOpen ? null : pos)}
+            >
+              <div className="relative w-9 h-[54px] rounded-lg overflow-hidden ring-1 ring-border/50 shrink-0">
+                <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
+                  <span className="text-[8px] text-white/80 font-bold">{val}</span>
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Поз. {pos} · {compatPositionTitles[pos]}</p>
+                <p className="font-display font-bold text-base text-foreground">{arcana.name}</p>
+              </div>
+              {isOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
+            </button>
+            {isOpen && (
+              <div className="px-4 pb-4 space-y-2">
+                <div className="rounded-xl bg-emerald-500/8 border border-emerald-500/20 p-3">
+                  <p className="text-[10px] font-medium text-emerald-600 mb-1">В плюсе — как усиливает союз</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{arcana.personalDescription}</p>
+                </div>
+                <div className="rounded-xl bg-red-500/8 border border-red-500/20 p-3">
+                  <p className="text-[10px] font-medium text-red-500 mb-1">В минусе — как разрушает союз</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{arcana.personalReversed}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── MoneyAndChildrenBlock ─────────────────────────────────────────────────────
+function MoneyAndChildrenBlock({ result }: { result: CompatibilityResult }) {
+  const allMatrices: { matrix: PersonalMatrix | undefined; label: string; color: 'primary' | 'violet' }[] = [
+    { matrix: result.matrix1, label: result.person1.name, color: 'primary' },
+    { matrix: result.matrix2, label: result.person2.name, color: 'violet' },
+    { matrix: result.unionMatrix, label: 'Матрица союза', color: 'primary' },
+  ];
+  const financialHits: { arcana: number; pos: number; source: string; color: 'primary' | 'violet' }[] = [];
+  const childrenHits: { arcana: number; pos: number; source: string; color: 'primary' | 'violet' }[] = [];
+  allMatrices.forEach(({ matrix, label, color }) => {
+    if (!matrix) return;
+    matrix.positions.forEach((val, idx) => {
+      const arc = getArcana(val);
+      if (!arc) return;
+      if (arc.isFinancialArcana) financialHits.push({ arcana: val, pos: idx + 1, source: label, color });
+      if (arc.isChildArcana) childrenHits.push({ arcana: val, pos: idx + 1, source: label, color });
+    });
+  });
+
+  const renderHitList = (hits: typeof financialHits) => (
+    <div className="flex flex-wrap gap-2">
+      {hits.map((hit, i) => (
+        <div key={i} className={cn(
+          "flex items-center gap-2 px-3 py-2 rounded-xl gradient-card border",
+          hit.color === 'violet' ? "border-violet-300/30" : "border-primary/25"
+        )}>
+          <div className="relative w-7 h-[42px] rounded-lg overflow-hidden ring-1 ring-border/50 shrink-0">
+            <img src={getArcanaImage(hit.arcana)} alt="" className="w-full h-full object-cover" />
+          </div>
+          <div className="text-xs">
+            <p className={cn("font-medium", hit.color === 'violet' ? "text-violet-500" : "text-primary")}>
+              {getArcana(hit.arcana)?.name}
+            </p>
+            <p className="text-muted-foreground">{hit.source} · Поз. {hit.pos}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-primary" />
+          <span className="text-sm font-semibold text-foreground">Денежная совместимость</span>
+        </div>
+        {financialHits.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Финансовые арканы в ключевых позициях не выражены.</p>
+        ) : renderHitList(financialHits)}
+      </div>
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-primary" />
+          <span className="text-sm font-semibold text-foreground">Детская тема пары</span>
+        </div>
+        {childrenHits.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Детские арканы в ключевых позициях не выражены.</p>
+        ) : (
+          <>
+            {renderHitList(childrenHits)}
+            <p className="text-xs text-muted-foreground leading-relaxed bg-primary/3 rounded-xl border border-primary/15 px-3 py-2">
+              {childrenHits.length >= 5
+                ? 'Тема детей ярко выражена в матрицах — союз несёт сильный семейный потенциал.'
+                : childrenHits.length >= 3
+                ? 'Тема семьи и детей присутствует в союзе — есть природная склонность к созданию семьи.'
+                : 'Тема детей присутствует в матрице.'}
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── HarmonizesBlock ──────────────────────────────────────────────────────────
+function HarmonizesBlock({ matrix1, matrix2, unionMatrix, name1, name2 }: {
+  matrix1: PersonalMatrix; matrix2: PersonalMatrix; unionMatrix: PersonalMatrix; name1: string; name2: string;
+}) {
+  const stabilityArcana = new Set([8, 14, 6, 2, 9, 3, 21]);
+  const sc1 = matrix1.successCode;
+  const sc2 = matrix2.successCode;
+  const stab1 = sc1.filter(v => stabilityArcana.has(v)).length;
+  const stab2 = sc2.filter(v => stabilityArcana.has(v)).length;
+  const [harmonizer, mover] = stab1 >= stab2 ? [name1, name2] : [name2, name1];
+  const harmonyArcana = getArcana(unionMatrix.positions[2]);
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="gradient-card rounded-xl border border-primary/25 bg-primary/3 p-3">
+          <p className="text-[10px] text-primary uppercase tracking-wide font-medium mb-1">Гармонизирует</p>
+          <p className="text-sm font-semibold text-foreground">{harmonizer}</p>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Берёт роль стабилизатора — через понимание, мудрость, поиск баланса.</p>
+        </div>
+        <div className="gradient-card rounded-xl border border-violet-300/25 bg-violet-400/3 p-3">
+          <p className="text-[10px] text-violet-500 uppercase tracking-wide font-medium mb-1">Двигает вперёд</p>
+          <p className="text-sm font-semibold text-foreground">{mover}</p>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Вносит в союз движение, энергию, новые идеи и жизненную силу.</p>
+        </div>
+      </div>
+      {harmonyArcana && (
+        <div className="gradient-card rounded-xl border border-border p-3 flex gap-3 items-start">
+          <div className="relative w-8 h-[48px] rounded-lg overflow-hidden ring-1 ring-border/50 shrink-0">
+            <img src={getArcanaImage(unionMatrix.positions[2])} alt="" className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground mb-0.5">Аркан гармонии союза · {harmonyArcana.name}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{harmonyArcana.compatibilityDescription}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── TriggersBlock ────────────────────────────────────────────────────────────
+function TriggersBlock({ matrix1, matrix2, name1, name2 }: {
+  matrix1: PersonalMatrix; matrix2: PersonalMatrix; name1: string; name2: string;
+}) {
+  interface TriggerItem { label: string; arcana: number; text: string; variant: 'p1' | 'p2' | 'cross' }
+  const items: TriggerItem[] = [];
+  const keyIdx = [3, 4, 6, 11]; // positions 4,5,7,12 zero-indexed
+
+  matrix1.reversedArcana.forEach(r => {
+    const arc = getArcana(r.arcana);
+    if (!arc) return;
+    items.push({ label: `${name1} · ${arc.name} (поз. ${r.positions.join(', ')})`, arcana: r.arcana, text: arc.personalReversed, variant: 'p1' });
+  });
+  matrix2.reversedArcana.forEach(r => {
+    const arc = getArcana(r.arcana);
+    if (!arc) return;
+    items.push({ label: `${name2} · ${arc.name} (поз. ${r.positions.join(', ')})`, arcana: r.arcana, text: arc.personalReversed, variant: 'p2' });
+  });
+  // Cross-triggers: reversed from p1 that hits key positions of p2
+  matrix1.reversedArcana.forEach(r => {
+    const inKey2 = keyIdx.filter(i => matrix2.positions[i] === r.arcana);
+    if (inKey2.length > 0) {
+      const arc = getArcana(r.arcana);
+      if (!arc) return;
+      items.push({
+        label: `${arc.name} — взаимный триггер`,
+        arcana: r.arcana,
+        text: `Перевёрнутый аркан у ${name1} совпадает с ключевой позицией у ${name2}. Один активирует тень другого. ${arc.personalReversed}`,
+        variant: 'cross',
+      });
+    }
+  });
+
+  if (items.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">Выраженных перевёрнутых и взаимных триггеров в матрицах не обнаружено.</p>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      {items.map((item, i) => (
+        <div key={i} className={cn(
+          "gradient-card rounded-xl border p-3 flex gap-3",
+          item.variant === 'p1' ? "border-primary/25" : item.variant === 'p2' ? "border-violet-300/25" : "border-amber-400/25"
+        )}>
+          <div className="relative w-8 h-[48px] rounded-lg overflow-hidden ring-1 ring-border/50 shrink-0">
+            <img src={getArcanaImage(item.arcana)} alt="" className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={cn("text-xs font-medium",
+              item.variant === 'p1' ? "text-primary" : item.variant === 'p2' ? "text-violet-500" : "text-amber-500"
+            )}>{item.label}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed mt-1">{item.text}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── SuccessCodeBlock (PartnerTab) ────────────────────────────────────────────
+function SuccessCodeBlock({ matrix, accentColor }: { matrix: PersonalMatrix; accentColor: 'primary' | 'violet' }) {
+  const isViolet = accentColor === 'violet';
+  const colorClass = isViolet ? "text-violet-500" : "text-primary";
+  const borderClass = isViolet ? "border-violet-300/25" : "border-primary/25";
+  const bgClass = isViolet ? "bg-violet-400/5" : "bg-primary/5";
+  const ringClass = isViolet ? "ring-violet-400/30" : "ring-primary/30";
+  const scLabels = ['Мудрость', 'Профессия', 'Цель жизни', 'Карма'];
+  const scPositions = [4, 5, 7, 12];
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  return (
+    <div className={cn("gradient-card rounded-2xl border p-4 space-y-3", borderClass, bgClass)}>
+      <div className="flex items-center gap-2 mb-1">
+        <Key className={cn("w-4 h-4", colorClass)} />
+        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Код успеха</span>
+      </div>
+      <div className="flex gap-3 flex-wrap">
+        {matrix.successCode.map((val, i) => {
+          const arcana = getArcana(val);
+          return (
+            <button key={i} onClick={() => setActiveIdx(activeIdx === i ? null : i)} className="flex flex-col items-center gap-1 group">
+              <div className={cn("relative w-11 h-[66px] rounded-xl overflow-hidden ring-2 transition-all",
+                activeIdx === i ? (isViolet ? "ring-violet-400" : "ring-primary") : cn("ring-border/50 group-hover:", ringClass)
+              )}>
+                <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
+                  <span className="text-[8px] text-white/80 font-bold">{val}</span>
+                </div>
+                <div className={cn("absolute top-[3px] right-[3px] w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white",
+                  isViolet ? "bg-violet-500" : "bg-primary"
+                )}>{scPositions[i]}</div>
+              </div>
+              <span className="text-[9px] text-muted-foreground/60 leading-tight">{scLabels[i]}</span>
+              <span className={cn("text-[9px] font-medium leading-tight max-w-[44px] text-center", colorClass)}>{arcana?.name}</span>
+            </button>
+          );
+        })}
+      </div>
+      {activeIdx !== null && (() => {
+        const val = matrix.successCode[activeIdx];
+        const arcana = getArcana(val);
+        if (!arcana) return null;
+        return (
+          <div className={cn("rounded-xl border p-3 space-y-2", borderClass)}>
+            <p className={cn("text-xs font-semibold", colorClass)}>{arcana.name} — {scLabels[activeIdx]}</p>
+            <div className="rounded-lg bg-emerald-500/8 border border-emerald-500/15 p-2">
+              <p className="text-[10px] font-medium text-emerald-600 mb-0.5">В плюсе</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{arcana.personalDescription}</p>
+            </div>
+            <div className="rounded-lg bg-red-500/8 border border-red-500/15 p-2">
+              <p className="text-[10px] font-medium text-red-500 mb-0.5">В минусе</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{arcana.personalReversed}</p>
+            </div>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+// ─── MirrorReversedBlock (PartnerTab) ─────────────────────────────────────────
+function MirrorReversedBlock({ matrix, accentColor }: { matrix: PersonalMatrix; accentColor: 'primary' | 'violet' }) {
+  const isViolet = accentColor === 'violet';
+  const colorClass = isViolet ? "text-violet-500" : "text-primary";
+  const borderClass = isViolet ? "border-violet-300/25" : "border-primary/25";
+  const bgClass = isViolet ? "bg-violet-400/5" : "bg-primary/5";
+  const hasMirror = matrix.mirrorArcana.length > 0;
+  const hasReversed = matrix.reversedArcana.length > 0;
+  if (!hasMirror && !hasReversed) return null;
+  return (
+    <div className="space-y-4">
+      {hasMirror && (
+        <div className={cn("gradient-card rounded-2xl border p-4 space-y-3", borderClass, bgClass)}>
+          <p className="text-xs uppercase tracking-wide font-medium text-muted-foreground">Зеркальные арканы</p>
+          {matrix.mirrorArcana.map((item, i) => {
+            const arcana = getArcana(item.arcana);
+            if (!arcana) return null;
+            return (
+              <div key={i} className="flex items-start gap-3">
+                <div className="relative w-10 h-[60px] rounded-xl overflow-hidden ring-1 ring-border/50 shrink-0">
+                  <img src={getArcanaImage(item.arcana)} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
+                    <span className="text-[8px] text-white/80 font-bold">{item.arcana}</span>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className={cn("font-display font-bold text-base", colorClass)}>{arcana.name}</div>
+                  <p className="text-xs text-muted-foreground mt-0.5 mb-1">Зеркало: поз. {item.positions[0]} ↔ поз. {item.positions[1]}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Эта энергия усилена в матрице и задаёт мощный тон личности. {arcana.personalDescription}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {hasReversed && (
+        <div className="gradient-card rounded-2xl border border-amber-400/25 bg-amber-400/3 p-4 space-y-3">
+          <p className="text-xs uppercase tracking-wide font-medium text-muted-foreground">Перевёрнутые арканы</p>
+          {matrix.reversedArcana.map((item, i) => {
+            const arcana = getArcana(item.arcana);
+            if (!arcana) return null;
+            return (
+              <div key={i} className="flex items-start gap-3">
+                <div className="relative w-10 h-[60px] rounded-xl overflow-hidden ring-1 ring-amber-400/30 shrink-0">
+                  <img src={getArcanaImage(item.arcana)} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
+                    <span className="text-[8px] text-white/80 font-bold">{item.arcana}</span>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-display font-bold text-base text-amber-500">{arcana.name}</div>
+                  <p className="text-xs text-muted-foreground mt-0.5 mb-1">
+                    {item.positions.length >= 3 ? 'Тройной аркан' : 'Перевёрнутый'} · поз. {item.positions.join(', ')}
+                  </p>
+                  <div className="space-y-1.5">
+                    <p className="text-xs text-muted-foreground"><span className="text-emerald-600 font-medium">В плюсе: </span>{arcana.personalDescription}</p>
+                    <p className="text-xs text-muted-foreground"><span className="text-red-500 font-medium">В минусе: </span>{arcana.personalReversed}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Union Tab ─────────────────────────────────────────────────────────────────
 
 function UnionTab({ result }: { result: CompatibilityResult }) {
@@ -563,6 +1048,23 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
           {unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
         </p>
       </div>
+
+      {/* ═══ СОВПАДАЮЩИЕ ЭНЕРГИИ ════════════════════════════════════════════════ */}
+      {result.matrix1 && result.matrix2 && (
+        <div className="space-y-4">
+          <SectionHeader
+            icon={Users}
+            title="Совпадающие энергии партнёров"
+            subtitle="Арканы, которые есть у обоих — они создают узнавание и общий язык между партнёрами."
+          />
+          <CommonArcanaBlock
+            matrix1={result.matrix1}
+            matrix2={result.matrix2}
+            name1={result.person1.name}
+            name2={result.person2.name}
+          />
+        </div>
+      )}
 
       {/* ═══ ТРЕУГОЛЬНИКИ ══════════════════════════════════════════════════════ */}
       <div className="space-y-6">
@@ -622,6 +1124,79 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
           <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} />
         ))}
       </div>
+
+
+      {/* ═══ ПЛЮС И МИНУС ГЛАВНЫХ ЭНЕРГИЙ ══════════════════════════════════════ */}
+      <div className="space-y-4">
+        <SectionHeader
+          icon={Star}
+          title="Плюс и минус главных энергий"
+          subtitle="Позиции 4 · 5 · 7 · 12 — ключевые арканы союза. Как они усиливают пару и где могут создавать конфликт."
+        />
+        <KeyEnergiesBlock matrix={matrix} />
+      </div>
+
+      {/* ═══ КОД УСПЕХА ПАРЫ ═════════════════════════════════════════════════ */}
+      {result.matrix1 && result.matrix2 && (
+        <div className="space-y-4">
+          <SectionHeader
+            icon={Key}
+            title="Код успеха пары"
+            subtitle="Жизненные программы партнёров — через что каждый идёт к результатам и насколько ваши пути совпадают."
+          />
+          <SuccessCodeCompare
+            matrix1={result.matrix1}
+            matrix2={result.matrix2}
+            name1={result.person1.name}
+            name2={result.person2.name}
+          />
+        </div>
+      )}
+
+      {/* ═══ ДЕНЬГИ И ДЕТИ ═══════════════════════════════════════════════════ */}
+      <div className="space-y-4">
+        <SectionHeader
+          icon={TrendingUp}
+          title="Деньги и дети"
+          subtitle="Денежные и детские арканы в матрицах — финансовый потенциал союза и тема семьи."
+        />
+        <MoneyAndChildrenBlock result={result} />
+      </div>
+
+      {/* ═══ КТО ГАРМОНИЗИРУЕТ ═══════════════════════════════════════════════ */}
+      {result.matrix1 && result.matrix2 && result.unionMatrix && (
+        <div className="space-y-4">
+          <SectionHeader
+            icon={Heart}
+            title="Кто гармонизирует отношения"
+            subtitle="Кто больше стабилизирует союз, кто двигает его вперёд — и аркан гармонии пары."
+          />
+          <HarmonizesBlock
+            matrix1={result.matrix1}
+            matrix2={result.matrix2}
+            unionMatrix={result.unionMatrix}
+            name1={result.person1.name}
+            name2={result.person2.name}
+          />
+        </div>
+      )}
+
+      {/* ═══ ГЛАВНЫЕ ТРИГГЕРЫ ════════════════════════════════════════════════ */}
+      {result.matrix1 && result.matrix2 && (
+        <div className="space-y-4">
+          <SectionHeader
+            icon={ShieldAlert}
+            title="Главные триггеры пары"
+            subtitle="Перевёрнутые арканы и взаимные точки напряжения — что чаще всего будет провоцировать конфликты."
+          />
+          <TriggersBlock
+            matrix1={result.matrix1}
+            matrix2={result.matrix2}
+            name1={result.person1.name}
+            name2={result.person2.name}
+          />
+        </div>
+      )}
 
     </div>
   );
@@ -697,6 +1272,12 @@ function PartnerTab({
         </div>
         <p className="text-xs text-muted-foreground text-center mt-3">Нажмите на карту чтобы рассмотреть аркан</p>
       </div>
+
+      {/* ── Код успеха ──────────────────────────────────────────────────────── */}
+      <SuccessCodeBlock matrix={matrix} accentColor={accentColor} />
+
+      {/* ── Зеркальные / Перевёрнутые ──────────────────────────────────────── */}
+      <MirrorReversedBlock matrix={matrix} accentColor={accentColor} />
 
       {/* Sub-tabs */}
       <div className="flex gap-2 flex-wrap">
