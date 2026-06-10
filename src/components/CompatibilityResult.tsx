@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { CompatibilityResult, PersonalMatrix } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
+import { arcanaCompatibilityData } from "@/lib/arcanaCompatibilityData";
+import { getCompatPositionText } from "@/lib/compatibilityTexts";
 import { getPositionInterpretation } from "@/lib/matrixInterpretation";
 import { cn } from "@/lib/utils";
 import { PDFDownloadButton } from "./PDFDownloadButton";
@@ -272,17 +274,29 @@ function CompCard({ position, value, positionTitle, contextIntro, expandableLabe
   );
 }
 
-// Обёртка для совместимости — contextIntro динамический (по аркану = по датам)
-function CompatCard({ position, value, highlight = false }: { position: number; value: number; highlight?: boolean }) {
+// Обёртка для совместимости — contextIntro динамический (по аркану × позиции)
+function CompatCard({ position, value, highlight = false, context = 'union' }: {
+  position: number;
+  value: number;
+  highlight?: boolean;
+  context?: 'union' | 'cross';
+}) {
   const arcana = getArcana(value);
+  const compatData = arcanaCompatibilityData[value];
+  // Rich expandable: general + upright/reversed from arcanaCompatibilityData
+  const expandable = compatData
+    ? `${compatData.upright}\n\nВ минусе: ${compatData.reversed}`
+    : (compatPositionIntros[position] || '');
+  const positionText = getCompatPositionText(context, position, value);
+  const contextIntro = positionText || arcana?.compatibilityDescription || arcana?.personalDescription || '';
   return (
     <CompCard
       position={position}
       value={value}
       positionTitle={compatPositionTitles[position] || `Позиция ${position}`}
-      contextIntro={arcana?.compatibilityDescription || arcana?.personalDescription || ''}
-      expandableLabel="Смысл позиции"
-      expandableContent={compatPositionIntros[position] || ''}
+      contextIntro={contextIntro}
+      expandableLabel="Расширенный разбор"
+      expandableContent={expandable}
       highlight={highlight}
     />
   );
@@ -408,6 +422,7 @@ function TriangleSection({
   positions,
   matrix,
   shownPositions,
+  context = 'union',
 }: {
   triangleNum: number;
   label: string;
@@ -415,6 +430,7 @@ function TriangleSection({
   positions: readonly number[];
   matrix: PersonalMatrix;
   shownPositions: Set<number>;
+  context?: 'union' | 'cross';
 }) {
   const p = matrix.positions;
   const newPositions = positions.filter(pos => !shownPositions.has(pos));
@@ -459,7 +475,7 @@ function TriangleSection({
 
       {/* New positions — full CompCards */}
       {newPositions.map(pos => (
-        <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 2} />
+        <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 2} context={context} />
       ))}
     </div>
   );
@@ -1010,6 +1026,230 @@ function MirrorReversedBlock({ matrix, accentColor }: { matrix: PersonalMatrix; 
   );
 }
 
+// ─── TriplesBlock — тройные арканы союза ──────────────────────────────────────
+
+function TriplesBlock({ matrix, title = "Тройные арканы" }: { matrix: PersonalMatrix; title?: string }) {
+  const triples = matrix.reversedArcana.filter(item => item.positions.length >= 3);
+  if (triples.length === 0) return null;
+  return (
+    <div className="gradient-card rounded-2xl border border-violet-400/25 bg-violet-400/3 p-5 space-y-4">
+      <div className="flex items-center gap-2">
+        <Layers className="w-4 h-4 text-violet-500" />
+        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{title}</span>
+      </div>
+      <p className="text-xs text-muted-foreground leading-relaxed">
+        Тройной аркан — это повторяющаяся энергия, которая звучит особенно громко. Это не ошибка и не плохой знак — это усиленный акцент на конкретной теме. Такой аркан требует особого внимания: он либо главный ресурс пары, либо главная точка роста.
+      </p>
+      {triples.map((item, i) => {
+        const arcana = getArcana(item.arcana);
+        const compatData = arcanaCompatibilityData[item.arcana];
+        if (!arcana) return null;
+        return (
+          <div key={i} className="flex items-start gap-3 pt-3 border-t border-violet-400/15">
+            <div className="relative w-12 h-[72px] rounded-xl overflow-hidden ring-1 ring-violet-400/30 shrink-0">
+              <img src={getArcanaImage(item.arcana)} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
+                <span className="text-[8px] text-white/80 font-bold">{item.arcana}</span>
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <span className="font-display font-bold text-base text-violet-500">{arcana.name}</span>
+                <span className="text-xs text-violet-400/70 bg-violet-400/10 px-2 py-0.5 rounded-full">
+                  {item.positions.length}× · поз. {item.positions.join(', ')}
+                </span>
+              </div>
+              {compatData && (
+                <p className="text-xs text-muted-foreground leading-relaxed">{compatData.general}</p>
+              )}
+              <div className="mt-2 space-y-1">
+                <p className="text-xs text-muted-foreground">
+                  <span className="text-emerald-600 font-medium">Усиленный плюс: </span>
+                  {compatData?.upright.slice(0, 180) || arcana.personalDescription}
+                  {(compatData?.upright.length ?? 0) > 180 ? '...' : ''}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  <span className="text-amber-500 font-medium">Усиленный вызов: </span>
+                  {compatData?.reversed.slice(0, 180) || arcana.personalReversed}
+                  {(compatData?.reversed.length ?? 0) > 180 ? '...' : ''}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── PerspectiveBlock — перспектива союза ──────────────────────────────────────
+
+function PerspectiveBlock({ result }: { result: CompatibilityResult }) {
+  const matrix = result.unionMatrix;
+  if (!matrix) return null;
+  const p = matrix.positions;
+  const unionArcana = getArcana(result.unionArcana);
+  const harmonyArcana = getArcana(p[2]); // поз. 3 — пара вовне
+  const destArcana = getArcana(p[11]);   // поз. 12 — кармическая задача
+  const pathArcana = getArcana(p[6]);    // поз. 7 — общая цель
+  const compatData = arcanaCompatibilityData[result.unionArcana];
+
+  const perspectives = [
+    {
+      label: "Аркан союза",
+      value: result.unionArcana,
+      arcana: unionArcana,
+      text: compatData?.conclusion || "Ключевая энергия, которая определяет характер этого союза на всём его протяжении.",
+    },
+    {
+      label: "Как вас видит мир",
+      value: p[2],
+      arcana: harmonyArcana,
+      text: "Образ пары снаружи — что транслируется людям вокруг. Именно это воспринимают друзья, семья, коллеги.",
+    },
+    {
+      label: "Общая цель",
+      value: p[6],
+      arcana: pathArcana,
+      text: "Зачем эти двое встретились — с точки зрения движения и смысла. Куда ведут отношения.",
+    },
+    {
+      label: "Главная задача",
+      value: p[11],
+      arcana: destArcana,
+      text: "Глубинная кармическая задача союза — то, ради чего они пришли друг к другу на уровне судьбы.",
+    },
+  ];
+
+  return (
+    <div className="gradient-card rounded-2xl border border-primary/20 p-5 space-y-4">
+      <div className="flex items-center gap-2 mb-1">
+        <Sparkles className="w-4 h-4 text-primary" />
+        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Перспектива союза</span>
+      </div>
+      <p className="text-xs text-muted-foreground leading-relaxed">
+        Четыре ключевые точки, которые определяют будущее этого союза. Где пара сейчас, как её воспринимают, куда она движется — и какова её глубинная задача.
+      </p>
+      <div className="grid grid-cols-2 gap-3">
+        {perspectives.map(({ label, value, arcana, text }) => (
+          <div key={label} className="gradient-card rounded-xl border border-border/50 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="relative w-8 h-12 rounded-lg overflow-hidden shrink-0 ring-1 ring-primary/20">
+                <img src={getArcanaImage(value)} alt="" className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground/70 uppercase tracking-wide leading-none">{label}</p>
+                <p className="text-xs font-semibold text-foreground mt-0.5">{arcana?.name ?? value}</p>
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">{text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── RecommendationsBlock — рекомендации паре ─────────────────────────────────
+
+function RecommendationsBlock({ result }: { result: CompatibilityResult }) {
+  const matrix = result.unionMatrix;
+  if (!matrix) return null;
+  const p = matrix.positions;
+  const unionArcana = result.unionArcana;
+  const karmaArcana = p[11]; // поз. 12
+  const goalArcana = p[6];   // поз. 7
+  const baseArcana = p[5];   // поз. 6
+
+  // Рекомендации на основе ключевых арканов
+  const getRecForArcana = (arcana: number, role: 'him' | 'her' | 'pair'): string => {
+    const compatData = arcanaCompatibilityData[arcana];
+    if (!compatData) return '';
+    if (role === 'pair') return compatData.conclusion;
+    // For him/her we use parts of upright/reversed
+    return role === 'him'
+      ? compatData.upright.split('.')[0] + '.'
+      : compatData.reversed.split('.')[0] + '.';
+  };
+
+  const pairRec = getRecForArcana(unionArcana, 'pair');
+  const goalText = arcanaCompatibilityData[goalArcana]?.general?.split('.')[0] + '.' || '';
+  const karmaText = arcanaCompatibilityData[karmaArcana]?.general?.split('.')[0] + '.' || '';
+
+  const himName = result.person1.name || 'Партнёр А';
+  const herName = result.person2.name || 'Партнёр Б';
+
+  // Cross matrix position 4 texts for each partner
+  const cross1Pos4 = result.cross1Matrix?.positions[3];
+  const cross2Pos4 = result.cross2Matrix?.positions[3];
+  const himRec = cross1Pos4 ? getCompatPositionText('cross', 4, cross1Pos4) : '';
+  const herRec = cross2Pos4 ? getCompatPositionText('cross', 4, cross2Pos4) : '';
+
+  return (
+    <div className="space-y-4">
+      {/* Ему */}
+      {himRec && (
+        <div className="gradient-card rounded-2xl border border-primary/20 bg-primary/3 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-primary">Е</span>
+            </div>
+            <span className="text-sm font-semibold text-foreground">{himName}</span>
+            {cross1Pos4 && (
+              <div className="relative w-5 h-7 rounded overflow-hidden ring-1 ring-primary/20 ml-auto">
+                <img src={getArcanaImage(cross1Pos4)} alt="" className="w-full h-full object-cover" />
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">{himRec}</p>
+        </div>
+      )}
+
+      {/* Ей */}
+      {herRec && (
+        <div className="gradient-card rounded-2xl border border-violet-400/20 bg-violet-400/3 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-full bg-violet-400/10 flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-violet-500">Е</span>
+            </div>
+            <span className="text-sm font-semibold text-foreground">{herName}</span>
+            {cross2Pos4 && (
+              <div className="relative w-5 h-7 rounded overflow-hidden ring-1 ring-violet-400/20 ml-auto">
+                <img src={getArcanaImage(cross2Pos4)} alt="" className="w-full h-full object-cover" />
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">{herRec}</p>
+        </div>
+      )}
+
+      {/* Паре */}
+      <div className="gradient-card rounded-2xl border border-border p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Heart className="w-4 h-4 text-primary" />
+          <span className="text-sm font-semibold text-foreground">Паре вместе</span>
+        </div>
+        <div className="space-y-2">
+          {pairRec && <p className="text-xs text-muted-foreground leading-relaxed">{pairRec}</p>}
+          {goalText && (
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <span className="font-medium text-foreground">Общая цель: </span>{goalText}
+            </p>
+          )}
+          {karmaText && (
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <span className="font-medium text-foreground">Главная задача: </span>{karmaText}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground leading-relaxed mt-2 pt-2 border-t border-border/50">
+            Помните: матрица предназначения показывает потенциал, а не приговор. Всё, что здесь написано — это возможности и точки роста. Ваши отношения — это живая система, которую вы создаёте каждый день.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Union Tab ─────────────────────────────────────────────────────────────────
 
 function UnionTab({ result }: { result: CompatibilityResult }) {
@@ -1042,11 +1282,16 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
       <div className="gradient-card rounded-2xl border border-primary/20 p-5 bg-primary/3">
         <div className="flex items-center gap-2 mb-3">
           <Heart className="w-4 h-4 text-primary" />
-          <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Общая энергия союза</span>
+          <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Аркан союза · {unionArcana?.name}</span>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          {unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
+          {getCompatPositionText('union', 2, result.unionArcana) || arcanaCompatibilityData[result.unionArcana]?.general || unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
         </p>
+        {arcanaCompatibilityData[result.unionArcana] && (
+          <p className="text-xs text-muted-foreground/70 leading-relaxed mt-2 pt-2 border-t border-primary/10">
+            {arcanaCompatibilityData[result.unionArcana].conclusion}
+          </p>
+        )}
       </div>
 
       {/* ═══ СОВПАДАЮЩИЕ ЭНЕРГИИ ════════════════════════════════════════════════ */}
@@ -1197,6 +1442,38 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
           />
         </div>
       )}
+
+      {/* ═══ ТРОЙНЫЕ АРКАНЫ ══════════════════════════════════════════════════ */}
+      {matrix.reversedArcana.some(item => item.positions.length >= 3) && (
+        <div className="space-y-4">
+          <SectionHeader
+            icon={Layers}
+            title="Тройные арканы союза"
+            subtitle="Арканы, которые появляются три и более раз — усиленный акцент на конкретной теме союза."
+          />
+          <TriplesBlock matrix={matrix} />
+        </div>
+      )}
+
+      {/* ═══ ПЕРСПЕКТИВА СОЮЗА ═══════════════════════════════════════════════ */}
+      <div className="space-y-4">
+        <SectionHeader
+          icon={Sparkles}
+          title="Перспектива союза"
+          subtitle="Четыре ключевые точки, которые определяют будущее этих отношений."
+        />
+        <PerspectiveBlock result={result} />
+      </div>
+
+      {/* ═══ РЕКОМЕНДАЦИИ ════════════════════════════════════════════════════ */}
+      <div className="space-y-4">
+        <SectionHeader
+          icon={CheckCircle}
+          title="Рекомендации"
+          subtitle="Ключевые зоны роста и практические советы — ему, ей и паре вместе."
+        />
+        <RecommendationsBlock result={result} />
+      </div>
 
     </div>
   );
@@ -1400,6 +1677,7 @@ function PartnerTab({
                   positions={tri.positions}
                   matrix={crossMatrix}
                   shownPositions={TRIANGLE_SHOWN_SETS[idx]}
+                  context="cross"
                 />
               </div>
             ))}
@@ -1412,7 +1690,7 @@ function PartnerTab({
               title="Основа отношений"
               subtitle="Позиция 6 — кармический аркан, ключевой вызов и скрытый ресурс."
             />
-            <CompatCard position={6} value={crossP[5]} />
+            <CompatCard position={6} value={crossP[5]} context="cross" />
           </div>
 
           {/* Цели */}
@@ -1420,10 +1698,10 @@ function PartnerTab({
             <SectionHeader
               icon={Target}
               title="Цели в этих отношениях"
-              subtitle="Позиции 7 · 8 · 9 — общая жизненная цель, инструмент достижения, зона комфорта."
+              subtitle="Позиции 7 · 8 · 9 — жизненная цель, способ достижения, зона комфорта."
             />
             {[7, 8, 9].map(pos => (
-              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} />
+              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} context="cross" />
             ))}
           </div>
 
@@ -1432,10 +1710,10 @@ function PartnerTab({
             <SectionHeader
               icon={ShieldAlert}
               title="Кармические задачи"
-              subtitle="Позиции 10 · 11 · 12 — ошибки прошлого, задачи и космическая миссия в этом союзе."
+              subtitle="Позиции 10 · 11 · 12 — ошибки прошлого, автоматические сценарии и главная кармическая задача в этом союзе."
             />
             {[10, 11, 12].map(pos => (
-              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} highlight={pos === 12} />
+              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} context="cross" highlight={pos === 12} />
             ))}
           </div>
         </div>
