@@ -1621,4 +1621,340 @@ function PartnerTab({
       {crossMatrix && crossP && (
         <div className="space-y-6 pt-2">
           <SectionHeader
-            ico
+            icon={Users}
+            title={`${name} в этих отношениях`}
+            subtitle={`Как ${name} воспринимает этот союз — кросс-матрица с ${otherName}.`}
+          />
+
+          {/* Ключевые арканы кросс-матрицы */}
+          <div className={cn("gradient-card rounded-2xl border p-4", borderClass, bgClass)}>
+            <div className="flex items-center gap-2 mb-3">
+              <Key className={cn("w-4 h-4", colorClass)} />
+              <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Ключ в отношениях</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[1, 2, 5, 12].map(pos => {
+                const val = crossP[pos - 1];
+                const arcana = getArcana(val);
+                return (
+                  <div key={pos} className={cn("flex items-center gap-1.5 px-2 py-1 rounded-full text-xs border", borderClass, bgClass)}>
+                    <div className="relative w-4 h-6 rounded overflow-hidden shrink-0">
+                      <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-muted-foreground">Поз.{pos}:</span>
+                    <span className={cn("font-medium", colorClass)}>{arcana?.name ?? val}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Визуальная матрица кросс */}
+          <div className={cn("gradient-card rounded-2xl border p-5", borderClass)}>
+            <div className="flex items-center gap-2 mb-4">
+              <Compass className={cn("w-5 h-5", colorClass)} />
+              <span className="font-display font-semibold text-foreground">Матрица в отношениях</span>
+            </div>
+            <div className="flex justify-center">
+              <MatrixGrid matrix={crossMatrix} />
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-3">Нажмите на карту чтобы рассмотреть аркан</p>
+          </div>
+
+          {/* Три треугольника */}
+          <div className="space-y-4">
+            <SectionHeader
+              icon={Clock}
+              title="Три периода"
+              subtitle="Как эти отношения влияют на начало, динамику и зрелость восприятия союза."
+            />
+            {TRIANGLES.map((tri, idx) => (
+              <div key={tri.num} className="gradient-card rounded-2xl border border-border p-5 space-y-5">
+                <TriangleSection
+                  triangleNum={tri.num}
+                  label={tri.label}
+                  intro={tri.intro}
+                  positions={tri.positions}
+                  matrix={crossMatrix}
+                  shownPositions={TRIANGLE_SHOWN_SETS[idx]}
+                  context="cross"
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Основа отношений — поз. 6 */}
+          <div className="space-y-4">
+            <SectionHeader
+              icon={Anchor}
+              title="Основа отношений"
+              subtitle="Позиция 6 — кармический аркан, ключевой вызов и скрытый ресурс."
+            />
+            <CompatCard position={6} value={crossP[5]} context="cross" />
+          </div>
+
+          {/* Цели */}
+          <div className="space-y-4">
+            <SectionHeader
+              icon={Target}
+              title="Цели в этих отношениях"
+              subtitle="Позиции 7 · 8 · 9 — жизненная цель, способ достижения, зона комфорта."
+            />
+            {[7, 8, 9].map(pos => (
+              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} context="cross" />
+            ))}
+          </div>
+
+          {/* Кармические задачи */}
+          <div className="space-y-4">
+            <SectionHeader
+              icon={ShieldAlert}
+              title="Кармические задачи"
+              subtitle="Позиции 10 · 11 · 12 — ошибки прошлого, автоматические сценарии и главная кармическая задача в этом союзе."
+            />
+            {[10, 11, 12].map(pos => (
+              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} context="cross" highlight={pos === 12} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Matrices Tab ──────────────────────────────────────────────────────────────
+
+function MatricesTab({ result }: { result: CompatibilityResult }) {
+  if (!result.matrix1 || !result.matrix2 || !result.unionMatrix) return null;
+
+  const matrices = [
+    { label: `Предназначение — ${result.person1.name}`, matrix: result.matrix1, accent: 'primary' as const },
+    { label: `Предназначение — ${result.person2.name}`, matrix: result.matrix2, accent: 'violet' as const },
+    { label: "Матрица союза", matrix: result.unionMatrix, accent: 'primary' as const },
+    ...(result.cross1Matrix ? [{ label: `${result.person1.name} в отношениях`, matrix: result.cross1Matrix, accent: 'primary' as const }] : []),
+    ...(result.cross2Matrix ? [{ label: `${result.person2.name} в отношениях`, matrix: result.cross2Matrix, accent: 'violet' as const }] : []),
+  ];
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-muted-foreground text-center">
+        Пять матриц — полный энергетический портрет пары. Нажмите на карту чтобы рассмотреть аркан.
+      </p>
+      {matrices.map(({ label, matrix, accent }) => (
+        <div key={label} className={cn(
+          "gradient-card rounded-2xl border p-5",
+          accent === 'violet' ? "border-violet-300/25" : "border-primary/25"
+        )}>
+          <p className={cn(
+            "text-xs font-medium uppercase tracking-wide mb-4 text-center",
+            accent === 'violet' ? "text-violet-500" : "text-primary"
+          )}>{label}</p>
+          <div className="flex justify-center">
+            <MatrixGrid matrix={matrix} accentPos2={label === "Матрица союза"} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Main Component ────────────────────────────────────────────────────────────
+
+interface CompatibilityResultProps {
+  result: CompatibilityResult;
+  onReset: () => void;
+  tier?: TierType;
+}
+
+type TabType = 'union' | 'person1' | 'person2' | 'matrices';
+
+export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }: CompatibilityResultProps) {
+  const { t } = useTranslation();
+  const isPro = tier === 'professional';
+  const [activeTab, setActiveTab] = useState<TabType>('union');
+
+  const unionArcana = getArcana(result.unionArcana);
+
+  const handleDownloadPDF = async () => {
+    const person1Date = formatBirthDateForPDF(result.person1.birthDate.day, result.person1.birthDate.month, result.person1.birthDate.year);
+    const person2Date = formatBirthDateForPDF(result.person2.birthDate.day, result.person2.birthDate.month, result.person2.birthDate.year);
+    await generatePDF({
+      title: t("compatibility.title"),
+      subtitle: `${result.person1.name} & ${result.person2.name}`,
+      birthDate: `${person1Date} / ${person2Date}`,
+      sections: [
+        { title: `${t("compatibility.compatibilityScore")}: ${result.compatibilityPercent}%`, content: "", highlight: true },
+        { title: `${t("compatibility.unionArcana")}: ${result.unionArcana} — ${unionArcana?.name || ""}`, content: unionArcana?.compatibilityDescription || unionArcana?.personalDescription || "" },
+        { title: t("compatibility.strengths"), content: result.strengths.join("\n") },
+        { title: t("compatibility.challenges"), content: result.challenges.join("\n") },
+      ],
+    });
+  };
+
+  const tabs: { id: TabType; label: string }[] = isPro ? [
+    { id: 'union', label: 'Союз' },
+    { id: 'person1', label: result.person1.name || 'Партнёр А' },
+    { id: 'person2', label: result.person2.name || 'Партнёр Б' },
+    { id: 'matrices', label: 'Матрицы' },
+  ] : [];
+
+  return (
+    <div className="max-w-4xl mx-auto">
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <Button variant="ghost" onClick={onReset} className="text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {t("results.newCalculation")}
+        </Button>
+        <PDFDownloadButton onDownload={handleDownloadPDF} />
+      </div>
+
+      {/* Hero Card: Partners + Score */}
+      <div className="gradient-card rounded-2xl border border-primary/20 p-5 mb-6">
+        {/* Badge + title */}
+        <div className="text-center mb-4">
+          <span className={cn(
+            "inline-block px-3 py-1 rounded-full text-xs font-medium mb-2",
+            isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
+          )}>
+            {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
+          </span>
+          <div className="flex items-center justify-center gap-2">
+            <Heart className="w-4 h-4 text-primary/70" />
+            <span className="text-sm text-muted-foreground">{t("compatibility.title")}</span>
+          </div>
+        </div>
+
+        {/* Partner cards */}
+        <div className="flex items-stretch gap-3 mb-5">
+          <div className="flex-1 rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 text-center">
+            <p className="font-display font-bold text-2xl text-primary leading-tight">{result.person1.name || 'Партнёр А'}</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {String(result.person1.birthDate.day).padStart(2, '0')}.{String(result.person1.birthDate.month).padStart(2, '0')}.{result.person1.birthDate.year}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-center shrink-0 px-1">
+            <Heart className="w-5 h-5 text-primary/50" />
+          </div>
+
+          <div className="flex-1 rounded-xl bg-violet-400/5 border border-violet-300/30 px-4 py-3 text-center">
+            <p className="font-display font-bold text-2xl text-violet-500 leading-tight">{result.person2.name || 'Партнёр Б'}</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {String(result.person2.birthDate.day).padStart(2, '0')}.{String(result.person2.birthDate.month).padStart(2, '0')}.{result.person2.birthDate.year}
+            </p>
+          </div>
+        </div>
+
+        {/* Score */}
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <span className={cn(
+            "text-5xl font-display font-bold shrink-0",
+            result.compatibilityPercent >= 80 ? "text-emerald-600" :
+            result.compatibilityPercent >= 60 ? "text-primary" :
+            result.compatibilityPercent >= 40 ? "text-amber-600" : "text-red-500"
+          )}>
+            {result.compatibilityPercent}%
+          </span>
+          <div className="flex-1 w-full">
+            <ScoreBar percent={result.compatibilityPercent} />
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ BASIC TIER ═══════════════════════════════════════════════════════ */}
+      {!isPro && (
+        <div className="space-y-6">
+          <div className="gradient-card rounded-xl p-5 border border-primary/30">
+            <div className="flex items-center gap-2 mb-3">
+              <Heart className="w-5 h-5 text-primary" />
+              <h2 className="font-display font-semibold text-foreground">
+                {t("compatibility.unionArcana")}: {result.unionArcana} — {unionArcana?.name}
+              </h2>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="gradient-card rounded-xl p-5 border border-border">
+              <h3 className="text-base font-display text-primary mb-3 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" /> {t("compatibility.strengths")}
+              </h3>
+              <ul className="space-y-2">
+                {result.strengths.slice(0, 3).map((s, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <span className="text-primary mt-0.5">✓</span>{s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="gradient-card rounded-xl p-5 border border-border">
+              <h3 className="text-base font-display text-primary mb-3 flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4" /> {t("compatibility.challenges")}
+              </h3>
+              <ul className="space-y-2">
+                {result.challenges.slice(0, 3).map((c, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <span className="text-amber-500 mt-0.5">!</span>{c}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="bg-muted/30 rounded-xl border border-border p-5 text-center">
+            <p className="text-sm text-muted-foreground">{t("res.compat.proFooter")}</p>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ PRO TIER ═════════════════════════════════════════════════════════ */}
+      {isPro && (
+        <>
+          {/* Tab bar */}
+          <div className="flex gap-2 flex-wrap mb-6">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1.5",
+                  activeTab === tab.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                )}
+              >
+                {tab.id === 'matrices' && <Layers className="w-3.5 h-3.5" />}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab content */}
+          {activeTab === 'union' && <UnionTab result={result} />}
+          {activeTab === 'person1' && result.matrix1 && (
+            <PartnerTab
+              matrix={result.matrix1}
+              crossMatrix={result.cross1Matrix}
+              name={result.person1.name}
+              accentColor="primary"
+              otherName={result.person2.name}
+            />
+          )}
+          {activeTab === 'person2' && result.matrix2 && (
+            <PartnerTab
+              matrix={result.matrix2}
+              crossMatrix={result.cross2Matrix}
+              name={result.person2.name}
+              accentColor="primary"
+              otherName={result.person1.name}
+            />
+          )}
+          {activeTab === 'matrices' && <MatricesTab result={result} />}
+        </>
+      )}
+
+    </div>
+  );
+}
