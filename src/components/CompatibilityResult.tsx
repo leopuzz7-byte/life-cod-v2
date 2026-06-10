@@ -6,6 +6,7 @@ import {
   Target, ShieldAlert, CheckCircle, Users, X, Layers,
   ChevronDown, ChevronUp, Sparkles, Key
 } from "lucide-react";
+import { useAIReading } from "@/hooks/useAIReading";
 import { CompatibilityResult, PersonalMatrix } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
 import { arcanaCompatibilityData } from "@/lib/arcanaCompatibilityData";
@@ -213,9 +214,9 @@ function CompCard({ position, value, positionTitle, contextIntro, expandableLabe
   const [modalOpen, setModalOpen] = useState(false);
 
   const isViolet = accentColor === 'violet';
-  const accentText = isViolet ? "text-violet-500" : "text-primary";
-  const accentBorder = isViolet ? "border-violet-300/40" : "border-primary/30";
-  const accentBg = isViolet ? "bg-violet-400/8" : "bg-primary/8";
+  const accentText = isViolet ? "text-primary" : "text-primary";
+  const accentBorder = isViolet ? "border-primary/40" : "border-primary/30";
+  const accentBg = isViolet ? "bg-primary/8" : "bg-primary/8";
 
   return (
     <div className={cn(
@@ -275,20 +276,20 @@ function CompCard({ position, value, positionTitle, contextIntro, expandableLabe
 }
 
 // Обёртка для совместимости — contextIntro динамический (по аркану × позиции)
-function CompatCard({ position, value, highlight = false, context = 'union' }: {
+function CompatCard({ position, value, highlight = false, context = 'union', aiText }: {
   position: number;
   value: number;
   highlight?: boolean;
   context?: 'union' | 'cross';
+  aiText?: string;
 }) {
   const arcana = getArcana(value);
   const compatData = arcanaCompatibilityData[value];
-  // Rich expandable: general + upright/reversed from arcanaCompatibilityData
   const expandable = compatData
     ? `${compatData.upright}\n\nВ минусе: ${compatData.reversed}`
     : (compatPositionIntros[position] || '');
   const positionText = getCompatPositionText(context, position, value);
-  const contextIntro = positionText || arcana?.compatibilityDescription || arcana?.personalDescription || '';
+  const contextIntro = aiText || positionText || arcana?.compatibilityDescription || arcana?.personalDescription || '';
   return (
     <CompCard
       position={position}
@@ -595,7 +596,7 @@ function CommonArcanaBlock({ matrix1, matrix2, name1, name2 }: {
                 <div className="text-xs text-muted-foreground mt-0.5 mb-2">
                   <span className="text-primary">{name1}:</span> поз. {item.pos1.join(', ')}
                   {' · '}
-                  <span className="text-violet-500">{name2}:</span> поз. {item.pos2.join(', ')}
+                  <span className="text-primary">{name2}:</span> поз. {item.pos2.join(', ')}
                 </div>
                 {tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-2">
@@ -653,7 +654,7 @@ function SuccessCodeCompare({ matrix1, matrix2, name1, name2 }: {
   return (
     <div className="space-y-5">
       {renderRow(sc1, "text-primary", "ring-primary/30", name1)}
-      {renderRow(sc2, "text-violet-500", "ring-violet-400/30", name2)}
+      {renderRow(sc2, "text-primary", "ring-primary/30", name2)}
       {common.length > 0 && (
         <div className="gradient-card rounded-xl border border-primary/20 bg-primary/3 p-3">
           <p className="text-xs text-primary font-medium mb-1.5">Общие арканы кода успеха</p>
@@ -747,13 +748,13 @@ function MoneyAndChildrenBlock({ result }: { result: CompatibilityResult }) {
       {hits.map((hit, i) => (
         <div key={i} className={cn(
           "flex items-center gap-2 px-3 py-2 rounded-xl gradient-card border",
-          hit.color === 'violet' ? "border-violet-300/30" : "border-primary/25"
+          hit.color === 'violet' ? "border-primary/30" : "border-primary/25"
         )}>
           <div className="relative w-7 h-[42px] rounded-lg overflow-hidden ring-1 ring-border/50 shrink-0">
             <img src={getArcanaImage(hit.arcana)} alt="" className="w-full h-full object-cover" />
           </div>
           <div className="text-xs">
-            <p className={cn("font-medium", hit.color === 'violet' ? "text-violet-500" : "text-primary")}>
+            <p className={cn("font-medium", hit.color === 'violet' ? "text-primary" : "text-primary")}>
               {getArcana(hit.arcana)?.name}
             </p>
             <p className="text-muted-foreground">{hit.source} · Поз. {hit.pos}</p>
@@ -817,8 +818,8 @@ function HarmonizesBlock({ matrix1, matrix2, unionMatrix, name1, name2 }: {
           <p className="text-sm font-semibold text-foreground">{harmonizer}</p>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Берёт роль стабилизатора — через понимание, мудрость, поиск баланса.</p>
         </div>
-        <div className="gradient-card rounded-xl border border-violet-300/25 bg-violet-400/3 p-3">
-          <p className="text-[10px] text-violet-500 uppercase tracking-wide font-medium mb-1">Двигает вперёд</p>
+        <div className="gradient-card rounded-xl border border-primary/25 bg-primary/3 p-3">
+          <p className="text-[10px] text-primary uppercase tracking-wide font-medium mb-1">Двигает вперёд</p>
           <p className="text-sm font-semibold text-foreground">{mover}</p>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Вносит в союз движение, энергию, новые идеи и жизненную силу.</p>
         </div>
@@ -881,14 +882,14 @@ function TriggersBlock({ matrix1, matrix2, name1, name2 }: {
       {items.map((item, i) => (
         <div key={i} className={cn(
           "gradient-card rounded-xl border p-3 flex gap-3",
-          item.variant === 'p1' ? "border-primary/25" : item.variant === 'p2' ? "border-violet-300/25" : "border-amber-400/25"
+          item.variant === 'p1' ? "border-primary/25" : item.variant === 'p2' ? "border-primary/25" : "border-amber-400/25"
         )}>
           <div className="relative w-8 h-[48px] rounded-lg overflow-hidden ring-1 ring-border/50 shrink-0">
             <img src={getArcanaImage(item.arcana)} alt="" className="w-full h-full object-cover" />
           </div>
           <div className="flex-1 min-w-0">
             <p className={cn("text-xs font-medium",
-              item.variant === 'p1' ? "text-primary" : item.variant === 'p2' ? "text-violet-500" : "text-amber-500"
+              item.variant === 'p1' ? "text-primary" : item.variant === 'p2' ? "text-primary" : "text-amber-500"
             )}>{item.label}</p>
             <p className="text-xs text-muted-foreground leading-relaxed mt-1">{item.text}</p>
           </div>
@@ -901,10 +902,10 @@ function TriggersBlock({ matrix1, matrix2, name1, name2 }: {
 // ─── SuccessCodeBlock (PartnerTab) ────────────────────────────────────────────
 function SuccessCodeBlock({ matrix, accentColor }: { matrix: PersonalMatrix; accentColor: 'primary' | 'violet' }) {
   const isViolet = accentColor === 'violet';
-  const colorClass = isViolet ? "text-violet-500" : "text-primary";
-  const borderClass = isViolet ? "border-violet-300/25" : "border-primary/25";
-  const bgClass = isViolet ? "bg-violet-400/5" : "bg-primary/5";
-  const ringClass = isViolet ? "ring-violet-400/30" : "ring-primary/30";
+  const colorClass = isViolet ? "text-primary" : "text-primary";
+  const borderClass = isViolet ? "border-primary/25" : "border-primary/25";
+  const bgClass = isViolet ? "bg-primary/5" : "bg-primary/5";
+  const ringClass = isViolet ? "ring-primary/30" : "ring-primary/30";
   const scLabels = ['Мудрость', 'Профессия', 'Цель жизни', 'Карма'];
   const scPositions = [4, 5, 7, 12];
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
@@ -920,14 +921,14 @@ function SuccessCodeBlock({ matrix, accentColor }: { matrix: PersonalMatrix; acc
           return (
             <button key={i} onClick={() => setActiveIdx(activeIdx === i ? null : i)} className="flex flex-col items-center gap-1 group">
               <div className={cn("relative w-11 h-[66px] rounded-xl overflow-hidden ring-2 transition-all",
-                activeIdx === i ? (isViolet ? "ring-violet-400" : "ring-primary") : cn("ring-border/50 group-hover:", ringClass)
+                activeIdx === i ? (isViolet ? "ring-primary" : "ring-primary") : cn("ring-border/50 group-hover:", ringClass)
               )}>
                 <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
                 <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
                   <span className="text-[8px] text-white/80 font-bold">{val}</span>
                 </div>
                 <div className={cn("absolute top-[3px] right-[3px] w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white",
-                  isViolet ? "bg-violet-500" : "bg-primary"
+                  isViolet ? "bg-primary" : "bg-primary"
                 )}>{scPositions[i]}</div>
               </div>
               <span className="text-[9px] text-muted-foreground/60 leading-tight">{scLabels[i]}</span>
@@ -961,9 +962,9 @@ function SuccessCodeBlock({ matrix, accentColor }: { matrix: PersonalMatrix; acc
 // ─── MirrorReversedBlock (PartnerTab) ─────────────────────────────────────────
 function MirrorReversedBlock({ matrix, accentColor }: { matrix: PersonalMatrix; accentColor: 'primary' | 'violet' }) {
   const isViolet = accentColor === 'violet';
-  const colorClass = isViolet ? "text-violet-500" : "text-primary";
-  const borderClass = isViolet ? "border-violet-300/25" : "border-primary/25";
-  const bgClass = isViolet ? "bg-violet-400/5" : "bg-primary/5";
+  const colorClass = isViolet ? "text-primary" : "text-primary";
+  const borderClass = isViolet ? "border-primary/25" : "border-primary/25";
+  const bgClass = isViolet ? "bg-primary/5" : "bg-primary/5";
   const hasMirror = matrix.mirrorArcana.length > 0;
   const hasReversed = matrix.reversedArcana.length > 0;
   if (!hasMirror && !hasReversed) return null;
@@ -1032,9 +1033,9 @@ function TriplesBlock({ matrix, title = "Тройные арканы" }: { matri
   const triples = matrix.reversedArcana.filter(item => item.positions.length >= 3);
   if (triples.length === 0) return null;
   return (
-    <div className="gradient-card rounded-2xl border border-violet-400/25 bg-violet-400/3 p-5 space-y-4">
+    <div className="gradient-card rounded-2xl border border-primary/25 bg-primary/3 p-5 space-y-4">
       <div className="flex items-center gap-2">
-        <Layers className="w-4 h-4 text-violet-500" />
+        <Layers className="w-4 h-4 text-primary" />
         <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{title}</span>
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed">
@@ -1045,8 +1046,8 @@ function TriplesBlock({ matrix, title = "Тройные арканы" }: { matri
         const compatData = arcanaCompatibilityData[item.arcana];
         if (!arcana) return null;
         return (
-          <div key={i} className="flex items-start gap-3 pt-3 border-t border-violet-400/15">
-            <div className="relative w-12 h-[72px] rounded-xl overflow-hidden ring-1 ring-violet-400/30 shrink-0">
+          <div key={i} className="flex items-start gap-3 pt-3 border-t border-primary/15">
+            <div className="relative w-12 h-[72px] rounded-xl overflow-hidden ring-1 ring-primary/30 shrink-0">
               <img src={getArcanaImage(item.arcana)} alt="" className="w-full h-full object-cover" />
               <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
                 <span className="text-[8px] text-white/80 font-bold">{item.arcana}</span>
@@ -1054,8 +1055,8 @@ function TriplesBlock({ matrix, title = "Тройные арканы" }: { matri
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span className="font-display font-bold text-base text-violet-500">{arcana.name}</span>
-                <span className="text-xs text-violet-400/70 bg-violet-400/10 px-2 py-0.5 rounded-full">
+                <span className="font-display font-bold text-base text-primary">{arcana.name}</span>
+                <span className="text-xs text-primary/70 bg-primary/10 px-2 py-0.5 rounded-full">
                   {item.positions.length}× · поз. {item.positions.join(', ')}
                 </span>
               </div>
@@ -1084,7 +1085,7 @@ function TriplesBlock({ matrix, title = "Тройные арканы" }: { matri
 
 // ─── PerspectiveBlock — перспектива союза ──────────────────────────────────────
 
-function PerspectiveBlock({ result }: { result: CompatibilityResult }) {
+function PerspectiveBlock({ result, ai }: { result: CompatibilityResult; ai?: import("@/lib/aiReadingService").AIReading["perspective"] | null }) {
   const matrix = result.unionMatrix;
   if (!matrix) return null;
   const p = matrix.positions;
@@ -1099,25 +1100,25 @@ function PerspectiveBlock({ result }: { result: CompatibilityResult }) {
       label: "Аркан союза",
       value: result.unionArcana,
       arcana: unionArcana,
-      text: compatData?.conclusion || "Ключевая энергия, которая определяет характер этого союза на всём его протяжении.",
+      text: ai?.union_arcana || compatData?.conclusion || "Ключевая энергия, которая определяет характер этого союза на всём его протяжении.",
     },
     {
       label: "Как вас видит мир",
       value: p[2],
       arcana: harmonyArcana,
-      text: "Образ пары снаружи — что транслируется людям вокруг. Именно это воспринимают друзья, семья, коллеги.",
+      text: ai?.external || "Образ пары снаружи — что транслируется людям вокруг. Именно это воспринимают друзья, семья, коллеги.",
     },
     {
       label: "Общая цель",
       value: p[6],
       arcana: pathArcana,
-      text: "Зачем эти двое встретились — с точки зрения движения и смысла. Куда ведут отношения.",
+      text: ai?.goal || "Зачем эти двое встретились — с точки зрения движения и смысла. Куда ведут отношения.",
     },
     {
       label: "Главная задача",
       value: p[11],
       arcana: destArcana,
-      text: "Глубинная кармическая задача союза — то, ради чего они пришли друг к другу на уровне судьбы.",
+      text: ai?.karma || "Глубинная кармическая задача союза — то, ради чего они пришли друг к другу на уровне судьбы.",
     },
   ];
 
@@ -1152,7 +1153,7 @@ function PerspectiveBlock({ result }: { result: CompatibilityResult }) {
 
 // ─── RecommendationsBlock — рекомендации паре ─────────────────────────────────
 
-function RecommendationsBlock({ result }: { result: CompatibilityResult }) {
+function RecommendationsBlock({ result, ai }: { result: CompatibilityResult; ai?: import("@/lib/aiReadingService").AIReading["recommendations"] | null }) {
   const matrix = result.unionMatrix;
   if (!matrix) return null;
   const p = matrix.positions;
@@ -1172,7 +1173,7 @@ function RecommendationsBlock({ result }: { result: CompatibilityResult }) {
       : compatData.reversed.split('.')[0] + '.';
   };
 
-  const pairRec = getRecForArcana(unionArcana, 'pair');
+  const pairRec = ai?.pair || getRecForArcana(unionArcana, 'pair');
   const goalText = arcanaCompatibilityData[goalArcana]?.general?.split('.')[0] + '.' || '';
   const karmaText = arcanaCompatibilityData[karmaArcana]?.general?.split('.')[0] + '.' || '';
 
@@ -1182,8 +1183,8 @@ function RecommendationsBlock({ result }: { result: CompatibilityResult }) {
   // Cross matrix position 4 texts for each partner
   const cross1Pos4 = result.cross1Matrix?.positions[3];
   const cross2Pos4 = result.cross2Matrix?.positions[3];
-  const himRec = cross1Pos4 ? getCompatPositionText('cross', 4, cross1Pos4) : '';
-  const herRec = cross2Pos4 ? getCompatPositionText('cross', 4, cross2Pos4) : '';
+  const himRec = ai?.him || (cross1Pos4 ? getCompatPositionText('cross', 4, cross1Pos4) : '');
+  const herRec = ai?.her || (cross2Pos4 ? getCompatPositionText('cross', 4, cross2Pos4) : '');
 
   return (
     <div className="space-y-4">
@@ -1207,14 +1208,14 @@ function RecommendationsBlock({ result }: { result: CompatibilityResult }) {
 
       {/* Ей */}
       {herRec && (
-        <div className="gradient-card rounded-2xl border border-violet-400/20 bg-violet-400/3 p-4">
+        <div className="gradient-card rounded-2xl border border-primary/20 bg-primary/3 p-4">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-full bg-violet-400/10 flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold text-violet-500">Е</span>
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-primary">Е</span>
             </div>
             <span className="text-sm font-semibold text-foreground">{herName}</span>
             {cross2Pos4 && (
-              <div className="relative w-5 h-7 rounded overflow-hidden ring-1 ring-violet-400/20 ml-auto">
+              <div className="relative w-5 h-7 rounded overflow-hidden ring-1 ring-primary/20 ml-auto">
                 <img src={getArcanaImage(cross2Pos4)} alt="" className="w-full h-full object-cover" />
               </div>
             )}
@@ -1252,7 +1253,7 @@ function RecommendationsBlock({ result }: { result: CompatibilityResult }) {
 
 // ─── Union Tab ─────────────────────────────────────────────────────────────────
 
-function UnionTab({ result }: { result: CompatibilityResult }) {
+function UnionTab({ result, isPro, aiReading }: { result: CompatibilityResult; isPro: boolean; aiReading: import("@/lib/aiReadingService").AIReading | null }) {
   const unionArcana = getArcana(result.unionArcana);
   const matrix = result.unionMatrix;
   if (!matrix) return null;
@@ -1285,9 +1286,9 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
           <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Аркан союза · {unionArcana?.name}</span>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          {getCompatPositionText('union', 2, result.unionArcana) || arcanaCompatibilityData[result.unionArcana]?.general || unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
+          {aiReading?.union_arcana || getCompatPositionText('union', 2, result.unionArcana) || arcanaCompatibilityData[result.unionArcana]?.general || unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
         </p>
-        {arcanaCompatibilityData[result.unionArcana] && (
+        {!aiReading && arcanaCompatibilityData[result.unionArcana] && (
           <p className="text-xs text-muted-foreground/70 leading-relaxed mt-2 pt-2 border-t border-primary/10">
             {arcanaCompatibilityData[result.unionArcana].conclusion}
           </p>
@@ -1340,7 +1341,7 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
           title="Кармическая ось"
           subtitle="Позиция 6 — в матрице совместимости здесь стоит кармический аркан. Ключевой вызов и скрытый ресурс пары."
         />
-        <CompatCard position={6} value={p[5]} />
+        <CompatCard position={6} value={p[5]} aiText={aiReading?.positions?.['6']} />
       </div>
 
       {/* ═══ ЦЕЛИ В ОТНОШЕНИЯХ ════════════════════════════════════════════════ */}
@@ -1351,7 +1352,7 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
           subtitle="Позиции 7 · 8 · 9 — куда идёт пара, через что достигает и где восстанавливается."
         />
         {[7, 8, 9].map(pos => (
-          <CompatCard key={pos} position={pos} value={p[pos - 1]} />
+          <CompatCard key={pos} position={pos} value={p[pos - 1]} aiText={aiReading?.positions?.[String(pos)]} />
         ))}
       </div>
 
@@ -1366,7 +1367,7 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
           Кармические позиции — не приговор и не плохой знак. Это точки трансформации: то, что будет провоцировать конфликты, пока пара не осознает их вместе. Именно здесь — самый глубокий рост.
         </div>
         {[10, 11, 12].map(pos => (
-          <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} />
+          <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} aiText={aiReading?.positions?.[String(pos)]} />
         ))}
       </div>
 
@@ -1462,7 +1463,7 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
           title="Перспектива союза"
           subtitle="Четыре ключевые точки, которые определяют будущее этих отношений."
         />
-        <PerspectiveBlock result={result} />
+        <PerspectiveBlock result={result} ai={aiReading?.perspective} />
       </div>
 
       {/* ═══ РЕКОМЕНДАЦИИ ════════════════════════════════════════════════════ */}
@@ -1472,7 +1473,7 @@ function UnionTab({ result }: { result: CompatibilityResult }) {
           title="Рекомендации"
           subtitle="Ключевые зоны роста и практические советы — ему, ей и паре вместе."
         />
-        <RecommendationsBlock result={result} />
+        <RecommendationsBlock result={result} ai={aiReading?.recommendations} />
       </div>
 
     </div>
@@ -1495,9 +1496,9 @@ function PartnerTab({
   otherName: string;
 }) {
   const isViolet = accentColor === 'violet';
-  const colorClass = isViolet ? "text-violet-500" : "text-primary";
-  const borderClass = isViolet ? "border-violet-300/30" : "border-primary/30";
-  const bgClass = isViolet ? "bg-violet-400/5" : "bg-primary/5";
+  const colorClass = isViolet ? "text-primary" : "text-primary";
+  const borderClass = isViolet ? "border-primary/30" : "border-primary/30";
+  const bgClass = isViolet ? "bg-primary/5" : "bg-primary/5";
   const [destTab, setDestTab] = useState<'main' | 'goals' | 'karma'>('main');
 
   const p = matrix.positions;
@@ -1512,7 +1513,7 @@ function PartnerTab({
       {/* Шапка */}
       <div className={cn("gradient-card rounded-2xl border p-5", borderClass, bgClass)}>
         <div className="flex items-center gap-3 mb-3">
-          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", isViolet ? "bg-violet-400/15" : "bg-primary/10")}>
+          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", isViolet ? "bg-primary/15" : "bg-primary/10")}>
             <Users className={cn("w-5 h-5", colorClass)} />
           </div>
           <div>
@@ -1526,7 +1527,7 @@ function PartnerTab({
             const val = p[pos - 1];
             const arcana = getArcana(val);
             return (
-              <div key={pos} className={cn("flex items-center gap-1.5 px-2 py-1 rounded-full text-xs border", isViolet ? "border-violet-300/30 bg-violet-400/5" : "border-primary/20 bg-primary/5")}>
+              <div key={pos} className={cn("flex items-center gap-1.5 px-2 py-1 rounded-full text-xs border", isViolet ? "border-primary/30 bg-primary/5" : "border-primary/20 bg-primary/5")}>
                 <div className="relative w-4 h-6 rounded overflow-hidden shrink-0">
                   <img src={getArcanaImage(val)} alt="" className="w-full h-full object-cover" />
                 </div>
@@ -1569,7 +1570,7 @@ function PartnerTab({
             className={cn(
               "px-4 py-2 rounded-full text-sm font-medium transition-all",
               destTab === tab.id
-                ? isViolet ? "bg-violet-500 text-white" : "bg-primary text-primary-foreground"
+                ? isViolet ? "bg-primary text-white" : "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             )}
           >
@@ -1743,11 +1744,11 @@ function MatricesTab({ result }: { result: CompatibilityResult }) {
       {matrices.map(({ label, matrix, accent }) => (
         <div key={label} className={cn(
           "gradient-card rounded-2xl border p-5",
-          accent === 'violet' ? "border-violet-300/25" : "border-primary/25"
+          accent === 'violet' ? "border-primary/25" : "border-primary/25"
         )}>
           <p className={cn(
             "text-xs font-medium uppercase tracking-wide mb-4 text-center",
-            accent === 'violet' ? "text-violet-500" : "text-primary"
+            accent === 'violet' ? "text-primary" : "text-primary"
           )}>{label}</p>
           <div className="flex justify-center">
             <MatrixGrid matrix={matrix} accentPos2={label === "Матрица союза"} />
@@ -1772,6 +1773,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
   const { t } = useTranslation();
   const isPro = tier === 'professional';
   const [activeTab, setActiveTab] = useState<TabType>('union');
+  const { reading: aiReading } = useAIReading(result, isPro);
 
   const unionArcana = getArcana(result.unionArcana);
 
@@ -1839,8 +1841,8 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
             <Heart className="w-5 h-5 text-primary/50" />
           </div>
 
-          <div className="flex-1 rounded-xl bg-violet-400/5 border border-violet-300/30 px-4 py-3 text-center">
-            <p className="font-display font-bold text-2xl text-violet-500 leading-tight">{result.person2.name || 'Партнёр Б'}</p>
+          <div className="flex-1 rounded-xl bg-primary/5 border border-primary/30 px-4 py-3 text-center">
+            <p className="font-display font-bold text-2xl text-primary leading-tight">{result.person2.name || 'Партнёр Б'}</p>
             <p className="text-sm text-muted-foreground mt-1">
               {String(result.person2.birthDate.day).padStart(2, '0')}.{String(result.person2.birthDate.month).padStart(2, '0')}.{result.person2.birthDate.year}
             </p>
@@ -1932,7 +1934,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
           </div>
 
           {/* Tab content */}
-          {activeTab === 'union' && <UnionTab result={result} />}
+          {activeTab === 'union' && <UnionTab result={result} isPro={isPro} aiReading={aiReading ?? null} />}
           {activeTab === 'person1' && result.matrix1 && (
             <PartnerTab
               matrix={result.matrix1}
