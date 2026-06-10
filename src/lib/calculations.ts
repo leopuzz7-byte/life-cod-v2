@@ -372,6 +372,26 @@ function computeCompatibilityPercent(
   return Math.round(Math.max(25, Math.min(98, weighted)));
 }
 
+
+// Вспомогательная функция: строит полную 12-позиционную матрицу из 3 входных значений
+// (аналог calculatePersonalMatrix, но принимает уже нормализованные pos1/pos2/pos4)
+function calculateMatrixFromInputs(in1: number, in2: number, in4: number): number[] {
+  const p = new Array(12).fill(0);
+  p[0] = normalizeToArcana(in1);   // pos1
+  p[1] = normalizeToArcana(in2);   // pos2
+  p[3] = normalizeToArcana(in4);   // pos4
+  p[2] = normalizeToArcana(p[0] + p[1]);   // pos3 = 1+2
+  p[4] = normalizeToArcana(p[1] + p[3]);   // pos5 = 2+4
+  p[5] = normalizeToArcana(p[2] + p[4]);   // pos6 = 3+5
+  p[6] = normalizeToArcana(p[2] + p[3]);   // pos7 = 3+4
+  p[7] = normalizeToArcana(p[1] + p[5]);   // pos8 = 2+6
+  p[8] = normalizeToArcana(p[6] + p[7]);   // pos9 = 7+8
+  p[9]  = normalizeToArcana(p[0] - p[1]);  // pos10 = 1-2
+  p[10] = normalizeToArcana(p[1] - p[3]);  // pos11 = 2-4
+  p[11] = normalizeToArcana(p[9] - p[10]); // pos12 = 10-11
+  return p;
+}
+
 export function calculateCompatibility(
   person1Day: number,
   person1Month: number,
@@ -392,16 +412,60 @@ export function calculateCompatibility(
   const soul1 = matrix1.positions[0];
   const soul2 = matrix2.positions[0];
 
-  // Аркан союза — сумма арканов предназначения
-  const unionArcana = normalizeToArcana(destiny1 + destiny2);
+  // === ОБЩАЯ МАТРИЦА СОЮЗА ===
+  // Правильная формула: суммируем pos1, pos2, pos4 обоих партнёров,
+  // затем пересчитываем ВСЕ 12 позиций по стандартной формуле.
+  // Проверено по разбору Нади: Леонид(23.07.2001)+Екатерина(18.07.2003) → 19•14•11•8•22•11•19•3•22•5•6•21
+  const unionPos = calculateMatrixFromInputs(
+    matrix1.positions[0] + matrix2.positions[0],  // сумма арканов дня
+    matrix1.positions[1] + matrix2.positions[1],  // сумма месяцев
+    matrix1.positions[3] + matrix2.positions[3]   // сумма арканов года
+  );
+  const unionMatrix: PersonalMatrix = {
+    birthDate: matrix1.birthDate,
+    positions: unionPos,
+    mirrorArcana: [],
+    reversedArcana: [],
+    successCode: [unionPos[3], unionPos[4], unionPos[6], unionPos[11]],
+  };
 
-  // Кармический аркан — разница арканов предназначения
-  // (если разница 0 — берём 22 как "полный круг кармы")
+  // Аркан союза = pos2 общей матрицы (суть союза)
+  const unionArcana = unionPos[1];
+  // Кармический аркан = разница арканов предназначения (для процента/вызовов)
   const diffDestiny = Math.abs(destiny1 - destiny2);
   const karmaArcana = normalizeToArcana(diffDestiny === 0 ? 22 : diffDestiny);
+  // Аркан гармонии = pos3 общей матрицы (образ пары)
+  const harmonyArcana = unionPos[2];
 
-  // Аркан гармонии — сумма арканов души
-  const harmonyArcana = normalizeToArcana(soul1 + soul2);
+  // === КРОС-МАТРИЦЫ ===
+  // Крос матрица: pos1/pos2/pos4 человека + pos1/pos2/pos4 союза → полный пересчёт
+  // Проверено: Леонид→Екатерина = 20•21•19•11•10•7•8•6•14•21•10•11
+  //            Екатерина→Леонид = 15•21•14•13•12•4•5•3•8•16•8•8 (тройная 8 в поз.9/11/12)
+  const cross1Pos = calculateMatrixFromInputs(
+    matrix1.positions[0] + unionPos[0],
+    matrix1.positions[1] + unionPos[1],
+    matrix1.positions[3] + unionPos[3]
+  );
+  const cross1Matrix: PersonalMatrix = {
+    birthDate: matrix1.birthDate,
+    positions: cross1Pos,
+    mirrorArcana: [],
+    reversedArcana: [],
+    successCode: [cross1Pos[3], cross1Pos[4], cross1Pos[6], cross1Pos[11]],
+  };
+
+  const cross2Pos = calculateMatrixFromInputs(
+    matrix2.positions[0] + unionPos[0],
+    matrix2.positions[1] + unionPos[1],
+    matrix2.positions[3] + unionPos[3]
+  );
+  const cross2Matrix: PersonalMatrix = {
+    birthDate: matrix2.birthDate,
+    positions: cross2Pos,
+    mirrorArcana: [],
+    reversedArcana: [],
+    successCode: [cross2Pos[3], cross2Pos[4], cross2Pos[6], cross2Pos[11]],
+  };
 
   // Процент совместимости — взвешенная оценка по 6 факторам
   const compatibilityPercent = computeCompatibilityPercent(
@@ -412,52 +476,9 @@ export function calculateCompatibility(
     unionArcana, karmaArcana, harmonyArcana,
   );
 
-  // Определяем сильные стороны и вызовы на основе арканов
+  // Сильные стороны и вызовы
   const strengths = getCompatibilityStrengths(unionArcana, harmonyArcana, destiny1, destiny2);
   const challenges = getCompatibilityChallenges(karmaArcana, soul1, soul2);
-
-  // === 5 МАТРИЦ ===
-  // Общая матрица союза: каждая позиция = нормализованная сумма позиций обоих
-  const unionPositions = matrix1.positions.map((p, i) =>
-    normalizeToArcana(p + matrix2.positions[i])
-  );
-  // Ключевые позиции общей матрицы — арканы союза/гармонии/кармы
-  unionPositions[1] = unionArcana;    // позиция 2 = аркан союза
-  unionPositions[5] = karmaArcana;    // позиция 6 = кармический аркан
-  unionPositions[2] = harmonyArcana;  // позиция 3 = аркан гармонии
-  const unionMatrix: PersonalMatrix = {
-    birthDate: matrix1.birthDate,
-    positions: unionPositions,
-    mirrorArcana: [],
-    reversedArcana: [],
-    successCode: [unionPositions[3], unionPositions[4], unionPositions[6], unionPositions[11]],
-  };
-
-  // Матрица человека 1 в отношениях: личная матрица + влияние партнёра
-  const cross1Positions = [...matrix1.positions];
-  cross1Positions[1] = normalizeToArcana(matrix1.positions[1] + matrix2.positions[3]); // внутр. суть + предназначение партнёра
-  cross1Positions[4] = normalizeToArcana(matrix1.positions[4] + unionArcana);           // проф. путь + аркан союза
-  cross1Positions[6] = normalizeToArcana(matrix1.positions[6] + harmonyArcana);         // цель жизни + гармония
-  const cross1Matrix: PersonalMatrix = {
-    birthDate: matrix1.birthDate,
-    positions: cross1Positions,
-    mirrorArcana: [],
-    reversedArcana: [],
-    successCode: [cross1Positions[3], cross1Positions[4], cross1Positions[6], cross1Positions[11]],
-  };
-
-  // Матрица человека 2 в отношениях: личная матрица + влияние партнёра
-  const cross2Positions = [...matrix2.positions];
-  cross2Positions[1] = normalizeToArcana(matrix2.positions[1] + matrix1.positions[3]);
-  cross2Positions[4] = normalizeToArcana(matrix2.positions[4] + unionArcana);
-  cross2Positions[6] = normalizeToArcana(matrix2.positions[6] + harmonyArcana);
-  const cross2Matrix: PersonalMatrix = {
-    birthDate: matrix2.birthDate,
-    positions: cross2Positions,
-    mirrorArcana: [],
-    reversedArcana: [],
-    successCode: [cross2Positions[3], cross2Positions[4], cross2Positions[6], cross2Positions[11]],
-  };
 
   return {
     person1: {
