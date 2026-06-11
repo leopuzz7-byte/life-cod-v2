@@ -429,6 +429,7 @@ function TriangleSection({
   matrix,
   shownPositions,
   context = 'union',
+  aiReading,
 }: {
   triangleNum: number;
   label: string;
@@ -437,6 +438,7 @@ function TriangleSection({
   matrix: PersonalMatrix;
   shownPositions: Set<number>;
   context?: 'union' | 'cross';
+  aiReading?: AIReading | null;
 }) {
   const p = matrix.positions;
   const newPositions = positions.filter(pos => !shownPositions.has(pos));
@@ -481,7 +483,15 @@ function TriangleSection({
 
       {/* New positions — full CompCards */}
       {newPositions.map(pos => (
-        <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 2} context={context} />
+        <CompatCard
+          key={pos}
+          position={pos}
+          value={p[pos - 1]}
+          highlight={pos === 2}
+          context={context}
+          aiText={aiReading?.positions?.[String(pos)]}
+          aiExpandable={aiReading?.positions_expanded?.[String(pos)]}
+        />
       ))}
     </div>
   );
@@ -1336,6 +1346,7 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
               positions={tri.positions}
               matrix={matrix}
               shownPositions={TRIANGLE_SHOWN_SETS[idx]}
+              aiReading={aiReading}
             />
           </div>
         ))}
@@ -1460,6 +1471,37 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
             subtitle="Арканы, которые появляются три и более раз — усиленный акцент на конкретной теме союза."
           />
           <TriplesBlock matrix={matrix} />
+        </div>
+      )}
+
+      {/* ═══ АНАЛИЗ СОЮЗА ════════════════════════════════════════════════════ */}
+      {aiReading?.analysis && (
+        <div className="space-y-4">
+          <SectionHeader
+            icon={ShieldAlert}
+            title="Анализ союза"
+            subtitle="Главный конфликт, сила и уязвимость — три ключевых психологических слоя этих отношений."
+          />
+          <div className="grid grid-cols-1 gap-3">
+            <div className="gradient-card rounded-2xl border border-destructive/20 p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-destructive/80">Главный конфликт</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{aiReading.analysis.conflict}</p>
+            </div>
+            <div className="gradient-card rounded-2xl border border-emerald-500/20 p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">Сила союза</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{aiReading.analysis.strength}</p>
+            </div>
+            <div className="gradient-card rounded-2xl border border-amber-500/20 p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">Слабое место</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{aiReading.analysis.weakness}</p>
+            </div>
+          </div>
         </div>
       )}
 
