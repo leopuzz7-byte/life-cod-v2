@@ -1506,7 +1506,7 @@ function PartnerTab({
   const colorClass = isViolet ? "text-primary" : "text-primary";
   const borderClass = isViolet ? "border-primary/30" : "border-primary/30";
   const bgClass = isViolet ? "bg-primary/5" : "bg-primary/5";
-  const [destTab, setDestTab] = useState<'main' | 'goals' | 'karma'>('main');
+  const [destTab, setDestTab] = useState<'main' | 'goals' | 'karma' | 'relations'>('main');
 
   const p = matrix.positions;
   const crossP = crossMatrix?.positions;
@@ -1570,6 +1570,7 @@ function PartnerTab({
           { id: 'main' as const, label: 'Основной треугольник' },
           { id: 'goals' as const, label: 'Цели' },
           { id: 'karma' as const, label: 'Карма' },
+          { id: 'relations' as const, label: 'В отношениях' },
         ].map(tab => (
           <button
             key={tab.id}
@@ -1626,7 +1627,7 @@ function PartnerTab({
       )}
 
       {/* ─── В ЭТИХ ОТНОШЕНИЯХ ──────────────────────────────────────────────── */}
-      {crossMatrix && crossP && (
+      {destTab === 'relations' && crossMatrix && crossP && (
         <div className="space-y-6 pt-2">
           <SectionHeader
             icon={Users}
