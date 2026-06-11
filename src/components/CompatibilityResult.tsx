@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { useAIReading } from "@/hooks/useAIReading";
 import type { AIReading } from "@/lib/aiReadingService";
-import type { AIReading } from "@/lib/aiReadingService";
 import { CompatibilityResult, PersonalMatrix } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
 import { arcanaCompatibilityData } from "@/lib/arcanaCompatibilityData";
@@ -16,7 +15,6 @@ import { getCompatPositionText } from "@/lib/compatibilityTexts";
 import { getPositionInterpretation } from "@/lib/matrixInterpretation";
 import { cn } from "@/lib/utils";
 import { PDFDownloadButton } from "./PDFDownloadButton";
-import { LoadingScreen } from "./LoadingScreen";
 import { LoadingScreen } from "./LoadingScreen";
 import { generatePDF, formatBirthDateForPDF } from "@/lib/pdfGenerator";
 import type { TierType } from "@/lib/analysisConfig";
@@ -1092,7 +1090,7 @@ function TriplesBlock({ matrix, title = "Тройные арканы" }: { matri
 
 // ─── PerspectiveBlock — перспектива союза ──────────────────────────────────────
 
-function PerspectiveBlock({ result, ai }: { result: CompatibilityResult; ai?: import("@/lib/aiReadingService").AIReading["perspective"] | null }) {
+function PerspectiveBlock({ result, ai }: { result: CompatibilityResult; ai?: AIReading["perspective"] | null }) {
   const matrix = result.unionMatrix;
   if (!matrix) return null;
   const p = matrix.positions;
@@ -1160,7 +1158,7 @@ function PerspectiveBlock({ result, ai }: { result: CompatibilityResult; ai?: im
 
 // ─── RecommendationsBlock — рекомендации паре ─────────────────────────────────
 
-function RecommendationsBlock({ result, ai }: { result: CompatibilityResult; ai?: import("@/lib/aiReadingService").AIReading["recommendations"] | null }) {
+function RecommendationsBlock({ result, ai }: { result: CompatibilityResult; ai?: AIReading["recommendations"] | null }) {
   const matrix = result.unionMatrix;
   if (!matrix) return null;
   const p = matrix.positions;
@@ -1376,7 +1374,7 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
           Кармические позиции — не приговор и не плохой знак. Это точки трансформации: то, что будет провоцировать конфликты, пока пара не осознает их вместе. Именно здесь — самый глубокий рост.
         </div>
         {[10, 11, 12].map(pos => (
-          <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} aiText={aiReading?.positions?.[String(pos)]} />
+          <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} />
         ))}
       </div>
 
@@ -1782,7 +1780,6 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
   const { t } = useTranslation();
   const isPro = tier === 'professional';
   const [activeTab, setActiveTab] = useState<TabType>('union');
-  const { reading: aiReading, loading: aiLoading } = useAIReading(result, isPro);
   const { reading: aiReading, loading: aiLoading } = useAIReading(result, isPro);
 
   const unionArcana = getArcana(result.unionArcana);
