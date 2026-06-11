@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useAIReading } from "@/hooks/useAIReading";
 import type { AIReading } from "@/lib/aiReadingService";
+import type { AIReading } from "@/lib/aiReadingService";
 import { CompatibilityResult, PersonalMatrix } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
 import { arcanaCompatibilityData } from "@/lib/arcanaCompatibilityData";
@@ -15,6 +16,7 @@ import { getCompatPositionText } from "@/lib/compatibilityTexts";
 import { getPositionInterpretation } from "@/lib/matrixInterpretation";
 import { cn } from "@/lib/utils";
 import { PDFDownloadButton } from "./PDFDownloadButton";
+import { LoadingScreen } from "./LoadingScreen";
 import { LoadingScreen } from "./LoadingScreen";
 import { generatePDF, formatBirthDateForPDF } from "@/lib/pdfGenerator";
 import type { TierType } from "@/lib/analysisConfig";
@@ -278,16 +280,19 @@ function CompCard({ position, value, positionTitle, contextIntro, expandableLabe
 }
 
 // Обёртка для совместимости — contextIntro динамический (по аркану × позиции)
-function CompatCard({ position, value, highlight = false, context = 'union', aiText }: {
+function CompatCard({ position, value, highlight = false, context = 'union', aiText, aiExpandable }: {
   position: number;
   value: number;
   highlight?: boolean;
   context?: 'union' | 'cross';
   aiText?: string;
+  aiExpandable?: string;
 }) {
   const arcana = getArcana(value);
   const compatData = arcanaCompatibilityData[value];
-  const expandable = compatData
+  const expandable = aiExpandable
+    ? aiExpandable
+    : compatData
     ? `${compatData.upright}\n\nВ минусе: ${compatData.reversed}`
     : (compatPositionIntros[position] || '');
   const positionText = getCompatPositionText(context, position, value);
@@ -607,7 +612,7 @@ function CommonArcanaBlock({ matrix1, matrix2, name1, name2 }: {
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground leading-relaxed">{arcana.compatibilityDescription}</p>
+
               </div>
             </div>
           </div>
@@ -1345,7 +1350,7 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
           title="Кармическая ось"
           subtitle="Позиция 6 — в матрице совместимости здесь стоит кармический аркан. Ключевой вызов и скрытый ресурс пары."
         />
-        <CompatCard position={6} value={p[5]} aiText={aiReading?.positions?.['6']} />
+        <CompatCard position={6} value={p[5]} aiText={aiReading?.positions?.['6']} aiExpandable={aiReading?.positions_expanded?.['6']} />
       </div>
 
       {/* ═══ ЦЕЛИ В ОТНОШЕНИЯХ ════════════════════════════════════════════════ */}
@@ -1356,7 +1361,7 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
           subtitle="Позиции 7 · 8 · 9 — куда идёт пара, через что достигает и где восстанавливается."
         />
         {[7, 8, 9].map(pos => (
-          <CompatCard key={pos} position={pos} value={p[pos - 1]} aiText={aiReading?.positions?.[String(pos)]} />
+          <CompatCard key={pos} position={pos} value={p[pos - 1]} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} />
         ))}
       </div>
 
@@ -1777,6 +1782,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
   const { t } = useTranslation();
   const isPro = tier === 'professional';
   const [activeTab, setActiveTab] = useState<TabType>('union');
+  const { reading: aiReading, loading: aiLoading } = useAIReading(result, isPro);
   const { reading: aiReading, loading: aiLoading } = useAIReading(result, isPro);
 
   const unionArcana = getArcana(result.unionArcana);
