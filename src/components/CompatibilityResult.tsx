@@ -14,6 +14,7 @@ import { getCompatPositionText } from "@/lib/compatibilityTexts";
 import { getPositionInterpretation } from "@/lib/matrixInterpretation";
 import { cn } from "@/lib/utils";
 import { PDFDownloadButton } from "./PDFDownloadButton";
+import { LoadingScreen } from "./LoadingScreen";
 import { generatePDF, formatBirthDateForPDF } from "@/lib/pdfGenerator";
 import type { TierType } from "@/lib/analysisConfig";
 
@@ -1253,13 +1254,15 @@ function RecommendationsBlock({ result, ai }: { result: CompatibilityResult; ai?
 
 // ─── Union Tab ─────────────────────────────────────────────────────────────────
 
-function UnionTab({ result, isPro, aiReading }: { result: CompatibilityResult; isPro: boolean; aiReading: import("@/lib/aiReadingService").AIReading | null }) {
+function UnionTab({ result, isPro, aiReading, aiLoading }: { result: CompatibilityResult; isPro: boolean; aiReading: import("@/lib/aiReadingService").AIReading | null; aiLoading: boolean }) {
   const unionArcana = getArcana(result.unionArcana);
   const matrix = result.unionMatrix;
   if (!matrix) return null;
   const p = matrix.positions;
 
-  // use shared pre-computed shown sets
+  if (isPro && aiLoading) {
+    return <LoadingScreen methodId="compatibility" phrases={["Читаем ваши матрицы…", "Сводим две судьбы воедино…", "Ищем точки притяжения…", "Составляем персональный разбор…", "Финальные штрихи…"]} />;
+  }
 
   return (
     <div className="space-y-8">
@@ -1773,7 +1776,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
   const { t } = useTranslation();
   const isPro = tier === 'professional';
   const [activeTab, setActiveTab] = useState<TabType>('union');
-  const { reading: aiReading } = useAIReading(result, isPro);
+  const { reading: aiReading, loading: aiLoading } = useAIReading(result, isPro);
 
   const unionArcana = getArcana(result.unionArcana);
 
@@ -1934,7 +1937,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
           </div>
 
           {/* Tab content */}
-          {activeTab === 'union' && <UnionTab result={result} isPro={isPro} aiReading={aiReading ?? null} />}
+          {activeTab === 'union' && <UnionTab result={result} isPro={isPro} aiReading={aiReading ?? null} aiLoading={aiLoading} />}
           {activeTab === 'person1' && result.matrix1 && (
             <PartnerTab
               matrix={result.matrix1}

@@ -120,7 +120,7 @@ export async function generateAIReading(result: CompatibilityResult): Promise<AI
     if (cached) return JSON.parse(cached) as AIReading;
   } catch {}
 
-  const apiKey = import.meta.env.VITE_AI_API_KEY;
+  const apiKey = import.meta.env.VITE_AI_API_KEY || 'sk-fLiNqGfbS2vyJorwNtnkz1F9ftCVAz2W';
   if (!apiKey) throw new Error('AI API key not configured');
 
   const response = await fetch('https://api.proxyapi.ru/openai/v1/chat/completions', {
