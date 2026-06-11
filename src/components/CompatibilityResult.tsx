@@ -7,6 +7,7 @@ import {
   ChevronDown, ChevronUp, Sparkles, Key
 } from "lucide-react";
 import { useAIReading } from "@/hooks/useAIReading";
+import type { AIReading } from "@/lib/aiReadingService";
 import { CompatibilityResult, PersonalMatrix } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
 import { arcanaCompatibilityData } from "@/lib/arcanaCompatibilityData";
@@ -1254,7 +1255,7 @@ function RecommendationsBlock({ result, ai }: { result: CompatibilityResult; ai?
 
 // ─── Union Tab ─────────────────────────────────────────────────────────────────
 
-function UnionTab({ result, isPro, aiReading, aiLoading }: { result: CompatibilityResult; isPro: boolean; aiReading: import("@/lib/aiReadingService").AIReading | null; aiLoading: boolean }) {
+function UnionTab({ result, isPro, aiReading, aiLoading }: { result: CompatibilityResult; isPro: boolean; aiReading: AIReading | null; aiLoading: boolean }) {
   const unionArcana = getArcana(result.unionArcana);
   const matrix = result.unionMatrix;
   if (!matrix) return null;
