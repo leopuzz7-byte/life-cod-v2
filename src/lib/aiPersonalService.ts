@@ -8,7 +8,7 @@ export interface PersonalReading {
   cross_positions: Record<string, string>;     // "1".."12" -> "В отношениях" tab
 }
 
-const CACHE_PREFIX = 'ai_personal_v1_';
+const CACHE_PREFIX = 'ai_personal_v2_';
 
 function buildCacheKey(result: CompatibilityResult, person: 1 | 2): string {
   const s = person === 1 ? result.person1 : result.person2;
@@ -76,7 +76,7 @@ ${posLines}
 ${crossLines}
 
 ПРАВИЛА СТИЛЯ (строго):
-- Пиши от третьего лица, называй по имени: ${n}
+- Пиши от третьего лица. Имя ${n} упоминай только там, где без него непонятно - не в каждом предложении
 - ЗАПРЕТ на длинное тире (-). Только запятая или обычный короткий дефис (-)
 - В каждом тексте ровно 4-6 предложений
 - Разные стили для разных групп позиций (см. ниже)

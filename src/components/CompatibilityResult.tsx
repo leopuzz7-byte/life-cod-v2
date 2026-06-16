@@ -523,7 +523,7 @@ function MiniArcanaRef({ position, value, note }: { position: number; value: num
 // ─── ScoreBar ──────────────────────────────────────────────────────────────────
 
 function ScoreBar({ percent }: { percent: number }) {
-  const color = percent >= 80 ? "bg-emerald-500" : percent >= 60 ? "bg-primary" : percent >= 40 ? "bg-amber-500" : "bg-red-400";
+  const color = "bg-primary";
   const label = percent >= 80 ? "Высокая совместимость" : percent >= 60 ? "Хорошая совместимость" : percent >= 40 ? "Средняя совместимость" : "Сложный союз";
   return (
     <div className="space-y-1.5">
