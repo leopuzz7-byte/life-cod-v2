@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { useAIReading } from "@/hooks/useAIReading";
 import type { AIReading } from "@/lib/aiReadingService";
+import type { PersonalReading } from "@/lib/aiPersonalService";
+import { usePersonalReading } from "@/hooks/usePersonalReading";
 import { CompatibilityResult, PersonalMatrix } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
 import { arcanaCompatibilityData } from "@/lib/arcanaCompatibilityData";
@@ -309,14 +311,16 @@ function CompatCard({ position, value, highlight = false, context = 'union', aiT
 }
 
 // Обёртка для личной матрицы
-function PersonalCard({ position, value, accentColor = 'primary' as const }: { position: number; value: number; accentColor?: 'primary' | 'violet' }) {
+function PersonalCard({ position, value, accentColor = 'primary' as const, aiText, aiExpandable }: { position: number; value: number; accentColor?: 'primary' | 'violet'; aiText?: string; aiExpandable?: string }) {
   const interp = getPositionInterpretation(position, value);
   return (
     <CompCard
       position={position}
       value={value}
       positionTitle={interp.positionTitle || `Позиция ${position}`}
-      contextIntro={interp.positionIntro || ''}
+      contextIntro={aiText || interp.positionIntro || ''}
+      expandableContent={aiExpandable}
+      expandableLabel={aiExpandable ? 'Подробнее' : undefined}
       accentColor={accentColor}
     />
   );
@@ -1537,12 +1541,14 @@ function PartnerTab({
   name,
   accentColor,
   otherName,
+  aiReading,
 }: {
   matrix: PersonalMatrix;
   crossMatrix: PersonalMatrix | undefined;
   name: string;
   accentColor: 'primary' | 'violet';
   otherName: string;
+  aiReading?: PersonalReading | null;
 }) {
   const isViolet = accentColor === 'violet';
   const colorClass = isViolet ? "text-primary" : "text-primary";
@@ -1637,7 +1643,10 @@ function PartnerTab({
             <p className="text-xs text-muted-foreground mt-0.5">Позиции 1–6 · детство, суть, таланты, точка опоры</p>
           </div>
           {[1, 2, 3, 4, 5, 6].map(pos => (
-            <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor} />
+            <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor}
+              aiText={aiReading?.positions?.[String(pos)]}
+              aiExpandable={aiReading?.positions_expanded?.[String(pos)]}
+            />
           ))}
         </div>
       )}
@@ -1650,7 +1659,10 @@ function PartnerTab({
             <p className="text-xs text-muted-foreground mt-0.5">Позиции 7–9 · жизненная цель, инструмент, зона комфорта</p>
           </div>
           {[7, 8, 9].map(pos => (
-            <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor} />
+            <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor}
+              aiText={aiReading?.positions?.[String(pos)]}
+              aiExpandable={aiReading?.positions_expanded?.[String(pos)]}
+            />
           ))}
         </div>
       )}
@@ -1663,7 +1675,10 @@ function PartnerTab({
             <p className="text-xs text-muted-foreground mt-0.5">Позиции 10–12 · ошибки прошлого, задачи, главная миссия</p>
           </div>
           {[10, 11, 12].map(pos => (
-            <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor} />
+            <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor}
+              aiText={aiReading?.positions?.[String(pos)]}
+              aiExpandable={aiReading?.positions_expanded?.[String(pos)]}
+            />
           ))}
         </div>
       )}
@@ -1741,7 +1756,7 @@ function PartnerTab({
               title="Основа отношений"
               subtitle="Позиция 6 — кармический аркан, ключевой вызов и скрытый ресурс."
             />
-            <CompatCard position={6} value={crossP[5]} context="cross" />
+            <CompatCard position={6} value={crossP[5]} context="cross" aiText={aiReading?.cross_positions?.["6"]} />
           </div>
 
           {/* Цели */}
@@ -1752,7 +1767,7 @@ function PartnerTab({
               subtitle="Позиции 7 · 8 · 9 — жизненная цель, способ достижения, зона комфорта."
             />
             {[7, 8, 9].map(pos => (
-              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} context="cross" />
+              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} context="cross" aiText={aiReading?.cross_positions?.[String(pos)]} />
             ))}
           </div>
 
@@ -1764,7 +1779,7 @@ function PartnerTab({
               subtitle="Позиции 10 · 11 · 12 — ошибки прошлого, автоматические сценарии и главная кармическая задача в этом союзе."
             />
             {[10, 11, 12].map(pos => (
-              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} context="cross" highlight={pos === 12} />
+              <CompatCard key={pos} position={pos} value={crossP[pos - 1]} context="cross" highlight={pos === 12} aiText={aiReading?.cross_positions?.[String(pos)]} />
             ))}
           </div>
         </div>
@@ -1824,6 +1839,8 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
   const isPro = tier === 'professional';
   const [activeTab, setActiveTab] = useState<TabType>('union');
   const { reading: aiReading, loading: aiLoading } = useAIReading(result, isPro);
+  const { reading: aiReading1 } = usePersonalReading(result, 1, isPro);
+  const { reading: aiReading2 } = usePersonalReading(result, 2, isPro);
 
   const unionArcana = getArcana(result.unionArcana);
 
@@ -1992,6 +2009,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               name={result.person1.name}
               accentColor="primary"
               otherName={result.person2.name}
+              aiReading={aiReading1}
             />
           )}
           {activeTab === 'person2' && result.matrix2 && (
@@ -2001,6 +2019,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               name={result.person2.name}
               accentColor="primary"
               otherName={result.person1.name}
+              aiReading={aiReading2}
             />
           )}
           {activeTab === 'matrices' && <MatricesTab result={result} />}
