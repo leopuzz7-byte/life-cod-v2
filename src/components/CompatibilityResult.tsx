@@ -447,6 +447,7 @@ function TriangleSection({
   shownPositions,
   context = 'union',
   aiReading,
+  aiLoading = false,
 }: {
   triangleNum: number;
   label: string;
@@ -456,6 +457,7 @@ function TriangleSection({
   shownPositions: Set<number>;
   context?: 'union' | 'cross';
   aiReading?: AIReading | null;
+  aiLoading?: boolean;
 }) {
   const p = matrix.positions;
   const newPositions = positions.filter(pos => !shownPositions.has(pos));
