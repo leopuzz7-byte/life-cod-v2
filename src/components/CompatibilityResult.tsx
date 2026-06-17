@@ -208,9 +208,10 @@ interface CompCardProps {
   expandableContent?: string;  // content for expandable section (overrides arcana desc)
   accentColor?: 'primary' | 'violet';
   highlight?: boolean;
+  aiLoading?: boolean;         // show skeleton instead of static fallback
 }
 
-function CompCard({ position, value, positionTitle, contextIntro, expandableLabel, expandableContent, accentColor = 'primary', highlight = false }: CompCardProps) {
+function CompCard({ position, value, positionTitle, contextIntro, expandableLabel, expandableContent, accentColor = 'primary', highlight = false, aiLoading = false }: CompCardProps) {
   const arcana = getArcana(value);
   if (!arcana) return null;
   const imgSrc = getArcanaImage(value);
@@ -255,7 +256,15 @@ function CompCard({ position, value, positionTitle, contextIntro, expandableLabe
 
       {/* Context intro */}
       <div className="px-4 pb-3 text-sm text-muted-foreground leading-relaxed border-t border-border/30 pt-3">
-        {contextIntro}
+        {(aiLoading && !contextIntro) ? (
+          <div className="space-y-2 animate-pulse">
+            <div className="h-3 bg-muted/40 rounded w-full" />
+            <div className="h-3 bg-muted/40 rounded w-11/12" />
+            <div className="h-3 bg-muted/40 rounded w-4/5" />
+            <div className="h-3 bg-muted/40 rounded w-10/12" />
+            <div className="h-3 bg-muted/40 rounded w-3/4" />
+          </div>
+        ) : contextIntro}
       </div>
 
       {/* Expandable section */}
@@ -280,13 +289,14 @@ function CompCard({ position, value, positionTitle, contextIntro, expandableLabe
 }
 
 // Обёртка для совместимости — contextIntro динамический (по аркану × позиции)
-function CompatCard({ position, value, highlight = false, context = 'union', aiText, aiExpandable }: {
+function CompatCard({ position, value, highlight = false, context = 'union', aiText, aiExpandable, aiLoading = false }: {
   position: number;
   value: number;
   highlight?: boolean;
   context?: 'union' | 'cross';
   aiText?: string;
   aiExpandable?: string;
+  aiLoading?: boolean;
 }) {
   const arcana = getArcana(value);
   const compatData = arcanaCompatibilityData[value];
@@ -296,7 +306,7 @@ function CompatCard({ position, value, highlight = false, context = 'union', aiT
     ? `${compatData.upright}\n\nВ минусе: ${compatData.reversed}`
     : (compatPositionIntros[position] || '');
   const positionText = getCompatPositionText(context, position, value);
-  const contextIntro = aiText || positionText || arcana?.compatibilityDescription || arcana?.personalDescription || '';
+  const contextIntro = (aiLoading && !aiText) ? '' : (aiText || positionText || arcana?.compatibilityDescription || arcana?.personalDescription || '');
   return (
     <CompCard
       position={position}
@@ -306,22 +316,25 @@ function CompatCard({ position, value, highlight = false, context = 'union', aiT
       expandableLabel="Расширенный разбор"
       expandableContent={expandable}
       highlight={highlight}
+      aiLoading={aiLoading && !aiText}
     />
   );
 }
 
 // Обёртка для личной матрицы
-function PersonalCard({ position, value, accentColor = 'primary' as const, aiText, aiExpandable }: { position: number; value: number; accentColor?: 'primary' | 'violet'; aiText?: string; aiExpandable?: string }) {
+function PersonalCard({ position, value, accentColor = 'primary' as const, aiText, aiExpandable, aiLoading = false }: { position: number; value: number; accentColor?: 'primary' | 'violet'; aiText?: string; aiExpandable?: string; aiLoading?: boolean }) {
   const interp = getPositionInterpretation(position, value);
+  const contextIntro = (aiLoading && !aiText) ? '' : (aiText || interp.positionIntro || '');
   return (
     <CompCard
       position={position}
       value={value}
       positionTitle={interp.positionTitle || `Позиция ${position}`}
-      contextIntro={aiText || interp.positionIntro || ''}
+      contextIntro={contextIntro}
       expandableContent={aiExpandable}
       expandableLabel={aiExpandable ? 'Подробнее' : undefined}
       accentColor={accentColor}
+      aiLoading={aiLoading && !aiText}
     />
   );
 }
@@ -495,6 +508,7 @@ function TriangleSection({
           context={context}
           aiText={aiReading?.positions?.[String(pos)]}
           aiExpandable={aiReading?.positions_expanded?.[String(pos)]}
+          aiLoading={aiLoading}
         />
       ))}
     </div>
@@ -1351,6 +1365,7 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
               matrix={matrix}
               shownPositions={TRIANGLE_SHOWN_SETS[idx]}
               aiReading={aiReading}
+              aiLoading={aiLoading}
             />
           </div>
         ))}
@@ -1363,7 +1378,7 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
           title="Кармическая ось"
           subtitle="Позиция 6 — в матрице совместимости здесь стоит кармический аркан. Ключевой вызов и скрытый ресурс пары."
         />
-        <CompatCard position={6} value={p[5]} aiText={aiReading?.positions?.['6']} aiExpandable={aiReading?.positions_expanded?.['6']} />
+        <CompatCard position={6} value={p[5]} aiText={aiReading?.positions?.['6']} aiExpandable={aiReading?.positions_expanded?.['6']} aiLoading={aiLoading} />
       </div>
 
       {/* ═══ ЦЕЛИ В ОТНОШЕНИЯХ ════════════════════════════════════════════════ */}
@@ -1374,7 +1389,7 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
           subtitle="Позиции 7 · 8 · 9 — куда идёт пара, через что достигает и где восстанавливается."
         />
         {[7, 8, 9].map(pos => (
-          <CompatCard key={pos} position={pos} value={p[pos - 1]} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} />
+          <CompatCard key={pos} position={pos} value={p[pos - 1]} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} aiLoading={aiLoading} />
         ))}
       </div>
 
@@ -1389,7 +1404,7 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
           Кармические позиции — не приговор и не плохой знак. Это точки трансформации: то, что будет провоцировать конфликты, пока пара не осознает их вместе. Именно здесь — самый глубокий рост.
         </div>
         {[10, 11, 12].map(pos => (
-          <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} />
+          <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} aiLoading={aiLoading} />
         ))}
       </div>
 
@@ -1542,6 +1557,7 @@ function PartnerTab({
   accentColor,
   otherName,
   aiReading,
+  aiLoading = false,
 }: {
   matrix: PersonalMatrix;
   crossMatrix: PersonalMatrix | undefined;
@@ -1549,6 +1565,7 @@ function PartnerTab({
   accentColor: 'primary' | 'violet';
   otherName: string;
   aiReading?: PersonalReading | null;
+  aiLoading?: boolean;
 }) {
   const isViolet = accentColor === 'violet';
   const colorClass = isViolet ? "text-primary" : "text-primary";
@@ -1646,6 +1663,7 @@ function PartnerTab({
             <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor}
               aiText={aiReading?.positions?.[String(pos)]}
               aiExpandable={aiReading?.positions_expanded?.[String(pos)]}
+              aiLoading={aiLoading}
             />
           ))}
         </div>
@@ -1662,6 +1680,7 @@ function PartnerTab({
             <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor}
               aiText={aiReading?.positions?.[String(pos)]}
               aiExpandable={aiReading?.positions_expanded?.[String(pos)]}
+              aiLoading={aiLoading}
             />
           ))}
         </div>
@@ -1678,6 +1697,7 @@ function PartnerTab({
             <PersonalCard key={pos} position={pos} value={p[pos - 1]} accentColor={accentColor}
               aiText={aiReading?.positions?.[String(pos)]}
               aiExpandable={aiReading?.positions_expanded?.[String(pos)]}
+              aiLoading={aiLoading}
             />
           ))}
         </div>
@@ -1839,8 +1859,8 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
   const isPro = tier === 'professional';
   const [activeTab, setActiveTab] = useState<TabType>('union');
   const { reading: aiReading, loading: aiLoading } = useAIReading(result, isPro);
-  const { reading: aiReading1 } = usePersonalReading(result, 1, isPro);
-  const { reading: aiReading2 } = usePersonalReading(result, 2, isPro);
+  const { reading: aiReading1, loading: aiLoading1 } = usePersonalReading(result, 1, isPro);
+  const { reading: aiReading2, loading: aiLoading2 } = usePersonalReading(result, 2, isPro);
 
   const unionArcana = getArcana(result.unionArcana);
 
@@ -1920,9 +1940,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <span className={cn(
             "text-5xl font-display font-bold shrink-0",
-            result.compatibilityPercent >= 80 ? "text-emerald-600" :
-            result.compatibilityPercent >= 60 ? "text-primary" :
-            result.compatibilityPercent >= 40 ? "text-amber-600" : "text-red-500"
+            "text-primary"
           )}>
             {result.compatibilityPercent}%
           </span>
@@ -2010,6 +2028,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               accentColor="primary"
               otherName={result.person2.name}
               aiReading={aiReading1}
+              aiLoading={aiLoading1}
             />
           )}
           {activeTab === 'person2' && result.matrix2 && (
@@ -2020,6 +2039,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               accentColor="primary"
               otherName={result.person1.name}
               aiReading={aiReading2}
+              aiLoading={aiLoading2}
             />
           )}
           {activeTab === 'matrices' && <MatricesTab result={result} />}

@@ -387,8 +387,8 @@ const Index = () => {
   };
 
   const { lock } = useAccess();
-  const OWNER_EMAIL = "leo.puzz7@gmail.com";
-  const isOwner = user?.email === OWNER_EMAIL;
+  const OWNER_EMAILS = ["leo.puzz7@gmail.com", "nadiakoval76@gmail.com"];
+  const isOwner = !!user?.email && OWNER_EMAILS.includes(user.email);
   const { prices: methodPrices } = useMethodPrice(selectedMethod);
 
   const handleReset = () => {
