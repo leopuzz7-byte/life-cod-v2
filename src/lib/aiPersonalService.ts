@@ -160,7 +160,7 @@ export async function generatePersonalReading(
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       temperature: 0.7,
       max_tokens: 7000,
       messages: [
