@@ -1,242 +1,147 @@
 import { useTranslation } from "react-i18next";
 import { MonthForecast, formatBirthDate } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
-import { ArcanaCard } from "./ArcanaCard";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Heart, Briefcase, Activity, Brain, AlertTriangle, CheckCircle, Target, Sparkles, Clock, BookOpen, MessageCircle } from "lucide-react";
-import { PDFDownloadButton } from "./PDFDownloadButton";
-import { generatePDF, formatBirthDateForPDF } from "@/lib/pdfGenerator";
-import { cn } from "@/lib/utils";
-import { generateMonthProInterpretation } from "@/lib/proMonthForecast";
-import { ProSectionBlock, ProTextBlock, ProListBlock, ProNumberedList } from "./ProSectionBlock";
-import type { TierType } from "@/lib/analysisConfig";
+import { ArrowLeft, Calendar, Heart, Briefcase, Activity, AlertTriangle, CheckCircle, Target, Sparkles, BookOpen, MessageCircle } from "lucide-react";
+import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
+import { useMonthForecastAI } from "@/hooks/useMonthForecastAI";
+
+const MONTH_NAMES_RU: Record<number, string> = {
+  1:'Январь',2:'Февраль',3:'Март',4:'Апрель',5:'Май',6:'Июнь',
+  7:'Июль',8:'Август',9:'Сентябрь',10:'Октябрь',11:'Ноябрь',12:'Декабрь',
+};
 
 interface MonthForecastResultProps {
   forecast: MonthForecast;
   name: string;
   onReset: () => void;
-  tier?: TierType;
+  tier?: string;
 }
 
-export function MonthForecastResult({ forecast, name, onReset, tier = 'basic' }: MonthForecastResultProps) {
+export function MonthForecastResult({ forecast, name, onReset }: MonthForecastResultProps) {
   const { t } = useTranslation();
-  const isPro = tier === 'professional';
   const formattedDate = formatBirthDate(forecast.birthDate.day, forecast.birthDate.month, forecast.birthDate.year);
-  const monthName = t(`forecast.months.${forecast.targetMonth}`);
-  const arcana1 = getArcana(forecast.position1);
-  const arcana2 = getArcana(forecast.position2);
-  const arcana3 = getArcana(forecast.position3);
-  const proData = isPro ? generateMonthProInterpretation(forecast.position1, forecast.position2, forecast.position3, monthName, forecast.targetYear) : null;
-
-  const handleDownloadPDF = async () => {
-    await generatePDF({
-      title: t("forecast.monthForecast"),
-      subtitle: `${monthName} ${forecast.targetYear}`,
-      birthDate: formatBirthDateForPDF(forecast.birthDate.day, forecast.birthDate.month, forecast.birthDate.year),
-      name: name || undefined,
-      sections: [
-        {
-          title: t("forecast.monthTriangle"),
-          content: [
-            `${arcana1?.name || forecast.position1} (${forecast.position1}) — ${t("forecast.yearEnergyBackground")}`,
-            `${arcana2?.name || forecast.position2} (${forecast.position2}) — ${t("forecast.monthEnergy")}`,
-            `${arcana3?.name || forecast.position3} (${forecast.position3}) — ${t("forecast.monthResultEnergy")}`,
-          ],
-          highlight: true,
-        },
-        {
-          title: `${t("forecast.mainMonthArcana")}: ${forecast.position3} — ${arcana3?.name}`,
-          content: [arcana3 ? `${arcana3.planet} • ${arcana3.element}` : "", "", arcana3?.monthForecast || arcana3?.yearForecast || ""],
-        },
-      ],
-    });
-  };
+  const monthName = MONTH_NAMES_RU[forecast.targetMonth] ?? t(`forecast.months.${forecast.targetMonth}`);
+  const a1 = getArcana(forecast.position1);
+  const a3 = getArcana(forecast.position3);
+  const { reading, loading } = useMonthForecastAI(forecast, name);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center justify-between mb-4">
-        <Button variant="ghost" onClick={onReset}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {t("results.newCalculation")}
-        </Button>
-        <PDFDownloadButton onDownload={handleDownloadPDF} />
-      </div>
+      <Button variant="ghost" onClick={onReset} className="mb-2 text-muted-foreground">
+        <ArrowLeft className="w-4 h-4 mr-2" /> {t("results.newCalculation")}
+      </Button>
 
       <div className="text-center">
-        <span className={cn(
-          "inline-block px-3 py-1 rounded-full text-xs font-medium mb-2",
-          isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
-        )}>
-          {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
-        </span>
         <h1 className="text-2xl md:text-3xl font-display text-primary mb-2">
           {t("forecast.monthForecast")} — {monthName} {forecast.targetYear}
         </h1>
-        {name && <p className="text-lg text-foreground mb-1">{t("forecast.for")} {name}</p>}
-        <p className="text-muted-foreground">{t("results.birthDate")}: {formattedDate}</p>
+        {name && <p className="text-lg text-foreground mb-1">{name}</p>}
+        <p className="text-muted-foreground text-sm">{t("results.birthDate")}: {formattedDate}</p>
       </div>
 
-      {/* Triangle visualization */}
+      {/* Треугольник месяца */}
       <div className="gradient-card rounded-2xl p-6 border border-primary/30">
-        <div className="flex items-center gap-3 mb-6">
-          <Calendar className="w-6 h-6 text-primary" />
-          <h2 className="text-xl font-display text-foreground">{t("forecast.monthTriangle")}</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <Calendar className="w-5 h-5 text-primary" />
+          <h2 className="text-base font-display text-foreground">Треугольник месяца</h2>
         </div>
-
-        <div className="flex flex-col items-center mb-8">
-          <div className="flex flex-col items-center mb-4">
-            <div className="w-20 h-20 rounded-xl bg-primary/20 flex items-center justify-center border-2 border-primary">
+        <div className="flex flex-col items-center mb-4">
+          <div className="flex flex-col items-center mb-3">
+            <div className="w-20 h-20 rounded-xl bg-primary/20 border-2 border-primary flex items-center justify-center">
               <span className="text-3xl font-display font-bold text-primary">{forecast.position3}</span>
             </div>
-            <span className="text-xs text-muted-foreground mt-1">{t("forecast.monthResult")}</span>
+            <span className="text-xs text-muted-foreground mt-1">{a3?.name} — главный аркан</span>
           </div>
-          <div className="w-32 h-8 relative">
-            <div className="absolute left-1/2 top-0 w-px h-full bg-border transform -translate-x-1/2" />
-            <div className="absolute left-0 bottom-0 w-1/2 h-px bg-border transform rotate-45 origin-left" />
-            <div className="absolute right-0 bottom-0 w-1/2 h-px bg-border transform -rotate-45 origin-right" />
+          <div className="w-28 h-6 relative mb-3">
+            <div className="absolute left-1/2 top-0 w-px h-full bg-border -translate-x-1/2" />
+            <div className="absolute left-0 bottom-0 w-1/2 h-px bg-border rotate-45 origin-left" />
+            <div className="absolute right-0 bottom-0 w-1/2 h-px bg-border -rotate-45 origin-right" />
           </div>
-          <div className="flex gap-12">
+          <div className="flex gap-10">
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-xl bg-secondary flex items-center justify-center border border-border">
-                <span className="text-2xl font-display font-bold text-foreground">{forecast.position1}</span>
+              <div className="w-14 h-14 rounded-xl bg-secondary border border-border flex items-center justify-center">
+                <span className="text-xl font-display font-bold">{forecast.position1}</span>
               </div>
-              <span className="text-xs text-muted-foreground mt-1">{t("forecast.yearArcana")}</span>
+              <span className="text-xs text-muted-foreground mt-1">{a1?.name}</span>
             </div>
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-xl bg-secondary flex items-center justify-center border border-border">
-                <span className="text-2xl font-display font-bold text-foreground">{forecast.position2}</span>
+              <div className="w-14 h-14 rounded-xl bg-secondary border border-border flex items-center justify-center">
+                <span className="text-xl font-display font-bold">{forecast.position2}</span>
               </div>
-              <span className="text-xs text-muted-foreground mt-1">{t("forecast.monthNum")} ({forecast.targetMonth})</span>
+              <span className="text-xs text-muted-foreground mt-1">{monthName}</span>
             </div>
           </div>
         </div>
+        <p className="text-xs text-center text-muted-foreground">
+          {forecast.position1} {a1?.name} + {forecast.position2} ({monthName}) = {forecast.position3} {a3?.name}
+        </p>
+      </div>
 
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-foreground mb-2">{t("forecast.howToRead")}:</h3>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• <strong>{arcana1?.name}</strong> ({forecast.position1}) — {t("forecast.yearEnergyBackground")}</li>
-              <li>• <strong>{arcana2?.name}</strong> ({forecast.position2}) — {t("forecast.monthEnergy")}</li>
-              <li>• <strong>{arcana3?.name}</strong> ({forecast.position3}) — {t("forecast.monthResultEnergy")}</li>
-            </ul>
-          </div>
+      {/* Скелетон */}
+      {loading && !reading && (
+        <div className="space-y-4 animate-pulse">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="rounded-2xl border border-border p-6 space-y-3">
+              <div className="h-4 bg-muted rounded w-1/3" />
+              <div className="h-3 bg-muted rounded w-full" />
+              <div className="h-3 bg-muted rounded w-5/6" />
+              <div className="h-3 bg-muted rounded w-4/5" />
+            </div>
+          ))}
         </div>
-      </div>
+      )}
 
-      {/* Full detailed arcana cards */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-display text-foreground">{t("forecast.mainMonthArcana")}</h2>
-        <ArcanaCard number={forecast.position3} showMonthForecast={true} compact={false} />
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-lg font-display text-foreground">{t("forecast.influencingEnergies")}</h2>
-        <div className="grid gap-4">
-          <ArcanaCard number={forecast.position1} positionTitle={t("forecast.yearEnergyTitle")} showMonthForecast={true} compact={true} />
-          <ArcanaCard number={forecast.position2} positionTitle={`${t("forecast.energyOf")} ${monthName}`} showMonthForecast={true} compact={true} />
-        </div>
-      </div>
-
-      {/* ===== PRO CONTENT ===== */}
-      {isPro && proData && (
+      {/* AI контент */}
+      {reading && (
         <>
-          <ProSectionBlock icon={BookOpen} title={t("res.month.deepEnergies")} variant="highlight">
+          <ProSectionBlock icon={BookOpen} title="Главная энергия месяца" variant="highlight">
+            <ProTextBlock text={reading.mainEnergy} className="mb-4" />
+            <ProTextBlock text={reading.generalForecast} />
+          </ProSectionBlock>
+
+          <ProSectionBlock icon={Target} title="Влияние арканов">
             <div className="space-y-4">
               <div className="bg-muted/30 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-foreground mb-2">{t("res.month.yearBg")}</h4>
-                <ProTextBlock text={proData.yearEnergyAnalysis} />
+                <h4 className="text-sm font-medium text-foreground mb-2">Аркан {forecast.position1} — фоновая энергия</h4>
+                <ProTextBlock text={reading.arcana1influence} />
               </div>
-              <div className="bg-muted/30 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-foreground mb-2">{t("res.month.monthEnergy")}</h4>
-                <ProTextBlock text={proData.monthEnergyAnalysis} />
-              </div>
-              <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
-                <h4 className="text-sm font-medium text-foreground mb-2">{t("res.month.resultEnergy")}</h4>
-                <ProTextBlock text={proData.resultEnergyAnalysis} />
+              <div className="bg-primary/5 border border-primary/10 rounded-xl p-4">
+                <h4 className="text-sm font-medium text-foreground mb-2">Аркан {forecast.position2} — энергия месяца</h4>
+                <ProTextBlock text={reading.arcana2influence} />
               </div>
             </div>
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Target} title={t("res.month.synergyConflict")}>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-emerald-500/5 rounded-xl p-4 border border-emerald-500/20">
-                <h4 className="text-sm font-medium text-emerald-600 mb-2">{t("res.matrix.synergy")}</h4>
-                <ProTextBlock text={proData.synergy} />
-              </div>
-              <div className="bg-destructive/5 rounded-xl p-4 border border-destructive/20">
-                <h4 className="text-sm font-medium text-destructive mb-2">{t("res.matrix.conflict")}</h4>
-                <ProTextBlock text={proData.conflicts} />
-              </div>
-            </div>
+          <ProSectionBlock icon={Sparkles} title="Как проявится в жизни">
+            <ProTextBlock text={reading.lifeManifest} />
           </ProSectionBlock>
 
-          {/* Life spheres */}
-          <ProSectionBlock icon={Briefcase} title={t("res.month.money")}>
-            <ProTextBlock text={proData.money} />
+          <ProSectionBlock icon={Briefcase} title="Деньги и работа">
+            <ProTextBlock text={reading.money} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Briefcase} title={t("res.month.career")}>
-            <ProTextBlock text={proData.career} />
+          <ProSectionBlock icon={Heart} title="Отношения">
+            <ProTextBlock text={reading.relationships} />
           </ProSectionBlock>
 
-          <ProSectionBlock icon={Heart} title={t("res.month.relationships")}>
-            <ProTextBlock text={proData.relationships} />
+          <ProSectionBlock icon={Activity} title="Здоровье">
+            <ProTextBlock text={reading.health} />
           </ProSectionBlock>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={Activity} title={t("res.month.health")}>
-              <ProTextBlock text={proData.health} />
+            <ProSectionBlock icon={CheckCircle} title="Возможности месяца" variant="success">
+              <ProTextBlock text={reading.opportunities} />
             </ProSectionBlock>
-            <ProSectionBlock icon={Brain} title={t("res.month.innerState")}>
-              <ProTextBlock text={proData.innerState} />
+            <ProSectionBlock icon={AlertTriangle} title="Главный риск" variant="warning">
+              <ProTextBlock text={reading.mainRisk} />
             </ProSectionBlock>
           </div>
 
-          {/* Weekly breakdown */}
-          <ProSectionBlock icon={Clock} title={t("res.month.weekly")} variant="highlight">
-            <div className="space-y-4">
-              {[
-                { title: t("res.month.week1"), text: proData.firstWeek },
-                { title: t("res.month.week2"), text: proData.secondWeek },
-                { title: t("res.month.week3"), text: proData.thirdWeek },
-                { title: t("res.month.week4"), text: proData.fourthWeek },
-              ].map((week, i) => (
-                <div key={i} className="border border-border rounded-xl p-4">
-                  <h4 className="text-sm font-medium text-foreground mb-2">{week.title}</h4>
-                  <ProTextBlock text={week.text} />
-                </div>
-              ))}
-            </div>
-          </ProSectionBlock>
-
-          {/* Recommendations */}
-          <ProSectionBlock icon={CheckCircle} title={t("res.ancestralPro.recommendations")} variant="success">
-            <h4 className="text-sm font-medium text-foreground mb-3">{t("res.whatToDo")}</h4>
-            <ProNumberedList items={proData.toDo} className="mb-6" />
-            <h4 className="text-sm font-medium text-destructive mb-3">{t("res.whatToAvoid")}</h4>
-            <ProListBlock items={proData.toAvoid} icon="✗" />
-          </ProSectionBlock>
-
-          <ProSectionBlock icon={Sparkles} title={t("res.month.dailyPractice")}>
-            <ProTextBlock text={proData.dailyPractice} className="mb-4" />
-            <div className="bg-muted/30 rounded-xl p-4">
-              <h4 className="text-xs font-medium text-muted-foreground mb-1">{t("res.month.keyDays")}</h4>
-              <ProTextBlock text={proData.keyDays} />
-            </div>
-          </ProSectionBlock>
-
-          {/* Summary */}
-          <ProSectionBlock icon={MessageCircle} title={t("res.month.summary")} variant="highlight">
-            <ProTextBlock text={proData.mainMessage} />
+          <ProSectionBlock icon={MessageCircle} title="Рекомендации" variant="highlight">
+            <ProTextBlock text={reading.recommendations} />
           </ProSectionBlock>
         </>
-      )}
-
-      {!isPro && (
-        <div className="bg-muted/30 rounded-xl border border-border p-5 text-center space-y-2">
-          <p className="text-sm text-muted-foreground">
-            {t("res.month.proFooter")}
-          </p>
-        </div>
       )}
     </div>
   );

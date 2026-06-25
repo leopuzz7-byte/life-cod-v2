@@ -1,141 +1,153 @@
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
 import { getArcana } from "@/lib/arcana";
-import { ArrowLeft, BookOpen, Target, Briefcase, Heart, Activity, AlertTriangle, CheckCircle, Sparkles, MessageCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { getDailyProData } from "@/lib/proInterpretationsExtra";
-import { ProSectionBlock, ProTextBlock, ProListBlock } from "./ProSectionBlock";
-import type { TierType } from "@/lib/analysisConfig";
+import { ArrowLeft, BookOpen, Target, Briefcase, Heart, Activity, AlertTriangle, CheckCircle, Sparkles, MessageCircle, Sun } from "lucide-react";
+import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
+import { useDayForecastAI } from "@/hooks/useDayForecastAI";
 
 interface Props {
   result: DailyForecastType;
   name: string;
   onReset: () => void;
-  tier?: TierType;
+  tier?: string;
 }
 
-export function DailyForecastResultComponent({ result, name, onReset, tier = 'basic' }: Props) {
+const POS_TITLES: Record<number, string> = {
+  1:'Утро / Старт дня', 2:'Потенциал дня', 3:'Самооценка', 4:'Цель дня',
+  5:'Главный ресурс', 6:'Основа дня', 7:'Главная задача', 8:'Способ решения',
+  9:'Результат', 10:'Подсознательные процессы', 11:'Внешнее влияние', 12:'Кармическая задача дня',
+};
+
+export function DailyForecastResultComponent({ result, name, onReset }: Props) {
   const { t } = useTranslation();
-  const isPro = tier === 'professional';
   const { targetDate, positions } = result;
   const dateStr = `${targetDate.day}.${String(targetDate.month).padStart(2, '0')}.${targetDate.year}`;
-  const proData = isPro ? getDailyProData(positions, dateStr) : null;
-
-  const shownPositions = isPro ? positions : positions.slice(0, 4);
+  const { reading, loading } = useDayForecastAI(result, name);
 
   return (
     <div className="max-w-3xl mx-auto">
       <Button variant="ghost" onClick={onReset} className="mb-4 text-muted-foreground">
-        <ArrowLeft className="w-4 h-4 mr-2" /> {t("res.newCalc")}
+        <ArrowLeft className="w-4 h-4 mr-2" /> {t("results.newCalculation")}
       </Button>
 
       <div className="text-center mb-4">
-        <span className={cn(
-          "inline-block px-3 py-1 rounded-full text-xs font-medium mb-2",
-          isPro ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
-        )}>
-          {isPro ? `✦ ${t("res.proAnalysis")}` : t("res.basicAnalysis")}
-        </span>
+        <h2 className="text-2xl font-display text-primary mb-1">{t("forecast.dayForecast")}</h2>
+        <p className="text-muted-foreground text-sm">
+          {name ? `${name}, ` : ''}Дата: {dateStr}
+        </p>
       </div>
 
+      {/* Матрица дня — 12 позиций */}
       <div className="gradient-card rounded-2xl p-6 border border-border mb-6">
-        <h2 className="text-2xl font-display text-primary mb-1">{t("cfg.methods.day.title")}</h2>
-        <p className="text-muted-foreground text-sm mb-4">
-          {name ? `${name}, ` : ''}{t("res.day.dateWord")}: {dateStr}
-        </p>
-
-        <Accordion type="single" collapsible defaultValue={`pos-${shownPositions[0]?.position}`}>
-          {shownPositions.map((pos) => {
+        <h3 className="text-base font-display text-foreground mb-4">Матрица дня</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {positions.map((pos) => {
             const arcanaData = getArcana(pos.arcana);
             return (
-              <AccordionItem key={pos.position} value={`pos-${pos.position}`} className="border-border">
-                <AccordionTrigger className="hover:no-underline py-3">
-                  <div className="flex items-center gap-3 text-left">
-                    <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">{pos.arcana}</span>
-                    <div>
-                      <span className="font-display text-foreground text-sm">{pos.title}</span>
-                      <span className="text-xs text-muted-foreground ml-2">{arcanaData?.name}</span>
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm pb-4">{pos.description}</AccordionContent>
-              </AccordionItem>
+              <div key={pos.position} className="bg-muted/30 rounded-xl p-3 border border-border">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">{pos.arcana}</span>
+                  <span className="text-xs text-muted-foreground">{POS_TITLES[pos.position]}</span>
+                </div>
+                <p className="text-xs font-medium text-foreground">{arcanaData?.name}</p>
+              </div>
             );
           })}
-        </Accordion>
+        </div>
       </div>
 
-      {/* ===== PRO CONTENT ===== */}
-      {isPro && proData && (
-        <div className="space-y-6">
-          <ProSectionBlock icon={BookOpen} title={t("res.day.energyAnalysis")} variant="highlight">
-            <ProTextBlock text={proData.intro} className="mb-4" />
-            <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
-              <h4 className="text-sm font-medium text-foreground mb-2">{t("res.day.mainEnergy")}</h4>
-              <ProTextBlock text={proData.mainEnergy} />
+      {/* Скелетон */}
+      {loading && !reading && (
+        <div className="space-y-4 animate-pulse">
+          {[1,2,3,4,5].map(i => (
+            <div key={i} className="rounded-2xl border border-border p-6 space-y-3">
+              <div className="h-4 bg-muted rounded w-1/3" />
+              <div className="h-3 bg-muted rounded w-full" />
+              <div className="h-3 bg-muted rounded w-5/6" />
             </div>
-          </ProSectionBlock>
-
-          <ProSectionBlock icon={Target} title={t("res.day.strategy")}>
-            <div className="space-y-4">
-              <div className="bg-muted/30 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-foreground mb-2">🌅 {t("res.day.morning")}</h4>
-                <ProTextBlock text={proData.morningFocus} />
-              </div>
-              <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
-                <h4 className="text-sm font-medium text-foreground mb-2">☀️ {t("res.day.dayStrategy")}</h4>
-                <ProTextBlock text={proData.dayStrategy} />
-              </div>
-              <div className="bg-muted/30 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-foreground mb-2">🌙 {t("res.day.evening")}</h4>
-                <ProTextBlock text={proData.eveningReflection} />
-              </div>
-            </div>
-          </ProSectionBlock>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={Briefcase} title={`💰 ${t("res.day.money")}`}>
-              <ProTextBlock text={proData.spheres.money} />
-            </ProSectionBlock>
-            <ProSectionBlock icon={Briefcase} title={`💼 ${t("res.day.career")}`}>
-              <ProTextBlock text={proData.spheres.career} />
-            </ProSectionBlock>
-            <ProSectionBlock icon={Heart} title={`❤️ ${t("res.day.relationships")}`}>
-              <ProTextBlock text={proData.spheres.relationships} />
-            </ProSectionBlock>
-            <ProSectionBlock icon={Activity} title={`🏥 ${t("res.day.health")}`}>
-              <ProTextBlock text={proData.spheres.health} />
-            </ProSectionBlock>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={AlertTriangle} title={t("res.day.risks")} variant="warning">
-              <ProListBlock items={proData.risks} icon="⚠" />
-            </ProSectionBlock>
-            <ProSectionBlock icon={CheckCircle} title={t("res.day.opportunities")} variant="success">
-              <ProListBlock items={proData.opportunities} icon="★" />
-            </ProSectionBlock>
-          </div>
-
-          <ProSectionBlock icon={Sparkles} title={t("res.day.practice")}>
-            <ProTextBlock text={proData.practice} />
-          </ProSectionBlock>
-
-          <ProSectionBlock icon={MessageCircle} title={t("res.conclusion")} variant="highlight">
-            <div className="bg-primary/10 rounded-xl p-4 text-center">
-              <p className="text-sm text-foreground font-medium italic">«{proData.keyThought}»</p>
-            </div>
-          </ProSectionBlock>
+          ))}
         </div>
       )}
 
-      {!isPro && (
-        <div className="bg-muted/30 rounded-xl border border-border p-5 text-center space-y-2">
-          <p className="text-sm text-muted-foreground">
-            {t("res.day.proFooter")}
-          </p>
+      {/* AI контент */}
+      {reading && (
+        <div className="space-y-6">
+          <ProSectionBlock icon={BookOpen} title="Глубокий разбор дня" variant="highlight">
+            <ProTextBlock text={reading.deepAnalysis} />
+          </ProSectionBlock>
+
+          {/* Стратегия дня */}
+          <ProSectionBlock icon={Target} title="Стратегия дня">
+            <div className="space-y-3">
+              <div className="bg-muted/30 rounded-xl p-4">
+                <h4 className="text-sm font-medium text-foreground mb-2">🌅 Утро</h4>
+                <ProTextBlock text={reading.morning} />
+              </div>
+              <div className="bg-primary/5 border border-primary/10 rounded-xl p-4">
+                <h4 className="text-sm font-medium text-foreground mb-2">☀️ День</h4>
+                <ProTextBlock text={reading.afternoon} />
+              </div>
+              <div className="bg-muted/30 rounded-xl p-4">
+                <h4 className="text-sm font-medium text-foreground mb-2">🌙 Вечер</h4>
+                <ProTextBlock text={reading.evening} />
+              </div>
+            </div>
+          </ProSectionBlock>
+
+          {/* Разбор по позициям */}
+          <ProSectionBlock icon={Sun} title="Разбор каждой позиции">
+            <div className="space-y-3">
+              {positions.map((pos) => {
+                const posText = reading.positions[String(pos.position)];
+                if (!posText) return null;
+                return (
+                  <div key={pos.position} className="border border-border rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">{pos.arcana}</span>
+                      <span className="text-sm font-medium text-foreground">{POS_TITLES[pos.position]}</span>
+                    </div>
+                    <ProTextBlock text={posText} />
+                  </div>
+                );
+              })}
+            </div>
+          </ProSectionBlock>
+
+          {/* Сферы */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <ProSectionBlock icon={Briefcase} title="💰 Деньги">
+              <ProTextBlock text={reading.money} />
+            </ProSectionBlock>
+            <ProSectionBlock icon={Briefcase} title="💼 Карьера">
+              <ProTextBlock text={reading.career} />
+            </ProSectionBlock>
+            <ProSectionBlock icon={Heart} title="❤️ Отношения">
+              <ProTextBlock text={reading.relationships} />
+            </ProSectionBlock>
+            <ProSectionBlock icon={Activity} title="🏥 Здоровье">
+              <ProTextBlock text={reading.health} />
+            </ProSectionBlock>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <ProSectionBlock icon={AlertTriangle} title="Риски дня" variant="warning">
+              <ProTextBlock text={reading.risks} />
+            </ProSectionBlock>
+            <ProSectionBlock icon={CheckCircle} title="Возможности дня" variant="success">
+              <ProTextBlock text={reading.opportunities} />
+            </ProSectionBlock>
+          </div>
+
+          <ProSectionBlock icon={Sparkles} title="Практика дня">
+            <ProTextBlock text={reading.practice} />
+          </ProSectionBlock>
+
+          <ProSectionBlock icon={MessageCircle} title="Итог дня" variant="highlight">
+            <div className="bg-primary/10 rounded-xl p-4 text-center">
+              <p className="text-sm text-foreground font-medium italic">«{reading.conclusion}»</p>
+            </div>
+          </ProSectionBlock>
         </div>
       )}
     </div>
