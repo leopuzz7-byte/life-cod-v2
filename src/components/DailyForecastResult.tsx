@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
-import { getArcana } from "@/lib/arcana";
 import { ArrowLeft, BookOpen, Target, Briefcase, Heart, Activity, AlertTriangle, CheckCircle, Sparkles, MessageCircle, Sun } from "lucide-react";
 import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
+import { ArcanaCard } from "./ArcanaCard";
 import { useDayForecastAI } from "@/hooks/useDayForecastAI";
 
 interface Props {
@@ -26,41 +26,38 @@ export function DailyForecastResultComponent({ result, name, onReset }: Props) {
   const { reading, loading } = useDayForecastAI(result, name);
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Button variant="ghost" onClick={onReset} className="mb-4 text-muted-foreground">
+    <div className="max-w-3xl mx-auto space-y-6">
+      <Button variant="ghost" onClick={onReset} className="text-muted-foreground">
         <ArrowLeft className="w-4 h-4 mr-2" /> {t("results.newCalculation")}
       </Button>
 
-      <div className="text-center mb-4">
-        <h2 className="text-2xl font-display text-primary mb-1">{t("forecast.dayForecast")}</h2>
-        <p className="text-muted-foreground text-sm">
-          {name ? `${name}, ` : ''}Дата: {dateStr}
-        </p>
+      <div className="text-center">
+        <h1 className="text-2xl md:text-3xl font-display text-primary mb-2">
+          {t("methods.dayForecast")}
+        </h1>
+        {name && <p className="text-lg text-foreground mb-1">{name}</p>}
+        <p className="text-muted-foreground text-sm">Дата: {dateStr}</p>
       </div>
 
-      {/* Матрица дня — 12 позиций */}
-      <div className="gradient-card rounded-2xl p-6 border border-border mb-6">
-        <h3 className="text-base font-display text-foreground mb-4">Матрица дня</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {positions.map((pos) => {
-            const arcanaData = getArcana(pos.arcana);
-            return (
-              <div key={pos.position} className="bg-muted/30 rounded-xl p-3 border border-border">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">{pos.arcana}</span>
-                  <span className="text-xs text-muted-foreground">{POS_TITLES[pos.position]}</span>
-                </div>
-                <p className="text-xs font-medium text-foreground">{arcanaData?.name}</p>
-              </div>
-            );
-          })}
-        </div>
+      {/* 12 позиций — ArcanaCard */}
+      <div className="space-y-3">
+        <h2 className="text-base font-display text-foreground px-1">Матрица дня</h2>
+        {positions.map((pos) => (
+          <ArcanaCard
+            key={pos.position}
+            number={pos.arcana}
+            position={pos.position}
+            positionTitle={POS_TITLES[pos.position]}
+            positionDescription={reading?.positions[String(pos.position)]}
+            compact={true}
+          />
+        ))}
       </div>
 
       {/* Скелетон */}
       {loading && !reading && (
         <div className="space-y-4 animate-pulse">
-          {[1,2,3,4,5].map(i => (
+          {[1,2,3].map(i => (
             <div key={i} className="rounded-2xl border border-border p-6 space-y-3">
               <div className="h-4 bg-muted rounded w-1/3" />
               <div className="h-3 bg-muted rounded w-full" />
@@ -72,12 +69,11 @@ export function DailyForecastResultComponent({ result, name, onReset }: Props) {
 
       {/* AI контент */}
       {reading && (
-        <div className="space-y-6">
+        <>
           <ProSectionBlock icon={BookOpen} title="Глубокий разбор дня" variant="highlight">
             <ProTextBlock text={reading.deepAnalysis} />
           </ProSectionBlock>
 
-          {/* Стратегия дня */}
           <ProSectionBlock icon={Target} title="Стратегия дня">
             <div className="space-y-3">
               <div className="bg-muted/30 rounded-xl p-4">
@@ -95,37 +91,17 @@ export function DailyForecastResultComponent({ result, name, onReset }: Props) {
             </div>
           </ProSectionBlock>
 
-          {/* Разбор по позициям */}
-          <ProSectionBlock icon={Sun} title="Разбор каждой позиции">
-            <div className="space-y-3">
-              {positions.map((pos) => {
-                const posText = reading.positions[String(pos.position)];
-                if (!posText) return null;
-                return (
-                  <div key={pos.position} className="border border-border rounded-xl p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">{pos.arcana}</span>
-                      <span className="text-sm font-medium text-foreground">{POS_TITLES[pos.position]}</span>
-                    </div>
-                    <ProTextBlock text={posText} />
-                  </div>
-                );
-              })}
-            </div>
-          </ProSectionBlock>
-
-          {/* Сферы */}
           <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={Briefcase} title="💰 Деньги">
+            <ProSectionBlock icon={Briefcase} title="Деньги">
               <ProTextBlock text={reading.money} />
             </ProSectionBlock>
-            <ProSectionBlock icon={Briefcase} title="💼 Карьера">
+            <ProSectionBlock icon={Briefcase} title="Карьера">
               <ProTextBlock text={reading.career} />
             </ProSectionBlock>
-            <ProSectionBlock icon={Heart} title="❤️ Отношения">
+            <ProSectionBlock icon={Heart} title="Отношения">
               <ProTextBlock text={reading.relationships} />
             </ProSectionBlock>
-            <ProSectionBlock icon={Activity} title="🏥 Здоровье">
+            <ProSectionBlock icon={Activity} title="Здоровье">
               <ProTextBlock text={reading.health} />
             </ProSectionBlock>
           </div>
@@ -148,7 +124,7 @@ export function DailyForecastResultComponent({ result, name, onReset }: Props) {
               <p className="text-sm text-foreground font-medium italic">«{reading.conclusion}»</p>
             </div>
           </ProSectionBlock>
-        </div>
+        </>
       )}
     </div>
   );
