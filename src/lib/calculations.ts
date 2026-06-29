@@ -21,9 +21,9 @@ export interface MonthForecast {
   targetMonth: number;
   targetYear: number;
   // Треугольник месяца
-  position1: number; // Аркан года
-  position2: number; // Аркан месяца (1-12)
-  position3: number; // Сумма позиций 1 и 2
+  position1: number; // Аркан месяца (birthMonth + targetMonth)
+  position2: number; // Аркан года (личный год)
+  position3: number; // Итоговый аркан месяца (pos1 + pos2)
 }
 
 // Совместимость двух людей
@@ -245,14 +245,14 @@ export function calculateMonthForecast(
   targetMonth: number, 
   targetYear: number
 ): MonthForecast {
-  // Позиция 1: Аркан года (годовой прогноз)
+  // Позиция 1: Аркан месяца (энергия месяца = birthMonth + targetMonth)
+  const position1 = normalizeToArcana(month + targetMonth);
+  
+  // Позиция 2: Аркан года (личный годовой аркан)
   const yearForecast = calculateYearForecast(day, month, year, targetYear);
-  const position1 = yearForecast.arcana;
+  const position2 = yearForecast.arcana;
   
-  // Позиция 2: Номер месяца (1-12)
-  const position2 = targetMonth;
-  
-  // Позиция 3: Сумма позиций 1 и 2
+  // Позиция 3: Итоговый аркан месяца (pos1 + pos2)
   const position3 = normalizeToArcana(position1 + position2);
   
   return {

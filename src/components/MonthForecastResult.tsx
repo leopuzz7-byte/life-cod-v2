@@ -2,7 +2,8 @@ import { useTranslation } from "react-i18next";
 import { MonthForecast, formatBirthDate } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Heart, Briefcase, Activity, AlertTriangle, CheckCircle, Target, Sparkles, BookOpen, MessageCircle } from "lucide-react";
+import { ArrowLeft, Calendar, Heart, Briefcase, Activity, AlertTriangle, CheckCircle, Sparkles, BookOpen, MessageCircle } from "lucide-react";
+import { ForecastCard, ForecastMiniCard } from "./ForecastCard";
 import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
 import { useMonthForecastAI } from "@/hooks/useMonthForecastAI";
 
@@ -23,6 +24,7 @@ export function MonthForecastResult({ forecast, name, onReset }: MonthForecastRe
   const formattedDate = formatBirthDate(forecast.birthDate.day, forecast.birthDate.month, forecast.birthDate.year);
   const monthName = MONTH_NAMES_RU[forecast.targetMonth] ?? t(`forecast.months.${forecast.targetMonth}`);
   const a1 = getArcana(forecast.position1);
+  const a2 = getArcana(forecast.position2);
   const a3 = getArcana(forecast.position3);
   const { reading, loading } = useMonthForecastAI(forecast, name);
 
@@ -40,43 +42,44 @@ export function MonthForecastResult({ forecast, name, onReset }: MonthForecastRe
         <p className="text-muted-foreground text-sm">{t("results.birthDate")}: {formattedDate}</p>
       </div>
 
-      {/* Треугольник месяца */}
-      <div className="gradient-card rounded-2xl p-6 border border-primary/30">
-        <div className="flex items-center gap-2 mb-4">
-          <Calendar className="w-5 h-5 text-primary" />
-          <h2 className="text-base font-display text-foreground">Треугольник месяца</h2>
+      {/* Треугольник — расчёт */}
+      <div className="gradient-card rounded-2xl p-4 border border-border">
+        <div className="flex items-center gap-2 mb-3">
+          <Calendar className="w-4 h-4 text-primary" />
+          <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Расчёт треугольника</span>
         </div>
-        <div className="flex flex-col items-center mb-4">
-          <div className="flex flex-col items-center mb-3">
-            <div className="w-20 h-20 rounded-xl bg-primary/20 border-2 border-primary flex items-center justify-center">
-              <span className="text-3xl font-display font-bold text-primary">{forecast.position3}</span>
-            </div>
-            <span className="text-xs text-muted-foreground mt-1">{a3?.name} — главный аркан</span>
-          </div>
-          <div className="w-28 h-6 relative mb-3">
-            <div className="absolute left-1/2 top-0 w-px h-full bg-border -translate-x-1/2" />
-            <div className="absolute left-0 bottom-0 w-1/2 h-px bg-border rotate-45 origin-left" />
-            <div className="absolute right-0 bottom-0 w-1/2 h-px bg-border -rotate-45 origin-right" />
-          </div>
-          <div className="flex gap-10">
-            <div className="flex flex-col items-center">
-              <div className="w-14 h-14 rounded-xl bg-secondary border border-border flex items-center justify-center">
-                <span className="text-xl font-display font-bold">{forecast.position1}</span>
-              </div>
-              <span className="text-xs text-muted-foreground mt-1">{a1?.name}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-14 h-14 rounded-xl bg-secondary border border-border flex items-center justify-center">
-                <span className="text-xl font-display font-bold">{forecast.position2}</span>
-              </div>
-              <span className="text-xs text-muted-foreground mt-1">{monthName}</span>
-            </div>
-          </div>
+        <div className="flex items-center gap-3 flex-wrap">
+          <ForecastMiniCard value={forecast.position1} label="Энергия мес." />
+          <span className="text-sm text-muted-foreground">+</span>
+          <ForecastMiniCard value={forecast.position2} label="Аркан года" />
+          <span className="text-sm text-muted-foreground">=</span>
+          <ForecastMiniCard value={forecast.position3} label="Итог" />
         </div>
-        <p className="text-xs text-center text-muted-foreground">
-          {forecast.position1} {a1?.name} + {forecast.position2} ({monthName}) = {forecast.position3} {a3?.name}
+        <p className="text-xs text-muted-foreground mt-3">
+          {forecast.position1} {a1?.name} + {forecast.position2} {a2?.name} = {forecast.position3} {a3?.name}
         </p>
       </div>
+
+      {/* 3 аркана треугольника */}
+      <ForecastCard
+        value={forecast.position1}
+        positionTitle="Энергия месяца"
+        contextText={reading?.arcana1influence}
+        loading={loading}
+      />
+      <ForecastCard
+        value={forecast.position2}
+        positionTitle="Аркан года"
+        contextText={reading?.arcana2influence}
+        loading={loading}
+      />
+      <ForecastCard
+        value={forecast.position3}
+        positionTitle="Итоговый аркан месяца"
+        contextText={reading?.mainEnergy}
+        loading={loading}
+        highlight={true}
+      />
 
       {/* Скелетон */}
       {loading && !reading && (
@@ -95,22 +98,8 @@ export function MonthForecastResult({ forecast, name, onReset }: MonthForecastRe
       {/* AI контент */}
       {reading && (
         <>
-          <ProSectionBlock icon={BookOpen} title="Главная энергия месяца" variant="highlight">
-            <ProTextBlock text={reading.mainEnergy} className="mb-4" />
+          <ProSectionBlock icon={BookOpen} title="Прогноз месяца" variant="highlight">
             <ProTextBlock text={reading.generalForecast} />
-          </ProSectionBlock>
-
-          <ProSectionBlock icon={Target} title="Влияние арканов">
-            <div className="space-y-4">
-              <div className="bg-muted/30 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-foreground mb-2">Аркан {forecast.position1} — фоновая энергия</h4>
-                <ProTextBlock text={reading.arcana1influence} />
-              </div>
-              <div className="bg-primary/5 border border-primary/10 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-foreground mb-2">Аркан {forecast.position2} — энергия месяца</h4>
-                <ProTextBlock text={reading.arcana2influence} />
-              </div>
-            </div>
           </ProSectionBlock>
 
           <ProSectionBlock icon={Sparkles} title="Как проявится в жизни">

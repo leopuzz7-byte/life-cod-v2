@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
-import { ArrowLeft, BookOpen, Target, Briefcase, Heart, Activity, AlertTriangle, CheckCircle, Sparkles, MessageCircle, Sun } from "lucide-react";
+import { ArrowLeft, BookOpen, Target, Briefcase, Heart, Activity, AlertTriangle, CheckCircle, Sparkles, MessageCircle } from "lucide-react";
 import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
-import { ArcanaCard } from "./ArcanaCard";
+import { ForecastCard } from "./ForecastCard";
+import { DayMatrixGrid } from "./DayMatrixGrid";
 import { useDayForecastAI } from "@/hooks/useDayForecastAI";
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
 const POS_TITLES: Record<number, string> = {
   1:'Утро / Старт дня', 2:'Потенциал дня', 3:'Самооценка', 4:'Цель дня',
   5:'Главный ресурс', 6:'Основа дня', 7:'Главная задача', 8:'Способ решения',
-  9:'Результат', 10:'Подсознательные процессы', 11:'Внешнее влияние', 12:'Кармическая задача дня',
+  9:'Итог дня', 10:'Подсознательные процессы', 11:'Внешнее влияние', 12:'Кармическая задача дня',
 };
 
 export function DailyForecastResultComponent({ result, name, onReset }: Props) {
@@ -39,17 +40,21 @@ export function DailyForecastResultComponent({ result, name, onReset }: Props) {
         <p className="text-muted-foreground text-sm">Дата: {dateStr}</p>
       </div>
 
-      {/* 12 позиций — ArcanaCard */}
+      {/* Матрица дня — сетка карт */}
+      <DayMatrixGrid positions={positions} />
+
+      {/* 12 позиций — фото карт с AI разбором */}
       <div className="space-y-3">
-        <h2 className="text-base font-display text-foreground px-1">Матрица дня</h2>
+        <h2 className="text-base font-display text-foreground px-1">Разбор позиций</h2>
         {positions.map((pos) => (
-          <ArcanaCard
+          <ForecastCard
             key={pos.position}
-            number={pos.arcana}
+            value={pos.arcana}
             position={pos.position}
             positionTitle={POS_TITLES[pos.position]}
-            positionDescription={reading?.positions[String(pos.position)]}
-            compact={true}
+            contextText={reading?.positions[String(pos.position)]}
+            loading={loading}
+            highlight={pos.position === 6 || pos.position === 12}
           />
         ))}
       </div>

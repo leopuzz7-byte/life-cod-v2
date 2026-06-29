@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { YearForecast, formatBirthDate } from "@/lib/calculations";
-import { getArcana } from "@/lib/arcana";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, TrendingUp, Heart, Briefcase, Activity, AlertTriangle, Sparkles, CheckCircle, Target, ShieldAlert, BookOpen, MessageCircle } from "lucide-react";
+import { ForecastCard } from "./ForecastCard";
 import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
 import { useYearForecastAI } from "@/hooks/useYearForecastAI";
 
@@ -15,7 +15,6 @@ interface YearForecastResultProps {
 
 export function YearForecastResult({ forecast, name, onReset }: YearForecastResultProps) {
   const { t } = useTranslation();
-  const arcana = getArcana(forecast.arcana);
   const formattedDate = formatBirthDate(forecast.birthDate.day, forecast.birthDate.month, forecast.birthDate.year);
   const { reading, loading } = useYearForecastAI(forecast, name);
 
@@ -33,15 +32,13 @@ export function YearForecastResult({ forecast, name, onReset }: YearForecastResu
         <p className="text-muted-foreground text-sm">{t("results.birthDate")}: {formattedDate}</p>
       </div>
 
-      {/* Главный аркан */}
-      <div className="gradient-card rounded-2xl p-6 border border-primary/30 text-center">
-        <Calendar className="w-6 h-6 text-primary mx-auto mb-3" />
-        <div className="w-24 h-24 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-          <span className="text-5xl font-display font-bold text-primary">{forecast.arcana}</span>
-        </div>
-        <h2 className="text-xl font-display text-foreground mb-1">{arcana?.name}</h2>
-        <p className="text-sm text-muted-foreground">{arcana?.planet} · {arcana?.element}</p>
-      </div>
+      {/* Главный аркан года — фотокарточка */}
+      <ForecastCard
+        value={forecast.arcana}
+        contextText={reading?.arcanaOverview}
+        loading={loading}
+        highlight={true}
+      />
 
       {/* Скелетон */}
       {loading && !reading && (
@@ -60,19 +57,16 @@ export function YearForecastResult({ forecast, name, onReset }: YearForecastResu
       {/* AI контент */}
       {reading && (
         <>
-          <ProSectionBlock icon={BookOpen} title="Главная энергия года" variant="highlight">
-            <ProTextBlock text={reading.arcanaOverview} className="mb-4" />
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-emerald-600 mb-2">Сильные стороны</h4>
-                <ProTextBlock text={reading.arcanaStrengths} />
-              </div>
-              <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-destructive mb-2">Слабые стороны</h4>
-                <ProTextBlock text={reading.arcanaWeaknesses} />
-              </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
+              <h4 className="text-sm font-medium text-emerald-600 mb-2">Сильные стороны года</h4>
+              <ProTextBlock text={reading.arcanaStrengths} />
             </div>
-          </ProSectionBlock>
+            <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4">
+              <h4 className="text-sm font-medium text-destructive mb-2">Слабые стороны года</h4>
+              <ProTextBlock text={reading.arcanaWeaknesses} />
+            </div>
+          </div>
 
           <ProSectionBlock icon={Target} title="Введение в ваш год">
             <ProTextBlock text={reading.intro} />
@@ -124,18 +118,13 @@ export function YearForecastResult({ forecast, name, onReset }: YearForecastResu
           <ProSectionBlock icon={Calendar} title={`Прогноз на каждый месяц ${forecast.targetYear}`} variant="highlight">
             <div className="space-y-3">
               {reading.months.map(m => (
-                <div key={m.monthNum} className="border border-border rounded-xl overflow-hidden">
-                  <div className="bg-primary/10 px-4 py-2 flex items-center gap-3 flex-wrap">
-                    <span className="font-display text-sm font-semibold text-foreground">{m.monthName}</span>
-                    <span className="text-xs text-muted-foreground">{m.pos1} {m.pos1Name} - {m.pos2} мес. - <span className="text-primary font-medium">{m.pos3} {m.pos3Name}</span></span>
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <ProTextBlock text={m.forecast} />
-                    <div className="bg-primary/5 rounded-lg px-3 py-2">
-                      <p className="text-xs text-primary font-medium">{m.keyTip}</p>
-                    </div>
-                  </div>
-                </div>
+                <ForecastCard
+                  key={m.monthNum}
+                  value={m.pos3}
+                  positionTitle={m.monthName}
+                  contextText={m.forecast}
+                  tip={m.keyTip}
+                />
               ))}
             </div>
           </ProSectionBlock>

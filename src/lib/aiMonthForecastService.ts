@@ -1,6 +1,5 @@
 import { MonthForecast } from './calculations';
 import { getArcana } from './arcana';
-import { yearToArcana } from './calculations';
 
 export interface AIMonthReading {
   mainEnergy: string;
@@ -30,9 +29,8 @@ function arcanaLabel(n: number): string {
 
 function buildPrompt(forecast: MonthForecast, name: string): string {
   const { birthDate, targetMonth, targetYear, position1, position2, position3 } = forecast;
-  const birthYearArcana = yearToArcana(birthDate.year);
-  const yearArcana = position1;
   const a1 = getArcana(position1);
+  const a2 = getArcana(position2);
   const a3 = getArcana(position3);
   const monthName = MONTH_NAMES[targetMonth];
 
@@ -41,16 +39,16 @@ ${name ? `\nКЛИЕНТ: ${name}` : ''}
 МЕСЯЦ: ${monthName} ${targetYear}
 
 РАСЧЁТ ТРЕУГОЛЬНИКА:
-Позиция 2 (${monthName}): аркан года рождения ${arcanaLabel(birthYearArcana)} + номер месяца ${targetMonth} = ${arcanaLabel(position1)}
-Позиция 4 (фон года): ${arcanaLabel(yearArcana)}
-Главный аркан месяца (итог): ${arcanaLabel(position3)}
+Первая энергия (аркан месяца): месяц рождения ${birthDate.month} + ${targetMonth} (${monthName}) = ${arcanaLabel(position1)} - показывает КАК будут развиваться события
+Вторая энергия (аркан года): ${arcanaLabel(position2)} - создаёт основной жизненный фон
+Итоговый аркан месяца: ${arcanaLabel(position3)} - главная тема и результат
 
-ТРЕУГОЛЬНИК: ${arcanaLabel(position1)} - ${targetMonth} (${monthName}) - ${arcanaLabel(position3)}
-Планета главного аркана: ${a3?.planet ?? '-'}
+ТРЕУГОЛЬНИК: ${arcanaLabel(position1)} + ${arcanaLabel(position2)} = ${arcanaLabel(position3)}
+Планета итогового аркана: ${a3?.planet ?? '-'}
 Стихия: ${a3?.element ?? '-'}
 
-КОНТЕКСТ ГОДА:
-Аркан года: ${arcanaLabel(yearArcana)} (${a1?.planet ?? ''})
+КОНТЕКСТ:
+Аркан года: ${arcanaLabel(position2)} (${a2?.planet ?? ''})
 
 ПРАВИЛА СТИЛЯ (нарушение = ошибка):
 - ЗАПРЕТ на длинное тире. Только запятая или короткий дефис (-)
@@ -64,8 +62,8 @@ ${name ? `\nКЛИЕНТ: ${name}` : ''}
 {
   "mainEnergy": "главная энергия месяца: аркан ${position3}, планета, ключевая тема (2-3 предложения)",
   "generalForecast": "общая атмосфера ${monthName}: что будет происходить, главные тенденции (5-6 предложений)",
-  "arcana1influence": "как влияет фоновый аркан ${position1} на этот месяц (3-4 предложения)",
-  "arcana2influence": "как влияет аркан месяца, связанный с числом ${targetMonth} (3-4 предложения)",
+  "arcana1influence": "глубокий разбор энергии месяца ${position1} (${a1?.name}): как эта энергия проявится в событиях, её влияние на поведение и решения (3-4 предложения)",
+  "arcana2influence": "глубокий разбор аркана года ${position2} (${a2?.name}): как годовая энергия влияет на этот месяц, что она усиливает или тормозит (3-4 предложения)",
   "lifeManifest": "как всё это конкретно проявится в жизни: события, ситуации, встречи (4-5 предложений)",
   "money": "деньги и работа в ${monthName}: возможности, риски, конкретные советы (4-5 предложений)",
   "relationships": "отношения в ${monthName}: что ожидать, как использовать энергию (4-5 предложений)",
