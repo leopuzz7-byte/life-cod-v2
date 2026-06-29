@@ -150,6 +150,13 @@ analysis >> АНАЛИТИЧЕСКИЙ: психологически точно.
 }`;
 }
 
+export function getCachedAIReading(result: CompatibilityResult): AIReading | null {
+  try {
+    const cached = localStorage.getItem(buildCacheKey(result));
+    return cached ? JSON.parse(cached) as AIReading : null;
+  } catch { return null; }
+}
+
 export async function generateAIReading(result: CompatibilityResult): Promise<AIReading> {
   const cacheKey = buildCacheKey(result);
 

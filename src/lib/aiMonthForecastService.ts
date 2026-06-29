@@ -74,6 +74,14 @@ ${name ? `\nКЛИЕНТ: ${name}` : ''}
 }`;
 }
 
+export function getCachedMonthReading(forecast: MonthForecast): AIMonthReading | null {
+  try {
+    const key = `${CACHE_PREFIX}${forecast.birthDate.day}.${forecast.birthDate.month}.${forecast.birthDate.year}_${forecast.targetMonth}.${forecast.targetYear}`;
+    const cached = localStorage.getItem(key);
+    return cached ? JSON.parse(cached) as AIMonthReading : null;
+  } catch { return null; }
+}
+
 export async function generateMonthReading(
   forecast: MonthForecast,
   name: string

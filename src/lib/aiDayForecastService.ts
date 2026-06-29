@@ -106,6 +106,15 @@ ${posLines}
 }`;
 }
 
+export function getCachedDayReading(result: DailyForecastResult): AIDayReading | null {
+  try {
+    const { birthDate, targetDate } = result;
+    const key = `${CACHE_PREFIX}${birthDate.day}.${birthDate.month}.${birthDate.year}_${targetDate.day}.${targetDate.month}.${targetDate.year}`;
+    const cached = localStorage.getItem(key);
+    return cached ? JSON.parse(cached) as AIDayReading : null;
+  } catch { return null; }
+}
+
 export async function generateDayReading(
   result: DailyForecastResult,
   name: string

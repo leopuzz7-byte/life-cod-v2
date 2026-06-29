@@ -115,6 +115,14 @@ ${monthsInfo}
 }`;
 }
 
+export function getCachedYearReading(forecast: YearForecast): AIYearReading | null {
+  try {
+    const key = `${CACHE_PREFIX}${forecast.birthDate.day}.${forecast.birthDate.month}.${forecast.birthDate.year}_${forecast.targetYear}`;
+    const cached = localStorage.getItem(key);
+    return cached ? JSON.parse(cached) as AIYearReading : null;
+  } catch { return null; }
+}
+
 export async function generateYearReading(
   forecast: YearForecast,
   name: string

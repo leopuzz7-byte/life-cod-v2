@@ -139,6 +139,13 @@ cross_positions >> КОНТЕКСТНЫЙ: как воспринимает и п
 }`;
 }
 
+export function getCachedPersonalReading(result: CompatibilityResult, person: 1 | 2): AIPersonalReading | null {
+  try {
+    const cached = localStorage.getItem(buildCacheKey(result, person));
+    return cached ? JSON.parse(cached) as AIPersonalReading : null;
+  } catch { return null; }
+}
+
 export async function generatePersonalReading(
   result: CompatibilityResult,
   person: 1 | 2
