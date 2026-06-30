@@ -60,8 +60,8 @@ export function DailyForecastResultComponent({ result, name, onReset }: Props) {
         ))}
       </div>
 
-      {/* AI блоки — всегда видны: скелетон пока грузится, контент когда готов */}
-      <DayForecastAIBlocks reading={reading} loading={loading} />
+      {/* AI блоки — всегда видны: скелетон пока грузится, контент когда готов (повтор при флапе — автоматически в сервисе) */}
+      <DayForecastAIBlocks reading={reading} loading={loading || !reading} />
 
       <NadezhdaSignature />
     </div>

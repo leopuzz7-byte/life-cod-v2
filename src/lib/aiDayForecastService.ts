@@ -129,27 +129,41 @@ export async function generateDayReading(
 
   const apiKey = import.meta.env.VITE_AI_API_KEY || 'sk-fLiNqGfbS2vyJorwNtnkz1F9ftCVAz2W';
 
-  const response = await fetch('https://api.proxyapi.ru/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      temperature: 0.7,
-      max_tokens: 6000,
-      messages: [
-        { role: 'system', content: 'Отвечай только JSON. Никаких markdown-оберток, никаких пояснений.' },
-        { role: 'user', content: buildPrompt(result, name) },
-      ],
-    }),
+  const payload = JSON.stringify({
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    max_tokens: 6000,
+    messages: [
+      { role: 'system', content: 'Отвечай только JSON. Никаких markdown-оберток, никаких пояснений.' },
+      { role: 'user', content: buildPrompt(result, name) },
+    ],
   });
 
-  if (!response.ok) throw new Error(`API ${response.status}: ${await response.text()}`);
+  // proxyapi периодически флапает (Failed to fetch / 429 / 5xx). Повторяем автоматически,
+  // чтобы пользователю просто работало, без кнопок. До 4 попыток с нарастающей паузой.
+  let lastErr: unknown = null;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      const response = await fetch('https://api.proxyapi.ru/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: payload,
+      });
 
-  const data = await response.json();
-  const raw = data.choices?.[0]?.message?.content ?? '';
-  const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-  const reading: AIDayReading = JSON.parse(cleaned);
+      if (!response.ok) throw new Error(`API ${response.status}: ${await response.text()}`);
 
-  try { localStorage.setItem(cacheKey, JSON.stringify(reading)); } catch {}
-  return reading;
+      const data = await response.json();
+      const raw = data.choices?.[0]?.message?.content ?? '';
+      const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+      const reading: AIDayReading = JSON.parse(cleaned);
+
+      try { localStorage.setItem(cacheKey, JSON.stringify(reading)); } catch {}
+      return reading;
+    } catch (e) {
+      lastErr = e;
+      if (attempt < 3) await new Promise(r => setTimeout(r, 700 * (attempt + 1)));
+    }
+  }
+
+  throw lastErr instanceof Error ? lastErr : new Error('AI request failed');
 }

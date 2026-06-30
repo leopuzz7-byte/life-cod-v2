@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Надежда</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --navy:  #1C2952;
+  --gray:  #838185;
+  --light: #F7F7F7;
+  --white: #FFFFFF;
+}
+
+body {
+  background: var(--light);
+  color: var(--navy);
+  font-family: 'Onest', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.page {
+  width: 100%;
+  max-width: 430px;
+  padding: 32px 18px 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── HERO ── */
+.hero {
+  width: 100%;
+  padding: 28px 24px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--white);
+  border-radius: 24px;
+  border: 1px solid rgba(131,129,133,0.18);
+  box-shadow: 0 2px 20px rgba(28,41,82,0.05);
+  margin-bottom: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100px;
+  background: var(--navy);
+  border-radius: 24px 24px 60% 60% / 24px 24px 44px 44px;
+}
+.photo {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  object-fit: cover; object-position: center 10%;
+  border: 3px solid var(--white);
+  margin-bottom: 18px;
+  position: relative; z-index: 1;
+  box-shadow: 0 0 0 4px var(--navy);
+}
+.photo-ph {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  border: 3px solid var(--white);
+  background: #EEF0F6;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+  color: var(--gray); font-size: 10px; letter-spacing: 2px;
+  position: relative; z-index: 1;
+  box-shadow: 0 0 0 4px var(--navy);
+}
+.name {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 46px; font-weight: 400;
+  letter-spacing: 6px; text-transform: uppercase;
+  color: var(--navy);
+  margin-bottom: 10px;
+  line-height: 1;
+}
+.subtitle {
+  font-size: 10px; letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gray);
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  width: 100%; height: 1px;
+  background: var(--gray);
+  opacity: 0.2;
+  margin: 4px 0;
+}
+
+/* ── LABEL ── */
+.label {
+  font-size: 10px; letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gray);
+  align-self: flex-start;
+  margin: 8px 0 3px;
+  font-weight: 500;
+}
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 28px; font-weight: 400;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--navy);
+  align-self: flex-start;
+  margin: 18px 0 4px;
+}
+.pricelist-head {
+  font-size: 10px; letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gray);
+  align-self: flex-start;
+  margin: 14px 0 3px;
+  font-weight: 500;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 15px 20px;
+  font-family: 'Onest', sans-serif;
+  font-size: 12px; font-weight: 500; letter-spacing: 1.5px;
+  text-transform: uppercase; text-decoration: none;
+  transition: all .2s; cursor: pointer; border: none;
+  border-radius: 50px;
+}
+.btn-primary { background: var(--navy); color: var(--white); }
+.btn-primary:hover { opacity: 0.88; }
+.btn-secondary {
+  background: var(--white); color: var(--navy);
+  border: 1px solid rgba(131,129,133,0.3);
+}
+.btn-secondary:hover { border-color: var(--navy); }
+
+/* ── DONATE CARD ── */
+.donate-card {
+  width: 100%;
+  padding: 18px;
+  background: var(--white);
+  border: 1px solid rgba(131,129,133,0.2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+/* Robokassa widget overrides */
+.donate-card form {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+.donate-card form input[name="OutSum"],
+.donate-card form input[type="text"] {
+  flex: 1 !important; min-width: 0 !important;
+  padding: 13px 18px !important;
+  border: 1px solid rgba(131,129,133,0.3) !important;
+  border-radius: 50px !important;
+  font-family: 'Onest', sans-serif !important;
+  font-size: 15px !important;
+  color: var(--navy) !important;
+  background: var(--light) !important;
+  outline: none !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+.donate-card form input[type="submit"] {
+  background: var(--navy) !important;
+  color: #fff !important; border: none !important;
+  padding: 13px 22px !important;
+  border-radius: 50px !important;
+  font-family: 'Onest', sans-serif !important;
+  font-size: 11px !important; font-weight: 600 !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important; white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+.donate-card img,
+.donate-card a[href*="robo"],
+.donate-card a[href*="Robo"],
+.donate-card br { display: none !important; }
+.donate-card table { width: 100% !important; }
+
+/* ── SERVICE ICON ── */
+.s-icon {
+  width: 22px; height: 22px;
+  flex-shrink: 0;
+  color: var(--navy);
+  opacity: 0.5;
+}
+
+/* ── SERVICE ROW ── */
+.service-wrap { width: 100%; }
+.service {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 14px 18px;
+  background: var(--white);
+  border: 1px solid rgba(131,129,133,0.2);
+  border-radius: 16px;
+  color: var(--navy);
+  transition: all .2s; gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.service:hover,
+.service.active {
+  border-color: var(--navy);
+  box-shadow: 0 2px 14px rgba(28,41,82,0.1);
+}
+.s-info { flex: 1; min-width: 0; }
+.s-name {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 17px; font-weight: 400; line-height: 1.3;
+}
+.s-sub {
+  font-size: 11px; color: var(--gray);
+  margin-top: 2px; font-family: 'Onest', sans-serif;
+}
+.s-price { text-align: right; flex-shrink: 0; }
+.s-rub {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 17px; font-weight: 400; display: block; color: var(--navy);
+}
+.s-eur { font-size: 10px; color: var(--gray); letter-spacing: 0.5px; }
+
+/* ── PAY REVEAL ── */
+.pay-reveal { display: none; padding: 6px 0 2px; }
+.pay-reveal a {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; padding: 13px;
+  background: var(--navy); color: #fff;
+  border-radius: 50px; text-decoration: none;
+  font-family: 'Onest', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  box-sizing: border-box; transition: opacity .2s;
+}
+.pay-reveal a:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <img src="nadezhda.png" class="photo" alt="Надежда"
+         onerror="this.style.display='none';document.getElementById('ph').style.display='flex'">
+    <div id="ph" class="photo-ph" style="display:none">ФОТО</div>
+    <div class="name">Надежда</div>
+    <div class="subtitle">Нумеролог &nbsp;·&nbsp; Психолог &nbsp;·&nbsp; Life-коуч</div>
+  </div>
+
+  <!-- CONTACTS -->
+  <div class="label">Связь и запись</div>
+
+  <a href="https://wa.me/79194871235" class="btn btn-primary" target="_blank">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+    WhatsApp +7 919 487-12-35
+  </a>
+
+  <a href="https://serdcepiligrima.com/" class="btn btn-secondary" target="_blank">
+    serdcepiligrima.com
+  </a>
+
+  <a href="#" class="btn btn-secondary" target="_blank">
+    Нумерологический калькулятор
+  </a>
+
+  <div class="divider"></div>
+
+  <!-- DONATE -->
+  <div class="label">Поддержать Надежду любой суммой</div>
+
+  <div class="donate-card">
+    <script type="text/javascript"
+      src="https://auth.robokassa.ru/Merchant/PaymentForm/FormFLS.js?EncodedInvoiceId=isoxs4WF2kGHX4gRvzV_cQ&DefaultSum=0.00">
+    </script>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ПРАЙС ЛИСТ -->
+  <div class="section-title">Прайс лист</div>
+
+  <!-- LOVE -->
+  <div class="pricelist-head">♥ Любовь и отношения</div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/></svg>
+      <div class="s-info"><div class="s-name">Мини-разбор ситуации</div></div>
+      <div class="s-price"><span class="s-rub">5 000 ₽</span><span class="s-eur">50 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/_wQXSjsLGEmGz0ejyBufJw" target="_blank">Оплатить</a></div>
+  </div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <div class="s-info"><div class="s-name">Полный разбор отношений</div><div class="s-sub">Психотип · мысли · намерения</div></div>
+      <div class="s-price"><span class="s-rub">8 500 ₽</span><span class="s-eur">85 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/leGg5Ue5nk-onfimMBMP-g" target="_blank">Оплатить</a></div>
+  </div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="5"/><circle cx="16" cy="12" r="5"/></svg>
+      <div class="s-info"><div class="s-name">Есть ли будущее у пары</div><div class="s-sub">9 карт</div></div>
+      <div class="s-price"><span class="s-rub">9 000 ₽</span><span class="s-eur">90 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/zCzxCwHDbkiLe_z0r36Xkg" target="_blank">Оплатить</a></div>
+  </div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.41"/></svg>
+      <div class="s-info"><div class="s-name">Вернётся ли человек</div><div class="s-sub">9 карт</div></div>
+      <div class="s-price"><span class="s-rub">9 000 ₽</span><span class="s-eur">90 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/6PQx4D7CeEi0Afd2ctKBBg" target="_blank">Оплатить</a></div>
+  </div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <div class="s-info"><div class="s-name">Есть ли любовница / любовник</div></div>
+      <div class="s-price"><span class="s-rub">8 500 ₽</span><span class="s-eur">85 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/14bwnF_4A02MXnfZiQtimg" target="_blank">Оплатить</a></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MONEY -->
+  <div class="pricelist-head">✦ Деньги и работа</div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <div class="s-info"><div class="s-name">Диагностика финансовой ситуации</div></div>
+      <div class="s-price"><span class="s-rub">5 000 ₽</span><span class="s-eur">50 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/WgyOdSEs_kecPKNbbr-VoA" target="_blank">Оплатить</a></div>
+  </div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <div class="s-info"><div class="s-name">Карьерный потенциал</div><div class="s-sub">7 карт</div></div>
+      <div class="s-price"><span class="s-rub">7 000 ₽</span><span class="s-eur">70 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/wmyCEdyjWEufyvUbILD5LA" target="_blank">Оплатить</a></div>
+  </div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+      <div class="s-info"><div class="s-name">Как увеличить доход</div></div>
+      <div class="s-price"><span class="s-rub">9 000 ₽</span><span class="s-eur">90 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/Wj0FN7Nf1EurvD--ezMS6Q" target="_blank">Оплатить</a></div>
+  </div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      <div class="s-info"><div class="s-name">Работа или бизнес</div><div class="s-sub">Перспективы и развитие</div></div>
+      <div class="s-price"><span class="s-rub">9 000 ₽</span><span class="s-eur">90 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/krDAtZJ5SUWNzcYW_ch5vg" target="_blank">Оплатить</a></div>
+  </div>
+
+  <div class="service-wrap">
+    <div class="service" onclick="togglePay(this)">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div class="s-info"><div class="s-name">Прогноз по финансам на год</div><div class="s-sub">По месяцам</div></div>
+      <div class="s-price"><span class="s-rub">25 000 ₽</span><span class="s-eur">250 €</span></div>
+    </div>
+    <div class="pay-reveal"><a href="https://auth.robokassa.ru/merchant/Invoice/16Bjl1HEO0C3-fQI0ZJJog" target="_blank">Оплатить</a></div>
+  </div>
+
+</div>
+
+<script>
+function togglePay(el) {
+  var wrap = el.parentElement;
+  var reveal = wrap.querySelector('.pay-reveal');
+  var isOpen = reveal.style.display === 'block';
+  document.querySelectorAll('.pay-reveal').forEach(function(r){ r.style.display='none'; });
+  document.querySelectorAll('.service').forEach(function(s){ s.classList.remove('active'); });
+  if (!isOpen) { reveal.style.display='block'; el.classList.add('active'); }
+}
+</script>
+
+</body>
+</html>
