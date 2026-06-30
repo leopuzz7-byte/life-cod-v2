@@ -2,36 +2,39 @@ import { YearForecast } from './calculations';
 import { getArcana } from './arcana';
 import { yearToArcana, normalizeToArcana } from './calculations';
 
-export interface AIYearMonth {
-  monthName: string;
-  monthNum: number;
-  pos1: number; pos1Name: string;
-  pos2: number; pos2Name: string;
-  pos3: number; pos3Name: string;
-  forecast: string;
-  keyTip: string;
-}
-
 export interface AIYearReading {
-  arcanaOverview: string;
-  arcanaStrengths: string;
-  arcanaWeaknesses: string;
-  arcanaDistortions: string;
-  intro: string;
-  atmosphere: string;
-  money: string;
-  relationships: string;
-  health: string;
-  opportunities: string;
-  risks: string;
-  plusManifest: string;
-  minusManifest: string;
-  recommendations: string;
-  conclusion: string;
-  months: AIYearMonth[];
+  // Аркан года и его трактовка
+  arcanaOverview: string;     // полная трактовка аркана / основная энергия
+  arcanaStrengths: string;    // сильные стороны
+  arcanaWeaknesses: string;   // слабые стороны
+  arcanaDistortions: string;  // искажения энергии
+  lifeManifest: string;       // как проявляется в жизни
+  // Персональный год
+  intro: string;              // введение в ваш год
+  atmosphere: string;         // общая атмосфера года
+  money: string;              // деньги и финансы
+  work: string;               // работа и реализация
+  relationships: string;      // отношения
+  health: string;             // здоровье
+  innerState: string;         // внутреннее состояние
+  opportunities: string;      // главные возможности года
+  risks: string;              // главные риски года
+  plusManifest: string;       // аркан в плюсе
+  minusManifest: string;      // аркан в минусе
+  recommendations: string;    // практические рекомендации
+  conclusion: string;         // итог года
+  // Расширенный VIP-анализ
+  energyInteractions: string; // энергетические взаимодействия по периодам
+  energyGivers: string;       // что даёт энергию
+  energyTakers: string;       // что забирает энергию
+  talents: string;            // таланты и возможности года
+  healing: string;            // исцеляющие темы года
+  exam: string;               // главный экзамен года
+  tasks: string;              // задачи года
+  wish: string;               // пожелание на следующий год
 }
 
-const CACHE_PREFIX = 'ai_year_v1_';
+const CACHE_PREFIX = 'ai_year_v2_';
 const MONTH_NAMES: Record<number, string> = {
   1:'Январь',2:'Февраль',3:'Март',4:'Апрель',5:'Май',6:'Июнь',
   7:'Июль',8:'Август',9:'Сентябрь',10:'Октябрь',11:'Ноябрь',12:'Декабрь',
@@ -42,76 +45,87 @@ function arcanaLabel(n: number): string {
   return a ? `${n} - ${a.name}` : String(n);
 }
 
-function buildMonthsData(yearArcana: number, targetYear: number) {
-  return Array.from({ length: 12 }, (_, i) => {
-    const m = i + 1;
-    const pos1 = yearArcana;
-    const pos2 = m;
-    const pos3 = normalizeToArcana(pos1 + pos2);
-    return {
-      monthNum: m,
-      monthName: MONTH_NAMES[m],
-      pos1, pos1Name: getArcana(pos1)?.name ?? '',
-      pos2, pos2Name: String(m),
-      pos3, pos3Name: getArcana(pos3)?.name ?? '',
-    };
-  });
-}
-
-function buildPrompt(forecast: YearForecast, name: string): string {
+function yearContext(forecast: YearForecast): string {
   const { birthDate, targetYear, arcana } = forecast;
   const birthYearArcana = yearToArcana(birthDate.year);
   const targetYearArcana = yearToArcana(targetYear);
   const a = getArcana(arcana);
-  const months = buildMonthsData(arcana, targetYear);
-
-  const monthsInfo = months.map(m =>
-    `${m.monthName}: треугольник ${m.pos1} ${m.pos1Name} - ${m.pos2} (${m.monthName}) - ${m.pos3} ${m.pos3Name}`
-  ).join('\n');
-
-  return `Ты нумеролог системы Аркан-Коды. Пишешь персональный годовой прогноз. Язык: русский.
-${name ? `\nКЛИЕНТ: ${name}` : ''}
+  return `ДАТА РОЖДЕНИЯ: ${birthDate.day}.${birthDate.month}.${birthDate.year}
 ГОД ПРОГНОЗА: ${targetYear}
 
-РАСЧЁТ:
+РАСЧЁТ ГОДА:
 Аркан года рождения: ${arcanaLabel(birthYearArcana)}
 Аркан ${targetYear} года: ${arcanaLabel(targetYearArcana)}
-Итоговый аркан года: ${arcanaLabel(arcana)}
-Планета: ${a?.planet ?? '-'}
-Стихия: ${a?.element ?? '-'}
+Итоговый аркан года: ${arcanaLabel(arcana)} (планета ${a?.planet ?? '-'}, стихия ${a?.element ?? '-'})`;
+}
 
-ТРЕУГОЛЬНИКИ МЕСЯЦЕВ:
-${monthsInfo}
-
-ПРАВИЛА СТИЛЯ (нарушение = ошибка):
+const STYLE_RULES = `ПРАВИЛА СТИЛЯ (нарушение = ошибка):
 - ЗАПРЕТ на длинное тире. Только запятая или короткий дефис (-)
-- Никаких "год трансформации", "год роста", "год возможностей" - это запрещено
+- Никаких штампов "год трансформации", "год роста", "год возможностей"
 - Сначала факт/расчёт, потом трактовка, потом практический вывод
-- Конкретные рекомендации (не "занимайтесь спортом" - а "плавание, ходьба, велосипед")
-- Каждый блок отвечает на свой вопрос, не повторяет другой
-- Язык "вы/ваш", тепло, без напыщенности
-- События важнее философии. Человек должен видеть свою жизнь
+- Конкретные рекомендации (не "занимайтесь спортом", а "плавание, ходьба, велосипед, йога")
+- Каждый блок отвечает на свой вопрос и не повторяет другой
+- Язык "вы/ваш", тепло, без напыщенности и эзотерических рассуждений
+- События важнее философии, человек должен видеть свою жизнь`;
+
+function buildCorePrompt(forecast: YearForecast, name: string): string {
+  return `Ты нумеролог системы Аркан-Коды. Пишешь персональный годовой прогноз. Язык: русский.
+${name ? `КЛИЕНТ: ${name}\n` : ''}${yearContext(forecast)}
+
+Сначала раскрой сам аркан как архетип, затем покажи, как он будет проживаться именно этим человеком в этом году.
+
+${STYLE_RULES}
 
 Верни СТРОГО JSON без markdown:
 {
-  "arcanaOverview": "главная энергия аркана ${arcana} в этом году (4-5 предложений)",
-  "arcanaStrengths": "сильные стороны этой энергии (3-4 предложения)",
-  "arcanaWeaknesses": "слабые стороны и ловушки (3-4 предложения)",
-  "arcanaDistortions": "как проявляется в минусе, искажения (3-4 предложения)",
-  "intro": "почему именно этот аркан пришёл сейчас, какие темы станут главными (4-5 предложений)",
-  "atmosphere": "общие тенденции года, что усилится и что уйдёт (4-5 предложений)",
-  "money": "деньги и работа: возможности, риски, ошибки, конкретные советы (5-7 предложений)",
-  "relationships": "отношения: отдельно для одиноких и для пар, плюсы и риски (5-7 предложений)",
-  "health": "здоровье: зоны внимания, что полезно, конкретные практики (4-5 предложений)",
-  "opportunities": "главные возможности года (4-5 предложений)",
-  "risks": "главные риски и ошибки года (4-5 предложений)",
-  "plusManifest": "как правильно проживать энергию, что усиливает удачу (4-5 предложений)",
-  "minusManifest": "деструктивные сценарии и ловушки (4-5 предложений)",
-  "recommendations": "практические рекомендации: конкретный список что делать и чего избегать",
-  "conclusion": "итог: для чего дан этот год, главный урок (3-4 предложения)",
-  "months": [
-    ${months.map(m => `{"monthName":"${m.monthName}","monthNum":${m.monthNum},"pos1":${m.pos1},"pos1Name":"${m.pos1Name}","pos2":${m.pos2},"pos2Name":"${m.pos2Name}","pos3":${m.pos3},"pos3Name":"${m.pos3Name}","forecast":"3-4 предложения об этом месяце","keyTip":"один главный совет"}`).join(',\n    ')}
-  ]
+  "arcanaOverview": "полная трактовка аркана ${arcanaLabel(forecast.arcana)} как архетипа: главная энергия и суть (5-6 предложений)",
+  "arcanaStrengths": "сильные стороны этой энергии в году (4-5 предложений)",
+  "arcanaWeaknesses": "слабые стороны и ловушки энергии (4-5 предложений)",
+  "arcanaDistortions": "искажения энергии: как человек сам создаёт себе проблемы в минусе (4-5 предложений)",
+  "lifeManifest": "как энергия проявляется в реальной жизни, через какие события (4-5 предложений)",
+  "intro": "введение в ваш год: почему этот аркан пришёл сейчас, какие темы станут главными, что усилится, что уйдёт (5-6 предложений)",
+  "atmosphere": "общая атмосфера года: тенденции, куда ведёт год, что растёт, что завершается (5-6 предложений)",
+  "money": "деньги и финансы: возможности, риски, ошибки, конкретные способы заработка и советы (6-7 предложений)",
+  "work": "работа и реализация: карьера, проекты, стоит ли менять работу, конкретные рекомендации (5-6 предложений)",
+  "relationships": "отношения: отдельно для одиноких и для пар, плюсы, риски, рекомендации (6-7 предложений)",
+  "health": "здоровье: чувствительные зоны, что полезно, конкретные практики под энергию аркана (5-6 предложений)",
+  "innerState": "внутреннее состояние: эмоциональный фон, главный внутренний процесс года, в плюсе и в минусе (5-6 предложений)",
+  "opportunities": "главные возможности года: что можно получить, какие двери открываются (5-6 предложений)",
+  "risks": "главные риски года: что разрушает результаты, какие ошибки опасны (5-6 предложений)",
+  "plusManifest": "аркан в плюсе: как проживать энергию правильно, что усиливает удачу (4-5 предложений)",
+  "minusManifest": "аркан в минусе: ошибки, ловушки, деструктивные сценарии, признаки ухода в минус (4-5 предложений)",
+  "recommendations": "практические рекомендации года: конкретно что делать и чего избегать (6-7 предложений)",
+  "conclusion": "итог года: для чего дан этот год, главный урок, главный результат при правильном проживании (4-5 предложений)"
+}`;
+}
+
+function buildExtendedPrompt(forecast: YearForecast, name: string): string {
+  const { birthDate, arcana } = forecast;
+  const monthly = Array.from({ length: 12 }, (_, i) => {
+    const m = i + 1;
+    const p1 = normalizeToArcana(birthDate.month + m);
+    const p3 = normalizeToArcana(p1 + arcana);
+    return `${MONTH_NAMES[m]}: итог ${arcanaLabel(p3)}`;
+  }).join('\n');
+
+  return `Ты нумеролог системы Аркан-Коды. Пишешь расширенный VIP-анализ года. Язык: русский.
+${name ? `КЛИЕНТ: ${name}\n` : ''}${yearContext(forecast)}
+
+ИТОГОВЫЕ АРКАНЫ ПО МЕСЯЦАМ (для разбора периодов):
+${monthly}
+
+${STYLE_RULES}
+
+Верни СТРОГО JSON без markdown:
+{
+  "energyInteractions": "энергетические взаимодействия года по периодам (зима, весна, лето, осень): как годовой аркан соединяется с арканами месяцев, главная точка года (7-9 предложений)",
+  "energyGivers": "что будет давать вам энергию в этом году: какие месяцы и темы ресурсные (4-5 предложений)",
+  "energyTakers": "что будет забирать энергию: какие месяцы и темы самые сложные (4-5 предложений)",
+  "talents": "таланты и точки роста года: что раскрывается и в какие месяцы (4-5 предложений)",
+  "healing": "исцеляющие темы года: что восстанавливается, какие сферы выходят из дисбаланса (4-5 предложений)",
+  "exam": "главный экзамен года: ключевая проверка, главный вопрос, как пройти (5-6 предложений)",
+  "tasks": "задачи года: что важно сделать, чему научиться (5-6 предложений)",
+  "wish": "тёплое личное пожелание на следующий год (3-4 предложения)"
 }`;
 }
 
@@ -121,6 +135,38 @@ export function getCachedYearReading(forecast: YearForecast): AIYearReading | nu
     const cached = localStorage.getItem(key);
     return cached ? JSON.parse(cached) as AIYearReading : null;
   } catch { return null; }
+}
+
+// Один запрос к proxyapi с авто-повтором при флапе (Failed to fetch / 429 / 5xx).
+async function callAI(prompt: string, apiKey: string, maxTokens: number): Promise<Record<string, string>> {
+  const payload = JSON.stringify({
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    max_tokens: maxTokens,
+    messages: [
+      { role: 'system', content: 'Отвечай только JSON. Никаких markdown-оберток, никаких пояснений.' },
+      { role: 'user', content: prompt },
+    ],
+  });
+  let lastErr: unknown = null;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      const response = await fetch('https://api.proxyapi.ru/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: payload,
+      });
+      if (!response.ok) throw new Error(`API ${response.status}: ${await response.text()}`);
+      const data = await response.json();
+      const raw = data.choices?.[0]?.message?.content ?? '';
+      const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+      return JSON.parse(cleaned);
+    } catch (e) {
+      lastErr = e;
+      if (attempt < 3) await new Promise(r => setTimeout(r, 700 * (attempt + 1)));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error('AI request failed');
 }
 
 export async function generateYearReading(
@@ -136,26 +182,10 @@ export async function generateYearReading(
 
   const apiKey = import.meta.env.VITE_AI_API_KEY || 'sk-fLiNqGfbS2vyJorwNtnkz1F9ftCVAz2W';
 
-  const response = await fetch('https://api.proxyapi.ru/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      temperature: 0.7,
-      max_tokens: 8000,
-      messages: [
-        { role: 'system', content: 'Отвечай только JSON. Никаких markdown-оберток, никаких пояснений.' },
-        { role: 'user', content: buildPrompt(forecast, name) },
-      ],
-    }),
-  });
-
-  if (!response.ok) throw new Error(`API ${response.status}: ${await response.text()}`);
-
-  const data = await response.json();
-  const raw = data.choices?.[0]?.message?.content ?? '';
-  const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-  const reading: AIYearReading = JSON.parse(cleaned);
+  // Два запроса: основной разбор года и расширенный VIP-анализ. По отдельности надёжнее, чем один огромный.
+  const core = await callAI(buildCorePrompt(forecast, name), apiKey, 12000);
+  const ext = await callAI(buildExtendedPrompt(forecast, name), apiKey, 8000);
+  const reading = { ...core, ...ext } as unknown as AIYearReading;
 
   try { localStorage.setItem(cacheKey, JSON.stringify(reading)); } catch {}
   return reading;

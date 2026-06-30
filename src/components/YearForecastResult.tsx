@@ -1,9 +1,14 @@
 import { useTranslation } from "react-i18next";
-import { YearForecast, formatBirthDate } from "@/lib/calculations";
+import { YearForecast, formatBirthDate, yearToArcana } from "@/lib/calculations";
+import { getArcana } from "@/lib/arcana";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, TrendingUp, Heart, Briefcase, Activity, AlertTriangle, Sparkles, CheckCircle, Target, ShieldAlert, BookOpen, MessageCircle } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { ForecastCard } from "./ForecastCard";
-import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
+import { ChapterBlock } from "./ChapterBlock";
+import { YearCoreBlocks } from "./YearCoreBlocks";
+import { YearAnalysisBlocks } from "./YearAnalysisBlocks";
+import { YearMonthsSection } from "./YearMonthsSection";
+import { YearExtendedBlocks } from "./YearExtendedBlocks";
 import { NadezhdaSignature } from "./NadezhdaSignature";
 import { useYearForecastAI } from "@/hooks/useYearForecastAI";
 
@@ -19,6 +24,19 @@ export function YearForecastResult({ forecast, name, onReset }: YearForecastResu
   const formattedDate = formatBirthDate(forecast.birthDate.day, forecast.birthDate.month, forecast.birthDate.year);
   const { reading, loading } = useYearForecastAI(forecast, name);
 
+  const birthYearArcana = yearToArcana(forecast.birthDate.year);
+  const targetYearArcana = yearToArcana(forecast.targetYear);
+  const bA = getArcana(birthYearArcana);
+  const tA = getArcana(targetYearArcana);
+  const a = getArcana(forecast.arcana);
+
+  const base = {
+    day: forecast.birthDate.day,
+    month: forecast.birthDate.month,
+    year: forecast.birthDate.year,
+    targetYear: forecast.targetYear,
+  };
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <Button variant="ghost" onClick={onReset} className="mb-2 text-muted-foreground">
@@ -27,110 +45,33 @@ export function YearForecastResult({ forecast, name, onReset }: YearForecastResu
 
       <div className="text-center">
         <h1 className="text-2xl md:text-3xl font-display text-primary mb-2">
-          {t("forecast.yearForecast")} {forecast.targetYear}
+          Прогноз на год — {forecast.targetYear}
         </h1>
         {name && <p className="text-lg text-foreground mb-1">{name}</p>}
         <p className="text-muted-foreground text-sm">{t("results.birthDate")}: {formattedDate}</p>
       </div>
 
-      {/* Главный аркан года — фотокарточка */}
-      <ForecastCard
-        value={forecast.arcana}
-        contextText={reading?.arcanaOverview}
-        loading={loading}
-        highlight={true}
-      />
-
-      {/* Скелетон */}
-      {loading && !reading && (
-        <div className="space-y-4 animate-pulse">
-          {[1,2,3,4,5].map(i => (
-            <div key={i} className="rounded-2xl border border-border p-6 space-y-3">
-              <div className="h-4 bg-muted rounded w-1/3" />
-              <div className="h-3 bg-muted rounded w-full" />
-              <div className="h-3 bg-muted rounded w-5/6" />
-              <div className="h-3 bg-muted rounded w-4/5" />
-            </div>
-          ))}
+      {/* Расчёт + аркан года */}
+      <ChapterBlock icon={Sparkles} title="Ваш аркан года" subtitle={a ? `${forecast.arcana} ${a.name} · ${a.planet} · ${a.element}` : undefined}>
+        <div className="rounded-xl bg-muted/30 p-4 mb-4 text-center text-sm text-muted-foreground leading-relaxed">
+          Аркан года рождения <span className="text-foreground font-medium">{birthYearArcana} {bA?.name}</span>
+          {" + "}Аркан {forecast.targetYear} года <span className="text-foreground font-medium">{targetYearArcana} {tA?.name}</span>
+          {" = "}<span className="text-primary font-medium">{forecast.arcana} {a?.name}</span>
         </div>
-      )}
+        <ForecastCard value={forecast.arcana} contextText={reading?.arcanaOverview} loading={loading || !reading} highlight />
+      </ChapterBlock>
 
-      {/* AI контент */}
-      {reading && (
-        <>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
-              <h4 className="text-sm font-medium text-emerald-600 mb-2">Сильные стороны года</h4>
-              <ProTextBlock text={reading.arcanaStrengths} />
-            </div>
-            <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4">
-              <h4 className="text-sm font-medium text-destructive mb-2">Слабые стороны года</h4>
-              <ProTextBlock text={reading.arcanaWeaknesses} />
-            </div>
-          </div>
+      {/* Введение, энергия, глубокий разбор, сферы */}
+      <YearCoreBlocks reading={reading} loading={loading} />
 
-          <ProSectionBlock icon={Target} title="Введение в ваш год">
-            <ProTextBlock text={reading.intro} />
-          </ProSectionBlock>
+      {/* Возможности, риски, плюс/минус, рекомендации, итог */}
+      <YearAnalysisBlocks reading={reading} loading={loading} />
 
-          <ProSectionBlock icon={TrendingUp} title="Атмосфера года">
-            <ProTextBlock text={reading.atmosphere} />
-          </ProSectionBlock>
+      {/* 12 месяцев */}
+      <YearMonthsSection base={base} name={name} />
 
-          <ProSectionBlock icon={Briefcase} title="Деньги и работа">
-            <ProTextBlock text={reading.money} />
-          </ProSectionBlock>
-
-          <ProSectionBlock icon={Heart} title="Отношения">
-            <ProTextBlock text={reading.relationships} />
-          </ProSectionBlock>
-
-          <ProSectionBlock icon={Activity} title="Здоровье">
-            <ProTextBlock text={reading.health} />
-          </ProSectionBlock>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={Sparkles} title="Возможности года" variant="success">
-              <ProTextBlock text={reading.opportunities} />
-            </ProSectionBlock>
-            <ProSectionBlock icon={ShieldAlert} title="Риски года" variant="warning">
-              <ProTextBlock text={reading.risks} />
-            </ProSectionBlock>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <ProSectionBlock icon={CheckCircle} title="Как проявляется в плюсе" variant="success">
-              <ProTextBlock text={reading.plusManifest} />
-            </ProSectionBlock>
-            <ProSectionBlock icon={AlertTriangle} title="Как проявляется в минусе" variant="warning">
-              <ProTextBlock text={reading.minusManifest} />
-            </ProSectionBlock>
-          </div>
-
-          <ProSectionBlock icon={CheckCircle} title="Практические рекомендации" variant="highlight">
-            <ProTextBlock text={reading.recommendations} />
-          </ProSectionBlock>
-
-          <ProSectionBlock icon={MessageCircle} title="Итог года" variant="highlight">
-            <ProTextBlock text={reading.conclusion} />
-          </ProSectionBlock>
-
-          {/* По месяцам */}
-          <ProSectionBlock icon={Calendar} title={`Прогноз на каждый месяц ${forecast.targetYear}`} variant="highlight">
-            <div className="space-y-3">
-              {reading.months.map(m => (
-                <ForecastCard
-                  key={m.monthNum}
-                  value={m.pos3}
-                  positionTitle={m.monthName}
-                  contextText={m.forecast}
-                  tip={m.keyTip}
-                />
-              ))}
-            </div>
-          </ProSectionBlock>
-        </>
-      )}
+      {/* Расширенный VIP-анализ + пожелание (в конце) */}
+      <YearExtendedBlocks reading={reading} loading={loading} />
 
       <NadezhdaSignature />
     </div>
