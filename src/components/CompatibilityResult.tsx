@@ -20,6 +20,7 @@ import { PDFDownloadButton } from "./PDFDownloadButton";
 import { LoadingScreen } from "./LoadingScreen";
 import { generatePDF, formatBirthDateForPDF } from "@/lib/pdfGenerator";
 import type { TierType } from "@/lib/analysisConfig";
+import { NadezhdaSignature } from "./NadezhdaSignature";
 
 // ─── Совместимостные тексты ────────────────────────────────────────────────────
 
@@ -2048,6 +2049,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
         </>
       )}
 
+      <NadezhdaSignature />
     </div>
   );
 }

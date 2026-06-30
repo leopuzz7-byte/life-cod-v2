@@ -5,6 +5,7 @@ import { ArrowLeft, BookOpen, Target, Briefcase, Heart, Activity, AlertTriangle,
 import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
 import { ForecastCard } from "./ForecastCard";
 import { DayMatrixGrid } from "./DayMatrixGrid";
+import { NadezhdaSignature } from "./NadezhdaSignature";
 import { useDayForecastAI } from "@/hooks/useDayForecastAI";
 
 interface Props {
@@ -131,6 +132,8 @@ export function DailyForecastResultComponent({ result, name, onReset }: Props) {
           </ProSectionBlock>
         </>
       )}
+
+      <NadezhdaSignature />
     </div>
   );
 }

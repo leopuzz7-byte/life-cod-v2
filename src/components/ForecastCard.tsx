@@ -62,15 +62,34 @@ export function ForecastCard({ position, value, positionTitle, contextText, load
           </div>
         </button>
         <div className="flex-1 min-w-0 py-0.5">
-          {positionTitle && (
-            <div className="text-[10px] uppercase tracking-wide font-medium text-muted-foreground mb-0.5">
-              {position !== undefined ? `Поз. ${position} · ${positionTitle}` : positionTitle}
-            </div>
+          {position !== undefined ? (
+            // Day forecast: theme title is the hero, arcana name is secondary
+            <>
+              <div className="text-[9px] uppercase tracking-widest font-medium text-muted-foreground/50 mb-0.5">
+                Поз. {position}
+              </div>
+              {positionTitle && (
+                <div className={cn("font-display font-bold text-xl leading-tight mb-1", highlight ? "text-primary" : "text-foreground")}>
+                  {positionTitle}
+                </div>
+              )}
+              <div className="text-sm font-medium text-muted-foreground">{arcana.name}</div>
+              <div className="text-xs text-muted-foreground/60 mt-0.5">{arcana.planet} · {arcana.element}</div>
+            </>
+          ) : (
+            // Month / year / other: arcana name is the hero
+            <>
+              {positionTitle && (
+                <div className="text-[10px] uppercase tracking-wide font-medium text-muted-foreground mb-0.5">
+                  {positionTitle}
+                </div>
+              )}
+              <div className={cn("font-display font-bold text-xl leading-tight", highlight ? "text-primary" : "text-foreground")}>
+                {arcana.name}
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">{arcana.planet} · {arcana.element}</div>
+            </>
           )}
-          <div className={cn("font-display font-bold text-xl leading-tight", highlight ? "text-primary" : "text-foreground")}>
-            {arcana.name}
-          </div>
-          <div className="text-xs text-muted-foreground mt-0.5">{arcana.planet} · {arcana.element}</div>
         </div>
       </div>
       <div className="px-4 pb-3 text-sm text-muted-foreground leading-relaxed border-t border-border/30 pt-3 min-h-[56px]">

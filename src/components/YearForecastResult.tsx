@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, TrendingUp, Heart, Briefcase, Activity, AlertTriangle, Sparkles, CheckCircle, Target, ShieldAlert, BookOpen, MessageCircle } from "lucide-react";
 import { ForecastCard } from "./ForecastCard";
 import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
+import { NadezhdaSignature } from "./NadezhdaSignature";
 import { useYearForecastAI } from "@/hooks/useYearForecastAI";
 
 interface YearForecastResultProps {
@@ -130,6 +131,8 @@ export function YearForecastResult({ forecast, name, onReset }: YearForecastResu
           </ProSectionBlock>
         </>
       )}
+
+      <NadezhdaSignature />
     </div>
   );
 }

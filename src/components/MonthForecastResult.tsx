@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Heart, Briefcase, Activity, AlertTriangle, CheckCircle, Sparkles, BookOpen, MessageCircle } from "lucide-react";
 import { ForecastCard, ForecastMiniCard } from "./ForecastCard";
 import { ProSectionBlock, ProTextBlock } from "./ProSectionBlock";
+import { NadezhdaSignature } from "./NadezhdaSignature";
 import { useMonthForecastAI } from "@/hooks/useMonthForecastAI";
 
 const MONTH_NAMES_RU: Record<number, string> = {
@@ -132,6 +133,8 @@ export function MonthForecastResult({ forecast, name, onReset }: MonthForecastRe
           </ProSectionBlock>
         </>
       )}
+
+      <NadezhdaSignature />
     </div>
   );
 }
