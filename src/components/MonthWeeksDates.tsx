@@ -21,7 +21,7 @@ export function MonthWeeksDates({ reading }: Props) {
 
   return (
     <>
-      <ChapterBlock num={14} icon={CalendarDays} title="Прогноз по четырём неделям">
+      <ChapterBlock icon={CalendarDays} title="Прогноз по четырём неделям">
         <div className="space-y-3">
           {WEEKS.map((w, i) => (
             <div key={w.key} className={i === 2 ? "rounded-xl bg-primary/5 border border-primary/20 p-4" : "rounded-xl bg-muted/30 p-4"}>
@@ -35,15 +35,15 @@ export function MonthWeeksDates({ reading }: Props) {
         </div>
       </ChapterBlock>
 
-      <ChapterBlock num={15} icon={MessageCircle} title="Практические рекомендации" variant="highlight">
+      <ChapterBlock icon={MessageCircle} title="Практические рекомендации" variant="highlight">
         {T(reading?.recommendations)}
       </ChapterBlock>
 
-      <ChapterBlock num={16} icon={AlertTriangle} title="Чего избегать" variant="warning">
+      <ChapterBlock icon={AlertTriangle} title="Чего избегать" variant="warning">
         {T(reading?.avoid)}
       </ChapterBlock>
 
-      <ChapterBlock num={17} icon={Sparkles} title="Ежедневная практика месяца">
+      <ChapterBlock icon={Sparkles} title="Ежедневная практика месяца">
         {T(reading?.practice)}
       </ChapterBlock>
     </>

@@ -1,8 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { MonthForecast, formatBirthDate, yearToArcana } from "@/lib/calculations";
-import { getArcana } from "@/lib/arcana";
+import { MonthForecast, formatBirthDate } from "@/lib/calculations";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Flag } from "lucide-react";
+import { ArrowLeft, Flag } from "lucide-react";
 import { ForecastCard, ForecastMiniCard } from "./ForecastCard";
 import { ChapterBlock } from "./ChapterBlock";
 import { ProTextBlock } from "./ProSectionBlock";
@@ -30,17 +29,9 @@ export function MonthForecastResult({ forecast, name, onReset }: MonthForecastRe
   const { t } = useTranslation();
   const formattedDate = formatBirthDate(forecast.birthDate.day, forecast.birthDate.month, forecast.birthDate.year);
   const monthName = MONTH_NAMES_RU[forecast.targetMonth] ?? String(forecast.targetMonth);
-  const a1 = getArcana(forecast.position1);
-  const a2 = getArcana(forecast.position2);
-  const a3 = getArcana(forecast.position3);
   const { reading } = useMonthForecastAI(forecast, name);
   const keyDates = getMonthKeyDates(forecast);
   const consciousness = getConsciousnessArcana(forecast.birthDate.day);
-  const birthYearArcana = yearToArcana(forecast.birthDate.year);
-  const targetYearArcana = yearToArcana(forecast.targetYear);
-  const sumMonth = forecast.birthDate.month + forecast.targetMonth;
-  const sumYear = birthYearArcana + targetYearArcana;
-  const sumResult = forecast.position1 + forecast.position2;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -71,34 +62,10 @@ export function MonthForecastResult({ forecast, name, onReset }: MonthForecastRe
         </div>
       </div>
 
-      {/* 1. Расчёт месяца — арифметика */}
-      <ChapterBlock num={1} icon={Calendar} title="Расчёт месяца" subtitle="Треугольник трёх энергий">
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center justify-between gap-3 rounded-xl bg-muted/30 px-4 py-3">
-            <span className="text-muted-foreground">Энергия месяца</span>
-            <span className="text-foreground font-medium text-right">
-              {`${forecast.birthDate.month} + ${forecast.targetMonth} = ${sumMonth}${sumMonth !== forecast.position1 ? ' → ' + forecast.position1 : ''}`} · {a1?.name}
-            </span>
-          </div>
-          <div className="flex items-center justify-between gap-3 rounded-xl bg-muted/30 px-4 py-3">
-            <span className="text-muted-foreground">Аркан года</span>
-            <span className="text-foreground font-medium text-right">
-              {`${birthYearArcana} + ${targetYearArcana} = ${sumYear}${sumYear !== forecast.position2 ? ' → ' + forecast.position2 : ''}`} · {a2?.name}
-            </span>
-          </div>
-          <div className="flex items-center justify-between gap-3 rounded-xl bg-primary/8 border border-primary/20 px-4 py-3">
-            <span className="text-muted-foreground">Итог месяца</span>
-            <span className="text-primary font-medium text-right">
-              {`${forecast.position1} + ${forecast.position2} = ${sumResult}${sumResult !== forecast.position3 ? ' → ' + forecast.position3 : ''}`} · {a3?.name}
-            </span>
-          </div>
-        </div>
-      </ChapterBlock>
-
       {reading ? (
         <>
-          {/* 2. Треугольник месяца — три аркана карточками */}
-          <ChapterBlock num={2} title="Треугольник месяца" subtitle="Три энергии, через которые разворачивается месяц">
+          {/* Треугольник месяца — три аркана карточками */}
+          <ChapterBlock title="Треугольник месяца" subtitle="Три энергии, через которые разворачивается месяц">
             <div className="space-y-3">
               <ForecastCard value={forecast.position1} positionTitle="Энергия месяца" contextText={reading.arcana1influence} />
               <ForecastCard value={forecast.position2} positionTitle="Аркан года" contextText={reading.arcana2influence} />
@@ -106,8 +73,8 @@ export function MonthForecastResult({ forecast, name, onReset }: MonthForecastRe
             </div>
           </ChapterBlock>
 
-          {/* 3-13 — главная энергия, общий прогноз, глубокие разборы, синергия, сферы */}
-          <MonthForecastAIBlocks reading={reading} loading={false} />
+          {/* Главная энергия, общий прогноз, глубокие разборы, синергия, сферы */}
+          <MonthForecastAIBlocks reading={reading} a1={forecast.position1} a2={forecast.position2} a3={forecast.position3} />
 
           {/* 14-17 — недели, рекомендации, чего избегать, практика */}
           <MonthWeeksDates reading={reading} loading={false} />
@@ -115,8 +82,8 @@ export function MonthForecastResult({ forecast, name, onReset }: MonthForecastRe
           {/* 18 — ключевые даты */}
           <MonthKeyDates reading={reading} keyDates={keyDates} monthName={monthName} consciousnessArcana={consciousness} />
 
-          {/* 19 — итог месяца */}
-          <ChapterBlock num={19} icon={Flag} title="Итог месяца" variant="highlight">
+          {/* Итог месяца */}
+          <ChapterBlock icon={Flag} title="Итог месяца" variant="highlight">
             <ProTextBlock text={reading.conclusion} />
           </ChapterBlock>
         </>

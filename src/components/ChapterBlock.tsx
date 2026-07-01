@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, X } from "lucide-react";
 
 interface ChapterBlockProps {
   num?: number;
   icon?: LucideIcon;
+  arcana?: number;
   title: string;
   subtitle?: string;
   children: React.ReactNode;
@@ -11,8 +13,32 @@ interface ChapterBlockProps {
   className?: string;
 }
 
-// Крупная красивая глава с нумерованным бейджем и заголовком.
-export function ChapterBlock({ num, icon: Icon, title, subtitle, children, variant = 'default', className }: ChapterBlockProps) {
+function ArcanaModal({ value, onClose }: { value: number; onClose: () => void }) {
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', h);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', h); document.body.style.overflow = ''; };
+  }, [onClose]);
+  return (
+    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="relative z-10 flex flex-col items-center pb-6 pt-4 sm:pb-0 sm:pt-0" onClick={e => e.stopPropagation()}>
+        <button onClick={onClose} className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white shadow-lg">
+          <X className="w-5 h-5" />
+        </button>
+        <img src={`/arcana/arcana-${value}.webp`} alt={`Аркан ${value}`} draggable={false} className="rounded-2xl shadow-2xl object-contain max-h-[78vh] w-auto sm:max-h-[80vh] sm:h-[520px]" />
+      </div>
+    </div>
+  );
+}
+
+// Крупная глава. Слева: кликабельная карта аркана (arcana), номер (num) или иконка (icon).
+export function ChapterBlock({ num, icon: Icon, arcana, title, subtitle, children, variant = 'default', className }: ChapterBlockProps) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const accent = variant === 'warning' ? "text-destructive" : variant === 'success' ? "text-emerald-600" : "text-primary";
+  const badgeBg = variant === 'warning' ? "bg-destructive/10" : variant === 'success' ? "bg-emerald-500/10" : "bg-primary/10";
+
   return (
     <section className={cn(
       "gradient-card rounded-2xl border p-6 md:p-7",
@@ -23,28 +49,33 @@ export function ChapterBlock({ num, icon: Icon, title, subtitle, children, varia
       className
     )}>
       <div className="flex items-start gap-3 mb-5 pb-4 border-b border-border/50">
-        <div className={cn(
-          "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-          variant === 'warning' ? "bg-destructive/10" : variant === 'success' ? "bg-emerald-500/10" : "bg-primary/10"
-        )}>
-          {num !== undefined ? (
-            <span className={cn(
-              "font-display font-bold text-lg",
-              variant === 'warning' ? "text-destructive" : variant === 'success' ? "text-emerald-600" : "text-primary"
-            )}>{num}</span>
-          ) : Icon ? (
-            <Icon className={cn(
-              "w-5 h-5",
-              variant === 'warning' ? "text-destructive" : variant === 'success' ? "text-emerald-600" : "text-primary"
-            )} />
-          ) : null}
-        </div>
+        {arcana !== undefined ? (
+          <button
+            onClick={() => setModalOpen(true)}
+            className="relative w-11 h-[62px] rounded-lg overflow-hidden shrink-0 ring-1 ring-border/60 hover:scale-105 transition-transform"
+            aria-label={`Открыть аркан ${arcana}`}
+          >
+            <img src={`/arcana/arcana-${arcana}.webp`} alt="" className="w-full h-full object-cover" draggable={false} />
+            <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
+              <span className="text-[9px] font-bold text-white/90">{arcana}</span>
+            </div>
+          </button>
+        ) : (num !== undefined || Icon) ? (
+          <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", badgeBg)}>
+            {num !== undefined ? (
+              <span className={cn("font-display font-bold text-lg", accent)}>{num}</span>
+            ) : Icon ? (
+              <Icon className={cn("w-5 h-5", accent)} />
+            ) : null}
+          </div>
+        ) : null}
         <div className="min-w-0 pt-0.5">
           <h2 className="font-display font-bold text-xl md:text-2xl text-foreground leading-tight">{title}</h2>
           {subtitle && <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{subtitle}</p>}
         </div>
       </div>
       {children}
+      {arcana !== undefined && modalOpen && <ArcanaModal value={arcana} onClose={() => setModalOpen(false)} />}
     </section>
   );
 }

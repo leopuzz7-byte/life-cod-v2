@@ -20,7 +20,7 @@ export function MonthKeyDates({ reading, keyDates, monthName, consciousnessArcan
   const consc = getArcana(consciousnessArcana);
 
   return (
-    <ChapterBlock num={18} icon={CalendarHeart} title="Ключевые даты месяца">
+    <ChapterBlock icon={CalendarHeart} title="Ключевые даты месяца">
       <p className="text-sm text-muted-foreground leading-relaxed mb-4">
         Ваше число Сознания — <span className="text-foreground font-medium">{consciousnessArcana} {consc?.name}</span>.
         Именно через него активируются самые значимые дни месяца.
