@@ -133,6 +133,7 @@ export async function generateDayReading(
     model: 'gpt-4o-mini',
     temperature: 0.7,
     max_tokens: 6000,
+    response_format: { type: 'json_object' },
     messages: [
       { role: 'system', content: 'Отвечай только JSON. Никаких markdown-оберток, никаких пояснений.' },
       { role: 'user', content: buildPrompt(result, name) },

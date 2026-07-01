@@ -2,9 +2,11 @@ import { useTranslation } from "react-i18next";
 import { YearForecast, formatBirthDate, yearToArcana } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, BookOpen } from "lucide-react";
 import { ForecastCard } from "./ForecastCard";
 import { ChapterBlock } from "./ChapterBlock";
+import { ProTextBlock } from "./ProSectionBlock";
+import { LoadingScreen } from "./LoadingScreen";
 import { YearCoreBlocks } from "./YearCoreBlocks";
 import { YearAnalysisBlocks } from "./YearAnalysisBlocks";
 import { YearMonthsSection } from "./YearMonthsSection";
@@ -22,7 +24,7 @@ interface YearForecastResultProps {
 export function YearForecastResult({ forecast, name, onReset }: YearForecastResultProps) {
   const { t } = useTranslation();
   const formattedDate = formatBirthDate(forecast.birthDate.day, forecast.birthDate.month, forecast.birthDate.year);
-  const { reading, loading } = useYearForecastAI(forecast, name);
+  const { reading } = useYearForecastAI(forecast, name);
 
   const birthYearArcana = yearToArcana(forecast.birthDate.year);
   const targetYearArcana = yearToArcana(forecast.targetYear);
@@ -58,20 +60,31 @@ export function YearForecastResult({ forecast, name, onReset }: YearForecastResu
           {" + "}Аркан {forecast.targetYear} года <span className="text-foreground font-medium">{targetYearArcana} {tA?.name}</span>
           {" = "}<span className="text-primary font-medium">{forecast.arcana} {a?.name}</span>
         </div>
-        <ForecastCard value={forecast.arcana} contextText={reading?.arcanaOverview} loading={loading || !reading} highlight />
+        <ForecastCard value={forecast.arcana} contextText={a?.yearForecast} highlight />
       </ChapterBlock>
 
-      {/* Введение, энергия, глубокий разбор, сферы */}
-      <YearCoreBlocks reading={reading} loading={loading} />
+      {reading ? (
+        <>
+          {/* Полная трактовка аркана года */}
+          <ChapterBlock icon={BookOpen} title="Полная трактовка аркана года">
+            <ProTextBlock text={reading.arcanaOverview} />
+          </ChapterBlock>
 
-      {/* Возможности, риски, плюс/минус, рекомендации, итог */}
-      <YearAnalysisBlocks reading={reading} loading={loading} />
+          {/* Введение, энергия, глубокий разбор, сферы */}
+          <YearCoreBlocks reading={reading} loading={false} />
 
-      {/* 12 месяцев */}
-      <YearMonthsSection base={base} name={name} />
+          {/* Возможности, риски, плюс/минус, рекомендации, итог */}
+          <YearAnalysisBlocks reading={reading} loading={false} />
 
-      {/* Расширенный VIP-анализ + пожелание (в конце) */}
-      <YearExtendedBlocks reading={reading} loading={loading} />
+          {/* 12 месяцев */}
+          <YearMonthsSection base={base} name={name} />
+
+          {/* Расширенный VIP-анализ + пожелание (в конце) */}
+          <YearExtendedBlocks reading={reading} loading={false} />
+        </>
+      ) : (
+        <LoadingScreen methodId="year" />
+      )}
 
       <NadezhdaSignature />
     </div>
