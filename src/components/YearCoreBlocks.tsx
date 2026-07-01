@@ -1,15 +1,16 @@
 import { AIYearReading } from "@/lib/aiYearForecastService";
 import { ChapterBlock, ChapterSkeleton } from "./ChapterBlock";
 import { ProTextBlock } from "./ProSectionBlock";
-import { Target, TrendingUp, BookOpen, Coins, Briefcase, Heart, Activity, Compass } from "lucide-react";
+import { Target, TrendingUp, Grid3x3, Coins, Briefcase, Heart, Activity, Compass } from "lucide-react";
 
 interface Props {
   reading: AIYearReading | null;
   loading: boolean;
+  arcana: number;
 }
 
 // Введение, основная энергия, глубокий разбор аркана и сферы года.
-export function YearCoreBlocks({ reading }: Props) {
+export function YearCoreBlocks({ reading, arcana }: Props) {
   const T = (text?: string) => (reading ? <ProTextBlock text={text || ""} /> : <ChapterSkeleton />);
 
   return (
@@ -22,7 +23,7 @@ export function YearCoreBlocks({ reading }: Props) {
         {T(reading?.atmosphere)}
       </ChapterBlock>
 
-      <ChapterBlock icon={BookOpen} title="Глубокий разбор аркана года">
+      <ChapterBlock arcana={arcana} title="Глубокий разбор аркана года">
         <div className="space-y-3">
           <div className="grid md:grid-cols-2 gap-3">
             <div className="rounded-xl bg-emerald-500/8 border border-emerald-500/20 p-4">
@@ -43,6 +44,10 @@ export function YearCoreBlocks({ reading }: Props) {
             {reading ? <ProTextBlock text={reading.lifeManifest} /> : <ChapterSkeleton lines={3} />}
           </div>
         </div>
+      </ChapterBlock>
+
+      <ChapterBlock icon={Grid3x3} title="Связь с вашей личной матрицей">
+        {T(reading?.matrixInteraction)}
       </ChapterBlock>
 
       <ChapterBlock icon={Coins} title="Деньги и финансы">

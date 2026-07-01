@@ -1,7 +1,7 @@
 import { AIYearReading } from "@/lib/aiYearForecastService";
 import { ChapterBlock, ChapterSkeleton } from "./ChapterBlock";
 import { ProTextBlock } from "./ProSectionBlock";
-import { Layers, BatteryCharging, BatteryLow, Star, HeartPulse, GraduationCap, ListChecks, Gift } from "lucide-react";
+import { Layers, BatteryCharging, BatteryLow, Star, HeartPulse, GraduationCap, ListChecks, Gift, CalendarClock } from "lucide-react";
 
 interface Props {
   reading: AIYearReading | null;
@@ -16,6 +16,10 @@ export function YearExtendedBlocks({ reading }: Props) {
     <>
       <ChapterBlock icon={Layers} title="Энергетические взаимодействия" subtitle="Как энергии года складываются по периодам" variant="highlight">
         {T(reading?.energyInteractions)}
+      </ChapterBlock>
+
+      <ChapterBlock icon={CalendarClock} title="Ключевые даты года">
+        {T(reading?.keyDates)}
       </ChapterBlock>
 
       <div className="grid md:grid-cols-2 gap-4">

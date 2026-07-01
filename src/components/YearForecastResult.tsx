@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { YearForecast, formatBirthDate, yearToArcana } from "@/lib/calculations";
 import { getArcana } from "@/lib/arcana";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Sparkles, BookOpen } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { ForecastCard } from "./ForecastCard";
 import { ChapterBlock } from "./ChapterBlock";
 import { ProTextBlock } from "./ProSectionBlock";
@@ -66,18 +66,18 @@ export function YearForecastResult({ forecast, name, onReset }: YearForecastResu
       {reading ? (
         <>
           {/* Полная трактовка аркана года */}
-          <ChapterBlock icon={BookOpen} title="Полная трактовка аркана года">
+          <ChapterBlock arcana={forecast.arcana} title="Полная трактовка аркана года">
             <ProTextBlock text={reading.arcanaOverview} />
           </ChapterBlock>
 
-          {/* Введение, энергия, глубокий разбор, сферы */}
-          <YearCoreBlocks reading={reading} loading={false} />
+          {/* Введение, энергия, глубокий разбор, связь с матрицей, сферы */}
+          <YearCoreBlocks reading={reading} loading={false} arcana={forecast.arcana} />
 
-          {/* Возможности, риски, плюс/минус, рекомендации, итог */}
-          <YearAnalysisBlocks reading={reading} loading={false} />
+          {/* Возможности, риски, внимание, плюс/минус, рекомендации, чего избегать, итог */}
+          <YearAnalysisBlocks reading={reading} loading={false} arcana={forecast.arcana} />
 
-          {/* 12 месяцев */}
-          <YearMonthsSection base={base} name={name} />
+          {/* 12 месяцев (предзагружены) */}
+          <YearMonthsSection base={base} months={reading.months} />
 
           {/* Расширенный VIP-анализ + пожелание (в конце) */}
           <YearExtendedBlocks reading={reading} loading={false} />

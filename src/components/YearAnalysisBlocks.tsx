@@ -1,15 +1,16 @@
 import { AIYearReading } from "@/lib/aiYearForecastService";
 import { ChapterBlock, ChapterSkeleton } from "./ChapterBlock";
 import { ProTextBlock } from "./ProSectionBlock";
-import { Sparkles, ShieldAlert, CheckCircle, AlertTriangle, MessageCircle, Flag } from "lucide-react";
+import { Sparkles, ShieldAlert, MessageCircle, Flag, Eye, Ban } from "lucide-react";
 
 interface Props {
   reading: AIYearReading | null;
   loading: boolean;
+  arcana: number;
 }
 
-// Возможности, риски, аркан в плюсе и минусе, рекомендации, итог года.
-export function YearAnalysisBlocks({ reading }: Props) {
+// Возможности, риски, внимание, аркан в плюсе и минусе, рекомендации, чего избегать, итог года.
+export function YearAnalysisBlocks({ reading, arcana }: Props) {
   const T = (text?: string) => (reading ? <ProTextBlock text={text || ""} /> : <ChapterSkeleton />);
 
   return (
@@ -22,16 +23,24 @@ export function YearAnalysisBlocks({ reading }: Props) {
         {T(reading?.risks)}
       </ChapterBlock>
 
-      <ChapterBlock icon={CheckCircle} title="Аркан в плюсе" variant="success">
+      <ChapterBlock icon={Eye} title="На что обратить особое внимание">
+        {T(reading?.attention)}
+      </ChapterBlock>
+
+      <ChapterBlock arcana={arcana} title="Аркан в плюсе" variant="success">
         {T(reading?.plusManifest)}
       </ChapterBlock>
 
-      <ChapterBlock icon={AlertTriangle} title="Аркан в минусе" variant="warning">
+      <ChapterBlock arcana={arcana} title="Аркан в минусе" variant="warning">
         {T(reading?.minusManifest)}
       </ChapterBlock>
 
       <ChapterBlock icon={MessageCircle} title="Практические рекомендации" variant="highlight">
         {T(reading?.recommendations)}
+      </ChapterBlock>
+
+      <ChapterBlock icon={Ban} title="Чего лучше избегать" variant="warning">
+        {T(reading?.avoid)}
       </ChapterBlock>
 
       <ChapterBlock icon={Flag} title="Итог года" variant="highlight">
