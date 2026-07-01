@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { Sparkles, Send } from "lucide-react";
 
 export function NadezhdaSignature() {
   return (
@@ -38,6 +38,14 @@ export function NadezhdaSignature() {
             <p className="text-lg font-display font-semibold text-primary">Надежда Ковалева Серина</p>
             <p className="text-xs text-muted-foreground tracking-wide uppercase">консультант Life Code</p>
           </div>
+          <a
+            href="https://t.me/BisnessWomenN"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+          >
+            <Send className="w-4 h-4" /> Написать Надежде в Telegram
+          </a>
         </div>
       </div>
     </div>

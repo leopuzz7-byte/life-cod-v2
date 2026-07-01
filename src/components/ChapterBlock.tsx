@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { LucideIcon, X } from "lucide-react";
+import { getArcana } from "@/lib/arcana";
 
 interface ChapterBlockProps {
   num?: number;
@@ -36,6 +37,7 @@ function ArcanaModal({ value, onClose }: { value: number; onClose: () => void })
 // Крупная глава. Слева: кликабельная карта аркана (arcana), номер (num) или иконка (icon).
 export function ChapterBlock({ num, icon: Icon, arcana, title, subtitle, children, variant = 'default', className }: ChapterBlockProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const arc = arcana !== undefined ? getArcana(arcana) : null;
   const accent = variant === 'warning' ? "text-destructive" : variant === 'success' ? "text-emerald-600" : "text-primary";
   const badgeBg = variant === 'warning' ? "bg-destructive/10" : variant === 'success' ? "bg-emerald-500/10" : "bg-primary/10";
 
@@ -71,6 +73,7 @@ export function ChapterBlock({ num, icon: Icon, arcana, title, subtitle, childre
         ) : null}
         <div className="min-w-0 pt-0.5">
           <h2 className="font-display font-bold text-xl md:text-2xl text-foreground leading-tight">{title}</h2>
+          {arc && <p className="text-sm text-muted-foreground mt-1">{arcana} {arc.name} · {arc.planet} · {arc.element}</p>}
           {subtitle && <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{subtitle}</p>}
         </div>
       </div>
