@@ -13,6 +13,7 @@ import { YearForecastResult } from "@/components/YearForecastResult";
 import { MonthForecastResult } from "@/components/MonthForecastResult";
 import { PersonalMatrixResult } from "@/components/PersonalMatrixResult";
 import { KeyToResultComponent } from "@/components/KeyToResult";
+import { KeyToBusinessResultComponent } from "@/components/KeyToBusinessResult";
 import { CompatibilityResultComponent } from "@/components/CompatibilityResult";
 import { AncestralResultComponent } from "@/components/AncestralResult";
 import { DailyForecastResultComponent } from "@/components/DailyForecastResult";
@@ -72,6 +73,7 @@ const Index = () => {
     | { type: "month"; data: MonthForecast }
     | { type: "purpose"; data: PersonalMatrix }
     | { type: "keyto"; data: KeyToResult }
+    | { type: "keyto-business"; data: KeyToResult }
     | { type: "compatibility"; data: CompatibilityResult }
     | { type: "ancestral"; data: AncestralResult }
     | { type: "lifecod"; data: LifeCodCompatibilityResult }
@@ -334,9 +336,7 @@ const Index = () => {
         break;
       }
       case "business": {
-        const isProTier = selectedTier === 'professional';
-        const data = isProTier ? calculateBusinessPro(day, month, year) : calculateBusinessBasic(day, month, year);
-        setResult({ type: "business", data, isPro: isProTier });
+        setResult({ type: "keyto-business", data: calculateKeyTo(day, month, year) });
         break;
       }
       case "success-path": {
@@ -460,8 +460,7 @@ const Index = () => {
           setResult({ type: "ancestral", data: calculateAncestralPrograms(day, month, year, gender || 'female') });
           break;
         case "business": {
-          const isProTier = resolvedTier === 'professional';
-          setResult({ type: "business", data: isProTier ? calculateBusinessPro(day, month, year) : calculateBusinessBasic(day, month, year), isPro: isProTier });
+          setResult({ type: "keyto-business", data: calculateKeyTo(day, month, year) });
           break;
         }
         case "success-path":
@@ -829,7 +828,7 @@ const Index = () => {
                       {selectedTier === 'professional' && currentConfig.professional && (
                         <div className="mt-1 mb-4 px-4 py-3 rounded-xl text-xs leading-relaxed" style={{background:'rgba(15,32,68,0.04)',border:'1px solid rgba(15,32,68,0.12)'}}>
                           <p className="font-semibold mb-1 text-[#0F2044]">{t("res.proExtendedIncluded")}</p>
-                          <p className="text-[#0F2044]/70">{selectedMethod === 'lifecod-compatibility' ? 'Все 4 числа судьбы пары (Ума, Действия, Реализации, Итога) с подробными описаниями, раскладка «состоит из» каждого числа и Общий год пары.' : proExtendedDescription(selectedMethodology)}</p>
+                          <p className="text-[#0F2044]/70">{selectedMethod === 'lifecod-compatibility' ? 'Все 4 числа судьбы пары (Ума, Действия, Реализации, Итога) с подробными описаниями, раскладка «состоит из» каждого числа и Общий год пары.' : selectedMethod === 'business' ? 'Числа Ума, Действия и Реализации в деловом ключе, подходящие профессии, ключевые навыки и детальная матрица.' : proExtendedDescription(selectedMethodology)}</p>
                         </div>
                       )}
                     </div>
@@ -991,6 +990,9 @@ const Index = () => {
                 onReset={handleReset}
                 tier={selectedTier}
               />
+            )}
+            {result.type === "keyto-business" && (
+              <KeyToBusinessResultComponent result={result.data} name={userName} onReset={handleReset} />
             )}
             {result.type === "business" && (
               <div className="space-y-4">
