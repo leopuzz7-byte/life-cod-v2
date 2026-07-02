@@ -37,7 +37,7 @@ export function KeyToMatrixSection({ id, matrix }: Props) {
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {Array.from({ length: 9 }, (_, i) => i + 1).map((d) => {
+        {MATRIX_GRID.map((d) => {
           const present = matrix.counts[d] > 0;
           return (
             <div key={d} className="rounded-xl bg-muted/25 border border-border/50 p-4">
