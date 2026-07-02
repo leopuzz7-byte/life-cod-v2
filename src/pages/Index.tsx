@@ -14,6 +14,7 @@ import { MonthForecastResult } from "@/components/MonthForecastResult";
 import { PersonalMatrixResult } from "@/components/PersonalMatrixResult";
 import { KeyToResultComponent } from "@/components/KeyToResult";
 import { KeyToBusinessResultComponent } from "@/components/KeyToBusinessResult";
+import { KeyToContractResultComponent } from "@/components/KeyToContractResult";
 import { CompatibilityResultComponent } from "@/components/CompatibilityResult";
 import { AncestralResultComponent } from "@/components/AncestralResult";
 import { DailyForecastResultComponent } from "@/components/DailyForecastResult";
@@ -74,6 +75,7 @@ const Index = () => {
     | { type: "purpose"; data: PersonalMatrix }
     | { type: "keyto"; data: KeyToResult }
     | { type: "keyto-business"; data: KeyToResult }
+    | { type: "keyto-contract"; data: KeyToCompatResult }
     | { type: "compatibility"; data: CompatibilityResult }
     | { type: "ancestral"; data: AncestralResult }
     | { type: "lifecod"; data: LifeCodCompatibilityResult }
@@ -316,13 +318,20 @@ const Index = () => {
         break;
       }
       case "contract": {
-        const contract = calculateDailyForecast(
-          day, month, year,
-          targetDay || new Date().getDate(),
-          targetMonth || new Date().getMonth() + 1,
-          targetYear || new Date().getFullYear()
-        );
-        setResult({ type: "contract", data: contract });
+        if (selectedMethodology === "2") {
+          setResult({ type: "keyto-contract", data: calculateKeyToCompat(
+            targetDay || new Date().getDate(), targetMonth || (new Date().getMonth() + 1), targetYear || new Date().getFullYear(),
+            day, month, year
+          ) });
+        } else {
+          const contract = calculateDailyForecast(
+            day, month, year,
+            targetDay || new Date().getDate(),
+            targetMonth || new Date().getMonth() + 1,
+            targetYear || new Date().getFullYear()
+          );
+          setResult({ type: "contract", data: contract });
+        }
         break;
       }
       case "finance": {
@@ -451,7 +460,11 @@ const Index = () => {
           setResult({ type: "day", data: calculateDailyForecast(day, month, year, targetDay || new Date().getDate(), targetMonth || new Date().getMonth() + 1, targetYear || new Date().getFullYear()) });
           break;
         case "contract":
-          setResult({ type: "contract", data: calculateDailyForecast(day, month, year, targetDay || new Date().getDate(), targetMonth || new Date().getMonth() + 1, targetYear || new Date().getFullYear()) });
+          if (resolvedMethodology === "2") {
+            setResult({ type: "keyto-contract", data: calculateKeyToCompat(targetDay || new Date().getDate(), targetMonth || (new Date().getMonth() + 1), targetYear || new Date().getFullYear(), day, month, year) });
+          } else {
+            setResult({ type: "contract", data: calculateDailyForecast(day, month, year, targetDay || new Date().getDate(), targetMonth || new Date().getMonth() + 1, targetYear || new Date().getFullYear()) });
+          }
           break;
         case "finance":
           setResult({ type: "finance", data: calculateFinancialCode(day, month, year) });
@@ -982,6 +995,9 @@ const Index = () => {
                 result={result.data}
                 onReset={handleReset}
               />
+            )}
+            {result.type === "keyto-contract" && (
+              <KeyToContractResultComponent result={result.data} onReset={handleReset} />
             )}
             {result.type === "contract" && (
               <ContractEnergyResultComponent
