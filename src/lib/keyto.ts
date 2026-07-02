@@ -3,10 +3,18 @@
 
 export interface KeyToResult {
   birthDate: string;
-  mindNumber: number;       // Число Ума - день рождения, приведённый к 1-9
-  actionNumber: number;     // Число Действия - месяц рождения, приведённый к 1-9
-  realizationNumber: number; // Число Реализации - сумма всех цифр даты
-  outcomeNumber: number;    // Число Итога - сумма предыдущих трёх чисел
+  mindNumber: number;        // Число Ума - день рождения, сведённый к 1-9
+  actionNumber: number;      // Число Действия - сумма всех цифр даты, сведённая к 1-9
+  realizationNumber: number; // Число Реализации - (день + сумма цифр), сведённое к 1-9
+  outcomeNumber: number;     // Число Итога - (день + сумма цифр + Реализации_полное), сведённое к 1-9
+  // Полные (не сведённые) числа — то, что показывается как «X из Y»
+  mindFull: number;          // день (23)
+  actionFull: number;        // сумма всех цифр даты (15)
+  realizFull: number;        // mindFull + actionFull (38)
+  outcomeFull: number;       // mindFull + actionFull + realizFull (76)
+  day: number;
+  month: number;
+  year: number;
 }
 
 export interface KeyToNumberData {
@@ -37,19 +45,17 @@ function sumDigits(num: number): number {
 }
 
 export function calculateKeyTo(day: number, month: number, year: number): KeyToResult {
-  // Число Ума - день рождения (1-9)
-  const mindNumber = reduceToSingleDigit(day);
-  
-  // Число Действия - месяц (1-9)
-  const actionNumber = reduceToSingleDigit(month);
-  
-  // Число Реализации - сумма всех цифр даты рождения
-  const dateSum = sumDigits(day) + sumDigits(month) + sumDigits(year);
-  const realizationNumber = reduceToSingleDigit(dateSum);
-  
-  // Число Итога - сумма первых трёх чисел
-  const outcomeSum = mindNumber + actionNumber + realizationNumber;
-  const outcomeNumber = reduceToSingleDigit(outcomeSum);
+  // Формула KEYTO (Капустин), сверена по PDF на нескольких датах:
+  // Ума = день; Действия = сумма всех цифр даты; Реализации = Ума + Действия; Итог = Ума + Действия + Реализации.
+  const mindFull = day;                                          // напр. 23
+  const actionFull = sumDigits(day) + sumDigits(month) + sumDigits(year); // напр. 15
+  const realizFull = mindFull + actionFull;                      // напр. 38
+  const outcomeFull = mindFull + actionFull + realizFull;        // напр. 76
+
+  const mindNumber = reduceToSingleDigit(mindFull);              // 5
+  const actionNumber = reduceToSingleDigit(actionFull);          // 6
+  const realizationNumber = reduceToSingleDigit(realizFull);     // 2
+  const outcomeNumber = reduceToSingleDigit(outcomeFull);        // 4
 
   const formattedDate = `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year}`;
 
@@ -59,6 +65,13 @@ export function calculateKeyTo(day: number, month: number, year: number): KeyToR
     actionNumber,
     realizationNumber,
     outcomeNumber,
+    mindFull,
+    actionFull,
+    realizFull,
+    outcomeFull,
+    day,
+    month,
+    year,
   };
 }
 

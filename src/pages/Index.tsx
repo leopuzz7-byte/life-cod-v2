@@ -280,11 +280,6 @@ const Index = () => {
 
     // Methodology 2 — main "Predназначение" (classic-full) routes to keyto/unified
     if (selectedMethodology === "2" && selectedMethod === "classic-full") {
-      if (selectedTier === 'professional') {
-        const unifiedResult = calculateUnifiedPersonalAnalysis(name || "Вы", day, month, year, targetYear || new Date().getFullYear());
-        setResult({ type: "unified-personal", data: unifiedResult });
-        return;
-      }
       const classicResult = calculateKeyTo(day, month, year);
       setResult({ type: "keyto", data: classicResult });
       return;
@@ -438,11 +433,6 @@ const Index = () => {
 
       // Methodology 2 — main "Predназначение" (classic-full) routes to keyto/unified
       if (resolvedMethodology === "2" && resolvedMethod === "classic-full") {
-        if (resolvedTier === 'professional') {
-          const unifiedResult = calculateUnifiedPersonalAnalysis(name || "Вы", day, month, year, targetYear || new Date().getFullYear());
-          setResult({ type: "unified-personal", data: unifiedResult });
-          return;
-        }
         const classicResult = calculateKeyTo(day, month, year);
         setResult({ type: "keyto", data: classicResult });
         return;
@@ -923,6 +913,7 @@ const Index = () => {
                 result={result.data}
                 name={userName}
                 onReset={handleReset}
+                isPro={selectedTier === 'professional'}
               />
             )}
             {result.type === "compatibility" && (

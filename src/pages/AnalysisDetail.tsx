@@ -90,7 +90,7 @@ export default function AnalysisDetail() {
       case "purpose":
         return <PersonalMatrixResult matrix={data} name={userName} onReset={handleBack} tier={tier} />;
       case "keyto":
-        return <KeyToResultComponent result={data} name={userName} onReset={handleBack} />;
+        return <KeyToResultComponent result={data} name={userName} onReset={handleBack} isPro={tier === 'professional'} />;
       case "compatibility":
         return <CompatibilityResultComponent result={data} onReset={handleBack} tier={tier} />;
       case "ancestral":
