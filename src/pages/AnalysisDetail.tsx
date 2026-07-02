@@ -17,6 +17,7 @@ import { YearForecastResult } from "@/components/YearForecastResult";
 import { MonthForecastResult } from "@/components/MonthForecastResult";
 import { PersonalMatrixResult } from "@/components/PersonalMatrixResult";
 import { KeyToResultComponent } from "@/components/KeyToResult";
+import { KeyToCompatResultComponent } from "@/components/KeyToCompatResult";
 import { CompatibilityResultComponent } from "@/components/CompatibilityResult";
 import { AncestralResultComponent } from "@/components/AncestralResult";
 import { DailyForecastResultComponent } from "@/components/DailyForecastResult";
@@ -91,6 +92,8 @@ export default function AnalysisDetail() {
         return <PersonalMatrixResult matrix={data} name={userName} onReset={handleBack} tier={tier} />;
       case "keyto":
         return <KeyToResultComponent result={data} name={userName} onReset={handleBack} isPro={tier === 'professional'} />;
+      case "keyto-compat":
+        return <KeyToCompatResultComponent result={data} onReset={handleBack} isPro={tier === 'professional'} />;
       case "compatibility":
         return <CompatibilityResultComponent result={data} onReset={handleBack} tier={tier} />;
       case "ancestral":

@@ -37,6 +37,8 @@ import {
 import { calculateKeyTo, KeyToResult } from "@/lib/keyto";
 import { calculateAncestralPrograms, AncestralResult } from "@/lib/ancestral";
 import { calculateLifeCodCompatibility, LifeCodCompatibilityResult, RelationType, calculateUnifiedPersonalAnalysis, UnifiedPersonalAnalysis } from "@/lib/lifecod";
+import { calculateKeyToCompat, KeyToCompatResult } from "@/lib/keytoCompatCalc";
+import { KeyToCompatResultComponent } from "@/components/KeyToCompatResult";
 import { calculateBusinessBasic, calculateBusinessPro, type BusinessBasicModule, type BusinessProModule } from "@/lib/lifecod/businessAnalysis";
 import { calculateSuccessPath, type SuccessPathModule } from "@/lib/lifecod/successPath";
 import { BusinessResult } from "@/components/BusinessResult";
@@ -73,6 +75,7 @@ const Index = () => {
     | { type: "compatibility"; data: CompatibilityResult }
     | { type: "ancestral"; data: AncestralResult }
     | { type: "lifecod"; data: LifeCodCompatibilityResult }
+    | { type: "keyto-compat"; data: KeyToCompatResult }
     | { type: "lifecod-personal"; data: { name: string; day: number; month: number; year: number } }
     | { type: "unified-personal"; data: UnifiedPersonalAnalysis }
     | { type: "day"; data: DailyForecastType }
@@ -202,12 +205,11 @@ const Index = () => {
       setPaymentStatus("pending");
       return;
     }
-    const lifecodResult = calculateLifeCodCompatibility(
-      person1Name, person1Day, person1Month, person1Year,
-      person2Name, person2Day, person2Month, person2Year,
-      relationType
+    const compat = calculateKeyToCompat(
+      person1Day, person1Month, person1Year,
+      person2Day, person2Month, person2Year,
     );
-    setResult({ type: "lifecod", data: lifecodResult });
+    setResult({ type: "keyto-compat", data: compat });
   };
 
   // Reset method when methodology changes
@@ -412,9 +414,9 @@ const Index = () => {
 
     // Handle pending lifecod args
     if (pendingLifeCodArgs) {
-      const { p1Name, p1Day, p1Month, p1Year, p2Name, p2Day, p2Month, p2Year, relationType } = pendingLifeCodArgs;
-      const lifecodResult = calculateLifeCodCompatibility(p1Name, p1Day, p1Month, p1Year, p2Name, p2Day, p2Month, p2Year, relationType);
-      setResult({ type: "lifecod", data: lifecodResult });
+      const { p1Day, p1Month, p1Year, p2Day, p2Month, p2Year } = pendingLifeCodArgs;
+      const compat = calculateKeyToCompat(p1Day, p1Month, p1Year, p2Day, p2Month, p2Year);
+      setResult({ type: "keyto-compat", data: compat });
       return;
     }
 
@@ -929,6 +931,13 @@ const Index = () => {
                 name={userName}
                 onReset={handleReset}
                 tier={selectedTier}
+              />
+            )}
+            {result.type === "keyto-compat" && (
+              <KeyToCompatResultComponent
+                result={result.data}
+                onReset={handleReset}
+                isPro={selectedTier === 'professional'}
               />
             )}
             {result.type === "lifecod" && (
