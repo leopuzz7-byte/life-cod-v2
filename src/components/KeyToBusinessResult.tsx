@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyToResult, getKeyToNumberData } from "@/lib/keyto";
 import { computeMatrix } from "@/lib/keytoMatrix";
@@ -30,7 +29,6 @@ function NumberBadge({ value, full, title }: { value: number; full: number; titl
 
 export function KeyToBusinessResultComponent({ result, name, onReset }: Props) {
   const { t } = useTranslation();
-  const [tab, setTab] = useState<"full" | "matrix">("full");
   const { day, month, year, mindNumber, actionNumber, realizationNumber, mindFull, actionFull, realizFull } = result;
 
   const matrix = computeMatrix(day, month, year);
@@ -41,15 +39,11 @@ export function KeyToBusinessResultComponent({ result, name, onReset }: Props) {
   const br = businessRealiz[realizationNumber];
   const dateStr = `${String(day).padStart(2, "0")}.${String(month).padStart(2, "0")}.${year}`;
 
-  const tabBtn = (id: "full" | "matrix", label: string) => (
+  const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const navBtn = (id: string, label: string) => (
     <button
-      onClick={() => setTab(id)}
-      className={
-        "py-3 px-4 rounded-xl border text-sm font-display font-medium transition-colors " +
-        (tab === id
-          ? "border-primary text-primary bg-primary/5"
-          : "border-border text-muted-foreground hover:text-primary hover:border-primary/40")
-      }
+      onClick={() => go(id)}
+      className="py-3 px-4 rounded-xl border border-border text-sm font-display font-medium text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-colors"
     >
       {label}
     </button>
@@ -68,63 +62,61 @@ export function KeyToBusinessResultComponent({ result, name, onReset }: Props) {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {tabBtn("full", "Полный разбор")}
-        {tabBtn("matrix", "Описание матрицы")}
+        {navBtn("biz-full", "Полный разбор")}
+        {navBtn("biz-matrix", "Описание матрицы")}
       </div>
 
-      {tab === "full" ? (
-        <div className="space-y-6">
-          <div className="rounded-2xl bg-primary/10 border border-primary/20 p-5 text-center">
-            <div className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Бизнес-код</div>
-            <div className="text-4xl font-display font-bold text-primary tracking-[0.2em]">{code}</div>
-          </div>
-
-          <section className="gradient-card rounded-2xl border border-border p-6 md:p-7">
-            <NumberBadge value={mindNumber} full={mindFull} title="Число Ума" />
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{bm?.desc}</p>
-            {bm?.deep && (
-              <div className="mt-5">
-                <h4 className="font-display font-semibold text-foreground mb-2">Число Ума {mindNumber} состоит из {mindFull}</h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">{bm.deep}</p>
-              </div>
-            )}
-            {professions.length > 0 && (
-              <div className="mt-5">
-                <h4 className="font-display font-semibold text-foreground mb-3">Подходящие профессии</h4>
-                <div className="rounded-xl bg-muted/25 border border-border/50 p-4">
-                  <p className="text-sm text-muted-foreground leading-relaxed">{professions.join(", ")}</p>
-                </div>
-              </div>
-            )}
-          </section>
-
-          <section className="gradient-card rounded-2xl border border-border p-6 md:p-7">
-            <NumberBadge value={actionNumber} full={actionFull} title="Число Действия" />
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{ba?.desc}</p>
-            {ba?.skills && (
-              <div className="mt-5">
-                <h4 className="font-display font-semibold text-foreground mb-3">Ключевые навыки</h4>
-                <div className="rounded-xl bg-muted/25 border border-border/50 p-4">
-                  <p className="text-sm text-muted-foreground leading-relaxed">{ba.skills}</p>
-                </div>
-              </div>
-            )}
-            {ba?.deep && (
-              <div className="mt-5">
-                <h4 className="font-display font-semibold text-foreground mb-2">Число Действия {actionNumber} состоит из {actionFull}</h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">{ba.deep}</p>
-              </div>
-            )}
-          </section>
-
-          <section className="gradient-card rounded-2xl border border-border p-6 md:p-7">
-            <NumberBadge value={realizationNumber} full={realizFull} title="Число Реализации" />
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{br?.desc}</p>
-          </section>
+      <div id="biz-full" className="space-y-6 scroll-mt-24">
+        <div className="rounded-2xl bg-primary/10 border border-primary/20 p-5 text-center">
+          <div className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Бизнес-код</div>
+          <div className="text-4xl font-display font-bold text-primary tracking-[0.2em]">{code}</div>
         </div>
-      ) : (
-        <KeyToMatrixSection id="biz-matrix" matrix={matrix} />
-      )}
+
+        <section className="gradient-card rounded-2xl border border-border p-6 md:p-7">
+          <NumberBadge value={mindNumber} full={mindFull} title="Число Ума" />
+          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{bm?.desc}</p>
+          {bm?.deep && (
+            <div className="mt-5">
+              <h4 className="font-display font-semibold text-foreground mb-2">Число Ума {mindNumber} состоит из {mindFull}</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">{bm.deep}</p>
+            </div>
+          )}
+          {professions.length > 0 && (
+            <div className="mt-5">
+              <h4 className="font-display font-semibold text-foreground mb-3">Подходящие профессии</h4>
+              <div className="rounded-xl bg-muted/25 border border-border/50 p-4">
+                <p className="text-sm text-muted-foreground leading-relaxed">{professions.join(", ")}</p>
+              </div>
+            </div>
+          )}
+        </section>
+
+        <section className="gradient-card rounded-2xl border border-border p-6 md:p-7">
+          <NumberBadge value={actionNumber} full={actionFull} title="Число Действия" />
+          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{ba?.desc}</p>
+          {ba?.skills && (
+            <div className="mt-5">
+              <h4 className="font-display font-semibold text-foreground mb-3">Ключевые навыки</h4>
+              <div className="rounded-xl bg-muted/25 border border-border/50 p-4">
+                <p className="text-sm text-muted-foreground leading-relaxed">{ba.skills}</p>
+              </div>
+            </div>
+          )}
+          {ba?.deep && (
+            <div className="mt-5">
+              <h4 className="font-display font-semibold text-foreground mb-2">Число Действия {actionNumber} состоит из {actionFull}</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">{ba.deep}</p>
+            </div>
+          )}
+        </section>
+
+        <section className="gradient-card rounded-2xl border border-border p-6 md:p-7">
+          <NumberBadge value={realizationNumber} full={realizFull} title="Число Реализации" />
+          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{br?.desc}</p>
+        </section>
+      </div>
+
+      <KeyToMatrixSection id="biz-matrix" matrix={matrix} />
 
       <NadezhdaSignature />
     </div>
