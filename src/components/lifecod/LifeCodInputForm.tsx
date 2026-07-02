@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RelationTypeSelector } from "./RelationTypeSelector";
 import { RelationType } from "@/lib/lifecod/types";
 import { Users } from "lucide-react";
 
@@ -18,7 +17,7 @@ interface LifeCodInputFormProps {
 export function LifeCodInputForm({ onCalculate }: LifeCodInputFormProps) {
   const { t } = useTranslation();
   
-  const [relationType, setRelationType] = useState<RelationType>('love');
+  const relationType: RelationType = 'love';
   
   const [person1, setPerson1] = useState({
     name: '',
@@ -61,7 +60,7 @@ export function LifeCodInputForm({ onCalculate }: LifeCodInputFormProps) {
     labelKey: string
   ) => (
     <div className="space-y-3">
-      <h4 className="font-medium text-sm text-muted-foreground">{t(labelKey)}</h4>
+      <h4 className="font-medium text-sm text-muted-foreground">{labelKey}</h4>
       
       <div>
         <Label className="text-xs">{t('lifecod.form.name')}</Label>
@@ -119,18 +118,17 @@ export function LifeCodInputForm({ onCalculate }: LifeCodInputFormProps) {
   
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <RelationTypeSelector value={relationType} onChange={setRelationType} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {renderPersonInputs(
           person1, 
           setPerson1, 
-          relationType === 'love' ? 'lifecod.form.person1Love' : 'lifecod.form.person1Business'
+          'Партнёр А'
         )}
         {renderPersonInputs(
           person2, 
           setPerson2, 
-          relationType === 'love' ? 'lifecod.form.person2Love' : 'lifecod.form.person2Business'
+          'Партнёр Б'
         )}
       </div>
       

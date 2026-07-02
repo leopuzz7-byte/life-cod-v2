@@ -829,7 +829,7 @@ const Index = () => {
                       {selectedTier === 'professional' && currentConfig.professional && (
                         <div className="mt-1 mb-4 px-4 py-3 rounded-xl text-xs leading-relaxed" style={{background:'rgba(15,32,68,0.04)',border:'1px solid rgba(15,32,68,0.12)'}}>
                           <p className="font-semibold mb-1 text-[#0F2044]">{t("res.proExtendedIncluded")}</p>
-                          <p className="text-[#0F2044]/70">{proExtendedDescription(selectedMethodology)}</p>
+                          <p className="text-[#0F2044]/70">{selectedMethod === 'lifecod-compatibility' ? 'Все 4 числа судьбы пары (Ума, Действия, Реализации, Итога) с подробными описаниями, раскладка «состоит из» каждого числа и Общий год пары.' : proExtendedDescription(selectedMethodology)}</p>
                         </div>
                       )}
                     </div>
