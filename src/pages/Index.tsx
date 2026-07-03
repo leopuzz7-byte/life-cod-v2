@@ -21,6 +21,7 @@ import { DailyForecastResultComponent } from "@/components/DailyForecastResult";
 import { FinancialCodeResultComponent } from "@/components/FinancialCodeResult";
 import { NameEnergyResultComponent } from "@/components/NameEnergyResult";
 import { KeyToNameResultComponent } from "@/components/KeyToNameResult";
+import { KeyToFinanceResultComponent } from "@/components/KeyToFinanceResult";
 import { ContractEnergyResultComponent } from "@/components/ContractEnergyResult";
 import { ComingSoon } from "@/components/ComingSoon";
 import { LifeCodInputForm, LifeCodResult, UnifiedPersonalResult } from "@/components/lifecod";
@@ -50,6 +51,7 @@ import { calculateDailyForecast, DailyForecastResult as DailyForecastType } from
 import { calculateFinancialCode, FinancialCodeResult as FinancialCodeType } from "@/lib/financialCode";
 import { calculateNameEnergy, NameEnergyResult as NameEnergyType } from "@/lib/nameEnergy";
 import { calculateKeytoName, KeytoNameResult } from "@/lib/keytoName";
+import { calculateFinCode, FinCodeResult } from "@/lib/keytoFinance";
 import { LifeCodPersonalResult } from "@/components/lifecod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +81,7 @@ const Index = () => {
     | { type: "keyto-business"; data: KeyToResult }
     | { type: "keyto-contract"; data: KeyToCompatResult }
     | { type: "keyto-name"; data: KeytoNameResult }
+    | { type: "keyto-finance"; data: FinCodeResult }
     | { type: "compatibility"; data: CompatibilityResult }
     | { type: "ancestral"; data: AncestralResult }
     | { type: "lifecod"; data: LifeCodCompatibilityResult }
@@ -338,8 +341,7 @@ const Index = () => {
         break;
       }
       case "finance": {
-        const finance = calculateFinancialCode(day, month, year);
-        setResult({ type: "finance", data: finance });
+        setResult({ type: "keyto-finance", data: calculateFinCode(day, month, year) });
         break;
       }
       case "ancestral": {
@@ -470,7 +472,7 @@ const Index = () => {
           }
           break;
         case "finance":
-          setResult({ type: "finance", data: calculateFinancialCode(day, month, year) });
+          setResult({ type: "keyto-finance", data: calculateFinCode(day, month, year) });
           break;
         case "ancestral":
           setResult({ type: "ancestral", data: calculateAncestralPrograms(day, month, year, gender || 'female') });
@@ -984,6 +986,9 @@ const Index = () => {
                 onReset={handleReset}
                 tier={selectedTier}
               />
+            )}
+            {result.type === "keyto-finance" && (
+              <KeyToFinanceResultComponent result={result.data} onReset={handleReset} />
             )}
             {result.type === "finance" && (
               <FinancialCodeResultComponent
