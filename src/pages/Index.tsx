@@ -20,6 +20,7 @@ import { AncestralResultComponent } from "@/components/AncestralResult";
 import { DailyForecastResultComponent } from "@/components/DailyForecastResult";
 import { FinancialCodeResultComponent } from "@/components/FinancialCodeResult";
 import { NameEnergyResultComponent } from "@/components/NameEnergyResult";
+import { KeyToNameResultComponent } from "@/components/KeyToNameResult";
 import { ContractEnergyResultComponent } from "@/components/ContractEnergyResult";
 import { ComingSoon } from "@/components/ComingSoon";
 import { LifeCodInputForm, LifeCodResult, UnifiedPersonalResult } from "@/components/lifecod";
@@ -48,6 +49,7 @@ import { SuccessPathResult } from "@/components/SuccessPathResult";
 import { calculateDailyForecast, DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
 import { calculateFinancialCode, FinancialCodeResult as FinancialCodeType } from "@/lib/financialCode";
 import { calculateNameEnergy, NameEnergyResult as NameEnergyType } from "@/lib/nameEnergy";
+import { calculateKeytoName, KeytoNameResult } from "@/lib/keytoName";
 import { LifeCodPersonalResult } from "@/components/lifecod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,6 +78,7 @@ const Index = () => {
     | { type: "keyto"; data: KeyToResult }
     | { type: "keyto-business"; data: KeyToResult }
     | { type: "keyto-contract"; data: KeyToCompatResult }
+    | { type: "keyto-name"; data: KeytoNameResult }
     | { type: "compatibility"; data: CompatibilityResult }
     | { type: "ancestral"; data: AncestralResult }
     | { type: "lifecod"; data: LifeCodCompatibilityResult }
@@ -364,8 +367,8 @@ const Index = () => {
   const handleNameEnergyCalculate = () => {
     if (nameEnergyInput.trim()) {
       lastInputRef.current = { name: nameEnergyInput.trim() };
-      const nameResult = calculateNameEnergy(nameEnergyInput.trim());
-      setResult({ type: "name", data: nameResult });
+      const nameResult = calculateKeytoName(nameEnergyInput.trim());
+      setResult({ type: "keyto-name", data: nameResult });
     }
   };
 
@@ -989,6 +992,9 @@ const Index = () => {
                 onReset={handleReset}
                 tier={selectedTier}
               />
+            )}
+            {result.type === "keyto-name" && (
+              <KeyToNameResultComponent result={result.data} onReset={handleReset} />
             )}
             {result.type === "name" && (
               <NameEnergyResultComponent
