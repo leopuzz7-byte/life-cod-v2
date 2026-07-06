@@ -1,34 +1,50 @@
 import { useMysticMode } from "@/lib/mysticMode";
 
-const ZODIAC = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"];
-const PLANETS = ["☉", "☽", "☿", "♀", "♂", "♃", "♄", "♅", "♆"];
-const STARS = ["✦", "✧", "✶", "✦", "✧", "✶"];
-const DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
-
-const SIZE = 900;
+const SIZE = 1000;
 const C = SIZE / 2;
+const DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+// Тонкие астрологические символы (как в референсе), одним золотом
+const SYMS = ["☉", "☽", "☿", "♀", "♁", "♃", "♄", "♅", "♆", "♇", "☊", "⚸"];
 
-function cycle(base: string[], n: number): string[] {
+function cycle<T>(base: T[], n: number): T[] {
   return Array.from({ length: n }, (_, i) => base[i % base.length]);
 }
 
-function Ring({ r, count, glyphs, dur, reverse, dash, glyphSize, gold }: {
-  r: number; count: number; glyphs: string[]; dur: number; reverse?: boolean; dash?: string; glyphSize: number; gold?: boolean;
+// Веер радиальных штрихов (главный элемент), штрихи чередуются по длине
+function Ticks({ count, r, long, short, dur, reverse }: { count: number; r: number; long: number; short: number; dur: number; reverse?: boolean }) {
+  const from = reverse ? `360 ${C} ${C}` : `0 ${C} ${C}`;
+  const to = reverse ? `0 ${C} ${C}` : `360 ${C} ${C}`;
+  return (
+    <g stroke="url(#mysticGold)" strokeWidth={1.4}>
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from={from} to={to} dur={`${dur}s`} repeatCount="indefinite" />
+      {Array.from({ length: count }).map((_, i) => {
+        const a = (i / count) * 2 * Math.PI;
+        const len = i % 4 === 0 ? long : short;
+        const x1 = C + r * Math.cos(a), y1 = C + r * Math.sin(a);
+        const x2 = C + (r + len) * Math.cos(a), y2 = C + (r + len) * Math.sin(a);
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} opacity={i % 4 === 0 ? 0.9 : 0.55} />;
+      })}
+    </g>
+  );
+}
+
+function SymbolRing({ r, count, items, dur, reverse, digits, size }: {
+  r: number; count: number; items: string[]; dur: number; reverse?: boolean; digits: boolean; size: number;
 }) {
-  const items = cycle(glyphs, count);
+  const list = cycle(items, count);
   const from = reverse ? `360 ${C} ${C}` : `0 ${C} ${C}`;
   const to = reverse ? `0 ${C} ${C}` : `360 ${C} ${C}`;
   return (
     <g>
       <animateTransform attributeName="transform" attributeType="XML" type="rotate" from={from} to={to} dur={`${dur}s`} repeatCount="indefinite" />
-      <circle cx={C} cy={C} r={r} fill="none" stroke="currentColor" strokeWidth={1} strokeDasharray={dash || "2 12"} opacity={0.55} />
-      {items.map((g, i) => {
+      {list.map((it, i) => {
         const a = (i / count) * 2 * Math.PI - Math.PI / 2;
         const x = C + r * Math.cos(a);
         const y = C + r * Math.sin(a);
         return (
-          <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={glyphSize} fontWeight={600}
-            fill={gold ? "#C9973A" : "currentColor"} opacity={0.75}>{g}</text>
+          <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={size}
+            fontFamily={digits ? "'Cormorant', serif" : "'Segoe UI Symbol', 'Noto Sans Symbols', serif"}
+            fontWeight={digits ? 600 : 400} fill="url(#mysticGold)">{it}</text>
         );
       })}
     </g>
@@ -38,25 +54,32 @@ function Ring({ r, count, glyphs, dur, reverse, dash, glyphSize, gold }: {
 export function MysticBackground() {
   const { mode } = useMysticMode();
   const digits = mode === "digits";
-  const outer = digits ? DIGITS : ZODIAC;
-  const mid = digits ? DIGITS : PLANETS;
-  const inner = digits ? DIGITS : STARS;
+  const items = digits ? DIGITS : SYMS;
 
   return (
     <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-[150vmin] h-[150vmin] max-w-none opacity-[0.10] md:opacity-[0.14]" style={{ color: "#0F2044" }}>
-        <g>
-          <animateTransform attributeName="transform" attributeType="XML" type="rotate" from={`0 ${C} ${C}`} to={`360 ${C} ${C}`} dur="220s" repeatCount="indefinite" />
-          {Array.from({ length: 60 }).map((_, i) => {
-            const a = (i / 60) * 2 * Math.PI;
-            const r1 = 350, r2 = 366;
-            return <line key={i} x1={C + r1 * Math.cos(a)} y1={C + r1 * Math.sin(a)} x2={C + r2 * Math.cos(a)} y2={C + r2 * Math.sin(a)} stroke="currentColor" strokeWidth={1} opacity={0.4} />;
-          })}
-        </g>
-        <Ring r={415} count={12} glyphs={outer} dur={170} glyphSize={28} />
-        <Ring r={300} count={9} glyphs={mid} dur={130} reverse glyphSize={26} gold />
-        <Ring r={195} count={6} glyphs={inner} dur={95} glyphSize={22} />
-        <circle cx={C} cy={C} r={120} fill="none" stroke="currentColor" strokeWidth={1} strokeDasharray="1 14" opacity={0.45} />
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-[205vmin] h-[205vmin] max-w-none opacity-[0.35] md:opacity-[0.5]">
+        <defs>
+          <linearGradient id="mysticGold" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#F0D98A" />
+            <stop offset="0.5" stopColor="#C9973A" />
+            <stop offset="1" stopColor="#A87626" />
+          </linearGradient>
+        </defs>
+
+        {/* Веер радиальных штрихов */}
+        <Ticks count={120} r={392} long={34} short={20} dur={260} />
+
+        {/* Окружности */}
+        <circle cx={C} cy={C} r={388} fill="none" stroke="url(#mysticGold)" strokeWidth={2} opacity={0.85} />
+        <circle cx={C} cy={C} r={378} fill="none" stroke="url(#mysticGold)" strokeWidth={1} opacity={0.5} />
+
+        {/* Символы по окружности */}
+        <SymbolRing r={340} count={12} items={items} dur={240} digits={digits} size={digits ? 52 : 40} />
+
+        {/* Внутренние тонкие окружности для глубины */}
+        <circle cx={C} cy={C} r={250} fill="none" stroke="url(#mysticGold)" strokeWidth={1} strokeDasharray="1 14" opacity={0.4} />
+        <circle cx={C} cy={C} r={150} fill="none" stroke="url(#mysticGold)" strokeWidth={1} opacity={0.35} />
       </svg>
     </div>
   );
