@@ -641,12 +641,13 @@ const Index = () => {
                     {t("calculator.selectMethodology")}
                   </p>
 
-                  {/* Methodology 1 - 22 Arcana */}
-                  <div className="mb-4 md:mb-6">
+                  {/* Methodology cards — one row */}
+                  <div className="grid grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6 mt-2 items-stretch">
+                    {/* Methodology 1 - 22 Arcana */}
                     <button
                       onClick={() => setSelectedMethodology("1")}
                       className={cn(
-                        "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
+                        "relative w-full h-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "1"
                           ? "bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
                           : "bg-white border-[#0F2044]/40 hover:border-[#0F2044]"
@@ -655,182 +656,98 @@ const Index = () => {
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap" style={{background:'#fdfaf5',border:'1px solid #0F2044',borderRadius:'20px',color:'#0F2044',letterSpacing:'0.08em',textTransform:'uppercase'}}>
                         {t("methodology.moreAccurate")}
                       </div>
-
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-2 md:gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-                          selectedMethodology === "1"
-                            ? "border-[#0F2044] bg-[#0F2044]"
-                            : "border-[#0F2044]/40"
+                          selectedMethodology === "1" ? "border-[#0F2044] bg-[#0F2044]" : "border-[#0F2044]/40"
                         )}>
-                          {selectedMethodology === "1" && (
-                            <Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />
-                          )}
+                          {selectedMethodology === "1" && (<Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />)}
                         </div>
-
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="font-display font-semibold text-foreground text-base md:text-lg">
-                              {t("methodology.methodology1")}
-                            </h3>
-                            <span className="text-xs px-2 py-0.5" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'5px',fontWeight:500}}>
-                              {t("methodology.arcana22")}
-                            </span>
+                            <h3 className="font-display font-semibold text-foreground text-base md:text-lg">{t("methodology.methodology1")}</h3>
+                            <span className="text-xs px-2 py-0.5" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'5px',fontWeight:500}}>{t("methodology.arcana22")}</span>
                           </div>
-                          <p className="text-xs md:text-sm mb-3" style={{color:'#6b6b6b'}}>
-                            {t("methodology.arcanaDescription")}
-                          </p>
-                          <div className="flex flex-wrap gap-1">
-                            {[
-                              t("methodology.features.purpose"),
-                              t("methodology.features.compatibility"),
-                              t("methodology.features.forecasts"),
-                              t("methodology.features.lifePeriods"),
-                            ].map((feature, i) => (
-                              <span key={i} className="text-xs px-2 py-1" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'6px',fontWeight:500}}>
-                                {feature}
-                              </span>
+                          <p className="hidden md:block text-xs md:text-sm mb-3" style={{color:'#6b6b6b'}}>{t("methodology.arcanaDescription")}</p>
+                          <div className="hidden md:flex flex-wrap gap-1">
+                            {[t("methodology.features.purpose"), t("methodology.features.compatibility"), t("methodology.features.forecasts"), t("methodology.features.lifePeriods")].map((feature, i) => (
+                              <span key={i} className="text-xs px-2 py-1" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'6px',fontWeight:500}}>{feature}</span>
                             ))}
                           </div>
                         </div>
                       </div>
                     </button>
 
-                    {/* Methods grid - shown when Methodology 1 is selected */}
-                    {selectedMethodology === "1" && (
-                      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-                        {methodology1Methods.map((method) => (
-                          <button
-                            key={method.id}
-                            onClick={() => handleMethodSelect(method.id)}
-                            className={cn(
-                              "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left w-full",
-                              selectedMethod === method.id
-                                ? "gradient-card border-[#0F2044] md:border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.5),0_0_14px_rgba(15,32,68,0.25)] md:shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
-                                : "gradient-card border-[#0F2044]/30 md:hover:border-[#0F2044] md:hover:shadow-[0_2px_10px_rgba(15,32,68,0.12)]"
-                            )}
-                          >
-                            {/* Mobile: full-width text + icon absolute bottom-right */}
-                            <div className="md:hidden min-h-[90px] pb-14">
-                              {method.comingSoon && <span className="inline-block text-[8px] px-1 py-0.5 rounded-full font-medium mb-1" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                              <h4 className="font-display font-semibold text-sm leading-snug" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                              <p className="text-xs mt-1 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
-                            </div>
-                            {/* Icon 52×52 absolute bottom-right — same position on every card */}
-                            <div className="md:hidden absolute bottom-2 right-2 flex items-center justify-center pointer-events-none" style={{width:52,height:52}}>
-                              {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-full !h-full" /> : <method.icon style={{width:44,height:44,color:'#C9973A'}} />; })()}
-                            </div>
-                            {/* Desktop: icon top, text below */}
-                            <div className="hidden md:flex flex-col gap-2.5">
-                              <div className="flex items-start justify-between">
-                                {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-7 h-7" style={{color:'#C9973A'}} />; })()}
-                                <div className="flex items-center gap-1">
-                                  {method.comingSoon && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                                </div>
-                              </div>
-                              <div>
-                                <h4 className="font-display font-semibold text-lg" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                                <p className="text-sm mt-1 line-clamp-2" style={{color:'#6b6b6b'}}>{method.description}</p>
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Methodology 2 - Classic with Life C⚙D */}
-                  <div className="mb-6 md:mb-8">
+                    {/* Methodology 2 - Classic */}
                     <button
                       onClick={() => setSelectedMethodology("2")}
                       className={cn(
-                        "relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
+                        "relative w-full h-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "2"
                           ? "bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
                           : "bg-white border-[#0F2044]/40 hover:border-[#0F2044]"
                       )}
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-2 md:gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-                          selectedMethodology === "2"
-                            ? "border-[#0F2044] bg-[#0F2044]"
-                            : "border-[#0F2044]/40"
+                          selectedMethodology === "2" ? "border-[#0F2044] bg-[#0F2044]" : "border-[#0F2044]/40"
                         )}>
-                          {selectedMethodology === "2" && (
-                            <Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />
-                          )}
+                          {selectedMethodology === "2" && (<Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />)}
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="font-display font-semibold text-base md:text-lg" style={{color:'#1a1a1a'}}>
-                              {t("methodology.methodology2")}
-                            </h3>
-                            <span className="text-xs px-2 py-0.5" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'5px',fontWeight:500}}>
-                              {t("methodology.classic")}
-                            </span>
+                            <h3 className="font-display font-semibold text-base md:text-lg" style={{color:'#1a1a1a'}}>{t("methodology.methodology2")}</h3>
+                            <span className="text-xs px-2 py-0.5" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'5px',fontWeight:500}}>{t("methodology.classic")}</span>
                           </div>
-                          <p className="text-xs md:text-sm mb-3" style={{color:'#6b6b6b'}}>
-                            {t("methodology.classicDescription")}
-                          </p>
-                          <div className="flex flex-wrap gap-1">
-                            {[
-                              t("methodology.features.mindNumber"),
-                              t("methodology.features.actionNumber"),
-                              t("methodology.features.realizationNumber"),
-                              t("methodology.features.outcomeNumber"),
-                            ].map((feature, i) => (
-                              <span key={i} className="text-xs px-2 py-1" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'6px',fontWeight:500}}>
-                                {feature}
-                              </span>
+                          <p className="hidden md:block text-xs md:text-sm mb-3" style={{color:'#6b6b6b'}}>{t("methodology.classicDescription")}</p>
+                          <div className="hidden md:flex flex-wrap gap-1">
+                            {[t("methodology.features.mindNumber"), t("methodology.features.actionNumber"), t("methodology.features.realizationNumber"), t("methodology.features.outcomeNumber")].map((feature, i) => (
+                              <span key={i} className="text-xs px-2 py-1" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'6px',fontWeight:500}}>{feature}</span>
                             ))}
                           </div>
                         </div>
                       </div>
                     </button>
-
-                    {/* Methods grid - shown when Methodology 2 is selected */}
-                    {selectedMethodology === "2" && (
-                      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-                        {methodology2Methods.map((method) => (
-                          <button
-                            key={method.id}
-                            onClick={() => handleMethodSelect(method.id)}
-                            className={cn(
-                              "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left w-full",
-                              selectedMethod === method.id
-                                ? "gradient-card border-[#0F2044] md:border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.5),0_0_14px_rgba(15,32,68,0.25)] md:shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
-                                : "gradient-card border-[#0F2044]/30 md:hover:border-[#0F2044] md:hover:shadow-[0_2px_10px_rgba(15,32,68,0.12)]"
-                            )}
-                          >
-                            {/* Mobile: full-width text + icon absolute bottom-right */}
-                            <div className="md:hidden min-h-[90px] pb-14">
-                              {method.comingSoon && <span className="inline-block text-[8px] px-1 py-0.5 rounded-full font-medium mb-1" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                              <h4 className="font-display font-semibold text-sm leading-snug" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                              <p className="text-xs mt-1 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
-                            </div>
-                            {/* Icon 52×52 absolute bottom-right — same position on every card */}
-                            <div className="md:hidden absolute bottom-2 right-2 flex items-center justify-center pointer-events-none" style={{width:52,height:52}}>
-                              {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-full !h-full" /> : <method.icon style={{width:44,height:44,color:'#C9973A'}} />; })()}
-                            </div>
-                            {/* Desktop: icon top, text below */}
-                            <div className="hidden md:flex flex-col gap-2.5">
-                              <div className="flex items-start justify-between">
-                                {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-7 h-7" style={{color:'#C9973A'}} />; })()}
-                                <div className="flex items-center gap-1">
-                                  {method.comingSoon && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
-                                </div>
-                              </div>
-                              <div>
-                                <h4 className="font-display font-semibold text-lg" style={{color:'#1a1a1a'}}>{method.name}</h4>
-                                <p className="text-sm mt-1 line-clamp-2" style={{color:'#6b6b6b'}}>{method.description}</p>
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
+
+                  {/* Methods of selected methodology — full width below */}
+                  <div className="mb-6 md:mb-8 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+                    {(selectedMethodology === "1" ? methodology1Methods : methodology2Methods).map((method) => (
+                      <button
+                        key={method.id}
+                        onClick={() => handleMethodSelect(method.id)}
+                        className={cn(
+                          "relative p-3 md:p-4 rounded-xl border-[1.5px] transition-all duration-300 text-left w-full",
+                          selectedMethod === method.id
+                            ? "gradient-card border-[#0F2044] md:border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.5),0_0_14px_rgba(15,32,68,0.25)] md:shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
+                            : "gradient-card border-[#0F2044]/30 md:hover:border-[#0F2044] md:hover:shadow-[0_2px_10px_rgba(15,32,68,0.12)]"
+                        )}
+                      >
+                        <div className="md:hidden min-h-[90px] pb-14">
+                          {method.comingSoon && <span className="inline-block text-[8px] px-1 py-0.5 rounded-full font-medium mb-1" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
+                          <h4 className="font-display font-semibold text-sm leading-snug" style={{color:'#1a1a1a'}}>{method.name}</h4>
+                          <p className="text-xs mt-1 line-clamp-2 leading-relaxed" style={{color:'#6b6b6b'}}>{method.description}</p>
+                        </div>
+                        <div className="md:hidden absolute bottom-2 right-2 flex items-center justify-center pointer-events-none" style={{width:52,height:52}}>
+                          {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G className="!w-full !h-full" /> : <method.icon style={{width:44,height:44,color:'#C9973A'}} />; })()}
+                        </div>
+                        <div className="hidden md:flex flex-col gap-2.5">
+                          <div className="flex items-start justify-between">
+                            {(() => { const G = GOLDEN_ICONS[method.iconName]; return G ? <G /> : <method.icon className="w-7 h-7" style={{color:'#C9973A'}} />; })()}
+                            <div className="flex items-center gap-1">
+                              {method.comingSoon && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.15)',color:'#8B5E1A'}}>Скоро</span>}
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="font-display font-semibold text-lg" style={{color:'#1a1a1a'}}>{method.name}</h4>
+                            <p className="text-sm mt-1 line-clamp-2" style={{color:'#6b6b6b'}}>{method.description}</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
 
                   {/* Tier Selector — hidden for coming-soon methods */}
                   {currentConfig && !currentConfig.comingSoon && (
