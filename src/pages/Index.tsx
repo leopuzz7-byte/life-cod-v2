@@ -45,8 +45,10 @@ import { calculateKeyToCompat, KeyToCompatResult } from "@/lib/keytoCompatCalc";
 import { KeyToCompatResultComponent } from "@/components/KeyToCompatResult";
 import { calculateBusinessBasic, calculateBusinessPro, type BusinessBasicModule, type BusinessProModule } from "@/lib/lifecod/businessAnalysis";
 import { calculateSuccessPath, type SuccessPathModule } from "@/lib/lifecod/successPath";
+import { calculateKeytoSuccess, type SuccessResult } from "@/lib/keytoSuccessPath";
 import { BusinessResult } from "@/components/BusinessResult";
 import { SuccessPathResult } from "@/components/SuccessPathResult";
+import { KeyToSuccessPathResultComponent } from "@/components/KeyToSuccessPathResult";
 import { calculateDailyForecast, DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
 import { calculateFinancialCode, FinancialCodeResult as FinancialCodeType } from "@/lib/financialCode";
 import { calculateNameEnergy, NameEnergyResult as NameEnergyType } from "@/lib/nameEnergy";
@@ -94,6 +96,7 @@ const Index = () => {
     | { type: "contract"; data: DailyForecastType }
     | { type: "business"; data: BusinessBasicModule | BusinessProModule; isPro: boolean }
     | { type: "success-path"; data: SuccessPathModule }
+    | { type: "keyto-success"; data: SuccessResult }
     | null;
 
   const [selectedMethodology, setSelectedMethodology] = useState<"1" | "2">("1");
@@ -354,7 +357,7 @@ const Index = () => {
         break;
       }
       case "success-path": {
-        setResult({ type: "success-path", data: calculateSuccessPath(day, month, year) });
+        setResult({ type: "keyto-success", data: calculateKeytoSuccess(day, month, year) });
         break;
       }
       case "purpose":
@@ -482,7 +485,7 @@ const Index = () => {
           break;
         }
         case "success-path":
-          setResult({ type: "success-path", data: calculateSuccessPath(day, month, year) });
+          setResult({ type: "keyto-success", data: calculateKeytoSuccess(day, month, year) });
           break;
         case "purpose":
         default:
@@ -1031,6 +1034,9 @@ const Index = () => {
                 </div>
                 <BusinessResult result={result.data} isPro={result.isPro} />
               </div>
+            )}
+            {result.type === "keyto-success" && (
+              <KeyToSuccessPathResultComponent result={result.data} onReset={handleReset} />
             )}
             {result.type === "success-path" && (
               <div className="space-y-4">

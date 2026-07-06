@@ -22,6 +22,7 @@ import { KeyToBusinessResultComponent } from "@/components/KeyToBusinessResult";
 import { KeyToContractResultComponent } from "@/components/KeyToContractResult";
 import { KeyToNameResultComponent } from "@/components/KeyToNameResult";
 import { KeyToFinanceResultComponent } from "@/components/KeyToFinanceResult";
+import { KeyToSuccessPathResultComponent } from "@/components/KeyToSuccessPathResult";
 import { CompatibilityResultComponent } from "@/components/CompatibilityResult";
 import { AncestralResultComponent } from "@/components/AncestralResult";
 import { DailyForecastResultComponent } from "@/components/DailyForecastResult";
@@ -106,6 +107,8 @@ export default function AnalysisDetail() {
         return <KeyToNameResultComponent result={data} onReset={handleBack} />;
       case "keyto-finance":
         return <KeyToFinanceResultComponent result={data} onReset={handleBack} />;
+      case "keyto-success":
+        return <KeyToSuccessPathResultComponent result={data} onReset={handleBack} />;
       case "compatibility":
         return <CompatibilityResultComponent result={data} onReset={handleBack} tier={tier} />;
       case "ancestral":
