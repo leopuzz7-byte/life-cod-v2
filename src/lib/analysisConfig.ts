@@ -104,7 +104,7 @@ export const analysisConfigs: AnalysisTypeConfig[] = [
       description: 'Детальный прогноз, рекомендации, подходящие профессии, подводные камни',
     },
     inputType: 'date',
-    methodologies: ['1', '2'],
+    methodologies: ['1'],
   },
   {
     id: 'month',
@@ -315,7 +315,7 @@ export function getConfigsForMethodology(methodology: '1' | '2'): AnalysisTypeCo
   // Порядок для методики 1
   const order1 = ['purpose', 'compatibility', 'year', 'month', 'day', 'ancestral', 'contract'];
   // Порядок для методики 2
-  const order2 = ['classic-full', 'lifecod-compatibility', 'business', 'contract', 'name', 'finance', 'year', 'success-path'];
+  const order2 = ['classic-full', 'lifecod-compatibility', 'business', 'contract', 'name', 'finance', 'success-path'];
 
   const order = methodology === '1' ? order1 : order2;
   return order
