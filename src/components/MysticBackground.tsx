@@ -3,14 +3,14 @@ import { useMysticMode } from "@/lib/mysticMode";
 const SIZE = 1000;
 const C = SIZE / 2;
 const DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
-// Тонкие астрологические символы (как в референсе), одним золотом
+// Тонкие астрологические символы, одним золотом
 const SYMS = ["☉", "☽", "☿", "♀", "♁", "♃", "♄", "♅", "♆", "♇", "☊", "⚸"];
 
 function cycle<T>(base: T[], n: number): T[] {
   return Array.from({ length: n }, (_, i) => base[i % base.length]);
 }
 
-// Веер радиальных штрихов (главный элемент), штрихи чередуются по длине
+// Веер радиальных штрихов (медленно вращается), штрихи чередуются по длине
 function Ticks({ count, r, long, short, dur, reverse }: { count: number; r: number; long: number; short: number; dur: number; reverse?: boolean }) {
   const from = reverse ? `360 ${C} ${C}` : `0 ${C} ${C}`;
   const to = reverse ? `0 ${C} ${C}` : `360 ${C} ${C}`;
@@ -28,15 +28,11 @@ function Ticks({ count, r, long, short, dur, reverse }: { count: number; r: numb
   );
 }
 
-function SymbolRing({ r, count, items, dur, reverse, digits, size }: {
-  r: number; count: number; items: string[]; dur: number; reverse?: boolean; digits: boolean; size: number;
-}) {
+// Символы: статичные и ровные (вертикальные), симметрично по кругу
+function SymbolRing({ r, count, items, digits, size }: { r: number; count: number; items: string[]; digits: boolean; size: number }) {
   const list = cycle(items, count);
-  const from = reverse ? `360 ${C} ${C}` : `0 ${C} ${C}`;
-  const to = reverse ? `0 ${C} ${C}` : `360 ${C} ${C}`;
   return (
     <g>
-      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from={from} to={to} dur={`${dur}s`} repeatCount="indefinite" />
       {list.map((it, i) => {
         const a = (i / count) * 2 * Math.PI - Math.PI / 2;
         const x = C + r * Math.cos(a);
@@ -74,8 +70,8 @@ export function MysticBackground() {
         <circle cx={C} cy={C} r={388} fill="none" stroke="url(#mysticGold)" strokeWidth={2} opacity={0.85} />
         <circle cx={C} cy={C} r={378} fill="none" stroke="url(#mysticGold)" strokeWidth={1} opacity={0.5} />
 
-        {/* Символы по окружности */}
-        <SymbolRing r={340} count={12} items={items} dur={240} digits={digits} size={digits ? 52 : 40} />
+        {/* Символы по окружности — ровные и статичные */}
+        <SymbolRing r={344} count={12} items={items} digits={digits} size={digits ? 42 : 30} />
 
         {/* Внутренние тонкие окружности для глубины */}
         <circle cx={C} cy={C} r={250} fill="none" stroke="url(#mysticGold)" strokeWidth={1} strokeDasharray="1 14" opacity={0.4} />
