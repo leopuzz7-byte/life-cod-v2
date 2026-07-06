@@ -28,17 +28,22 @@ function Ticks({ count, r, long, short, dur, reverse }: { count: number; r: numb
   );
 }
 
-// Символы: статичные и ровные (вертикальные), симметрично по кругу
-function SymbolRing({ r, count, items, digits, size }: { r: number; count: number; items: string[]; digits: boolean; size: number }) {
+// Символы: вращаются вместе с кольцом и развёрнуты по радиусу (в сторону лучей)
+function SymbolRing({ r, count, items, digits, size, dur, reverse }: { r: number; count: number; items: string[]; digits: boolean; size: number; dur: number; reverse?: boolean }) {
   const list = cycle(items, count);
+  const from = reverse ? `360 ${C} ${C}` : `0 ${C} ${C}`;
+  const to = reverse ? `0 ${C} ${C}` : `360 ${C} ${C}`;
   return (
     <g>
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from={from} to={to} dur={`${dur}s`} repeatCount="indefinite" />
       {list.map((it, i) => {
         const a = (i / count) * 2 * Math.PI - Math.PI / 2;
+        const aDeg = (i / count) * 360 - 90;
         const x = C + r * Math.cos(a);
         const y = C + r * Math.sin(a);
         return (
           <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={size}
+            transform={`rotate(${aDeg + 90} ${x} ${y})`}
             fontFamily={digits ? "'Cormorant', serif" : "'Segoe UI Symbol', 'Noto Sans Symbols', serif"}
             fontWeight={digits ? 600 : 400} fill="url(#mysticGold)">{it}</text>
         );
@@ -71,7 +76,7 @@ export function MysticBackground() {
         <circle cx={C} cy={C} r={378} fill="none" stroke="url(#mysticGold)" strokeWidth={1} opacity={0.5} />
 
         {/* Символы по окружности — ровные и статичные */}
-        <SymbolRing r={344} count={12} items={items} digits={digits} size={digits ? 42 : 30} />
+        <SymbolRing r={344} count={12} items={items} digits={digits} size={digits ? 42 : 30} dur={260} />
 
         {/* Внутренние тонкие окружности для глубины */}
         <circle cx={C} cy={C} r={250} fill="none" stroke="url(#mysticGold)" strokeWidth={1} strokeDasharray="1 14" opacity={0.4} />
