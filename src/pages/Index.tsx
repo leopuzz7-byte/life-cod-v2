@@ -49,6 +49,7 @@ import { calculateKeytoSuccess, type SuccessResult } from "@/lib/keytoSuccessPat
 import { BusinessResult } from "@/components/BusinessResult";
 import { SuccessPathResult } from "@/components/SuccessPathResult";
 import { KeyToSuccessPathResultComponent } from "@/components/KeyToSuccessPathResult";
+import { useMysticMode } from "@/lib/mysticMode";
 import { calculateDailyForecast, DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
 import { calculateFinancialCode, FinancialCodeResult as FinancialCodeType } from "@/lib/financialCode";
 import { calculateNameEnergy, NameEnergyResult as NameEnergyType } from "@/lib/nameEnergy";
@@ -196,6 +197,7 @@ const Index = () => {
   }, [paymentStatus, pendingCalcArgs, pendingCompatArgs, pendingLifeCodArgs]);
 
   // Get current analysis config
+  const { setMode: setMysticMode } = useMysticMode();
   const currentConfig = getAnalysisConfig(selectedMethod);
 
   // Life C⚙D compatibility handler
@@ -234,6 +236,12 @@ const Index = () => {
     }
     setSelectedTier("basic");
   }, [selectedMethodology]);
+
+  // Вращающийся фон: цифры для методики 2, символы (таро) для методики 1
+  useEffect(() => {
+    setMysticMode(selectedMethodology === "2" ? "digits" : "symbols");
+    return () => setMysticMode("symbols");
+  }, [selectedMethodology, setMysticMode]);
 
   // When method changes — if the new method has no basic tier, auto-switch to professional
   useEffect(() => {

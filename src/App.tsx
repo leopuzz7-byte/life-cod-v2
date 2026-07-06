@@ -8,6 +8,8 @@ import { AccessProvider } from "@/lib/accessControl";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Footer } from "@/components/Footer";
+import { MysticBackground } from "@/components/MysticBackground";
+import { MysticModeProvider } from "@/lib/mysticMode";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
 // Главная грузится сразу (первый экран), остальные страницы — лениво,
@@ -39,7 +41,10 @@ const App = () => (
           <AccessProvider>
             <Toaster />
             <Sonner />
-            <div className="flex flex-col min-h-screen">
+            <MysticModeProvider>
+            <div className="flex flex-col min-h-screen relative">
+            <MysticBackground />
+            <div className="relative z-10 flex flex-col flex-1">
             <Suspense fallback={<LoadingScreen />}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -70,6 +75,8 @@ const App = () => (
             </Suspense>
             <Footer />
             </div>
+            </div>
+            </MysticModeProvider>
           </AccessProvider>
         </AuthProvider>
       </BrowserRouter>
