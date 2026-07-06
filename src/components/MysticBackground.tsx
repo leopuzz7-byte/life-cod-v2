@@ -59,7 +59,7 @@ export function MysticBackground() {
 
   return (
     <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-[205vmin] h-[205vmin] max-w-none opacity-[0.35] md:opacity-[0.5]">
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-[250vmin] h-[250vmin] md:w-[205vmin] md:h-[205vmin] max-w-none opacity-[0.35] md:opacity-[0.5] -translate-y-[10vh] md:translate-y-0">
         <defs>
           <linearGradient id="mysticGold" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#F0D98A" />
