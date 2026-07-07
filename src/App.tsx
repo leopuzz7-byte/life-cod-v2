@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Footer } from "@/components/Footer";
 import { MysticBackground } from "@/components/MysticBackground";
 import pageBg from "@/assets/page-bg.webp";
+import pageBgMobile from "@/assets/page-bg-mobile.webp";
 import { MysticModeProvider } from "@/lib/mysticMode";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
@@ -46,6 +47,8 @@ const App = () => (
             <div className="flex flex-col min-h-screen relative">
             <div className="hidden md:block fixed inset-0 z-0 pointer-events-none bg-cover bg-center" style={{ backgroundImage: `url(${pageBg})` }} />
             <div className="hidden md:block fixed inset-0 z-0 pointer-events-none" style={{ background: "rgba(245,244,239,0.12)" }} />
+            <div className="md:hidden fixed inset-0 z-0 pointer-events-none bg-cover bg-center" style={{ backgroundImage: `url(${pageBgMobile})` }} />
+            <div className="md:hidden fixed inset-0 z-0 pointer-events-none" style={{ background: "rgba(245,244,239,0.12)" }} />
             <MysticBackground />
             <div className="relative z-10 flex flex-col flex-1">
             <Suspense fallback={<LoadingScreen />}>

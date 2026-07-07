@@ -58,7 +58,7 @@ export function MysticBackground() {
   const items = digits ? DIGITS : SYMS;
 
   return (
-    <div aria-hidden className="fixed inset-0 z-0 overflow-hidden flex items-center justify-center pointer-events-none md:hidden">
+    <div aria-hidden className="fixed inset-0 z-0 overflow-hidden flex items-center justify-center pointer-events-none hidden">
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-[250vmin] h-[250vmin] md:w-[205vmin] md:h-[205vmin] max-w-none opacity-[0.35] md:opacity-[0.5] -translate-y-[10vh] md:translate-y-0">
         <defs>
           <linearGradient id="mysticGold" x1="0" y1="0" x2="0" y2="1">
