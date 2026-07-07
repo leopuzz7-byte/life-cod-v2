@@ -733,17 +733,21 @@ const Index = () => {
                             key={method.id}
                             onClick={() => handleMethodSelect(method.id)}
                             className={cn(
-                              "group relative rounded-xl border-[1.5px] overflow-hidden text-left w-full h-[150px] md:h-[188px] transition-all duration-300",
+                              "group relative rounded-xl border-[1.5px] overflow-hidden text-left w-full h-[158px] md:h-[184px] transition-all duration-300",
                               selectedMethod === method.id
                                 ? "border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.55),0_0_16px_rgba(15,32,68,0.28)] md:shadow-[0_3px_12px_rgba(15,32,68,0.22)]"
                                 : "border-[#0F2044]/25 md:hover:border-[#0F2044] md:hover:shadow-[0_3px_14px_rgba(15,32,68,0.16)]"
                             )}
                           >
-                            <img src={img} alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-105" />
+                            <img src={img} alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-105" style={{ objectPosition: "center 32%" }} />
                             {method.comingSoon && <span className="absolute top-2 left-2 z-10 text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.9)',color:'#3a2a10'}}>Скоро</span>}
-                            <div className="absolute inset-x-0 bottom-0 p-3 md:p-3.5 backdrop-blur-md bg-white/55 border-t border-white/50">
+                            {/* мягкое стекло: лёгкий блюр, затухающий кверху */}
+                            <div className="absolute inset-x-0 bottom-0 h-[52%] pointer-events-none backdrop-blur-[2.5px]" style={{ WebkitMaskImage: "linear-gradient(to top, #000 40%, transparent)", maskImage: "linear-gradient(to top, #000 40%, transparent)" }} />
+                            {/* плавный светлый переход: у текста плотнее, выше почти прозрачно */}
+                            <div className="absolute inset-x-0 bottom-0 h-[58%] pointer-events-none" style={{ background: "linear-gradient(to top, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.6) 40%, rgba(255,255,255,0) 100%)" }} />
+                            <div className="absolute inset-x-0 bottom-0 px-3 pb-2.5 md:px-3.5 md:pb-3">
                               <h4 className="font-display font-semibold text-sm md:text-base leading-snug" style={{color:'#0F2044'}}>{method.name}</h4>
-                              <p className="text-[11px] md:text-xs mt-0.5 line-clamp-2 leading-snug" style={{color:'#2a2a2a'}}>{method.description}</p>
+                              <p className="text-[11px] md:text-xs mt-0.5 line-clamp-2 leading-snug" style={{color:'#243049'}}>{method.description}</p>
                             </div>
                           </button>
                         );
