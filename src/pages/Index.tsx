@@ -50,7 +50,7 @@ import { BusinessResult } from "@/components/BusinessResult";
 import { SuccessPathResult } from "@/components/SuccessPathResult";
 import { KeyToSuccessPathResultComponent } from "@/components/KeyToSuccessPathResult";
 import { useMysticMode } from "@/lib/mysticMode";
-import { cardImages } from "@/lib/cardImages";
+import { cardImages, cardImagesM2 } from "@/lib/cardImages";
 
 // Карточки методики 1 с картинками. false — вернуть золотые значки (файлы/код не удалены).
 const SHOW_CARD_IMAGES = true;
@@ -726,7 +726,7 @@ const Index = () => {
                   {/* Methods of selected methodology — full width below */}
                   <div className="mb-6 md:mb-8 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                     {(selectedMethodology === "1" ? methodology1Methods : methodology2Methods).map((method) => {
-                      const img = SHOW_CARD_IMAGES && selectedMethodology === "1" ? cardImages[method.id] : undefined;
+                      const img = SHOW_CARD_IMAGES ? (selectedMethodology === "1" ? cardImages[method.id] : cardImagesM2[method.id]) : undefined;
                       if (img) {
                         return (
                           <button
