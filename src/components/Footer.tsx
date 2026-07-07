@@ -8,7 +8,7 @@ export function Footer() {
   const linkClass = "flex items-center gap-1 text-[#0F2044]/55 hover:text-[#0F2044] transition-colors duration-200 hover:underline underline-offset-2";
 
   return (
-    <footer className="w-full border-t border-white/25 bg-background/45 backdrop-blur-md mt-auto">
+    <footer className="w-full border-t border-white/20 bg-background/20 backdrop-blur-lg mt-auto">
       <div className="container mx-auto px-4 py-4 md:py-5">
         {/* Десктоп */}
         <div className="hidden md:flex items-center justify-between gap-4 text-xs text-[#0F2044]/50">
