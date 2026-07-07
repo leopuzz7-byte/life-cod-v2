@@ -50,6 +50,10 @@ import { BusinessResult } from "@/components/BusinessResult";
 import { SuccessPathResult } from "@/components/SuccessPathResult";
 import { KeyToSuccessPathResultComponent } from "@/components/KeyToSuccessPathResult";
 import { useMysticMode } from "@/lib/mysticMode";
+import { cardImages } from "@/lib/cardImages";
+
+// Карточки методики 1 с картинками. false — вернуть золотые значки (файлы/код не удалены).
+const SHOW_CARD_IMAGES = true;
 import { calculateDailyForecast, DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
 import { calculateFinancialCode, FinancialCodeResult as FinancialCodeType } from "@/lib/financialCode";
 import { calculateNameEnergy, NameEnergyResult as NameEnergyType } from "@/lib/nameEnergy";
@@ -721,7 +725,30 @@ const Index = () => {
 
                   {/* Methods of selected methodology — full width below */}
                   <div className="mb-6 md:mb-8 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-                    {(selectedMethodology === "1" ? methodology1Methods : methodology2Methods).map((method) => (
+                    {(selectedMethodology === "1" ? methodology1Methods : methodology2Methods).map((method) => {
+                      const img = SHOW_CARD_IMAGES && selectedMethodology === "1" ? cardImages[method.id] : undefined;
+                      if (img) {
+                        return (
+                          <button
+                            key={method.id}
+                            onClick={() => handleMethodSelect(method.id)}
+                            className={cn(
+                              "group relative rounded-xl border-[1.5px] overflow-hidden text-left w-full h-[150px] md:h-[188px] transition-all duration-300",
+                              selectedMethod === method.id
+                                ? "border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.55),0_0_16px_rgba(15,32,68,0.28)] md:shadow-[0_3px_12px_rgba(15,32,68,0.22)]"
+                                : "border-[#0F2044]/25 md:hover:border-[#0F2044] md:hover:shadow-[0_3px_14px_rgba(15,32,68,0.16)]"
+                            )}
+                          >
+                            <img src={img} alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-105" />
+                            {method.comingSoon && <span className="absolute top-2 left-2 z-10 text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.9)',color:'#3a2a10'}}>Скоро</span>}
+                            <div className="absolute inset-x-0 bottom-0 p-3 md:p-3.5 backdrop-blur-md bg-white/55 border-t border-white/50">
+                              <h4 className="font-display font-semibold text-sm md:text-base leading-snug" style={{color:'#0F2044'}}>{method.name}</h4>
+                              <p className="text-[11px] md:text-xs mt-0.5 line-clamp-2 leading-snug" style={{color:'#2a2a2a'}}>{method.description}</p>
+                            </div>
+                          </button>
+                        );
+                      }
+                      return (
                       <button
                         key={method.id}
                         onClick={() => handleMethodSelect(method.id)}
@@ -753,7 +780,8 @@ const Index = () => {
                           </div>
                         </div>
                       </button>
-                    ))}
+                      );
+                    })}
                   </div>
 
 
