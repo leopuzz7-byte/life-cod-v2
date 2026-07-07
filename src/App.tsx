@@ -45,7 +45,7 @@ const App = () => (
             <MysticModeProvider>
             <div className="flex flex-col min-h-screen relative">
             <div className="hidden md:block fixed inset-0 z-0 pointer-events-none bg-cover bg-center" style={{ backgroundImage: `url(${pageBg})` }} />
-            <div className="hidden md:block fixed inset-0 z-0 pointer-events-none" style={{ background: "rgba(245,244,239,0.28)" }} />
+            <div className="hidden md:block fixed inset-0 z-0 pointer-events-none" style={{ background: "rgba(245,244,239,0.12)" }} />
             <MysticBackground />
             <div className="relative z-10 flex flex-col flex-1">
             <Suspense fallback={<LoadingScreen />}>
