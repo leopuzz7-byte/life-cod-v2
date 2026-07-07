@@ -48,7 +48,7 @@ const App = () => (
             <div className="hidden md:block fixed inset-0 z-0 pointer-events-none bg-cover bg-center" style={{ backgroundImage: `url(${pageBg})` }} />
             <div className="hidden md:block fixed inset-0 z-0 pointer-events-none" style={{ background: "rgba(245,244,239,0.12)" }} />
             <div className="md:hidden fixed inset-0 z-0 pointer-events-none bg-cover bg-center" style={{ backgroundImage: `url(${pageBgMobile})` }} />
-            <div className="md:hidden fixed inset-0 z-0 pointer-events-none" style={{ background: "rgba(245,244,239,0.12)" }} />
+            <div className="md:hidden fixed inset-0 z-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(245,244,239,0.85) 0%, rgba(245,244,239,0.55) 20%, rgba(245,244,239,0.15) 42%, rgba(245,244,239,0.12) 100%)" }} />
             <MysticBackground />
             <div className="relative z-10 flex flex-col flex-1">
             <Suspense fallback={<LoadingScreen />}>
