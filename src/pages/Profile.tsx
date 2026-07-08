@@ -24,7 +24,7 @@ const days = Array.from({ length: 31 }, (_, i) => i + 1);
 function ProfileLoadError({ error, onRetry, onSignOut }: { error: string; onRetry: () => void; onSignOut: () => void }) {
   const { t } = useTranslation();
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-md mx-auto">
@@ -93,7 +93,7 @@ function ProfileNotFoundRecovery() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-md mx-auto">
@@ -178,7 +178,7 @@ export default function Profile() {
 
   if (loading || !profileFetched) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         <Header />
         <LoadingScreen />
       </div>
@@ -257,7 +257,7 @@ export default function Profile() {
     year !== String(profile.birth_year);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-2xl mx-auto">

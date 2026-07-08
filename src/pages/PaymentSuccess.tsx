@@ -75,7 +75,7 @@ export default function PaymentSuccess() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-16 flex items-center justify-center">
         <div className="max-w-md w-full text-center space-y-6">

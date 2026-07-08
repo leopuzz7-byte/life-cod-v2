@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import heroMobileImg from "@/assets/hero-mobile.png";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
 import { useAccess } from "@/lib/accessControl";
@@ -541,13 +540,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative">
-      {/* Mobile: fullscreen background behind header */}
-      {!user && (
-        <div
-          className="md:hidden absolute inset-0 bg-cover bg-top"
-          style={{ backgroundImage: `url(${heroMobileImg})` }}
-        />
-      )}
       <Header />
 
       <main className="relative z-10">

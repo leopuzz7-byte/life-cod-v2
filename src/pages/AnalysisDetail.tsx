@@ -55,7 +55,7 @@ export default function AnalysisDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         <Header />
         <LoadingScreen />
       </div>
@@ -64,7 +64,7 @@ export default function AnalysisDetail() {
 
   if (error || !analysis) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         <Header />
         <main className="container mx-auto px-4 py-12">
           <div className="max-w-md mx-auto text-center gradient-card rounded-2xl p-8 border border-border">
@@ -144,7 +144,7 @@ export default function AnalysisDetail() {
     });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-6 md:py-10">
         <div className="max-w-5xl mx-auto">
