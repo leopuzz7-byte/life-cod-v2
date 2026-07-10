@@ -9,7 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Footer } from "@/components/Footer";
 import { MysticBackground } from "@/components/MysticBackground";
-import pageBg from "@/assets/page-bg.webp";
+import pageBg from "@/assets/page-bg.png";
 import pageBgMobile from "@/assets/page-bg-mobile.webp";
 import { MysticModeProvider } from "@/lib/mysticMode";
 import { LoadingScreen } from "@/components/LoadingScreen";
