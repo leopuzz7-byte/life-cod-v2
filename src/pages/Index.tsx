@@ -11,6 +11,7 @@ import { CompatibilityDateInput } from "@/components/CompatibilityDateInput";
 import { YearForecastResult } from "@/components/YearForecastResult";
 import { MonthForecastResult } from "@/components/MonthForecastResult";
 import { PersonalMatrixResult } from "@/components/PersonalMatrixResult";
+import { PurposeReadingResult } from "@/components/PurposeReadingResult";
 import { KeyToResultComponent } from "@/components/KeyToResult";
 import { KeyToBusinessResultComponent } from "@/components/KeyToBusinessResult";
 import { KeyToContractResultComponent } from "@/components/KeyToContractResult";
@@ -872,7 +873,7 @@ const Index = () => {
               />
             )}
             {result.type === "purpose" && (
-              <PersonalMatrixResult
+              <PurposeReadingResult
                 matrix={result.data}
                 name={userName}
                 onReset={handleReset}

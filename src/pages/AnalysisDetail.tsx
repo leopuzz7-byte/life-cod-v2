@@ -16,6 +16,7 @@ import {
 import { YearForecastResult } from "@/components/YearForecastResult";
 import { MonthForecastResult } from "@/components/MonthForecastResult";
 import { PersonalMatrixResult } from "@/components/PersonalMatrixResult";
+import { PurposeReadingResult } from "@/components/PurposeReadingResult";
 import { KeyToResultComponent } from "@/components/KeyToResult";
 import { KeyToCompatResultComponent } from "@/components/KeyToCompatResult";
 import { KeyToBusinessResultComponent } from "@/components/KeyToBusinessResult";
@@ -94,7 +95,7 @@ export default function AnalysisDetail() {
       case "month":
         return <MonthForecastResult forecast={data} name={userName} onReset={handleBack} tier={tier} />;
       case "purpose":
-        return <PersonalMatrixResult matrix={data} name={userName} onReset={handleBack} tier={tier} />;
+        return <PurposeReadingResult matrix={data} name={userName} onReset={handleBack} tier={tier} />;
       case "keyto":
         return <KeyToResultComponent result={data} name={userName} onReset={handleBack} isPro={tier === 'professional'} />;
       case "keyto-compat":
