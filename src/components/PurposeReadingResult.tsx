@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { PersonalMatrix } from "@/lib/calculations";
 import { getArcana, positionDescriptions } from "@/lib/arcana";
 import {
@@ -37,7 +38,7 @@ function ArcanaZoom({ value, onClose }: { value: number; onClose: () => void }) 
     return () => { document.removeEventListener("keydown", h); document.body.style.overflow = ""; };
   }, [onClose]);
   const a = getArcana(value);
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div className="relative z-10 flex flex-col items-center pb-6 pt-4" onClick={(e) => e.stopPropagation()}>
@@ -47,7 +48,8 @@ function ArcanaZoom({ value, onClose }: { value: number; onClose: () => void }) 
         <img src={`/arcana/arcana-${value}.webp`} alt={`Аркан ${value}`} draggable={false} className="rounded-2xl shadow-2xl object-contain max-h-[78vh] w-auto sm:h-[520px]" />
         {a && <div className="mt-3 text-center text-white/90 text-sm font-display">{value} {a.name} · {a.planet} · {a.element}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

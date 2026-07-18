@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { LucideIcon, X } from "lucide-react";
 import { getArcana } from "@/lib/arcana";
@@ -21,7 +22,7 @@ function ArcanaModal({ value, onClose }: { value: number; onClose: () => void })
     document.body.style.overflow = 'hidden';
     return () => { document.removeEventListener('keydown', h); document.body.style.overflow = ''; };
   }, [onClose]);
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div className="relative z-10 flex flex-col items-center pb-6 pt-4 sm:pb-0 sm:pt-0" onClick={e => e.stopPropagation()}>
@@ -30,7 +31,8 @@ function ArcanaModal({ value, onClose }: { value: number; onClose: () => void })
         </button>
         <img src={`/arcana/arcana-${value}.webp`} alt={`Аркан ${value}`} draggable={false} className="rounded-2xl shadow-2xl object-contain max-h-[78vh] w-auto sm:max-h-[80vh] sm:h-[520px]" />
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

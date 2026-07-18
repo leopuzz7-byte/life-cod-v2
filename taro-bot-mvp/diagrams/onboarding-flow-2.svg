@@ -1,0 +1,27 @@
+<svg width="100%" viewBox="0 0 680 704" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Онбординг бота Надежды — от персонализации до главного меню</title>
+<desc>Шесть шагов: вау-момент персонализации, реакция пользователя на кнопках, короткая отработка скепсиса, вопрос про боль, бесплатный разбор дня целиком, переход в главное меню.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="200" y="40" width="280" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="340" y="60" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="600" fill="#3C3489">«Вау»-момент</text>
+<text x="340" y="80" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#534AB7">персонализация по карте и дате</text>
+<line x1="340" y1="96" x2="340" y2="156" stroke="#5F5E5A" stroke-width="0.5" marker-end="url(#arrow)"/>
+<rect x="200" y="156" width="280" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="340" y="176" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="600" fill="#085041">Реакция пользователя</text>
+<text x="340" y="196" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#0F6E56">3 кнопки: точно / не совсем / ещё</text>
+<line x1="340" y1="212" x2="340" y2="272" stroke="#5F5E5A" stroke-width="0.5" marker-end="url(#arrow)"/>
+<rect x="200" y="272" width="280" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="340" y="292" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="600" fill="#3C3489">Отработка скепсиса</text>
+<text x="340" y="312" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#534AB7">коротко, сразу после вау-момента</text>
+<line x1="340" y1="328" x2="340" y2="388" stroke="#5F5E5A" stroke-width="0.5" marker-end="url(#arrow)"/>
+<rect x="200" y="388" width="280" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="340" y="408" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="600" fill="#085041">Вопрос про боль</text>
+<text x="340" y="428" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#0F6E56">4 кнопки + свой вариант текстом</text>
+<line x1="340" y1="444" x2="340" y2="504" stroke="#5F5E5A" stroke-width="0.5" marker-end="url(#arrow)"/>
+<rect x="200" y="504" width="280" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="340" y="524" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="600" fill="#085041">Бесплатный разбор дня</text>
+<text x="340" y="544" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#0F6E56">карты и текст, без урезки</text>
+<line x1="340" y1="560" x2="340" y2="620" stroke="#5F5E5A" stroke-width="0.5" marker-end="url(#arrow)"/>
+<rect x="200" y="620" width="280" height="44" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="340" y="642" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="600" fill="#444441">Главное меню</text>
+</svg>

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { createPortal } from "react-dom";
 import { PersonalMatrix, formatBirthDate } from "@/lib/calculations";
 import { positionDescriptions, successCodePositions, lifePeriods, getArcanaName, getArcana } from "@/lib/arcana";
 import { ArcanaCard } from "./ArcanaCard";
@@ -447,7 +448,7 @@ function ArcanaModal({ value, onClose }: { value: number; onClose: () => void })
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
       onClick={onClose}
@@ -489,7 +490,8 @@ function ArcanaModal({ value, onClose }: { value: number; onClose: () => void })
           )}
         />
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

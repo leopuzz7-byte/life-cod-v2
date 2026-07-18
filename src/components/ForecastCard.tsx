@@ -1,4 +1,5 @@
 import { getArcana } from "@/lib/arcana";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
@@ -17,7 +18,7 @@ function ArcanaModal({ value, onClose }: { value: number; onClose: () => void })
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
   }, []);
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div className="relative z-10 w-full sm:w-auto flex flex-col items-center pb-6 pt-4 sm:pb-0" onClick={e => e.stopPropagation()}>
@@ -27,7 +28,8 @@ function ArcanaModal({ value, onClose }: { value: number; onClose: () => void })
         <img src={getArcanaImage(value)} alt={`Аркан ${value}`} draggable={false}
           className="rounded-2xl shadow-2xl object-contain max-h-[78vh] w-auto sm:max-h-[80vh] sm:h-[520px]" />
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
