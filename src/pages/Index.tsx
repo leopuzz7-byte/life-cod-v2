@@ -797,7 +797,7 @@ const Index = () => {
                       />
                       {/* What's inside Professional extended analysis (per methodology) */}
                       {selectedTier === 'professional' && currentConfig.professional && (
-                        <div className="mt-1 mb-4 px-4 py-3 rounded-xl text-xs leading-relaxed" style={{background:'rgba(15,32,68,0.04)',border:'1px solid rgba(15,32,68,0.12)'}}>
+                        <div className="mt-1 mb-4 px-4 py-3 rounded-xl text-xs leading-relaxed" style={{background:'rgba(255,255,255,0.30)',border:'1px solid rgba(255,255,255,0.45)',backdropFilter:'blur(16px) saturate(1.1)',WebkitBackdropFilter:'blur(16px) saturate(1.1)',boxShadow:'0 2px 12px rgba(15,32,68,0.08)'}}>
                           <p className="font-semibold mb-1 text-[#0F2044]">{t("res.proExtendedIncluded")}</p>
                           <p className="text-[#0F2044]/70">{selectedMethod === 'lifecod-compatibility' ? 'Все 4 числа судьбы пары (Ума, Действия, Реализации, Итога) с подробными описаниями, раскладка «состоит из» каждого числа и Общий год пары.' : selectedMethod === 'business' ? 'Числа Ума, Действия и Реализации в деловом ключе, подходящие профессии, ключевые навыки и детальная матрица.' : proExtendedDescription(selectedMethodology)}</p>
                         </div>
