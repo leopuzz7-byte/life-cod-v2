@@ -560,10 +560,7 @@ const Index = () => {
             {!user && (
               <section className="relative">
                 {/* ── MOBILE: text content only (bg is set on page root) ── */}
-                <div
-                  className="md:hidden"
-                  style={{ minHeight: 'calc(100vh - 80px)' }}
-                >
+                <div className="md:hidden">
                   <div className="pt-6 px-6 text-center">
                     <h1 className="font-display text-4xl leading-tight mb-4" style={{color:'#0F2044'}}>
                       Life Cod: ключ к осознанной жизни
@@ -577,17 +574,15 @@ const Index = () => {
                   </div>
                 </div>
 
-                {/* ── MOBILE: fixed bottom CTA ── */}
-                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col items-center gap-3 px-6 pb-8 pt-3">
+                {/* ── MOBILE: CTA в потоке (не закреплён) ── */}
+                <div className="md:hidden flex flex-col items-center gap-3 px-6 pt-6 pb-12">
                   <Link to="/register" className="w-full max-w-xs">
                     <Button
-                      className="w-full h-14 rounded-full text-base font-medium text-[#0F2044]"
+                      className="w-full h-14 rounded-full text-base font-medium text-white"
                       style={{
-                        background: 'rgba(245, 242, 236, 0.55)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
+                        background: '#0F2044',
                         border: '1px solid #0F2044',
-                        boxShadow: 'none',
+                        boxShadow: '0 4px 14px rgba(15,32,68,0.25)',
                       }}
                     >
                       Начать разбор →
@@ -617,7 +612,7 @@ const Index = () => {
                       </p>
                       <div className="flex flex-col items-center gap-3">
                         <Link to="/register">
-                          <Button className="h-14 px-8 rounded-full text-base font-medium gradient-brown text-white border-2 border-primary">
+                          <Button className="h-14 px-8 rounded-full text-base font-medium text-white border-2" style={{ background: '#0F2044', borderColor: '#0F2044' }}>
                             Начать разбор →
                           </Button>
                         </Link>
