@@ -1,0 +1,18 @@
+{
+  "name": "taro-bot",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Телеграм-бот Надежды: воронка знакомства, разбор Предназначения, подписка на канал, чат с ИИ-тарологом, меню платных разборов",
+  "main": "src/bot/index.js",
+  "scripts": {
+    "start": "node src/bot/index.js",
+    "selftest": "node src/engine/_selftest.js",
+    "broadcast:daily": "node src/bot/run-broadcast.js daily",
+    "broadcast:weekly": "node src/bot/run-broadcast.js weekly"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.2",
+    "grammy": "^1.45.1",
+    "dotenv": "^17.4.2"
+  }
+}
