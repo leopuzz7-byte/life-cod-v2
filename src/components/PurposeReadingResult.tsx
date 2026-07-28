@@ -1,65 +1,34 @@
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { PersonalMatrix } from "@/lib/calculations";
-import { getArcana, positionDescriptions } from "@/lib/arcana";
+import { getArcana } from "@/lib/arcana";
 import {
-  generatePurposeReading, PurposeReading, TriangleBlock, MatrixPositionBlock, PeriodBlock,
+  generatePurposeReading, PurposeReading, TriangleBlock, MatrixPositionBlock, PeriodBlock, PosMini,
 } from "@/lib/aiPurposeService";
+import { MatrixGrid, MatrixCell } from "./MatrixGrid";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft, Sparkles, Compass, Flame, Landmark, KeyRound, Link2, Crown, X,
+  ArrowLeft, Sparkles, Compass, Flame, Landmark, KeyRound, Link2, Crown,
   Sun, Moon, Hourglass, Grid3x3, TrendingUp, AlertTriangle, CheckCircle2, Lightbulb, Star,
+  Target, Briefcase, Copy, RefreshCw,
 } from "lucide-react";
 import { ChapterBlock } from "./ChapterBlock";
 import { LoadingScreen } from "./LoadingScreen";
 import { NadezhdaSignature } from "./NadezhdaSignature";
 
-interface Props {
-  matrix: PersonalMatrix;
-  name: string;
-  onReset: () => void;
-  tier?: string;
-}
+interface Props { matrix: PersonalMatrix; name: string; onReset: () => void; tier?: string }
 
-const TRI_TITLES = [
-  "Детство и юность (до 25 лет)",
-  "Внутренняя суть личности",
-  "Цель накопления мудрости (после 50 лет)",
-];
+const TRI_TITLES = ["Детство и юность (до 25 лет)", "Внутренняя суть личности", "Цель накопления мудрости (после 50 лет)"];
 const TRI_ICONS = [Sun, Moon, Hourglass];
 
-/* ============ мелкие кирпичики оформления ============ */
-
-function ArcanaZoom({ value, onClose }: { value: number; onClose: () => void }) {
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("keydown", h);
-    document.body.style.overflow = "hidden";
-    return () => { document.removeEventListener("keydown", h); document.body.style.overflow = ""; };
-  }, [onClose]);
-  const a = getArcana(value);
-  return createPortal(
-    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-      <div className="relative z-10 flex flex-col items-center pb-6 pt-4" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white shadow-lg">
-          <X className="w-5 h-5" />
-        </button>
-        <img src={`/arcana/arcana-${value}.webp`} alt={`Аркан ${value}`} draggable={false} className="rounded-2xl shadow-2xl object-contain max-h-[78vh] w-auto sm:h-[520px]" />
-        {a && <div className="mt-3 text-center text-white/90 text-sm font-display">{value} {a.name} · {a.planet} · {a.element}</div>}
-      </div>
-    </div>,
-    document.body
-  );
-}
+/* ============ кирпичики ============ */
 
 function Divider({ title, icon: Icon }: { title: string; icon: React.ElementType }) {
   return (
-    <div className="flex items-center gap-3 pt-4 pb-1">
+    <div className="flex items-center gap-3 pt-5 pb-1">
       <div className="h-px flex-1 bg-gradient-to-r from-transparent to-primary/40" />
       <div className="flex items-center gap-2 text-primary shrink-0">
         <Icon className="w-4 h-4" />
-        <span className="font-display font-semibold text-sm uppercase tracking-[0.18em]">{title}</span>
+        <span className="font-display font-semibold text-sm uppercase tracking-[0.18em] text-center">{title}</span>
       </div>
       <div className="h-px flex-1 bg-gradient-to-l from-transparent to-primary/40" />
     </div>
@@ -90,119 +59,108 @@ function Para({ label, text }: { label?: string; text?: string }) {
   );
 }
 
-function Verdict({ text }: { text?: string }) {
-  if (!text) return null;
+function DualPanel({ plus, minus, plusLabel = "В плюсе", minusLabel = "В минусе" }: { plus?: string; minus?: string; plusLabel?: string; minusLabel?: string }) {
+  if (!plus && !minus) return null;
   return (
-    <div className="mt-5 rounded-xl bg-primary/8 border border-primary/25 p-4 backdrop-blur-md">
-      <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1.5 flex items-center gap-1.5">
-        <Sparkles className="w-3.5 h-3.5" /> Главный вывод
-      </div>
-      <p className="text-sm text-foreground/90 leading-relaxed">{text}</p>
+    <div className="grid md:grid-cols-2 gap-3 mt-4">
+      {plus && (
+        <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4 backdrop-blur-md">
+          <div className="text-xs font-semibold uppercase tracking-wide text-emerald-600 mb-1.5 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> {plusLabel}</div>
+          <p className="text-sm text-foreground/90 leading-relaxed">{plus}</p>
+        </div>
+      )}
+      {minus && (
+        <div className="rounded-xl border border-destructive/25 bg-destructive/5 p-4 backdrop-blur-md">
+          <div className="text-xs font-semibold uppercase tracking-wide text-destructive mb-1.5 flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> {minusLabel}</div>
+          <p className="text-sm text-foreground/90 leading-relaxed">{minus}</p>
+        </div>
+      )}
     </div>
   );
 }
 
-function ListPanel({ title, items, tone }: { title: string; items?: string[]; tone: "primary" | "warning" | "success" }) {
+function Verdict({ text, title = "Главный вывод", icon: Icon = Sparkles }: { text?: string; title?: string; icon?: React.ElementType }) {
+  if (!text) return null;
+  return (
+    <div className="mt-5 rounded-xl bg-primary/8 border border-primary/25 p-4 backdrop-blur-md">
+      <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1.5 flex items-center gap-1.5"><Icon className="w-3.5 h-3.5" /> {title}</div>
+      <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{text}</p>
+    </div>
+  );
+}
+
+function ListPanel({ title, items, tone, icon: Icon }: { title: string; items?: string[]; tone: "primary" | "warning" | "success"; icon?: React.ElementType }) {
   if (!items || items.length === 0) return null;
   const border = tone === "warning" ? "border-destructive/25 bg-destructive/5" : tone === "success" ? "border-emerald-500/25 bg-emerald-500/5" : "border-primary/20 bg-primary/5";
   const head = tone === "warning" ? "text-destructive" : tone === "success" ? "text-emerald-600" : "text-primary";
-  const Icon = tone === "warning" ? AlertTriangle : tone === "success" ? CheckCircle2 : Star;
+  const Ic = Icon || (tone === "warning" ? AlertTriangle : tone === "success" ? CheckCircle2 : Star);
   return (
     <div className={`rounded-xl border p-4 backdrop-blur-md ${border}`}>
-      <div className={`text-xs font-semibold uppercase tracking-wide mb-1 flex items-center gap-1.5 ${head}`}>
-        <Icon className="w-3.5 h-3.5" /> {title}
-      </div>
+      <div className={`text-xs font-semibold uppercase tracking-wide mb-1 flex items-center gap-1.5 ${head}`}><Ic className="w-3.5 h-3.5" /> {title}</div>
       <Bullets items={items} tone={tone} />
     </div>
   );
 }
 
-function ArcanaThumb({ n, caption, sub, onOpen, big }: { n: number; caption?: string; sub?: string; onOpen: (n: number) => void; big?: boolean }) {
-  const a = getArcana(n);
+function ProfCatalog({ groups }: { groups: { group: string; items: string[] }[] }) {
+  if (!groups || groups.length === 0) return null;
   return (
-    <button onClick={() => onOpen(n)} className="group flex flex-col items-center text-center gap-1.5 rounded-2xl border border-border/60 bg-white/35 backdrop-blur-md p-2.5 hover:border-primary/50 hover:bg-white/50 transition-all">
-      <div className={`relative w-full ${big ? "aspect-[2/3]" : "aspect-[2/3]"} rounded-xl overflow-hidden ring-1 ring-border/60 shadow-sm`}>
-        <img src={`/arcana/arcana-${n}.webp`} alt={a?.name || ""} className="w-full h-full object-cover group-hover:scale-105 transition-transform" draggable={false} />
-        <div className="absolute inset-x-0 bottom-0 bg-black/60 py-0.5 text-center">
-          <span className="text-[10px] font-bold text-white/90">{n}</span>
+    <div className="space-y-3">
+      {groups.map((g, i) => (
+        <div key={i} className="rounded-xl bg-muted/20 border border-border/50 p-3 backdrop-blur-md">
+          <div className="text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5 text-primary" /> {g.group}</div>
+          <div className="flex flex-wrap gap-1.5">
+            {g.items?.map((p, j) => <span key={j} className="text-xs bg-secondary/70 px-2 py-1 rounded-full text-secondary-foreground">{p}</span>)}
+          </div>
         </div>
-      </div>
-      {caption && <div className="text-[10px] text-muted-foreground leading-tight">{caption}</div>}
-      <div className={`font-display font-semibold text-foreground leading-tight ${big ? "text-sm" : "text-[11px]"}`}>{a?.name}</div>
-      {sub && <div className="text-[10px] text-muted-foreground leading-tight">{sub}</div>}
-    </button>
+      ))}
+    </div>
   );
 }
 
-/* ============ крупные секции ============ */
+function PosCard({ item, arcanaNum }: { item: PosMini; arcanaNum: number }) {
+  const a = getArcana(arcanaNum);
+  return (
+    <div className="rounded-2xl border border-border/60 bg-white/25 backdrop-blur-md p-4">
+      <div className="flex items-start gap-3 mb-2">
+        <MatrixCell position={item.position} value={arcanaNum} />
+        <div className="min-w-0 pt-0.5">
+          <div className="text-[11px] text-primary/80 uppercase tracking-wide">Позиция {item.position}</div>
+          <div className="font-display font-semibold text-foreground leading-tight">{item.title}</div>
+          {a && <div className="text-xs text-muted-foreground mt-0.5">{arcanaNum} {a.name} · {a.planet} · {a.element}</div>}
+        </div>
+      </div>
+      <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{item.text}</p>
+      <DualPanel plus={item.plus} minus={item.minus} />
+    </div>
+  );
+}
+
+/* ============ секции ============ */
 
 function TriangleChapter({ b, arcanaNum, idx }: { b: TriangleBlock; arcanaNum: number; idx: number }) {
   const a = getArcana(arcanaNum);
   return (
-    <ChapterBlock
-      num={idx + 1}
-      arcana={arcanaNum}
-      title={b.positionTitle || TRI_TITLES[idx]}
-      subtitle={a ? `${b.arcanaName || `${arcanaNum} Аркан «${a.name}»`}` : b.arcanaName}
-    >
+    <ChapterBlock num={idx + 1} arcana={arcanaNum} title={b.positionTitle || TRI_TITLES[idx]} subtitle={b.arcanaName || (a ? `${arcanaNum} Аркан «${a.name}»` : undefined)}>
       <Para text={b.description} />
-
-      <div className="grid md:grid-cols-2 gap-3 mt-5">
-        <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4 backdrop-blur-md">
-          <div className="text-xs font-semibold uppercase tracking-wide text-emerald-600 mb-1.5 flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Энергия в плюсе
-          </div>
-          <p className="text-sm text-foreground/90 leading-relaxed">{b.plus}</p>
-        </div>
-        <div className="rounded-xl border border-destructive/25 bg-destructive/5 p-4 backdrop-blur-md">
-          <div className="text-xs font-semibold uppercase tracking-wide text-destructive mb-1.5 flex items-center gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5" /> Энергия в минусе
-          </div>
-          <p className="text-sm text-foreground/90 leading-relaxed">{b.minus}</p>
-        </div>
-      </div>
-
+      <DualPanel plus={b.plus} minus={b.minus} plusLabel="Энергия в плюсе" minusLabel="Энергия в минусе" />
       <Para label="Главная задача аркана" text={b.task} />
       <Para label="Как проявляется в жизни" text={b.inLife} />
-
       <div className="mt-5 rounded-xl border border-primary/25 bg-primary/5 p-4 backdrop-blur-md">
-        <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1.5 flex items-center gap-1.5">
-          <Star className="w-3.5 h-3.5" /> Как это проявляется у вас
-        </div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1.5 flex items-center gap-1.5"><Star className="w-3.5 h-3.5" /> Как это проявляется у вас</div>
         <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{b.inYou}</p>
       </div>
-
       <div className="grid md:grid-cols-2 gap-3 mt-5">
         <ListPanel title="Сильные стороны" items={b.strengths} tone="success" />
         <ListPanel title="Слабые стороны" items={b.weaknesses} tone="warning" />
       </div>
-
       {b.professions?.length > 0 && (
         <div className="mt-5">
-          <div className="text-xs font-semibold uppercase tracking-wide text-primary/80 mb-2 flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5" /> Где зарабатывает и подходящие профессии
-          </div>
-          <div className="space-y-3">
-            {b.professions.map((g, i) => (
-              <div key={i} className="rounded-xl bg-muted/20 border border-border/50 p-3 backdrop-blur-md">
-                <div className="text-sm font-medium text-foreground mb-1.5">{g.group}</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {g.items?.map((p, j) => (
-                    <span key={j} className="text-xs bg-secondary/70 px-2 py-1 rounded-full text-secondary-foreground">{p}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-primary/80 mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Где зарабатывает и подходящие профессии</div>
+          <ProfCatalog groups={b.professions} />
         </div>
       )}
-
-      {b.advice?.length > 0 && (
-        <div className="mt-5">
-          <ListPanel title="Что с этим делать" items={b.advice} tone="primary" />
-        </div>
-      )}
-
+      {b.advice?.length > 0 && <div className="mt-5"><ListPanel title="Что с этим делать" items={b.advice} tone="primary" icon={Lightbulb} /></div>}
       <Verdict text={b.conclusion} />
     </ChapterBlock>
   );
@@ -212,9 +170,7 @@ function PeriodCard({ p, i }: { p: PeriodBlock; i: number }) {
   const Icon = TRI_ICONS[i] || Hourglass;
   return (
     <div className="relative pl-8">
-      <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary/15 border border-primary/40 flex items-center justify-center backdrop-blur-md">
-        <Icon className="w-3 h-3 text-primary" />
-      </div>
+      <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary/15 border border-primary/40 flex items-center justify-center backdrop-blur-md"><Icon className="w-3 h-3 text-primary" /></div>
       <div className="absolute left-3 top-8 bottom-0 w-px bg-primary/20" />
       <div className="pb-6">
         <div className="font-display font-bold text-lg text-foreground leading-tight">{p.title}</div>
@@ -222,9 +178,7 @@ function PeriodCard({ p, i }: { p: PeriodBlock; i: number }) {
         <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{p.text}</p>
         {p.focus && (
           <div className="mt-3 rounded-xl bg-primary/5 border border-primary/20 p-3 backdrop-blur-md">
-            <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1 flex items-center gap-1.5">
-              <Lightbulb className="w-3.5 h-3.5" /> На чём сосредоточиться
-            </div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1 flex items-center gap-1.5"><Lightbulb className="w-3.5 h-3.5" /> На чём сосредоточиться</div>
             <p className="text-sm text-foreground/90 leading-relaxed">{p.focus}</p>
           </div>
         )}
@@ -233,17 +187,12 @@ function PeriodCard({ p, i }: { p: PeriodBlock; i: number }) {
   );
 }
 
-function MatrixPosCard({ item, arcanaNum, onOpen }: { item: MatrixPositionBlock; arcanaNum: number; onOpen: (n: number) => void }) {
+function MatrixPosCard({ item, arcanaNum }: { item: MatrixPositionBlock; arcanaNum: number }) {
   const a = getArcana(arcanaNum);
   return (
     <div className="gradient-card rounded-2xl border border-border p-5">
       <div className="flex items-start gap-3 mb-3 pb-3 border-b border-border/50">
-        <button onClick={() => onOpen(arcanaNum)} className="relative w-11 h-[62px] rounded-lg overflow-hidden shrink-0 ring-1 ring-border/60 hover:scale-105 transition-transform">
-          <img src={`/arcana/arcana-${arcanaNum}.webp`} alt="" className="w-full h-full object-cover" draggable={false} />
-          <div className="absolute inset-x-0 bottom-0 bg-black/60 text-center py-[1px]">
-            <span className="text-[9px] font-bold text-white/90">{arcanaNum}</span>
-          </div>
-        </button>
+        <MatrixCell position={item.position} value={arcanaNum} />
         <div className="min-w-0">
           <div className="text-[11px] text-primary/80 uppercase tracking-wide">Позиция {item.position}</div>
           <h3 className="font-display font-bold text-base text-foreground leading-tight">{item.title}</h3>
@@ -267,10 +216,10 @@ export function PurposeReadingResult({ matrix, name, onReset }: Props) {
   const [reading, setReading] = useState<PurposeReading | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(false);
-  const [zoom, setZoom] = useState<number | null>(null);
 
   const d = matrix.birthDate;
-  const tri = [matrix.positions[0], matrix.positions[1], matrix.positions[2]];
+  const P = matrix.positions;
+  const tri = [P[0], P[1], P[2]];
 
   useEffect(() => {
     let alive = true;
@@ -288,31 +237,18 @@ export function PurposeReadingResult({ matrix, name, onReset }: Props) {
       </Button>
 
       <div className="text-center">
-        <div className="inline-flex items-center gap-2 text-primary/80 text-xs uppercase tracking-[0.25em] mb-2">
-          <Sparkles className="w-3.5 h-3.5" /> Методика 22 арканов
-        </div>
+        <div className="inline-flex items-center gap-2 text-primary/80 text-xs uppercase tracking-[0.25em] mb-2"><Sparkles className="w-3.5 h-3.5" /> Методика 22 арканов</div>
         <h1 className="text-3xl md:text-4xl font-display text-primary mb-2">Предназначение</h1>
         {name && <p className="text-lg text-foreground">{name}</p>}
         <p className="text-muted-foreground text-sm">Дата рождения: {d.day}.{d.month}.{d.year}</p>
       </div>
 
-      {/* Треугольник виден сразу */}
-      <ChapterBlock icon={Compass} title="Основной треугольник" subtitle="Фундамент личности. Нажмите на карту, чтобы увеличить.">
-        <div className="grid grid-cols-3 gap-3">
-          {tri.map((n, i) => (
-            <ArcanaThumb key={i} n={n} caption={TRI_TITLES[i]} onOpen={setZoom} big />
-          ))}
-        </div>
-      </ChapterBlock>
-
-      {/* Полная матрица видна сразу */}
-      <ChapterBlock icon={Grid3x3} title="Полная матрица" subtitle="Все 12 позиций вашей матрицы предназначения">
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-          {matrix.positions.map((n, i) => (
-            <ArcanaThumb key={i} n={n} caption={`${i + 1}. ${positionDescriptions[i + 1]?.title || ""}`} onOpen={setZoom} />
-          ))}
-        </div>
-      </ChapterBlock>
+      {/* Матрица, единый вид как в остальных разборах */}
+      <div className="gradient-card rounded-2xl border border-border p-5">
+        <div className="flex items-center gap-2 mb-4"><Compass className="w-5 h-5 text-primary" /><span className="font-display font-semibold text-foreground">Ваша матрица</span></div>
+        <div className="flex justify-center"><MatrixGrid matrix={matrix} /></div>
+        <p className="text-xs text-muted-foreground text-center mt-3">Нажмите на карту чтобы рассмотреть аркан</p>
+      </div>
 
       {loading && <LoadingScreen methodId="purpose" />}
 
@@ -332,69 +268,124 @@ export function PurposeReadingResult({ matrix, name, onReset }: Props) {
           )}
 
           <Divider title="Основной треугольник" icon={Compass} />
-          {reading.triangle.slice(0, 3).map((b, i) => (
-            <TriangleChapter key={i} b={b} arcanaNum={tri[i]} idx={i} />
-          ))}
+          {reading.triangle.slice(0, 3).map((b, i) => <TriangleChapter key={i} b={b} arcanaNum={tri[i]} idx={i} />)}
 
           {reading.periods && reading.periods.length > 0 && (
             <>
               <Divider title="Жизненные периоды" icon={Hourglass} />
               <ChapterBlock icon={Hourglass} title="Периоды вашей жизни" subtitle="Как меняются энергии с возрастом">
-                <div className="mt-2">
-                  {reading.periods.map((p, i) => <PeriodCard key={i} p={p} i={i} />)}
-                </div>
+                <div className="mt-2">{reading.periods.map((p, i) => <PeriodCard key={i} p={p} i={i} />)}</div>
               </ChapterBlock>
             </>
           )}
 
-          {reading.fullMatrix && reading.fullMatrix.length > 0 && (
+          {reading.destinyTriangle && (
             <>
-              <Divider title="Разбор 12 позиций" icon={Grid3x3} />
-              <div className="space-y-4">
-                {reading.fullMatrix.map((it, i) => (
-                  <MatrixPosCard key={i} item={it} arcanaNum={matrix.positions[(it.position || i + 1) - 1] ?? matrix.positions[i]} onOpen={setZoom} />
-                ))}
-              </div>
+              <Divider title="Треугольник предназначения" icon={Target} />
+              <ChapterBlock icon={Target} title="Треугольник предназначения" subtitle="Позиции 2, 4, 5. Что вы призваны реализовать" variant="highlight">
+                <Para text={reading.destinyTriangle.intro} />
+                <div className="space-y-3 mt-4">
+                  {reading.destinyTriangle.items?.map((it, i) => <PosCard key={i} item={it} arcanaNum={P[it.position - 1]} />)}
+                </div>
+                <Verdict text={reading.destinyTriangle.conclusion} />
+              </ChapterBlock>
             </>
           )}
 
-          {reading.reversed && (
+          {reading.soulGoals && (
             <>
-              <Divider title="Заблокированные энергии" icon={Flame} />
-              <ChapterBlock icon={Flame} title="Перевёрнутые арканы" subtitle="Что работает не в полную силу и как это раскрыть" variant="warning">
-                <Para text={reading.reversed.intro} />
+              <Divider title="Цели и задачи души" icon={Compass} />
+              <ChapterBlock icon={Compass} title="Цели и задачи души" subtitle="Позиции 7, 8, 9. Цель, путь реализации и зона комфорта">
+                <Para text={reading.soulGoals.intro} />
                 <div className="space-y-3 mt-4">
-                  {reading.reversed.items?.map((it, i) => (
-                    <div key={i} className="rounded-xl bg-muted/20 border border-border/50 p-4 backdrop-blur-md">
-                      <div className="font-display font-semibold text-foreground mb-1">{it.arcanaName}</div>
-                      <Para label="Как проявляется" text={it.how} />
-                      <Para label="Что с этим делать" text={it.what} />
+                  {reading.soulGoals.items?.map((it, i) => <PosCard key={i} item={it} arcanaNum={P[it.position - 1]} />)}
+                </div>
+                <div className="grid md:grid-cols-2 gap-3 mt-5">
+                  <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4 backdrop-blur-md">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-emerald-600 mb-1.5 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Что ускоряет предназначение</div>
+                    <p className="text-sm text-foreground/90 leading-relaxed">{reading.soulGoals.accelerators}</p>
+                  </div>
+                  <div className="rounded-xl border border-destructive/25 bg-destructive/5 p-4 backdrop-blur-md">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-destructive mb-1.5 flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Что тормозит реализацию</div>
+                    <p className="text-sm text-foreground/90 leading-relaxed">{reading.soulGoals.brakes}</p>
+                  </div>
+                </div>
+                <Verdict text={reading.soulGoals.recommendations} title="Практические рекомендации" icon={Lightbulb} />
+                <Verdict text={reading.soulGoals.conclusion} />
+              </ChapterBlock>
+            </>
+          )}
+
+          {reading.work && (
+            <>
+              <Divider title="Работа и самореализация" icon={Briefcase} />
+              <ChapterBlock icon={Briefcase} title="Взаимодействие арканов в работе" subtitle="Как ваши энергии соединяются в профессиональный путь">
+                <Para text={reading.work.interaction} />
+                <div className="mt-5 rounded-xl border border-primary/25 bg-primary/5 p-4 backdrop-blur-md">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1.5 flex items-center gap-1.5"><Star className="w-3.5 h-3.5" /> Какая деятельность раскрывает ваш потенциал</div>
+                  <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{reading.work.whatReveals}</p>
+                </div>
+                {reading.work.professions?.length > 0 && (
+                  <div className="mt-5">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-primary/80 mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Подходящие профессии по вашим арканам</div>
+                    <div className="space-y-4">
+                      {reading.work.professions.map((pr, i) => (
+                        <div key={i}>
+                          <div className="font-display font-semibold text-foreground mb-2">{pr.arcanaName}</div>
+                          <ProfCatalog groups={pr.groups} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </ChapterBlock>
+            </>
+          )}
+
+          {reading.mirrors && reading.mirrors.items && reading.mirrors.items.length > 0 && (
+            <>
+              <Divider title="Зеркальные арканы" icon={Copy} />
+              <ChapterBlock icon={Copy} title="Зеркальные арканы" subtitle="Энергии, повторяющиеся в ключевых точках матрицы">
+                <Para text={reading.mirrors.intro} />
+                <div className="space-y-3 mt-4">
+                  {reading.mirrors.items.map((it, i) => (
+                    <div key={i} className="rounded-2xl border border-primary/20 bg-primary/5 p-4 backdrop-blur-md">
+                      <div className="font-display font-semibold text-foreground">{it.arcanaName}</div>
+                      <div className="text-xs text-primary/80 uppercase tracking-wide mb-1">{it.positions}{it.kind ? `, ${it.kind}` : ""}</div>
+                      <Para label="Что усиливается" text={it.repeats} />
+                      <DualPanel plus={it.plus} minus={it.minus} />
+                      <Para label="Жизненный сценарий" text={it.scenario} />
+                      <Para label="Влияние позиций" text={it.influence} />
                     </div>
                   ))}
                 </div>
-                <Verdict text={reading.reversed.conclusion} />
               </ChapterBlock>
             </>
           )}
 
-          {reading.purpose && (
+          {reading.reversed && reading.reversed.items && reading.reversed.items.length > 0 && (
             <>
-              <Divider title="Цель жизни" icon={Compass} />
-              <ChapterBlock icon={Compass} title="Цель жизни" subtitle="Предназначение и задача души" variant="highlight">
-                <Para label="Предназначение" text={reading.purpose.mission} />
-                <Para label="Главная задача души" text={reading.purpose.soulTask} />
-                <div className="grid md:grid-cols-2 gap-3 mt-5">
-                  <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4 backdrop-blur-md">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-emerald-600 mb-1.5">При реализации</div>
-                    <p className="text-sm text-foreground/90 leading-relaxed">{reading.purpose.inPlus}</p>
-                  </div>
-                  <div className="rounded-xl border border-destructive/25 bg-destructive/5 p-4 backdrop-blur-md">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-destructive mb-1.5">При уходе в минус</div>
-                    <p className="text-sm text-foreground/90 leading-relaxed">{reading.purpose.inMinus}</p>
-                  </div>
+              <Divider title="Перевёрнутые арканы" icon={Flame} />
+              <ChapterBlock icon={Flame} title="Перевёрнутые арканы" subtitle="Заблокированные энергии и как их раскрыть" variant="warning">
+                <Para text={reading.reversed.intro} />
+                <div className="space-y-3 mt-4">
+                  {reading.reversed.items.map((it, i) => (
+                    <div key={i} className="rounded-2xl border border-border/60 bg-white/25 p-4 backdrop-blur-md">
+                      <div className="font-display font-semibold text-foreground mb-1">{it.arcanaName}</div>
+                      {it.intro && <p className="text-sm text-muted-foreground leading-relaxed">{it.intro}</p>}
+                      <Para label="Как проявляется в минусе" text={it.minus} />
+                      <div className="mt-4 rounded-xl border border-primary/25 bg-primary/5 p-4 backdrop-blur-md">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1.5 flex items-center gap-1.5"><RefreshCw className="w-3.5 h-3.5" /> Как перевести энергию в плюс</div>
+                        <p className="text-sm text-foreground/90 leading-relaxed">{it.toPlus}</p>
+                      </div>
+                      <div className="mt-3 rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4 backdrop-blur-md">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-emerald-600 mb-1.5 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Как проявляется в плюсе</div>
+                        <p className="text-sm text-foreground/90 leading-relaxed">{it.plus}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="mt-5"><ListPanel title="Признаки, что вы идёте своим путём" items={reading.purpose.signs} tone="success" /></div>
-                <Verdict text={reading.purpose.conclusion} />
+                <Verdict text={reading.reversed.verdict} title="Итог от нумеролога" icon={Sparkles} />
               </ChapterBlock>
             </>
           )}
@@ -402,61 +393,32 @@ export function PurposeReadingResult({ matrix, name, onReset }: Props) {
           {reading.karma && (
             <>
               <Divider title="Кармические задачи" icon={Landmark} />
-              <ChapterBlock icon={Landmark} title="Кармические задачи" subtitle="Хвост прошлого, уроки и работа воплощения">
-                <Para label="Кармический хвост" text={reading.karma.tail} />
-                <Para label="Невыполненные задачи" text={reading.karma.unfinished} />
-                <Para label="Главный урок воплощения" text={reading.karma.lesson} />
-                <div className="mt-5"><ListPanel title="Повторяющиеся сценарии" items={reading.karma.patterns} tone="warning" /></div>
-                <Verdict text={reading.karma.conclusion} />
-              </ChapterBlock>
-            </>
-          )}
-
-          {reading.successCode && (
-            <>
-              <Divider title="Код успеха" icon={KeyRound} />
-              <ChapterBlock icon={KeyRound} title="Код успеха" subtitle="Личная формула достижения результата" variant="success">
-                <Para label="Ваша формула" text={reading.successCode.formula} />
-                <div className="grid md:grid-cols-2 gap-3 mt-5">
-                  <ListPanel title="Что ускоряет" items={reading.successCode.accelerators} tone="success" />
-                  <ListPanel title="Что тормозит" items={reading.successCode.brakes} tone="warning" />
-                </div>
-                <div className="mt-3"><ListPanel title="Сильные стороны" items={reading.successCode.strengths} tone="primary" /></div>
-                <div className="mt-3"><ListPanel title="С чего начать" items={reading.successCode.steps} tone="primary" /></div>
-                <Verdict text={reading.successCode.conclusion} />
-              </ChapterBlock>
-            </>
-          )}
-
-          {reading.connections && (
-            <>
-              <Divider title="Связки позиций" icon={Link2} />
-              <ChapterBlock icon={Link2} title="Связки позиций" subtitle="Как энергии матрицы взаимодействуют между собой">
-                <Para text={reading.connections.text} />
-                <div className="grid md:grid-cols-2 gap-3 mt-5">
-                  <ListPanel title="Усиления" items={reading.connections.amplifications} tone="success" />
-                  <ListPanel title="Конфликты энергий" items={reading.connections.conflicts} tone="warning" />
-                </div>
-                <div className="mt-3"><ListPanel title="Скрытые закономерности" items={reading.connections.hidden} tone="primary" /></div>
-                <Verdict text={reading.connections.conclusion} />
+              <ChapterBlock icon={Landmark} title="Кармические задачи" subtitle="Кармический треугольник, позиции 10, 11, 12">
+                <Para label="Взаимодействие кармических энергий" text={reading.karma.triangle} />
+                <Para label="Главный кармический урок" text={reading.karma.lesson} />
+                <Para label="Через какие ситуации проявляется карма" text={reading.karma.situations} />
+                <DualPanel plus={reading.karma.helps} minus={reading.karma.worsens} plusLabel="Что помогает закрыть уроки" minusLabel="Что усиливает проблемы" />
+                <Verdict text={reading.karma.recommendations} title="Практические рекомендации" icon={Lightbulb} />
               </ChapterBlock>
             </>
           )}
 
           {reading.final && (
             <>
-              <Divider title="Итоговый анализ" icon={Crown} />
-              <ChapterBlock icon={Crown} title="Итоговый анализ" subtitle="Профессиональное заключение мастера" variant="highlight">
-                <Para label="Кто вы в целом" text={reading.final.who} />
-                <Para label="Главный потенциал" text={reading.final.potential} />
-                <Para label="Ключевые риски" text={reading.final.risks} />
-                <Para label="Где реализуетесь быстрее всего" text={reading.final.whereRealize} />
+              <Divider title="Итоговое заключение" icon={Crown} />
+              <ChapterBlock icon={Crown} title="Взаимодействие шести позиций" subtitle="Позиции 2, 4, 5 и 7, 8, 9. Единый путь реализации" variant="highlight">
+                <DualPanel plus={reading.final.plus} minus={reading.final.minus} plusLabel="В гармоничном состоянии" minusLabel="В минусовом проявлении" />
                 <div className="mt-5 rounded-xl bg-primary/8 border border-primary/25 p-4 backdrop-blur-md">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1.5 flex items-center gap-1.5">
-                    <Crown className="w-3.5 h-3.5" /> Главная рекомендация на жизнь
-                  </div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1.5 flex items-center gap-1.5"><Crown className="w-3.5 h-3.5" /> Главная профессиональная рекомендация</div>
                   <p className="text-sm text-foreground/90 leading-relaxed">{reading.final.recommendation}</p>
                 </div>
+                <div className="grid md:grid-cols-2 gap-3 mt-3">
+                  <ListPanel title="Подходящие сферы" items={reading.final.spheres} tone="primary" icon={Briefcase} />
+                  <ListPanel title="Ключевые сильные стороны" items={reading.final.strengths} tone="success" />
+                </div>
+                <Para label="Оптимальный формат работы" text={reading.final.format} />
+                <Para label="Оптимальный путь реализации" text={reading.final.path} />
+                <Verdict text={reading.final.numerologist} title="Слово нумеролога" icon={Sparkles} />
               </ChapterBlock>
             </>
           )}
@@ -464,8 +426,6 @@ export function PurposeReadingResult({ matrix, name, onReset }: Props) {
           <NadezhdaSignature />
         </>
       )}
-
-      {zoom !== null && <ArcanaZoom value={zoom} onClose={() => setZoom(null)} />}
     </div>
   );
 }

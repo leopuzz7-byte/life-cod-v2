@@ -1,65 +1,54 @@
-// ИИ-разбор Предназначения (методика 1) по шаблону Надежды.
+// ИИ-разбор Предназначения (методика 1) по расширенному ТЗ Надежды.
 // Живой человечный таро-стиль, большой объём, строго без длинных тире.
-// Генерация идёт 8 параллельными запросами, у каждого свой бюджет токенов,
-// поэтому текста получается в разы больше, чем за один запрос.
+// Генерация многими параллельными запросами, у каждого свой бюджет токенов.
 import { PersonalMatrix } from "./calculations";
 import { getArcana, positionDescriptions } from "./arcana";
+import {
+  computeMirrors, computeReversedOrdered, MirrorHit, ReversedHit,
+  PROFESSION_CATEGORIES, posLabel, TRIANGLE_DESTINY, SOUL_GOALS, KARMA_TRIANGLE, DESTINY_SIX,
+} from "./purposeExtras";
 
 const API_KEY = import.meta.env.VITE_AI_API_KEY || "sk-fLiNqGfbS2vyJorwNtnkz1F9ftCVAz2W";
 const API_URL = "https://api.proxyapi.ru/openai/v1/chat/completions";
 
+/* ============ типы ============ */
+
+export interface ProfGroup { group: string; items: string[] }
+
 export interface TriangleBlock {
-  positionTitle: string;
-  arcanaName: string;
-  description: string;
-  plus: string;
-  minus: string;
-  task: string;
-  inLife: string;
-  inYou: string;
-  strengths: string[];
-  weaknesses: string[];
-  professions: { group: string; items: string[] }[];
-  advice: string[];
-  conclusion: string;
+  positionTitle: string; arcanaName: string;
+  description: string; plus: string; minus: string; task: string;
+  inLife: string; inYou: string;
+  strengths: string[]; weaknesses: string[];
+  professions: ProfGroup[]; advice: string[]; conclusion: string;
 }
-
-export interface MatrixPositionBlock {
-  position: number;
-  title: string;
-  arcanaName: string;
-  meaning: string;
-  inYou: string;
-  advice: string;
-}
-
+export interface MatrixPositionBlock { position: number; title: string; arcanaName: string; meaning: string; inYou: string; advice: string }
 export interface PeriodBlock { title: string; range: string; text: string; focus: string }
+export interface PosMini { position: number; title: string; arcanaName: string; text: string; plus: string; minus: string }
+export interface MirrorBlock { positions: string; arcanaName: string; kind: string; repeats: string; plus: string; minus: string; scenario: string; influence: string }
+export interface ReversedBlock { arcanaName: string; intro: string; minus: string; toPlus: string; plus: string }
 
 export interface PurposeReading {
   intro?: string;
   triangle: TriangleBlock[];
   periods?: PeriodBlock[];
   fullMatrix?: MatrixPositionBlock[];
-  reversed?: { intro: string; items: { arcanaName: string; how: string; what: string }[]; conclusion: string };
-  purpose?: { mission: string; soulTask: string; inPlus: string; inMinus: string; signs: string[]; conclusion: string };
-  karma?: { tail: string; unfinished: string; lesson: string; patterns: string[]; conclusion: string };
-  successCode?: { formula: string; strengths: string[]; accelerators: string[]; brakes: string[]; steps: string[]; conclusion: string };
-  connections?: { text: string; conflicts: string[]; amplifications: string[]; hidden: string[]; conclusion: string };
-  final?: { who: string; potential: string; risks: string; whereRealize: string; recommendation: string };
+  destinyTriangle?: { intro: string; items: PosMini[]; conclusion: string };
+  soulGoals?: { intro: string; items: PosMini[]; accelerators: string; brakes: string; recommendations: string; conclusion: string };
+  work?: { interaction: string; whatReveals: string; professions: { arcanaName: string; groups: ProfGroup[] }[] };
+  mirrors?: { intro: string; items: MirrorBlock[] } | null;
+  reversed?: { intro: string; items: ReversedBlock[]; verdict: string };
+  karma?: { triangle: string; lesson: string; situations: string; helps: string; worsens: string; recommendations: string };
+  final?: { intro: string; minus: string; plus: string; recommendation: string; spheres: string[]; format: string; strengths: string[]; path: string; numerologist: string };
 }
 
-const TRI_TITLES = [
-  "Детство и юность (до 25 лет)",
-  "Внутренняя суть личности",
-  "Цель накопления мудрости (после 50 лет)",
-];
+/* ============ инфраструктура ============ */
 
 const STYLE = `СТИЛЬ И ТРЕБОВАНИЯ:
-Ты профессиональный таролог-нумеролог Надежда. Пиши живым, тёплым, человечным тарологическим языком, как будто лично говоришь с человеком. Обращайся на «вы».
-Пиши ЩЕДРО и РАЗВЁРНУТО, это премиальный разбор на много страниц. Никакой сухости и никаких общих фраз, только конкретика и образность.
-СТРОГО ЗАПРЕЩЕНЫ длинные тире (символы — и –). Используй запятые, точки, двоеточия. Короткий дефис только внутри слов.
-Без смайликов, без канцелярита, без кринжа. Красиво, достойно, вдохновляюще.
-Опирайся строго на указанные арканы, их планеты и стихии, не путай их и не выдумывай другие.`;
+Ты профессиональный таролог-нумеролог Надежда. Пиши живым, тёплым, человечным тарологическим языком, лично обращаясь к человеку на «вы».
+Пиши ЩЕДРО и РАЗВЁРНУТО, это премиальный разбор. Конкретика, образность, никакой воды и общих фраз.
+СТРОГО ЗАПРЕЩЕНЫ длинные тире (символы — и –). Только запятые, точки, двоеточия. Короткий дефис лишь внутри слов.
+Без смайликов, без канцелярита, без кринжа. Опирайся строго на указанные арканы, их планеты и стихии, не путай их.`;
 
 function arcInfo(n: number): string {
   const a = getArcana(n);
@@ -90,8 +79,7 @@ async function callAI<T>(prompt: string, maxTokens: number): Promise<T | null> {
         body: JSON.stringify({
           model: "gpt-4o-mini",
           messages: [{ role: "user", content: prompt }],
-          temperature: 0.85,
-          max_tokens: maxTokens,
+          temperature: 0.85, max_tokens: maxTokens,
           response_format: { type: "json_object" },
         }),
       });
@@ -101,23 +89,22 @@ async function callAI<T>(prompt: string, maxTokens: number): Promise<T | null> {
       if (!raw) throw new Error("empty");
       return fixDashes(JSON.parse(raw)) as T;
     } catch {
-      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+      await new Promise((r) => setTimeout(r, 900 * (attempt + 1)));
     }
   }
   return null;
 }
 
 function ctx(m: PersonalMatrix, name: string): string {
-  const p = m.positions;
-  const all = p.map((n, i) => `позиция ${i + 1} (${positionDescriptions[i + 1]?.title || ""}): ${arcInfo(n)}`).join("; ");
-  const rev = m.reversedArcana.length ? m.reversedArcana.map((r) => arcInfo(r.arcana)).join("; ") : "нет выраженных";
+  const all = m.positions.map((n, i) => `${i + 1} (${positionDescriptions[i + 1]?.title || ""}): ${arcInfo(n)}`).join("; ");
   return `Человек${name ? ` по имени ${name}` : ""}, дата рождения ${m.birthDate.day}.${m.birthDate.month}.${m.birthDate.year}.
-Матрица из 12 позиций: ${all}.
-Перевёрнутые арканы: ${rev}.
-Код успеха (позиции 4, 5, 7, 12): ${m.successCode.map(arcInfo).join("; ")}.`;
+Матрица из 12 позиций: ${all}.`;
 }
 
-// --- отдельные генераторы, работают параллельно ---
+const CATS = PROFESSION_CATEGORIES.join(", ");
+const TRI_TITLES = ["Детство и юность (до 25 лет)", "Внутренняя суть личности", "Цель накопления мудрости (после 50 лет)"];
+
+/* ============ генераторы ============ */
 
 function genTriangle(m: PersonalMatrix, name: string, idx: number) {
   const n = m.positions[idx];
@@ -126,26 +113,18 @@ function genTriangle(m: PersonalMatrix, name: string, idx: number) {
 
 ${ctx(m, name)}
 
-Напиши МАКСИМАЛЬНО подробный разбор одной позиции основного треугольника.
-Позиция: ${TRI_TITLES[idx]}. Энергия этой позиции: ${arcInfo(n)}.
+Подробный разбор позиции основного треугольника личности.
+Позиция: ${TRI_TITLES[idx]}. Энергия: ${arcInfo(n)}.
 
 Верни строго JSON:
-{
- "positionTitle": "${TRI_TITLES[idx]}",
- "arcanaName": "${n} Аркан «${getArcana(n)?.name || ""}»",
- "description": "подробное описание аркана и его природы, 8-12 предложений",
- "plus": "проявление энергии в плюсе, развёрнуто, 6-9 предложений",
- "minus": "проявление энергии в минусе и теневая сторона, 6-9 предложений",
- "task": "главная задача этого аркана, 5-7 предложений",
- "inLife": "как эта энергия проявляется в жизни именно в этой позиции, 6-9 предложений",
- "inYou": "как это проявляется именно у вас, личное тёплое обращение с конкретикой, 8-12 предложений",
- "strengths": ["10-12 сильных сторон, каждая развёрнутой фразой"],
- "weaknesses": ["10-12 слабых сторон, каждая развёрнутой фразой"],
- "professions": [{"group":"название сферы","items":["6-9 профессий"]}],
- "advice": ["5-7 практических советов, что делать с этой энергией"],
- "conclusion": "Главный вывод по позиции, 3-4 предложения"
-}
-Профессий дай 3-5 разных сфер.`,
+{"positionTitle":"${TRI_TITLES[idx]}","arcanaName":"${n} Аркан «${getArcana(n)?.name || ""}»",
+"description":"описание аркана, 8-11 предложений","plus":"в плюсе, 6-8 предложений","minus":"в минусе, 6-8 предложений",
+"task":"главная задача аркана, 5-6 предложений","inLife":"как проявляется в жизни в этой позиции, 6-8 предложений",
+"inYou":"как проявляется именно у вас, тёплое личное обращение, 8-11 предложений",
+"strengths":["10-12 сильных сторон"],"weaknesses":["10-12 слабых сторон"],
+"professions":[{"group":"категория из списка: ${CATS}","items":["6-9 профессий"]}],
+"advice":["5-7 практических советов"],"conclusion":"Главный вывод, 3-4 предложения"}
+В professions используй только подходящие категории из списка, 3-5 категорий.`,
     6000
   );
 }
@@ -156,122 +135,165 @@ function genPeriods(m: PersonalMatrix, name: string) {
 
 ${ctx(m, name)}
 
-Напиши разбор трёх жизненных периодов человека по его матрице: до 25 лет, с 25 до 50 лет, после 50 лет.
-Верни строго JSON:
-{"periods":[{"title":"название периода","range":"возраст","text":"что происходит в этот период, какие энергии ведут, какие уроки и возможности, 8-11 предложений","focus":"на чём важно сосредоточиться в этот период, 3-4 предложения"}]}
-Ровно 3 периода.`,
+Разбор трёх жизненных периодов: до 25 лет, с 25 до 50, после 50.
+JSON: {"periods":[{"title":"название","range":"возраст","text":"что происходит, какие энергии ведут, уроки и возможности, 8-10 предложений","focus":"на чём сосредоточиться, 3-4 предложения"}]} Ровно 3 периода.`,
     4500
   );
 }
 
 function genFullMatrix(m: PersonalMatrix, name: string) {
-  const list = m.positions
-    .map((n, i) => `${i + 1}. ${positionDescriptions[i + 1]?.title || ""}: ${arcInfo(n)}`)
-    .join("\n");
+  const list = m.positions.map((n, i) => `${i + 1}. ${positionDescriptions[i + 1]?.title || ""}: ${arcInfo(n)}`).join("\n");
   return callAI<{ items: MatrixPositionBlock[] }>(
     `${STYLE}
 
 ${ctx(m, name)}
 
-Разбери ПОЛНУЮ матрицу из 12 позиций. Вот позиции и их арканы:
+Разбери ПОЛНУЮ матрицу из 12 позиций:
 ${list}
-
-Верни строго JSON:
-{"items":[{"position":1,"title":"название позиции","arcanaName":"N Аркан «Имя»","meaning":"что означает этот аркан в этой позиции, 5-7 предложений","inYou":"как это работает именно у вас, 5-7 предложений","advice":"практический совет по этой позиции, 2-3 предложения"}]}
-Ровно 12 объектов, по одному на каждую позицию, по порядку.`,
+JSON: {"items":[{"position":1,"title":"название","arcanaName":"N Аркан «Имя»","meaning":"значение аркана в этой позиции, 4-6 предложений","inYou":"как работает у вас, 4-6 предложений","advice":"совет, 2-3 предложения"}]} Ровно 12 объектов по порядку.`,
     9000
   );
 }
 
-function genReversed(m: PersonalMatrix, name: string) {
-  const rev = m.reversedArcana.length
-    ? m.reversedArcana.map((r) => `${arcInfo(r.arcana)} на позициях ${r.positions.join(", ")}`).join("; ")
-    : "выраженных перевёрнутых арканов нет";
+function genDestinySoul(m: PersonalMatrix, name: string) {
+  const dt = TRIANGLE_DESTINY.map((p) => posLabel(p, m.positions[p - 1])).join("\n");
+  const sg = SOUL_GOALS.map((p) => posLabel(p, m.positions[p - 1])).join("\n");
+  return callAI<{ destinyTriangle: PurposeReading["destinyTriangle"]; soulGoals: PurposeReading["soulGoals"] }>(
+    `${STYLE}
+
+${ctx(m, name)}
+
+Два раздела.
+
+РАЗДЕЛ А. Треугольник предназначения, позиции 2, 4, 5:
+${dt}
+Это то, что вы призваны реализовать. Для каждой позиции опиши энергию, в плюсе и в минусе.
+
+РАЗДЕЛ Б. Цели и задачи души, позиции 7, 8, 9:
+${sg}
+7 позиция это главная цель и задача души, 8 позиция это через что реализуются цели, 9 позиция это зона комфорта. Для каждой опиши, в плюсе, в минусе.
+
+JSON:
+{"destinyTriangle":{"intro":"вступление, 3-4 предложения","items":[{"position":2,"title":"название позиции","arcanaName":"N Аркан «Имя»","text":"что вы призваны реализовать через эту энергию, 5-7 предложений","plus":"в плюсе, 2-3 предложения","minus":"в минусе, 2-3 предложения"}],"conclusion":"Главный вывод, 2-3 предложения"},
+ "soulGoals":{"intro":"вступление, 3-4 предложения","items":[{"position":7,"title":"название","arcanaName":"N Аркан «Имя»","text":"описание, 5-7 предложений","plus":"в плюсе, 2-3 предложения","minus":"в минусе, 2-3 предложения"}],"accelerators":"что ускоряет выполнение предназначения, 4-6 предложений","brakes":"что тормозит реализацию, 4-6 предложений","recommendations":"практические рекомендации, 4-6 предложений","conclusion":"Главный вывод, 2-3 предложения"}}
+В destinyTriangle ровно 3 объекта (позиции 2,4,5), в soulGoals ровно 3 (позиции 7,8,9).`,
+    7000
+  );
+}
+
+function genWork(m: PersonalMatrix, name: string) {
+  const key = [2, 4, 5, 7, 8, 9].map((p) => posLabel(p, m.positions[p - 1])).join("\n");
+  return callAI<{ work: PurposeReading["work"] }>(
+    `${STYLE}
+
+${ctx(m, name)}
+
+Раздел «Взаимодействие арканов в работе и самореализации».
+Ключевые арканы:
+${key}
+Напиши цельный живой текст о том, как эти энергии взаимодействуют в профессиональной реализации, где усиливают, где конфликтуют, какой сценарий создают. Затем блок «Какая деятельность раскрывает ваш потенциал». Затем для каждого из ключевых арканов дай подходящие профессии структурированным каталогом по категориям.
+
+JSON:
+{"work":{"interaction":"как арканы взаимодействуют в работе и самореализации, живой связный текст, 12-16 предложений","whatReveals":"какая деятельность раскрывает ваш потенциал, 6-8 предложений","professions":[{"arcanaName":"N Аркан «Имя»","groups":[{"group":"категория из списка: ${CATS}","items":["профессии"]}]}]}}
+В professions по одному объекту на каждый ключевой аркан (без повторов арканов), в каждом 3-6 категорий из списка.`,
+    9000
+  );
+}
+
+function genMirrors(m: PersonalMatrix, name: string, mirrors: MirrorHit[]) {
+  if (mirrors.length === 0) return Promise.resolve(null);
+  const desc = mirrors.map((h) => `позиции ${h.a} и ${h.b} (${h.kind === "direct" ? "прямая" : "перекрёстная"} пара), одинаковый ${arcInfo(h.arcana)}`).join("; ");
+  return callAI<{ intro: string; items: MirrorBlock[] }>(
+    `${STYLE}
+
+${ctx(m, name)}
+
+Раздел «Зеркальные арканы». В матрице найдены совпадения: ${desc}.
+Разбирай не аркан отдельно, а взаимодействие двух позиций: что повторяется и усиливается, плюс, минус, какой жизненный сценарий создаёт совпадение, как одна позиция влияет на другую.
+
+JSON:
+{"intro":"вводный текст про зеркальные арканы и почему они важны, 5-7 предложений",
+"items":[{"positions":"позиции 4 и 7","arcanaName":"N Аркан «Имя»","kind":"прямая или перекрёстная","repeats":"что повторяется и усиливается, 3-5 предложений","plus":"как проявляется в плюсе, 3-4 предложения","minus":"как в минусе, 3-4 предложения","scenario":"какой жизненный сценарий создаёт совпадение, 3-5 предложений","influence":"как одна позиция влияет на другую, 3-4 предложения"}]}
+По объекту на каждое совпадение.`,
+    7000
+  );
+}
+
+function genReversed(m: PersonalMatrix, name: string, reversed: ReversedHit[]) {
+  const count = reversed.length;
+  const desc = count
+    ? reversed.map((r) => `${arcInfo(r.arcana)} (позиции ${r.positions.join(", ")}${r.inTriangle ? ", основной треугольник" : ""})`).join("; ")
+    : "выраженных перевёрнутых арканов не обнаружено";
   return callAI<PurposeReading["reversed"]>(
     `${STYLE}
 
 ${ctx(m, name)}
 
-Разбери перевёрнутые (заблокированные) арканы: ${rev}.
-Если выраженных перевёрнутых арканов нет, всё равно напиши раздел о том, какие энергии матрицы работают не в полную силу и почему, и дай 2-3 таких энергии в items.
+Раздел «Перевёрнутые арканы». Обнаружено перевёрнутых арканов: ${count}. Список: ${desc}.
+Сначала идут арканы основного треугольника, затем остальные. Один аркан не повторять.
+Для КАЖДОГО перевёрнутого аркана дай ровно три блока: как проявляется в минусе, как перевести энергию в плюс, как проявляется в плюсе. Плюс короткое введение по аркану.
+Если перевёрнутых нет, всё равно опиши 2-3 энергии матрицы, которые работают не в полную силу, в том же формате.
 
-Верни строго JSON:
-{"intro":"вступление про заблокированные энергии и что это значит, 5-7 предложений","items":[{"arcanaName":"N Аркан «Имя»","how":"как проявляется блок в жизни, конкретно и образно, 5-7 предложений","what":"что с этим делать, практическая проработка, 5-7 предложений"}],"conclusion":"Главный вывод, 3-4 предложения"}`,
-    5000
+JSON:
+{"intro":"вводный текст: в вашей матрице обнаружено ${count} перевёрнутых арканов, и пояснение про приоритет треугольника, 5-7 предложений",
+"items":[{"arcanaName":"Перевёрнутый аркан N, Имя","intro":"короткое введение, 2-3 предложения","minus":"как проявляется в минусе, 5-7 предложений","toPlus":"как перевести энергию в плюс, практические рекомендации, 5-7 предложений","plus":"как проявляется в плюсе после проработки, 5-7 предложений"}],
+"verdict":"Итог от нумеролога: перевёрнутый аркан это не приговор, а зона развития, 4-6 предложений"}`,
+    8000
   );
 }
 
-function genPurposeKarma(m: PersonalMatrix, name: string) {
-  return callAI<{ purpose: PurposeReading["purpose"]; karma: PurposeReading["karma"] }>(
+function genKarma(m: PersonalMatrix, name: string) {
+  const kt = KARMA_TRIANGLE.map((p) => posLabel(p, m.positions[p - 1])).join("\n");
+  return callAI<{ karma: PurposeReading["karma"] }>(
     `${STYLE}
 
 ${ctx(m, name)}
 
-Напиши два больших раздела: Цель жизни и Кармические задачи.
-Опирайся на позицию 7 (цель жизни) ${arcInfo(m.positions[6])}, позицию 10 (невыполненные задачи) ${arcInfo(m.positions[9])}, позицию 11 (ошибки прошлого) ${arcInfo(m.positions[10])} и позицию 12 (главная кармическая задача) ${arcInfo(m.positions[11])}.
-
-Верни строго JSON:
-{"purpose":{"mission":"предназначение развёрнуто, 9-12 предложений","soulTask":"главная задача души, 6-8 предложений","inPlus":"что происходит в жизни при реализации предназначения, 5-7 предложений","inMinus":"что происходит при уходе в минус, 5-7 предложений","signs":["5-7 признаков того, что вы идёте своим путём"],"conclusion":"Главный вывод, 3-4 предложения"},
- "karma":{"tail":"кармический хвост, что тянется из прошлого, 7-9 предложений","unfinished":"невыполненные задачи, 6-8 предложений","lesson":"главный урок текущего воплощения, 6-8 предложений","patterns":["5-7 повторяющихся сценариев, которые важно заметить"],"conclusion":"Главный вывод, 3-4 предложения"}}`,
-    7000
-  );
-}
-
-function genSuccessConnections(m: PersonalMatrix, name: string) {
-  return callAI<{ successCode: PurposeReading["successCode"]; connections: PurposeReading["connections"] }>(
-    `${STYLE}
-
-${ctx(m, name)}
-
-Напиши два больших раздела: Код успеха и Связки позиций.
-Код успеха строй на позициях 4, 5, 7, 12: ${m.successCode.map(arcInfo).join("; ")}.
-В связках проанализируй, как энергии позиций матрицы взаимодействуют между собой, где усиливают друг друга, а где конфликтуют.
-
-Верни строго JSON:
-{"successCode":{"formula":"личная формула достижения результата, развёрнуто и конкретно, 9-12 предложений","strengths":["7-9 сильных сторон"],"accelerators":["6-8 что ускоряет реализацию"],"brakes":["6-8 что тормозит"],"steps":["5-7 конкретных шагов, с чего начать"],"conclusion":"Главный вывод, 3-4 предложения"},
- "connections":{"text":"анализ взаимодействия энергий матрицы, 9-12 предложений","conflicts":["4-6 конфликтов энергий с пояснением"],"amplifications":["4-6 усилений с пояснением"],"hidden":["4-6 скрытых закономерностей"],"conclusion":"Главный вывод, 3-4 предложения"}}`,
-    7000
+Раздел «Кармические задачи». Кармический треугольник, позиции 10, 11, 12:
+${kt}
+JSON:
+{"karma":{"triangle":"взаимодействие кармических энергий треугольника, что связывает эти арканы и к чему ведёт душа, 8-11 предложений","lesson":"главный кармический урок, 5-7 предложений","situations":"через какие ситуации проявляется карма, 5-7 предложений","helps":"что помогает закрыть кармические уроки, 4-6 предложений","worsens":"что усиливает кармические проблемы, 4-6 предложений","recommendations":"практические рекомендации, 4-6 предложений"}}`,
+    6000
   );
 }
 
 function genFinal(m: PersonalMatrix, name: string) {
+  const six = DESTINY_SIX.map((p) => posLabel(p, m.positions[p - 1])).join("\n");
   return callAI<{ intro: string; final: PurposeReading["final"] }>(
     `${STYLE}
 
 ${ctx(m, name)}
 
-Напиши вступление ко всему разбору и профессиональное итоговое заключение.
-Заключение это не пересказ разделов, а взгляд мастера на человека целиком.
+Вступление ко всему разбору и финальное экспертное заключение о взаимодействии шести позиций предназначения (2, 4, 5 треугольник предназначения и 7, 8, 9 цели души):
+${six}
+Это заключение объединяет всю матрицу в единый путь реализации. Сначала как взаимодействие проявляется в минусе, затем в плюсе, затем главная профессиональная рекомендация, подходящие сферы, формат работы, сильные стороны, оптимальный путь, и финальное слово нумеролога.
 
-Верни строго JSON:
+JSON:
 {"intro":"тёплое вступление к разбору предназначения, 5-7 предложений",
- "final":{"who":"кто этот человек в целом, портрет личности, 9-12 предложений","potential":"главный потенциал, 6-8 предложений","risks":"ключевые риски, 6-8 предложений","whereRealize":"где реализуется быстрее всего, 6-8 предложений","recommendation":"главная рекомендация на жизнь, 7-9 предложений"}}`,
-    6000
+"final":{"minus":"как взаимодействие шести позиций проявляется в минусе, внутренний конфликт, 7-9 предложений","plus":"как в плюсе, энергии усиливают друг друга, 7-9 предложений","recommendation":"главная профессиональная рекомендация, 5-7 предложений","spheres":["5-7 подходящих сфер деятельности"],"format":"оптимальный формат работы, 3-5 предложений","strengths":["6-8 ключевых сильных сторон"],"path":"оптимальный путь реализации, 5-7 предложений","numerologist":"финальное слово нумеролога, вдохновляющее, 5-7 предложений"}}`,
+    7000
   );
 }
 
+/* ============ сборка ============ */
+
 function cacheKey(m: PersonalMatrix): string {
   const d = m.birthDate;
-  return `ai_purpose_v2_${d.day}_${d.month}_${d.year}`;
+  return `ai_purpose_v3_${d.day}_${d.month}_${d.year}`;
 }
 
 export async function generatePurposeReading(m: PersonalMatrix, name: string): Promise<PurposeReading> {
   const key = cacheKey(m);
-  try {
-    const cached = localStorage.getItem(key);
-    if (cached) return JSON.parse(cached);
-  } catch { /* ignore */ }
+  try { const c = localStorage.getItem(key); if (c) return JSON.parse(c); } catch { /* ignore */ }
 
-  const [t0, t1, t2, periods, full, reversed, pk, sc, fin] = await Promise.all([
-    genTriangle(m, name, 0),
-    genTriangle(m, name, 1),
-    genTriangle(m, name, 2),
-    genPeriods(m, name),
-    genFullMatrix(m, name),
-    genReversed(m, name),
-    genPurposeKarma(m, name),
-    genSuccessConnections(m, name),
-    genFinal(m, name),
+  const mirrors = computeMirrors(m);
+  const reversed = computeReversedOrdered(m);
+
+  const [t0, t1, t2, periods, full, ds, work, mir, rev, karma, fin] = await Promise.all([
+    genTriangle(m, name, 0), genTriangle(m, name, 1), genTriangle(m, name, 2),
+    genPeriods(m, name), genFullMatrix(m, name), genDestinySoul(m, name),
+    genWork(m, name), genMirrors(m, name, mirrors), genReversed(m, name, reversed),
+    genKarma(m, name), genFinal(m, name),
   ]);
 
   const triangle = [t0, t1, t2].filter(Boolean) as TriangleBlock[];
@@ -282,11 +304,12 @@ export async function generatePurposeReading(m: PersonalMatrix, name: string): P
     triangle,
     periods: periods?.periods,
     fullMatrix: full?.items,
-    reversed: reversed || undefined,
-    purpose: pk?.purpose,
-    karma: pk?.karma,
-    successCode: sc?.successCode,
-    connections: sc?.connections,
+    destinyTriangle: ds?.destinyTriangle,
+    soulGoals: ds?.soulGoals,
+    work: work?.work,
+    mirrors: mir,
+    reversed: rev || undefined,
+    karma: karma?.karma,
     final: fin?.final,
   };
 

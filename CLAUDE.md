@@ -57,3 +57,7 @@ Vite транспилирует TS без type-checking — билд может 
 - Не пушить из sandbox — давать команду пользователю для cmd (не MinGW):
   `cd C:\Users\галина\Documents\life-cod-v2 && del /f .git\HEAD.lock 2>nul & git add <files> && git commit -m "<msg>" && git push origin main`
 - Проверять деплой через Vercel MCP: projectId=prj_mzIOx2jm531koNV6253cuGFaF5N1, teamId=team_ZnihLEK3CKxqb1vhhwjAbvVw
+
+## Стиль общения и текстов
+
+Никаких стрелочек (→) и длинных тире (—) — нигде: ни в чате, ни в документах, ни в презентациях. Обычная человеческая речь: точки, запятые, двоеточия, союзы. Правило постоянное, действует на все будущие ответы и файлы.
