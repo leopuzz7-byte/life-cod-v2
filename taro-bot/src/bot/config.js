@@ -1,4 +1,3 @@
-// Конфиг бота. Секреты из .env (файл в .gitignore).
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", "..", ".env") });
 
@@ -12,22 +11,24 @@ const config = {
     url: process.env.AI_API_URL || "https://api.proxyapi.ru/openai/v1/chat/completions",
     model: process.env.AI_MODEL || "gpt-4o-mini",
   },
+  contacts: {
+    buyCards: process.env.BUY_CARDS_CONTACT || "@leonpuz",
+    consult: process.env.CONSULT_CONTACT || "",
+  },
+  prices: {
+    tarot: process.env.PRICE_TAROT || "",
+    consult: process.env.PRICE_CONSULT || "5000",
+  },
   robokassa: {
     login: process.env.ROBOKASSA_LOGIN || "",
     pass1: process.env.ROBOKASSA_PASS1 || "",
     pass2: process.env.ROBOKASSA_PASS2 || "",
     test: process.env.ROBOKASSA_TEST === "1",
+    resultPort: parseInt(process.env.ROBOKASSA_RESULT_PORT || "8080", 10),
+    get enabled() { return !!(this.login && this.pass1 && this.pass2); },
   },
-  limits: {
-    aiMessagesPerDay: 3,     // чат с ИИ-тарологом бесплатно
-    dayReadingPerDay: 1,     // разбор дня бесплатно
-    compatFree: 1,           // совместимость бесплатно (всего)
-  },
+  limits: { aiMessagesPerDay: 3 },
 };
 
-if (!config.botToken) {
-  console.error("Нет BOT_TOKEN в .env. Скопируй .env.example в .env и впиши токен.");
-  process.exit(1);
-}
-
+if (!config.botToken) { console.error("Нет BOT_TOKEN в .env"); process.exit(1); }
 module.exports = config;

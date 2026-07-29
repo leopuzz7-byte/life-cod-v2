@@ -1,82 +1,148 @@
-// Телеграм-бот Надежды. Сценарий (черно-золото, сферы жизни):
-// старт -> имя -> дата -> анимация -> три карты по сферам (отношения, деньги, путь) +
-// живой мини-разбор -> вопрос про тему -> вопрос про боль -> подписка на канал ->
-// глубокий разбор по теме (без матрицы) -> меню со смайликами + мини-апп калькулятор.
-// Тон: таролог-психолог, на «ты», без длинных тире.
-
-const { Bot, InlineKeyboard, InputFile } = require("grammy");
+// Телеграм-бот Надежды. Две цепочки на выбор (Таро и Нумерология),
+// подписочный гейт, глубокий разбор, меню reply-клавиатурой, мини-апп калькулятор,
+// оплата Robokassa (заглушка с готовой логикой). Тон: таролог-психолог, на «ты» умеренно.
+const path = require("path");
+const { Bot, InlineKeyboard, Keyboard, InputFile } = require("grammy");
 const config = require("./config");
 const { getUser, saveUser } = require("./store");
 const { calculatePersonalMatrix } = require("../engine/calculations");
 const { getArcana } = require("../engine/arcana");
 const { SPHERES, sphereCards, concernText } = require("../engine/spheres");
+const { THEMES, themeById, drawArcana, fallbackReveal, today } = require("../engine/tarot");
 const { renderThemeCards } = require("../render/theme");
+const { renderDeckChoice } = require("../render/deck");
 const ai = require("../ai/reading");
 const { applyReferral } = require("./broadcasts");
+const pay = require("./payment");
 
 const bot = new Bot(config.botToken);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const ARCANA_DIR = path.join(__dirname, "..", "..", "assets", "arcana");
 
-function parseDate(text) {
-  const m = String(text).trim().match(/^(\d{1,2})[.\/\s-](\d{1,2})[.\/\s-](\d{4})$/);
+// ---- меню (reply-клавиатура) ----
+const L = {
+  tarot: "🔮 Таро расклад", chat: "💬 Чат с Надеждой", arkan: "🃏 Аркан-код",
+  numer: "🔢 Нумерология", consult: "🕊 Консультация", academy: "🎓 Академия", buy: "🛍 Купить карты",
+};
+function mainMenu() {
+  return new Keyboard()
+    .text(L.tarot).text(L.chat).row()
+    .text(L.arkan).text(L.numer).row()
+    .text(L.consult).text(L.academy).row()
+    .text(L.buy).webApp("🧮 Калькулятор", config.calcUrl).row()
+    .resized();
+}
+async function showMenu(ctx, text) {
+  await ctx.reply(text || "Что откликается сейчас. Выбирай.", { reply_markup: mainMenu() });
+}
+
+// ---- тексты методик ----
+const ARKAN_DESC =
+  "🃏 <b>Методика «Аркан-код»</b>\n\n" +
+  "Глубокая система анализа личности на основе 22 Старших Арканов Таро. Каждый аркан отражает тип личности: характер, модели поведения, врождённые таланты, сильные стороны и жизненные задачи.\n\n" +
+  "По дате рождения рассчитывается уникальный набор арканов, который показывает, как эти качества проявляются в решениях, отношениях, деньгах, профессии и самореализации. На выходе не абстрактные советы, а понятная карта себя: кто ты по сути, в чём главный ресурс, какие сценарии влияют на жизнь и куда двигаться.";
+const ARKAN_SELL =
+  "Полный разбор по «Аркан-коду» собрала в калькуляторе. Скажу честно сразу: он платный, потому что это авторская методика и подробный персональный разбор, а не общие фразы. Зато на выходе конкретная карта себя, с которой правда можно работать.";
+const NUMER_DESC =
+  "🔢 <b>Методика «Нумерология»</b>\n\n" +
+  "Авторская система на основе классической нумерологии. Дата рождения и есть персональный код: каждая цифра отражает черты характера, модели поведения, таланты и жизненные задачи.\n\n" +
+  "Такой анализ помогает понять себя, увидеть сильные стороны, осознать, какие сценарии влияют на жизнь, и выбрать направление, где реализуешься сильнее всего.";
+const NUMER_SELL =
+  "Полный разбор по нумерологии открывается в калькуляторе. Тоже по-честному: он платный, это авторская методика и глубокий персональный разбор. Зато на выходе не абстракция, а понятная карта себя.";
+
+function parseDate(t) {
+  const m = String(t).trim().match(/^(\d{1,2})[.\/\s-](\d{1,2})[.\/\s-](\d{4})$/);
   if (!m) return null;
-  const day = +m[1], month = +m[2], year = +m[3];
-  const now = new Date().getFullYear();
+  const day = +m[1], month = +m[2], year = +m[3], now = new Date().getFullYear();
   if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > now) return null;
   return { day, month, year };
 }
-
-function mainMenu() {
-  return new InlineKeyboard()
-    .webApp("🔮 Калькулятор судьбы", config.calcUrl).row()
-    .text("🌙 Разбор дня", "menu:day").text("✨ Разбор месяца", "menu:month").row()
-    .text("🤍 Совместимость", "menu:compat").text("🕯 Расклад по вопросу", "menu:spread").row()
-    .text("📜 Чат с тарологом", "menu:chat").row()
-    .url("⭐ Канал Надежды", config.channelUrl).text("🕊 Консультация", "menu:consult");
-}
-function payKeyboard() {
-  return new InlineKeyboard().text("Оплатить", "pay:sub").row().text("В меню", "menu:open");
-}
-async function payStub(ctx, what) {
-  await ctx.reply(
-    `Чтобы открыть ${what}, нужна подписка. Оплата скоро подключится прямо здесь, а пока я запишу тебя, и Надежда откроет доступ.`,
-    { reply_markup: payKeyboard() }
-  );
-}
-
 async function waiting(ctx) {
   const steps = ["🔮 Считаю...", "✨ Смотрю на карты...", "🌙 Ещё немного..."];
-  let msg;
-  try {
-    msg = await ctx.reply(steps[0]);
-    for (let i = 1; i < steps.length; i++) { await sleep(1500); await ctx.api.editMessageText(ctx.chat.id, msg.message_id, steps[i]); }
-    await sleep(1200); await ctx.api.deleteMessage(ctx.chat.id, msg.message_id);
-  } catch (_) {}
+  let m;
+  try { m = await ctx.reply(steps[0]); for (let i = 1; i < steps.length; i++) { await sleep(1500); await ctx.api.editMessageText(ctx.chat.id, m.message_id, steps[i]); } await sleep(1100); await ctx.api.deleteMessage(ctx.chat.id, m.message_id); } catch (_) {}
 }
+async function isSubscribed(ctx) {
+  try { const mm = await ctx.api.getChatMember(config.channel, ctx.from.id); return ["member", "administrator", "creator"].includes(mm.status); } catch (_) { return false; }
+}
+function subKeyboard() { return new InlineKeyboard().url("Подписаться на канал", config.channelUrl).row().text("Я подписался, открой разбор", "check_sub"); }
+
+let deckCache = null;
+async function deckImage() { if (!deckCache) deckCache = await renderDeckChoice(5, { title: "Выбери карту", subtitle: "ту, к которой тянет" }); return deckCache; }
 
 // ---------- /start ----------
 bot.command("start", async (ctx) => {
   const u = getUser(ctx.from.id);
   const ref = (ctx.match || "").trim();
   if (ref && /^\d+$/.test(ref) && !u.referredBy) applyReferral(ctx.from.id, ref);
-  u.step = "await_name"; u.name = ""; u.birth = null; u.chatHistory = []; u.theme = null; u.concern = null;
+  Object.assign(u, { step: "idle", branch: null, name: "", birth: null, tarotQuestion: "", tarotTheme: null, tarotCard: null, theme: null, concern: null, chatHistory: [] });
   saveUser(u);
+  const nm = ctx.from.first_name ? `, ${ctx.from.first_name}` : "";
   await ctx.reply(
-    "Здравствуй. Меня зовут Надежда, и уже больше 10 лет я помогаю людям разобраться в себе, в отношениях, в деле, в том, что для них по-настоящему важно.\n\n" +
-    "Сейчас я разложу карты на тебя. Но сначала один маленький вопрос."
+    `Здравствуй${nm}.\n\n` +
+    "Меня зовут Надежда. Я цифровой психолог и нумеролог. Здесь можно найти инструменты, которые помогут глубже понять себя, увидеть скрытые причины происходящего и принять решения, меняющие жизнь.\n\n" +
+    "Иногда ответы приходят через карты. Иногда через язык чисел.\n\n" +
+    "<i>Выбери, с чего хочешь начать.</i>",
+    { parse_mode: "HTML", reply_markup: new InlineKeyboard().text("🔮 Таро", "br:tarot").text("🔢 Нумерология", "br:numer") }
   );
-  await ctx.reply("Как мне к тебе обращаться?");
 });
+bot.command("menu", async (ctx) => { const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); });
 
-bot.command("menu", async (ctx) => {
+// ---------- ветка ТАРО ----------
+bot.callbackQuery("br:tarot", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id); u.branch = "tarot"; u.step = "tarot_theme"; saveUser(u);
+  await ctx.reply("<i>В картах нет случайностей.</i> Сегодня выпадет именно та карта, которую важно увидеть.\n\nНо карты отвечают точнее, когда есть настоящий вопрос, тот, что правда не отпускает.", { parse_mode: "HTML" });
+  const kb = new InlineKeyboard();
+  THEMES.forEach((t) => kb.text(`${t.emoji} ${t.label}`, `tt:${t.id}`).row());
+  kb.text("✍️ Написать свой вопрос", "tt:custom");
+  await ctx.reply("Выбери, что откликается, или напиши свой вопрос колоде. 🌙", { reply_markup: kb });
+});
+bot.callbackQuery(/^tt:(love|money|choice|future)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const t = themeById(ctx.match[1]);
+  const u = getUser(ctx.from.id); u.tarotTheme = t.id; u.tarotQuestion = t.label; u.step = "tarot_pick"; saveUser(u);
+  await sendDeck(ctx);
+});
+bot.callbackQuery("tt:custom", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id); u.step = "await_custom_q"; saveUser(u);
+  await ctx.reply("Напиши вопрос одним сообщением, своими словами. Спрашивай как есть.");
+});
+async function sendDeck(ctx) {
+  const img = await deckImage();
+  await ctx.replyWithPhoto(new InputFile(img), {
+    caption: "Держи вопрос в сердце и не отпускай. Перед тобой пять карт. Выбери одну, ту, к которой тянет.",
+    reply_markup: new InlineKeyboard().text("1", "pick:1").text("2", "pick:2").text("3", "pick:3").text("4", "pick:4").text("5", "pick:5"),
+  });
+}
+bot.callbackQuery(/^pick:([1-5])$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
-  if (!u.birth) { await ctx.reply("Давай сначала познакомимся. Напиши /start."); return; }
-  u.step = "menu"; saveUser(u);
-  await ctx.reply("Что тебя сейчас волнует. Выбирай.", { reply_markup: mainMenu() });
+  if (!u.tarotQuestion) { await ctx.reply("Напиши /start, чтобы начать заново."); return; }
+  const pos = +ctx.match[1];
+  const card = drawArcana(ctx.from.id, pos, today());
+  u.tarotCard = card; u.step = "tarot_sub"; saveUser(u);
+  await ctx.replyWithChatAction("upload_photo");
+  // сырая карта оригиналом, без эффектов
+  await ctx.replyWithPhoto(new InputFile(path.join(ARCANA_DIR, `arcana-${card}.webp`)));
+  let r = await ai.generateTarotReveal(card, u.tarotQuestion);
+  const name = getArcana(card).name;
+  const text = r
+    ? `Твоя карта: <b>${esc(name)}</b>.\n\n${esc(r.text)}\n\n<i>${esc(r.hook)}</i>`
+    : `Твоя карта: <b>${esc(name)}</b>.\n\n${esc(fallbackReveal(card))}\n\n<i>Но одна карта показывает лишь верхний слой. Что привело к этому и чем закончится, откроет полный расклад.</i>`;
+  await ctx.reply(text, { parse_mode: "HTML" });
+  await sleep(400);
+  await ctx.reply("Чтобы раскрыть глубже, что стоит за этим и чем всё закончится, загляни в мой канал. 🌙\n\nПодпишись, и полный разбор откроется.", { reply_markup: subKeyboard() });
 });
 
-// ---------- выбор темы (сферы) ----------
+// ---------- ветка НУМЕРОЛОГИЯ ----------
+bot.callbackQuery("br:numer", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id); u.branch = "numerology"; u.step = "await_name"; saveUser(u);
+  await ctx.reply("Хорошо. Числа расскажут о тебе многое.\n\nКак мне к тебе обращаться?");
+});
 bot.callbackQuery(/^th:(love|money|path)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const key = ctx.match[1];
@@ -84,180 +150,147 @@ bot.callbackQuery(/^th:(love|money|path)$/, async (ctx) => {
   const s = SPHERES[key];
   const kb = new InlineKeyboard();
   s.concerns.forEach((c) => kb.text(c.text, `co:${key}:${c.id}`).row());
-  await ctx.reply(`${s.emoji} ${s.label}. А что именно сейчас откликается по этой теме?`, { reply_markup: kb });
+  await ctx.reply(`${s.emoji} ${s.label}. А что именно сейчас откликается?`, { reply_markup: kb });
 });
-
-// ---------- выбор боли ----------
 bot.callbackQuery(/^co:(love|money|path):([a-z]+)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
-  const key = ctx.match[1], cid = ctx.match[2];
-  const u = getUser(ctx.from.id); u.theme = key; u.concern = cid; u.step = "await_sub"; saveUser(u);
-  const s = SPHERES[key];
-  await ctx.reply(
-    `Я услышала тебя. В твоих картах по теме «${s.label}» правда есть глубокий узор.\n\n` +
-    `Чтобы раскрыть его для тебя целиком, загляни в мой канал. Подпишись, и я тут же открою разбор.`,
-    { reply_markup: new InlineKeyboard().url("Подписаться на канал", config.channelUrl).row().text("Я подписался, открой разбор", "check_sub") }
-  );
+  const u = getUser(ctx.from.id); u.theme = ctx.match[1]; u.concern = ctx.match[2]; u.step = "num_sub"; saveUser(u);
+  await ctx.reply(`Услышала. По теме «${SPHERES[u.theme].label}» в твоих картах есть глубокий узор.\n\nЧтобы раскрыть его целиком, загляни в канал. Подпишись, и разбор откроется.`, { reply_markup: subKeyboard() });
 });
 
-// ---------- проверка подписки -> глубокий разбор -> меню ----------
+// ---------- подписка -> глубокий разбор -> меню ----------
 bot.callbackQuery("check_sub", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
-  let ok = false;
-  try { const m = await ctx.api.getChatMember(config.channel, ctx.from.id); ok = ["member", "administrator", "creator"].includes(m.status); } catch (_) {}
-  if (!ok) {
-    await ctx.reply("Пока не вижу тебя в канале. Загляни, и я тут же открою разбор.",
-      { reply_markup: new InlineKeyboard().url("Открыть канал", config.channelUrl).row().text("Я подписался, проверь", "check_sub") });
+  if (!(await isSubscribed(ctx))) {
+    await ctx.reply("Пока не вижу тебя в канале. Загляни, и разбор откроется.", { reply_markup: subKeyboard() });
     return;
   }
-  if (!u.birth || !u.theme) { await ctx.reply("Напиши /start, чтобы начать заново."); return; }
   u.subscribed = true; saveUser(u);
   await ctx.replyWithChatAction("typing");
-  const matrix = calculatePersonalMatrix(u.birth.day, u.birth.month, u.birth.year);
-  const label = SPHERES[u.theme].label;
-  const concern = concernText(u.theme, u.concern);
-  let d = await ai.generateDeep(matrix, u.name, label, concern);
-  if (!d) {
-    const card = sphereCards(matrix).find((c) => c.key === u.theme);
-    d = {
-      opening: `Я всмотрелась в твою карту по теме «${label}», и там звучит ${card.name}.`,
-      insight: `Эта карта говорит о тебе больше, чем кажется. В ней и твоя сила, и то, что ты пока держишь в тени.`,
-      advice: `Не торопи себя. Один честный шаг здесь стоит десяти суетливых.`,
-      closing: `Это лишь часть. Глубже мы можем пойти со мной, в разборах и на консультации.`,
-    };
-  }
-  const text = `${d.opening}\n\n${d.insight}\n\n${d.advice}\n\n${d.closing}`;
-  await ctx.reply(text);
+  if (u.branch === "tarot" && u.tarotCard) {
+    let d = await ai.generateTarotDeep(u.tarotCard, u.tarotQuestion, u.tarotTheme ? themeById(u.tarotTheme).label : "твой вопрос");
+    await sendDeep(ctx, d, getArcana(u.tarotCard).name);
+  } else if (u.branch === "numerology" && u.birth) {
+    const matrix = calculatePersonalMatrix(u.birth.day, u.birth.month, u.birth.year);
+    let d = await ai.generateDeep(matrix, u.name, SPHERES[u.theme].label, concernText(u.theme, u.concern));
+    await sendDeep(ctx, d, SPHERES[u.theme].label);
+  } else { await ctx.reply("Напиши /start, чтобы начать."); return; }
   u.step = "menu"; saveUser(u);
   await sleep(400);
-  await ctx.reply("А теперь мы можем идти дальше. Спроси меня о чём угодно, у тебя есть три бесплатных сообщения в день. Или загляни в меню.", { reply_markup: mainMenu() });
+  await showMenu(ctx, "А теперь идём дальше. Спроси о чём угодно в чате со мной, или выбери в меню.");
 });
+async function sendDeep(ctx, d, fallbackName) {
+  if (!d) { await ctx.reply(`Карта ${fallbackName} говорит о многом. В ней и сила, и то, что пока в тени. Не торопи себя, один честный шаг здесь дороже десяти суетливых. Глубже можно пойти со мной, в разборах и на консультации.`); return; }
+  await ctx.reply(`${esc(d.opening)}\n\n${esc(d.insight)}\n\n<i>${esc(d.advice)}</i>\n\n${esc(d.closing)}`, { parse_mode: "HTML" });
+}
 
-// ---------- меню ----------
-bot.callbackQuery("menu:open", async (ctx) => {
-  await ctx.answerCallbackQuery();
-  const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u);
-  await ctx.reply("Что тебя сейчас волнует. Выбирай.", { reply_markup: mainMenu() });
-});
-bot.callbackQuery("menu:day", async (ctx) => {
-  await ctx.answerCallbackQuery();
+// ---------- пункты меню (reply-клавиатура шлёт текст) ----------
+async function handleMenu(ctx, label) {
   const u = getUser(ctx.from.id);
-  if (!u.birth) { await ctx.reply("Сначала напиши /start."); return; }
-  if (u.counters.dayReading >= config.limits.dayReadingPerDay && !u.subscribed) { await payStub(ctx, "безлимитный разбор дня"); return; }
-  u.counters.dayReading++; saveUser(u);
-  await ctx.replyWithChatAction("typing");
-  const matrix = calculatePersonalMatrix(u.birth.day, u.birth.month, u.birth.year);
-  let r = await ai.generateDayReading(matrix, u.name);
-  if (!r) r = { text: "Сегодня день слушать себя, а не спешить. Одно тихое решение окажется важнее десяти громких.", hook: "Завтра карты откроют новую грань. Возвращайся." };
-  await ctx.reply(`🌙 Разбор дня\n\n${r.text}\n\n${r.hook}`, { reply_markup: new InlineKeyboard().text("В меню", "menu:open") });
-});
-bot.callbackQuery("menu:month", async (ctx) => { await ctx.answerCallbackQuery(); await payStub(ctx, "разбор месяца"); });
-bot.callbackQuery("menu:spread", async (ctx) => { await ctx.answerCallbackQuery(); await payStub(ctx, "расклад по твоему вопросу"); });
-bot.callbackQuery("menu:compat", async (ctx) => {
-  await ctx.answerCallbackQuery();
-  await ctx.reply("Совместимость я считаю по двум датам рождения. Для глубокого разбора отношений у нас есть отдельный калькулятор, он видит гораздо больше.",
-    { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl).row().text("В меню", "menu:open") });
-});
-bot.callbackQuery("menu:consult", async (ctx) => {
-  await ctx.answerCallbackQuery();
-  await ctx.reply("Личная консультация со мной это отдельный глубокий разговор один на один. Записаться можно через канал.",
-    { reply_markup: new InlineKeyboard().url("Написать в канал", config.channelUrl).row().text("В меню", "menu:open") });
-});
-bot.callbackQuery("menu:chat", async (ctx) => {
-  await ctx.answerCallbackQuery();
-  const u = getUser(ctx.from.id); u.step = "chat"; saveUser(u);
-  const left = Math.max(0, config.limits.aiMessagesPerDay - u.counters.aiMessages);
-  await ctx.reply(left > 0 ? `Я здесь. Спроси меня о чём угодно, что тревожит или радует.\n\nСегодня у тебя ${left} бесплатных сообщения.`
-    : "На сегодня бесплатные сообщения закончились. Открыть безлимит можно по подписке.", left > 0 ? undefined : { reply_markup: payKeyboard() });
-});
+  if (label === L.tarot) {
+    u.step = "menu"; saveUser(u);
+    const priceLine = config.prices.tarot ? `\n\nСтоимость: ${config.prices.tarot} рублей.` : "";
+    await ctx.reply(`🔮 <b>Полный расклад</b>\n\nПервый расклад уже показала, теперь идём глубже. Полный расклад собираю под конкретный вопрос: что в корне, что мешает и чем всё закончится. Это разбор именно твоей ситуации, как на консультации, поэтому он платный.${priceLine}`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().text("Оплатить расклад", "pay:tarot") });
+  } else if (label === L.arkan) {
+    await ctx.reply(ARKAN_DESC, { parse_mode: "HTML" });
+    await ctx.reply(ARKAN_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
+  } else if (label === L.numer) {
+    await ctx.reply(NUMER_DESC, { parse_mode: "HTML" });
+    await ctx.reply(NUMER_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
+  } else if (label === L.chat) {
+    u.step = "chat"; saveUser(u);
+    const left = Math.max(0, config.limits.aiMessagesPerDay - u.counters.aiMessages);
+    await ctx.reply(left > 0 ? `Я здесь. Спроси о чём угодно, что тревожит или радует.\n\nСегодня есть ${left} бесплатных сообщения.` : "На сегодня бесплатные сообщения закончились. Безлимит открывается по подписке.", left > 0 ? undefined : { reply_markup: new InlineKeyboard().text("Оплатить", "pay:sub") });
+  } else if (label === L.consult) {
+    const c = config.contacts.consult;
+    const cta = c ? `Записаться: ${c}` : "Запись открою совсем скоро, а пока загляни в канал.";
+    await ctx.reply(`🕊 <b>Консультация с Надеждой</b>\n\nЛичный разбор один на один. Час работы, где разбираем ситуацию глубоко: отношения, выбор, деньги, реализация, повторяющиеся сценарии. На выходе ясность и конкретные шаги.\n\nМинимум час, ${config.prices.consult} рублей.\n\n${cta}`, { parse_mode: "HTML", reply_markup: c ? undefined : new InlineKeyboard().url("Канал Надежды", config.channelUrl) });
+  } else if (label === L.academy) {
+    await ctx.reply("🎓 <b>Лайф Код Академия</b>\n\nСкоро здесь появится академия с обучением. Следи за анонсами в канале.", { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Канал Надежды", config.channelUrl) });
+  } else if (label === L.buy) {
+    await ctx.reply(`🛍 <b>Купить карты Таро</b>\n\nАвторскую колоду можно купить у нас. Напиши, и всё расскажем: ${config.contacts.buyCards}`, { parse_mode: "HTML" });
+  } else return false;
+  return true;
+}
+
+// ---------- оплата (заглушка) ----------
 bot.callbackQuery(/^pay:/, async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply("Спасибо. Оплата через Robokassa скоро подключится прямо здесь. Пока я записала твою заявку, Надежда откроет доступ.",
-    { reply_markup: new InlineKeyboard().url("Канал Надежды", config.channelUrl).row().text("В меню", "menu:open") });
+  await ctx.reply("Оплата через Robokassa скоро подключится прямо здесь. Пока записала заявку, Надежда откроет доступ.", { reply_markup: new InlineKeyboard().url("Канал Надежды", config.channelUrl).row().text("В меню", "to:menu") });
 });
+bot.callbackQuery("to:menu", async (ctx) => { await ctx.answerCallbackQuery(); const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); });
 
-// ---------- текст: имя, дата, чат ----------
+// ---------- текст: ввод и меню ----------
 bot.on("message:text", async (ctx) => {
   const u = getUser(ctx.from.id);
+  const text = ctx.message.text;
 
   if (u.step === "await_name") {
-    u.name = ctx.message.text.trim().slice(0, 40).replace(/[<>]/g, "");
-    u.step = "await_date"; saveUser(u);
+    u.name = text.trim().slice(0, 40).replace(/[<>]/g, ""); u.step = "await_date"; saveUser(u);
     await ctx.reply(`Приятно познакомиться, ${u.name}. А когда ты родился(-ась)?\n\nВведи дату в формате ДД.ММ.ГГГГ, например 01.02.1991.`);
     return;
   }
-
   if (u.step === "await_date") {
-    const d = parseDate(ctx.message.text);
+    const d = parseDate(text);
     if (!d) { await ctx.reply("Что-то не так с датой. Напиши в формате ДД.ММ.ГГГГ, например 01.02.1991."); return; }
     u.birth = d; saveUser(u);
     await waiting(ctx);
-
     const matrix = calculatePersonalMatrix(d.day, d.month, d.year);
     const cards = sphereCards(matrix);
-    const png = await renderThemeCards(cards.map((c) => ({ n: c.n, label: c.label, sub: c.name })),
-      { title: "Твои три карты", subtitle: "три сферы, где решается твоя судьба" });
+    const png = await renderThemeCards(cards.map((c) => ({ n: c.n, label: c.label, sub: c.name })), { title: "Твои три карты", subtitle: "три сферы, где решается твоя судьба" });
     await ctx.replyWithPhoto(new InputFile(png), { caption: "Вот они, три твои карты. Смотри." });
-
     let t = await ai.generateSpheres(matrix, u.name);
-    if (!t) {
-      t = {
-        preface: `${u.name}, карты легли, и они уже говорят.`,
-        love_lead: "Первое, что я увидела в твоих отношениях,", love: `это ${cards[0].name}. Ты чувствуешь глубже, чем показываешь.`,
-        money_lead: "А вот в деле", money: `звучит ${cards[1].name}. Ты можешь много, когда перестаёшь сомневаться.`,
-        path_lead: "И самое важное, твой путь,", path: `это ${cards[2].name}. В нём больше света, чем ты себе позволяешь.`,
-      };
+    if (t) {
+      const msg = `${esc(t.preface)}\n\n${SPHERES.love.emoji} <b>Отношения</b>\n${esc(t.love_lead)} ${esc(t.love)}\n\n${SPHERES.money.emoji} <b>Деньги и дело</b>\n${esc(t.money_lead)} ${esc(t.money)}\n\n${SPHERES.path.emoji} <b>Путь и сила</b>\n${esc(t.path_lead)} ${esc(t.path)}`;
+      await ctx.reply(msg, { parse_mode: "HTML" });
+    } else {
+      await ctx.reply(`Карты легли. В отношениях ведёт ${cards[0].name}, в деле ${cards[1].name}, а путь освещает ${cards[2].name}. За этими тремя картами скрыто гораздо больше.`);
     }
-    const msg =
-      `${esc(t.preface)}\n\n` +
-      `${SPHERES.love.emoji} <b>Отношения</b>\n${esc(t.love_lead)} ${esc(t.love)}\n\n` +
-      `${SPHERES.money.emoji} <b>Деньги и дело</b>\n${esc(t.money_lead)} ${esc(t.money)}\n\n` +
-      `${SPHERES.path.emoji} <b>Путь и сила</b>\n${esc(t.path_lead)} ${esc(t.path)}`;
-    await ctx.reply(msg, { parse_mode: "HTML" });
-
     await sleep(500);
-    const kb = new InlineKeyboard()
-      .text(`${SPHERES.love.emoji} Отношения`, "th:love").row()
-      .text(`${SPHERES.money.emoji} Деньги и дело`, "th:money").row()
-      .text(`${SPHERES.path.emoji} Путь и сила`, "th:path");
-    await ctx.reply("Скажи, что сейчас откликается сильнее. С чего начнём?", { reply_markup: kb });
+    const kb = new InlineKeyboard().text(`${SPHERES.love.emoji} Отношения`, "th:love").row().text(`${SPHERES.money.emoji} Деньги и дело`, "th:money").row().text(`${SPHERES.path.emoji} Путь и сила`, "th:path");
+    await ctx.reply("Скажи, что откликается сильнее. С чего начнём?", { reply_markup: kb });
     u.step = "await_theme"; saveUser(u);
     return;
   }
+  if (u.step === "await_custom_q") {
+    u.tarotQuestion = text.trim().slice(0, 300); u.step = "tarot_pick"; saveUser(u);
+    await ctx.reply("Приняла вопрос. Теперь сосредоточься на нём.");
+    await sendDeck(ctx);
+    return;
+  }
+
+  // пункты меню (reply-клавиатура)
+  if (Object.values(L).includes(text)) { if (await handleMenu(ctx, text)) return; }
 
   if (u.step === "chat") {
     const limit = config.limits.aiMessagesPerDay;
     if (u.counters.aiMessages >= limit && !u.subscribed) {
-      await ctx.reply("Мне бы хотелось говорить с тобой без границ, но на сегодня бесплатные сообщения закончились. Открой безлимит, и я всегда буду на связи.", { reply_markup: payKeyboard() });
+      await ctx.reply("Мне бы хотелось говорить без границ, но на сегодня бесплатные сообщения закончились. Безлимит открывается по подписке.", { reply_markup: new InlineKeyboard().text("Оплатить", "pay:sub") });
       return;
     }
     u.counters.aiMessages++;
-    u.chatHistory = (u.chatHistory || []).concat({ role: "user", content: ctx.message.text }).slice(-12);
-    saveUser(u);
+    u.chatHistory = (u.chatHistory || []).concat({ role: "user", content: text }).slice(-12); saveUser(u);
     await ctx.replyWithChatAction("typing");
     const matrix = u.birth ? calculatePersonalMatrix(u.birth.day, u.birth.month, u.birth.year) : null;
-    let reply = await ai.generateChatReply(u.chatHistory, ctx.message.text, matrix, u.name);
+    let reply = await ai.generateChatReply(u.chatHistory, text, matrix, u.name);
     if (!reply) reply = "Карты сейчас молчат, но я рядом. Спроси иначе, и я всмотрюсь ещё раз.";
     u.chatHistory = u.chatHistory.concat({ role: "assistant", content: reply }).slice(-12); saveUser(u);
     await ctx.reply(reply);
     const left = limit - u.counters.aiMessages;
-    if (!u.subscribed && left === 1) await ctx.reply("У тебя осталось одно бесплатное сообщение на сегодня. Задай его от сердца.");
-    else if (!u.subscribed && left <= 0) await ctx.reply("Это было последнее бесплатное сообщение на сегодня. Открой безлимит, и мы продолжим без пауз.", { reply_markup: payKeyboard() });
+    if (!u.subscribed && left === 1) await ctx.reply("Осталось одно бесплатное сообщение на сегодня. Задай его от сердца.");
+    else if (!u.subscribed && left <= 0) await ctx.reply("Это было последнее бесплатное сообщение на сегодня. Безлимит открывается по подписке.", { reply_markup: new InlineKeyboard().text("Оплатить", "pay:sub") });
     return;
   }
 
-  if (!u.birth) await ctx.reply("Чтобы начать, напиши /start.");
-  else await ctx.reply("Открой меню, и выбери, о чём поговорим.", { reply_markup: new InlineKeyboard().text("Меню", "menu:open") });
+  if (u.branch || u.birth) await showMenu(ctx, "Выбирай в меню, о чём поговорим.");
+  else await ctx.reply("Чтобы начать, напиши /start.");
 });
 
 bot.catch((err) => console.error("Ошибка бота:", err?.error?.message || err?.message || err));
 
-// основная кнопка слева у поля ввода = мини-апп калькулятора
 async function setup() {
-  try {
-    await bot.api.setChatMenuButton({ menu_button: { type: "web_app", text: "Калькулятор", web_app: { url: config.calcUrl } } });
-  } catch (e) { console.error("menu button:", e?.message); }
+  try { await bot.api.setChatMenuButton({ menu_button: { type: "web_app", text: "Калькулятор", web_app: { url: config.calcUrl } } }); } catch (e) { console.error("menu button:", e?.message); }
+  pay.startResultServer((invId) => console.log("Оплачен счёт", invId));
 }
-
 bot.start({ onStart: async (bi) => { await setup(); console.log("Бот запущен: @" + bi.username); } });
