@@ -12,7 +12,7 @@ const { THEMES, themeById, drawArcana, fallbackReveal, today } = require("../eng
 const { renderThemeCards } = require("../render/theme");
 const { renderDeckChoice } = require("../render/deck");
 const ai = require("../ai/reading");
-const { applyReferral } = require("./broadcasts");
+const { applyReferral, sendAll } = require("./broadcasts");
 const pay = require("./payment");
 
 const bot = new Bot(config.botToken);
@@ -43,13 +43,13 @@ const ARKAN_DESC =
   "Глубокая система анализа личности на основе 22 Старших Арканов Таро. Каждый аркан отражает тип личности: характер, модели поведения, врождённые таланты, сильные стороны и жизненные задачи.\n\n" +
   "По дате рождения рассчитывается уникальный набор арканов, который показывает, как эти качества проявляются в решениях, отношениях, деньгах, профессии и самореализации. На выходе не абстрактные советы, а понятная карта себя: кто ты по сути, в чём главный ресурс, какие сценарии влияют на жизнь и куда двигаться.";
 const ARKAN_SELL =
-  "Полный разбор по «Аркан-коду» собрала в калькуляторе. Скажу честно сразу: он платный, потому что это авторская методика и подробный персональный разбор, а не общие фразы. Зато на выходе конкретная карта себя, с которой правда можно работать.";
+  "Полный разбор по «Аркан-коду» собран в интерактивном калькуляторе. Скажу честно: доступ платный, потому что это не шаблон, а глубокий персональный разбор по авторской методике. На выходе полная карта личности: сильные стороны, таланты, задачи, что влияет на жизнь и куда двигаться, чтобы раскрыть потенциал и решать осознаннее.";
 const NUMER_DESC =
   "🔢 <b>Методика «Нумерология»</b>\n\n" +
   "Авторская система на основе классической нумерологии. Дата рождения и есть персональный код: каждая цифра отражает черты характера, модели поведения, таланты и жизненные задачи.\n\n" +
   "Такой анализ помогает понять себя, увидеть сильные стороны, осознать, какие сценарии влияют на жизнь, и выбрать направление, где реализуешься сильнее всего.";
 const NUMER_SELL =
-  "Полный разбор по нумерологии открывается в калькуляторе. Тоже по-честному: он платный, это авторская методика и глубокий персональный разбор. Зато на выходе не абстракция, а понятная карта себя.";
+  "Полный разбор по нумерологии тоже в интерактивном калькуляторе. Скажу честно: доступ платный, потому что это глубокий персональный разбор по авторской методике, а не общие описания. На выходе полная карта личности: сильные стороны, таланты, задачи, что влияет на жизнь и куда двигаться, чтобы раскрыть потенциал и жить осознаннее.";
 
 function parseDate(t) {
   const m = String(t).trim().match(/^(\d{1,2})[.\/\s-](\d{1,2})[.\/\s-](\d{4})$/);
@@ -76,6 +76,7 @@ bot.command("start", async (ctx) => {
   const u = getUser(ctx.from.id);
   const ref = (ctx.match || "").trim();
   if (ref && /^\d+$/.test(ref) && !u.referredBy) applyReferral(ctx.from.id, ref);
+  if (u.onboarded) { u.step = "menu"; saveUser(u); await showMenu(ctx, "Ты уже со мной. Выбирай, что дальше."); return; }
   Object.assign(u, { step: "idle", branch: null, name: "", birth: null, tarotQuestion: "", tarotTheme: null, tarotCard: null, theme: null, concern: null, chatHistory: [] });
   saveUser(u);
   const nm = ctx.from.first_name ? `, ${ctx.from.first_name}` : "";
@@ -88,6 +89,15 @@ bot.command("start", async (ctx) => {
   );
 });
 bot.command("menu", async (ctx) => { const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); });
+bot.command("id", async (ctx) => { await ctx.reply("Твой Telegram ID: " + ctx.from.id); });
+bot.command("notify", async (ctx) => {
+  if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;
+  const text = (ctx.match || "").trim();
+  if (!text) { await ctx.reply("Формат: /notify текст рассылки"); return; }
+  await ctx.reply("Рассылаю...");
+  const sent = await sendAll(bot, text);
+  await ctx.reply("Отправлено: " + sent + " получателям.");
+});
 
 // ---------- ветка ТАРО ----------
 bot.callbackQuery("br:tarot", async (ctx) => {
@@ -124,6 +134,7 @@ bot.callbackQuery(/^pick:([1-5])$/, async (ctx) => {
   const pos = +ctx.match[1];
   const card = drawArcana(ctx.from.id, pos, today());
   u.tarotCard = card; u.step = "tarot_sub"; saveUser(u);
+  await waiting(ctx);
   await ctx.replyWithChatAction("upload_photo");
   // сырая карта оригиналом, без эффектов
   await ctx.replyWithPhoto(new InputFile(path.join(ARCANA_DIR, `arcana-${card}.webp`)));
@@ -176,7 +187,7 @@ bot.callbackQuery("check_sub", async (ctx) => {
     let d = await ai.generateDeep(matrix, u.name, SPHERES[u.theme].label, concernText(u.theme, u.concern));
     await sendDeep(ctx, d, SPHERES[u.theme].label);
   } else { await ctx.reply("Напиши /start, чтобы начать."); return; }
-  u.step = "menu"; saveUser(u);
+  u.step = "menu"; u.onboarded = true; saveUser(u);
   await sleep(400);
   await showMenu(ctx, "А теперь идём дальше. Спроси о чём угодно в чате со мной, или выбери в меню.");
 });

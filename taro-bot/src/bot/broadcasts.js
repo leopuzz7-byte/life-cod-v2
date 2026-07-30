@@ -88,4 +88,11 @@ function applyReferral(newUserId, refId) {
   return true;
 }
 
-module.exports = { QUESTION_BANK, sendDailyQuestion, sendWeekly, tomorrowHook, applyReferral, REFERRAL_BONUS };
+// Рассылка произвольного текста всем пользователям (для команды владельца).
+async function sendAll(bot, text) {
+  let sent = 0;
+  for (const u of allUsers()) { if (await safeSend(bot, u.id, text)) sent++; }
+  return sent;
+}
+
+module.exports = { QUESTION_BANK, sendAll, sendDailyQuestion, sendWeekly, tomorrowHook, applyReferral, REFERRAL_BONUS };

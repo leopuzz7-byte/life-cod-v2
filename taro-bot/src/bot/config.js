@@ -27,6 +27,7 @@ const config = {
     resultPort: parseInt(process.env.ROBOKASSA_RESULT_PORT || "8080", 10),
     get enabled() { return !!(this.login && this.pass1 && this.pass2); },
   },
+  ownerId: process.env.OWNER_ID || "",
   limits: { aiMessagesPerDay: 3 },
 };
 

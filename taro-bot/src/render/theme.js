@@ -5,10 +5,12 @@ const { createCanvas, loadImage, GlobalFonts } = require("@napi-rs/canvas");
 
 const FONTS = path.join(__dirname, "..", "..", "assets", "fonts");
 const ARCANA_DIR = path.join(__dirname, "..", "..", "assets", "arcana");
-GlobalFonts.registerFromPath(path.join(FONTS, "Playfair-ExtraBold.ttf"), "PlayfairXB");
-GlobalFonts.registerFromPath(path.join(FONTS, "Playfair-Bold.ttf"), "PlayfairB");
-GlobalFonts.registerFromPath(path.join(FONTS, "Playfair-Regular.ttf"), "PlayfairR");
-GlobalFonts.registerFromPath(path.join(FONTS, "Playfair-Italic.ttf"), "PlayfairI");
+try {
+  GlobalFonts.registerFromPath(path.join(FONTS, "Playfair-ExtraBold.ttf"), "PlayfairXB");
+  GlobalFonts.registerFromPath(path.join(FONTS, "Playfair-Bold.ttf"), "PlayfairB");
+  GlobalFonts.registerFromPath(path.join(FONTS, "Playfair-Regular.ttf"), "PlayfairR");
+  GlobalFonts.registerFromPath(path.join(FONTS, "Playfair-Italic.ttf"), "PlayfairI");
+} catch (e) { console.error("Шрифты не загрузились:", e.message); }
 
 // палитра
 const BG0 = "#0b0a0f", BG1 = "#15121c", GLOW = "#3a2c14";
