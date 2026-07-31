@@ -13,7 +13,8 @@ const config = {
   },
   contacts: {
     buyCards: process.env.BUY_CARDS_CONTACT || "@leonpuz",
-    consult: process.env.CONSULT_CONTACT || "",
+    support: process.env.SUPPORT_CONTACT || "@leonpuz",
+    consultPhone: process.env.CONSULT_PHONE || "79111232557",
   },
   prices: {
     tarot: process.env.PRICE_TAROT || "",

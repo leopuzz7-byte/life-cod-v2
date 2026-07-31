@@ -16,21 +16,25 @@ const { applyReferral, sendAll } = require("./broadcasts");
 const pay = require("./payment");
 
 const bot = new Bot(config.botToken);
+let botUsername = "taroiibbot";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const ARCANA_DIR = path.join(__dirname, "..", "..", "assets", "arcana");
 
 // ---- меню (reply-клавиатура) ----
 const L = {
-  tarot: "🔮 Таро расклад", chat: "💬 Чат с Надеждой", arkan: "🃏 Аркан-код",
-  numer: "🔢 Нумерология", consult: "🕊 Консультация", academy: "🎓 Академия", buy: "🛍 Купить карты",
+  arkan: "🃏 Аркан-код", numer: "🔢 Нумерология",
+  tarot: "🔮 Таро расклад", shop: "🛍 Магазин", invite: "👥 Пригласить друга",
+  academy: "🎓 Академия", consult: "🕊 Консультация",
+  chat: "💬 Чат с Надеждой", support: "🛟 Техподдержка",
 };
 function mainMenu() {
   return new Keyboard()
-    .text(L.tarot).text(L.chat).row()
     .text(L.arkan).text(L.numer).row()
-    .text(L.consult).text(L.academy).row()
-    .text(L.buy).webApp("🧮 Калькулятор", config.calcUrl).row()
+    .text(L.tarot).webApp("🧮 Калькулятор", config.calcUrl).row()
+    .text(L.shop).text(L.invite).row()
+    .text(L.academy).text(L.consult).row()
+    .text(L.chat).text(L.support).row()
     .resized();
 }
 async function showMenu(ctx, text) {
@@ -212,15 +216,20 @@ async function handleMenu(ctx, label) {
   } else if (label === L.chat) {
     u.step = "chat"; saveUser(u);
     const left = Math.max(0, config.limits.aiMessagesPerDay - u.counters.aiMessages);
-    await ctx.reply(left > 0 ? `Я здесь. Спроси о чём угодно, что тревожит или радует.\n\nСегодня есть ${left} бесплатных сообщения.` : "На сегодня бесплатные сообщения закончились. Безлимит открывается по подписке.", left > 0 ? undefined : { reply_markup: new InlineKeyboard().text("Оплатить", "pay:sub") });
+    await ctx.reply("💬 <b>Чат с Надеждой</b>\n\nЭто моя цифровая версия, обученная на моих методиках. Отвечаю живо и по делу. Личная встреча вживую это отдельная кнопка, Консультация.", { parse_mode: "HTML" });
+    await ctx.reply(left > 0 ? `Спроси о чём угодно, что тревожит или радует. Сегодня есть ${left} бесплатных сообщения.` : "На сегодня бесплатные сообщения закончились. Безлимит откроется по подписке.", left > 0 ? undefined : { reply_markup: new InlineKeyboard().text("Оплатить", "pay:sub") });
   } else if (label === L.consult) {
-    const c = config.contacts.consult;
-    const cta = c ? `Записаться: ${c}` : "Запись открою совсем скоро, а пока загляни в канал.";
-    await ctx.reply(`🕊 <b>Консультация с Надеждой</b>\n\nЛичный разбор один на один. Час работы, где разбираем ситуацию глубоко: отношения, выбор, деньги, реализация, повторяющиеся сценарии. На выходе ясность и конкретные шаги.\n\nМинимум час, ${config.prices.consult} рублей.\n\n${cta}`, { parse_mode: "HTML", reply_markup: c ? undefined : new InlineKeyboard().url("Канал Надежды", config.channelUrl) });
+    const phone = config.contacts.consultPhone;
+    await ctx.reply(`🕊 <b>Консультация с Надеждой</b>\n\nЭто личная встреча один на один, не с ботом, а со мной вживую. Час работы: отношения, выбор, деньги, реализация, повторяющиеся сценарии. На выходе ясность и конкретные шаги.\n\nМинимум час, ${config.prices.consult} рублей.\n\nДля записи напиши мне в Telegram.`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Написать для записи", "tg://resolve?phone=" + phone) });
   } else if (label === L.academy) {
     await ctx.reply("🎓 <b>Лайф Код Академия</b>\n\nСкоро здесь появится академия с обучением. Следи за анонсами в канале.", { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Канал Надежды", config.channelUrl) });
-  } else if (label === L.buy) {
-    await ctx.reply(`🛍 <b>Купить карты Таро</b>\n\nАвторскую колоду можно купить у нас. Напиши, и всё расскажем: ${config.contacts.buyCards}`, { parse_mode: "HTML" });
+  } else if (label === L.shop) {
+    await ctx.reply(`🛍 <b>Магазин</b>\n\nУ нас можно приобрести: уникальные авторские карты Таро, фирменную одежду в тематике нумерологии и Таро, полотенца, постельное бельё.\n\nДля покупки напиши: ${config.contacts.buyCards}`, { parse_mode: "HTML" });
+  } else if (label === L.invite) {
+    const link = `https://t.me/${botUsername}?start=${ctx.from.id}`;
+    await ctx.reply(`👥 <b>Пригласить друга</b>\n\nОтправь эту ссылку другу. Когда он зайдёт по ней и запустит бота, вы оба получите бонусное сообщение в чате со мной.\n\n${link}`, { parse_mode: "HTML" });
+  } else if (label === L.support) {
+    await ctx.reply(`🛟 <b>Техподдержка</b>\n\nЕсли что-то не работает или есть вопрос, напиши нам: ${config.contacts.support}`, { parse_mode: "HTML" });
   } else return false;
   return true;
 }
@@ -302,6 +311,7 @@ bot.catch((err) => console.error("Ошибка бота:", err?.error?.message |
 
 async function setup() {
   try { await bot.api.setChatMenuButton({ menu_button: { type: "web_app", text: "Калькулятор", web_app: { url: config.calcUrl } } }); } catch (e) { console.error("menu button:", e?.message); }
+  try { await bot.api.setMyDescription("Бот Надежды: таро, нумерология и личные разборы. Вопросы и техподдержка: " + config.contacts.support); } catch (_) {}
   pay.startResultServer((invId) => console.log("Оплачен счёт", invId));
 }
-bot.start({ onStart: async (bi) => { await setup(); console.log("Бот запущен: @" + bi.username); } });
+bot.start({ onStart: async (bi) => { botUsername = bi.username; await setup(); console.log("Бот запущен: @" + bi.username); } });
