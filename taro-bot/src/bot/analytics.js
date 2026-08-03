@@ -15,6 +15,20 @@ const SOURCE_NAMES = {
 };
 function sourceName(code) { return SOURCE_NAMES[code] || code || "Напрямую"; }
 
+// Все пункты меню в порядке показа (для полной статистики нажатий).
+const MENU_BUTTONS = [
+  "🃏 Аркан-код",
+  "🔢 Нумерология",
+  "🔮 Таро расклад",
+  "🛍 Магазин",
+  "👥 Пригласить друга",
+  "🎓 Академия",
+  "🕊 Консультация",
+  "💬 Чат с Надеждой",
+  "🛟 Техподдержка",
+  "🌐 Соцсети Надежды",
+];
+
 function ensure() { try { if (!fs.existsSync(DIR)) fs.mkdirSync(DIR, { recursive: true }); } catch (_) {} }
 
 // Записать событие. Никогда не роняет бота.
@@ -81,29 +95,38 @@ function summary(days) {
   out.push("");
   out.push("Ветки: таро " + brT + ", нумерология " + brN);
 
-  // Откликаемость по опроснику
-  function reso(branch) {
-    const f = ev.filter((e) => e.event === "feedback" && e.branch === branch);
+  // Опросник: сколько выбрали каждый вариант, по веткам и всего
+  function fbRows(branch) {
+    const f = ev.filter((e) => e.event === "feedback" && (branch ? e.branch === branch : true));
     const t = f.length;
-    if (!t) return "нет ответов";
+    if (!t) return ["нет ответов"];
     const hit = f.filter((e) => e.value === "hit").length;
     const part = f.filter((e) => e.value === "part").length;
     const miss = f.filter((e) => e.value === "miss").length;
-    return "попадание " + pct(hit, t) + "%, частично " + pct(part, t) + "%, мимо " + pct(miss, t) + "% (n=" + t + ")";
+    return [
+      "Да, про меня: " + hit + " (" + pct(hit, t) + "%)",
+      "Кое-что да: " + part + " (" + pct(part, t) + "%)",
+      "Не откликнулось: " + miss + " (" + pct(miss, t) + "%)",
+      "Всего ответов: " + t,
+    ];
   }
   out.push("");
-  out.push("Откликаемость таро: " + reso("tarot"));
-  out.push("Откликаемость нумер.: " + reso("numer"));
+  out.push("Опросник, таро:");
+  for (const r of fbRows("tarot")) out.push(r);
+  out.push("");
+  out.push("Опросник, нумерология:");
+  for (const r of fbRows("numer")) out.push(r);
+  out.push("");
+  out.push("Опросник, всего:");
+  for (const r of fbRows(null)) out.push(r);
 
-  // Топ кнопок меню
+  // Кнопки меню: все пункты с числом нажатий (включая нулевые)
   const btn = {};
   for (const e of ev) if (e.event === "menu_click" && e.button) btn[e.button] = (btn[e.button] || 0) + 1;
-  const top = Object.entries(btn).sort((a, b) => b[1] - a[1]).slice(0, 8);
-  if (top.length) {
-    out.push("");
-    out.push("Топ кнопок меню:");
-    for (const [b, c] of top) out.push(b + ": " + c);
-  }
+  out.push("");
+  out.push("Кнопки меню (нажатий):");
+  for (const b of MENU_BUTTONS) out.push(b + ": " + (btn[b] || 0));
+  for (const b of Object.keys(btn)) if (!MENU_BUTTONS.includes(b)) out.push(b + ": " + btn[b]);
 
   // Источники: пришло / подписались
   const bySource = {};
