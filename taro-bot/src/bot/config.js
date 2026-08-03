@@ -16,6 +16,13 @@ const config = {
     support: process.env.SUPPORT_CONTACT || "@leonpuz",
     consultPhone: process.env.CONSULT_PHONE || "79111232557",
   },
+  social: {
+    instaTaro: process.env.SOCIAL_INSTA_TARO || "https://www.instagram.com/taronadezhdi",
+    instaNumer: process.env.SOCIAL_INSTA_NUMER || "https://www.instagram.com/lifecode.numerology",
+    youtubeTaro: process.env.SOCIAL_YT_TARO || "https://youtube.com/@taronadezhdy2351",
+    youtubePiligrim: process.env.SOCIAL_YT_PILIGRIM || "https://youtube.com/@piligrims_heart",
+    tiktok: process.env.SOCIAL_TIKTOK || "https://tiktok.com/@taronadezhdi1235",
+  },
   prices: {
     tarot: process.env.PRICE_TAROT || "",
     consult: process.env.PRICE_CONSULT || "5000",

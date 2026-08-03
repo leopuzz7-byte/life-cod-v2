@@ -38,7 +38,10 @@ const QUESTION_BANK = [
 // Обёртка безопасной отправки (пользователь мог заблокировать бота).
 async function safeSend(bot, id, text, extra) {
   try { await bot.api.sendMessage(id, text, extra); return true; }
-  catch { return false; }
+  catch (e) {
+    try { const code = e && (e.error_code || (e.parameters && e.parameters.error_code)); if (code === 403 || String(e).includes("403")) require("./analytics").track(id, "blocked", {}); } catch (_) {}
+    return false;
+  }
 }
 
 // Ежедневный вопрос неплативших (у кого нет активной подписки).
