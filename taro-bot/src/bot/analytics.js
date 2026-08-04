@@ -24,9 +24,10 @@ const MENU_BUTTONS = [
   "👥 Пригласить друга",
   "🎓 Академия",
   "🕊 Консультация",
-  "💬 Чат с Надеждой",
+  "💬 Чат с Надеждой (ИИ)",
   "🛟 Техподдержка",
   "🌐 Соцсети Надежды",
+  "🔒 Закрытый клуб",
 ];
 
 function ensure() { try { if (!fs.existsSync(DIR)) fs.mkdirSync(DIR, { recursive: true }); } catch (_) {} }

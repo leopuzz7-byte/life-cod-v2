@@ -28,8 +28,8 @@ const L = {
   arkan: "🃏 Аркан-код", numer: "🔢 Нумерология",
   tarot: "🔮 Таро расклад", shop: "🛍 Магазин", invite: "👥 Пригласить друга",
   academy: "🎓 Академия", consult: "🕊 Консультация",
-  chat: "💬 Чат с Надеждой", support: "🛟 Техподдержка",
-  social: "🌐 Соцсети Надежды",
+  chat: "💬 Чат с Надеждой (ИИ)", support: "🛟 Техподдержка",
+  social: "🌐 Соцсети Надежды", club: "🔒 Закрытый клуб",
 };
 function mainMenu() {
   return new Keyboard()
@@ -38,7 +38,7 @@ function mainMenu() {
     .text(L.shop).text(L.invite).row()
     .text(L.academy).text(L.consult).row()
     .text(L.chat).text(L.support).row()
-    .text(L.social).row()
+    .text(L.social).text(L.club).row()
     .resized();
 }
 async function showMenu(ctx, text) {
@@ -257,13 +257,15 @@ async function handleMenu(ctx, label) {
   } else if (label === L.chat) {
     u.step = "chat"; saveUser(u);
     const left = Math.max(0, config.limits.aiMessagesPerDay - u.counters.aiMessages);
-    await ctx.reply("💬 <b>Чат с Надеждой</b>\n\nЭто моя цифровая версия, обученная на моих методиках. Отвечаю живо и по делу. Личная встреча вживую это отдельная кнопка, Консультация.", { parse_mode: "HTML" });
+    await ctx.reply("💬 <b>Чат с Надеждой (ИИ)</b>\n\nЭто моя цифровая версия, отвечает искусственный интеллект, обученный на моих методиках. Живо и по делу. Живая встреча со мной это отдельная кнопка, Консультация.", { parse_mode: "HTML" });
     await ctx.reply(left > 0 ? `Спроси о чём угодно, что тревожит или радует. Сегодня есть ${left} бесплатных сообщения.` : "На сегодня бесплатные сообщения закончились. Безлимит откроется по подписке.", left > 0 ? undefined : { reply_markup: new InlineKeyboard().text("Оплатить", "pay:sub") });
   } else if (label === L.consult) {
     const phone = config.contacts.consultPhone;
     await ctx.reply(`🕊 <b>Консультация с Надеждой</b>\n\nЭто личная встреча один на один, не с ботом, а со мной вживую. Час работы: отношения, выбор, деньги, реализация, повторяющиеся сценарии. На выходе ясность и конкретные шаги.\n\nМинимум час, ${config.prices.consult} рублей.\n\nДля записи напиши мне в Telegram.`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Написать для записи", "tg://resolve?phone=" + phone) });
   } else if (label === L.academy) {
     await ctx.reply("🎓 <b>Лайф Код Академия</b>\n\nСкоро здесь появится академия с обучением. Следи за анонсами в канале.", { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Канал Надежды", config.channelUrl) });
+  } else if (label === L.club) {
+    await ctx.reply("🔒 <b>Закрытый клуб</b>\n\nСкоро откроется закрытый клуб Надежды: личные разборы, живые эфиры и разборы знаменитостей. Следи за анонсами в канале.", { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Канал Надежды", config.channelUrl) });
   } else if (label === L.shop) {
     await ctx.reply(`🛍 <b>Магазин</b>\n\nУ нас можно приобрести: уникальные авторские карты Таро, фирменную одежду в тематике нумерологии и Таро, полотенца, постельное бельё.\n\nДля покупки напиши: ${config.contacts.buyCards}`, { parse_mode: "HTML" });
   } else if (label === L.invite) {
