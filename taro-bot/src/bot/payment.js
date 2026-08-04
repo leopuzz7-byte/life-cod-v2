@@ -53,4 +53,31 @@ function startResultServer(onPaid) {
   return server;
 }
 
-module.exports = { createPaymentLink, verifyResult, startResultServer };
+// --- Оплата бота через Supabase (реюз платёжки калькулятора) ---
+// Ссылку на оплату и статус считает Supabase, а оплату ловит существующая
+// функция robokassa-result. Бот только просит создать счёт и спрашивает статус.
+async function botFetch(pathname, body) {
+  try {
+    const res = await fetch(config.supabase.fnUrl + pathname, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": config.supabase.anonKey,
+        "Authorization": "Bearer " + config.supabase.anonKey,
+        "x-bot-secret": config.supabase.botSecret || "",
+      },
+      body: JSON.stringify(body),
+    });
+    return await res.json();
+  } catch (e) {
+    return { error: e && e.message ? e.message : "network error" };
+  }
+}
+function createBotPayment(telegramId, product) {
+  return botFetch("/bot-create-payment", { telegram_id: String(telegramId), product });
+}
+function checkBotPayment(telegramId, invId) {
+  return botFetch("/bot-payment-status", { telegram_id: String(telegramId), inv_id: invId });
+}
+
+module.exports = { createPaymentLink, verifyResult, startResultServer, createBotPayment, checkBotPayment };

@@ -44,6 +44,19 @@ function mainMenu() {
 async function showMenu(ctx, text) {
   await ctx.reply(text || "Что откликается сейчас. Выбирай.", { reply_markup: mainMenu() });
 }
+const isPaid = (u) => !!(u.proUntil && u.proUntil > Date.now());
+async function showChatPaywall(ctx) {
+  const p = config.plans;
+  const fmt = (x) => `${x.label}: ${x.price} руб, было ${x.old}, скидка ${x.discount}%`;
+  await ctx.reply(
+    "💬 Бесплатные сообщения закончились.\n\nОткрой безлимитное общение с Надеждой по подписке:\n\n" +
+    fmt(p.week) + "\n" + fmt(p.month) + "\n" + fmt(p.year),
+    { reply_markup: new InlineKeyboard()
+        .text(`Неделя ${p.week.price} руб`, "buy:week").row()
+        .text(`Месяц ${p.month.price} руб`, "buy:month").row()
+        .text(`Год ${p.year.price} руб`, "buy:year") }
+  );
+}
 
 // ---- тексты методик ----
 const ARKAN_DESC =
@@ -246,8 +259,8 @@ async function handleMenu(ctx, label) {
   track(ctx.from.id, "menu_click", { button: label });
   if (label === L.tarot) {
     u.step = "menu"; saveUser(u);
-    const priceLine = config.prices.tarot ? `\n\nСтоимость: ${config.prices.tarot} рублей.` : "";
-    await ctx.reply(`🔮 <b>Полный расклад</b>\n\nПервый расклад уже показала, теперь идём глубже. Полный расклад собираю под конкретный вопрос: что в корне, что мешает и чем всё закончится. Это разбор именно твоей ситуации, как на консультации, поэтому он платный.${priceLine}`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().text("Оплатить расклад", "pay:tarot") });
+    const t = config.taro;
+    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nЛичный разбор под твой вопрос: что в корне, что влияет и чем всё закончится. Его делает Надежда лично и присылает.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().text(`Оплатить ${t.price} руб`, "pay:tarot") });
   } else if (label === L.arkan) {
     await ctx.reply(ARKAN_DESC, { parse_mode: "HTML" });
     await ctx.reply(ARKAN_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
@@ -256,9 +269,12 @@ async function handleMenu(ctx, label) {
     await ctx.reply(NUMER_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
   } else if (label === L.chat) {
     u.step = "chat"; saveUser(u);
-    const left = Math.max(0, config.limits.aiMessagesPerDay - u.counters.aiMessages);
+    const paid = isPaid(u);
+    const left = Math.max(0, config.limits.aiMessagesPerDay - (u.chatFree || 0));
     await ctx.reply("💬 <b>Чат с Надеждой (ИИ)</b>\n\nЭто моя цифровая версия, отвечает искусственный интеллект, обученный на моих методиках. Живо и по делу. Живая встреча со мной это отдельная кнопка, Консультация.", { parse_mode: "HTML" });
-    await ctx.reply(left > 0 ? `Спроси о чём угодно, что тревожит или радует. Сегодня есть ${left} бесплатных сообщения.` : "На сегодня бесплатные сообщения закончились. Безлимит откроется по подписке.", left > 0 ? undefined : { reply_markup: new InlineKeyboard().text("Оплатить", "pay:sub") });
+    if (paid) await ctx.reply("У тебя активна подписка. Спрашивай о чём угодно, отвечаю без ограничений.");
+    else if (left > 0) await ctx.reply(`Спроси о чём угодно, что тревожит или радует. Есть ${left} бесплатных сообщения, дальше по подписке.`);
+    else await showChatPaywall(ctx);
   } else if (label === L.consult) {
     const phone = config.contacts.consultPhone;
     await ctx.reply(`🕊 <b>Консультация с Надеждой</b>\n\nЭто личная встреча один на один, не с ботом, а со мной вживую. Час работы: отношения, выбор, деньги, реализация, повторяющиеся сценарии. На выходе ясность и конкретные шаги.\n\nМинимум час, ${config.prices.consult} рублей.\n\nДля записи напиши мне в Telegram.`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Написать для записи", "tg://resolve?phone=" + phone) });
@@ -287,10 +303,56 @@ async function handleMenu(ctx, label) {
 }
 
 // ---------- оплата (заглушка) ----------
-bot.callbackQuery(/^pay:/, async (ctx) => {
+bot.callbackQuery(/^buy:(week|month|year)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
-  track(ctx.from.id, "pay_click", { what: ctx.callbackQuery.data });
-  await ctx.reply("Оплата через Robokassa скоро подключится прямо здесь. Пока записала заявку, Надежда откроет доступ.", { reply_markup: new InlineKeyboard().url("Канал Надежды", config.channelUrl).row().text("В меню", "to:menu") });
+  const key = ctx.match[1];
+  const plan = config.plans[key];
+  const r = await pay.createBotPayment(ctx.from.id, plan.product);
+  if (!r || !r.payment_url) { await ctx.reply("Не удалось создать оплату, попробуй ещё раз или напиши в техподдержку " + config.contacts.support); return; }
+  const u = getUser(ctx.from.id); u.pay = { kind: "sub", key, product: plan.product, invId: r.inv_id }; saveUser(u);
+  track(ctx.from.id, "pay_click", { what: plan.product });
+  const testNote = r.is_test ? "\n\n(тестовый режим оплаты)" : "";
+  await ctx.reply(`Счёт на ${plan.price} рублей, подписка ${plan.label}.${testNote}\n\nОплати по кнопке, потом вернись и нажми «Проверить оплату».`, { reply_markup: new InlineKeyboard().url(`Оплатить ${plan.price} руб`, r.payment_url).row().text("Проверить оплату", "chk:sub") });
+});
+bot.callbackQuery("chk:sub", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.pay || u.pay.kind !== "sub") { await ctx.reply("Нет активного счёта. Начни оплату заново."); return; }
+  const key = u.pay.key;
+  const r = await pay.checkBotPayment(ctx.from.id, u.pay.invId);
+  if (r && r.status === "paid") {
+    const days = config.plans[key].days;
+    const base = isPaid(u) ? u.proUntil : Date.now();
+    u.proUntil = base + days * 86400000;
+    track(ctx.from.id, "paid", { product: config.plans[key].product });
+    u.pay = null; saveUser(u);
+    await ctx.reply("Оплата получена, подписка активна. Пиши, отвечаю без ограничений.");
+  } else {
+    await ctx.reply("Оплату пока не вижу. Если только что оплатил, подожди минуту и нажми ещё раз.", { reply_markup: new InlineKeyboard().text("Проверить оплату", "chk:sub") });
+  }
+});
+bot.callbackQuery("pay:tarot", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const t = config.taro;
+  const r = await pay.createBotPayment(ctx.from.id, t.product);
+  if (!r || !r.payment_url) { await ctx.reply("Не удалось создать оплату, попробуй ещё раз или напиши в техподдержку " + config.contacts.support); return; }
+  const u = getUser(ctx.from.id); u.pay = { kind: "taro", product: t.product, invId: r.inv_id }; saveUser(u);
+  track(ctx.from.id, "pay_click", { what: t.product });
+  const testNote = r.is_test ? "\n\n(тестовый режим оплаты)" : "";
+  await ctx.reply(`Счёт на ${t.price} рублей за полный расклад.${testNote}\n\nОплати по кнопке, потом вернись и нажми «Проверить оплату».`, { reply_markup: new InlineKeyboard().url(`Оплатить ${t.price} руб`, r.payment_url).row().text("Проверить оплату", "chk:taro") });
+});
+bot.callbackQuery("chk:taro", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.pay || u.pay.kind !== "taro") { await ctx.reply("Нет активного счёта. Начни оплату заново."); return; }
+  const r = await pay.checkBotPayment(ctx.from.id, u.pay.invId);
+  if (r && r.status === "paid") {
+    track(ctx.from.id, "paid", { product: u.pay.product });
+    u.pay = null; u.step = "taro_brief"; saveUser(u);
+    await ctx.reply("Оплата получена, спасибо. Напиши одним сообщением имя, дату рождения и свой вопрос. Надежда сделает разбор и пришлёт, обычно в течение 12-48 часов.");
+  } else {
+    await ctx.reply("Оплату пока не вижу. Если только что оплатил, подожди минуту и нажми ещё раз.", { reply_markup: new InlineKeyboard().text("Проверить оплату", "chk:taro") });
+  }
 });
 bot.callbackQuery("to:menu", async (ctx) => { await ctx.answerCallbackQuery(); const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); });
 
@@ -333,17 +395,22 @@ bot.on("message:text", async (ctx) => {
     await sendDeck(ctx);
     return;
   }
+  if (u.step === "taro_brief") {
+    const brief = text.trim().slice(0, 600);
+    u.step = "menu"; saveUser(u);
+    if (config.ownerId) { try { await bot.api.sendMessage(config.ownerId, `🃏 Оплачен таро-расклад.\nОт: ${u.name || ctx.from.first_name || ""} (id ${ctx.from.id})\nБриф: ${brief}`); } catch (_) {} }
+    await ctx.reply("Заявку приняла. Разбор придёт сюда в течение 12-48 часов. Спасибо, что доверяешь.");
+    return;
+  }
 
   // пункты меню (reply-клавиатура)
   if (Object.values(L).includes(text)) { if (await handleMenu(ctx, text)) return; }
 
   if (u.step === "chat") {
-    const limit = config.limits.aiMessagesPerDay;
-    if (u.counters.aiMessages >= limit && !u.subscribed) {
-      await ctx.reply("Мне бы хотелось говорить без границ, но на сегодня бесплатные сообщения закончились. Безлимит открывается по подписке.", { reply_markup: new InlineKeyboard().text("Оплатить", "pay:sub") });
-      return;
-    }
-    u.counters.aiMessages++;
+    const FREE = config.limits.aiMessagesPerDay;
+    const paid = isPaid(u);
+    if (!paid && (u.chatFree || 0) >= FREE) { await showChatPaywall(ctx); return; }
+    if (!paid) { u.chatFree = (u.chatFree || 0) + 1; }
     track(ctx.from.id, "chat_msg", {});
     u.chatHistory = (u.chatHistory || []).concat({ role: "user", content: text }).slice(-12); saveUser(u);
     await ctx.replyWithChatAction("typing");
@@ -352,9 +419,11 @@ bot.on("message:text", async (ctx) => {
     if (!reply) reply = "Карты сейчас молчат, но я рядом. Спроси иначе, и я всмотрюсь ещё раз.";
     u.chatHistory = u.chatHistory.concat({ role: "assistant", content: reply }).slice(-12); saveUser(u);
     await ctx.reply(reply);
-    const left = limit - u.counters.aiMessages;
-    if (!u.subscribed && left === 1) await ctx.reply("Осталось одно бесплатное сообщение на сегодня. Задай его от сердца.");
-    else if (!u.subscribed && left <= 0) await ctx.reply("Это было последнее бесплатное сообщение на сегодня. Безлимит открывается по подписке.", { reply_markup: new InlineKeyboard().text("Оплатить", "pay:sub") });
+    if (!paid) {
+      const left = FREE - (u.chatFree || 0);
+      if (left === 1) await ctx.reply("Осталось одно бесплатное сообщение, дальше открывается по подписке.");
+      else if (left <= 0) await showChatPaywall(ctx);
+    }
     return;
   }
 
