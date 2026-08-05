@@ -1,0 +1,13 @@
+# Зависимости ставятся на сервере через npm install, в git не кладём
+node_modules/
+
+# Реальные секреты: в git только .env.example, сам .env никогда
+.env
+
+# Дамп данных с реальными email и хэшами паролей, в git нельзя
+db/data_small.sql
+db/data_*.sql
+
+# Мусор
+*.log
+_check*.mjs
