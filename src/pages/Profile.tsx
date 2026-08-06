@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, AlertCircle, LogOut, KeyRound, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 const months = [
   "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
@@ -67,24 +67,22 @@ function ProfileNotFoundRecovery() {
     if (!day || !month || !year) return setError(t("auth.fullBirthDate"));
 
     setSaving(true);
-    const { error: upsertError } = await supabase.from("profiles").upsert({
-      id: user.id,
-      email: user.email || "",
-      name: name.trim(),
-      birth_day: parseInt(day),
-      birth_month: parseInt(month),
-      birth_year: parseInt(year),
-    });
-    setSaving(false);
-
-    if (upsertError) {
-      console.error("[Profile] upsert failed:", upsertError);
-      setError(t("profile.saveFailed") + upsertError.message);
-      return;
+    try {
+      await api.updateProfile({
+        email: user.email || "",
+        name: name.trim(),
+        birth_day: parseInt(day),
+        birth_month: parseInt(month),
+        birth_year: parseInt(year),
+      });
+      setSaving(false);
+      await refreshProfile();
+      toast.success(t("profile.created"));
+    } catch (upsertError) {
+      setSaving(false);
+      console.error("[Profile] update failed:", upsertError);
+      setError(t("profile.saveFailed") + (upsertError instanceof Error ? upsertError.message : ""));
     }
-
-    await refreshProfile();
-    toast.success(t("profile.created"));
   };
 
   const handleSignOut = async () => {
@@ -225,11 +223,9 @@ export default function Profile() {
 
     setChangingPassword(true);
     // Проверяем старый пароль через повторный вход
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: profile.email,
-      password: oldPassword,
-    });
-    if (signInError) {
+    try {
+      await api.login({ email: profile.email, password: oldPassword });
+    } catch {
       setChangingPassword(false);
       return setPasswordError("Текущий пароль неверный");
     }

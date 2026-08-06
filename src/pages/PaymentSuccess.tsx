@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
@@ -31,12 +31,10 @@ export default function PaymentSuccess() {
     const check = async () => {
       if (cancelled) return;
       try {
-        const { data, error } = await supabase.functions.invoke("payment-status", {
-          body: { order_id: orderId },
-        });
+        const data = await api.paymentStatus(orderId);
         if (cancelled) return;
 
-        if (!error && data?.status === "paid") {
+        if (data?.status === "paid") {
           setStatus("paid");
           return;
         }

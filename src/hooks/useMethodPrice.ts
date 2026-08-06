@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 interface MethodPrice {
   price_basic: number;
@@ -16,21 +16,16 @@ function loadAllPrices(): Promise<void> {
   if (allPricesLoaded) return Promise.resolve();
   if (loadingPromise) return loadingPromise;
 
-  loadingPromise = supabase
-    .from("method_prices")
-    .select("method_id, price_basic, price_pro")
-    .then(({ data, error }) => {
-      if (!error && data) {
-        data.forEach((row) => {
-          priceCache[row.method_id] = {
-            price_basic: Number(row.price_basic),
-            price_pro: Number(row.price_pro),
-          };
-        });
-        allPricesLoaded = true;
-      } else {
-        loadingPromise = null; // сброс — чтобы следующий вызов попробовал снова
-      }
+  loadingPromise = api
+    .prices()
+    .then((rows) => {
+      rows.forEach((row) => {
+        priceCache[row.method_id] = {
+          price_basic: Number(row.price_basic),
+          price_pro: Number(row.price_pro),
+        };
+      });
+      allPricesLoaded = true;
     })
     .catch(() => {
       loadingPromise = null; // сброс при сетевой ошибке

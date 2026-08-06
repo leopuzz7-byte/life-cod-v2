@@ -20,6 +20,12 @@ const ORIGINS = (process.env.FRONTEND_ORIGIN || "").split(",").map((s) => s.trim
 app.use(cors({
   origin(origin, cb) {
     if (!origin || ORIGINS.length === 0 || ORIGINS.includes(origin)) return cb(null, true);
+    try {
+      const host = new URL(origin).hostname;
+      if (host.endsWith(".vercel.app") || host === "lifecod.app" || host.endsWith(".lifecod.app")) {
+        return cb(null, true);
+      }
+    } catch {}
     cb(new Error("Origin not allowed"));
   },
   credentials: true,
@@ -124,6 +130,19 @@ app.post("/api/auth/reset", async (req, res) => {
     if (!user) return res.status(400).json({ error: "Ссылка недействительна или истекла" });
     const hash = await bcrypt.hash(String(password), 10);
     await q("UPDATE users SET password_hash = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?", [hash, user.id]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Смена пароля залогиненным пользователем (страница Профиль).
+app.post("/api/auth/change-password", requireAuth, async (req, res) => {
+  try {
+    const { new_password } = req.body || {};
+    if (!new_password || String(new_password).length < 6) return res.status(400).json({ error: "Пароль минимум 6 символов" });
+    const hash = await bcrypt.hash(String(new_password), 10);
+    await q("UPDATE users SET password_hash = ? WHERE id = ?", [hash, req.userId]);
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });

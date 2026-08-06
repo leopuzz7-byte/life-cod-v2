@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getAnalysisConfig } from "@/lib/analysisConfig";
 import { useMethodPrice } from "@/hooks/useMethodPrice";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 interface PaymentScreenProps {
   methodId: string;
@@ -28,14 +28,16 @@ export function PaymentScreen({ methodId, tier, onBack }: PaymentScreenProps) {
     setProcessing(method);
     setError(null);
 
-    const fnName = method === "card" ? "create-payment" : "create-payment-crypto";
+    if (method === "crypto") {
+      setError("Оплата криптовалютой временно недоступна, выберите оплату картой");
+      setProcessing(null);
+      return;
+    }
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke(fnName, {
-        body: { method_id: methodId, tier },
-      });
+      const data = await api.createPayment({ method_id: methodId, tier });
 
-      if (fnError || !data) throw new Error(fnError?.message || t("paymentScreen.createError"));
+      if (!data) throw new Error(t("paymentScreen.createError"));
 
       // Базовый бесплатный — сервер вернул free: true
       if (data.free) {

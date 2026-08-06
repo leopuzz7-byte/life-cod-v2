@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { withTimeout } from "@/lib/withTimeout";
 
 const LIST_CACHE_KEY = "lifecod-analyses-cache";
@@ -60,12 +60,11 @@ function writeCachedList(userId: string, items: SavedAnalysisSummary[]) {
 
 export async function saveAnalysis(data: CreateAnalysisInput): Promise<{ id: string | null; error: string | null }> {
   try {
-    const { data: row, error } = await withTimeout(
-      supabase.from("analyses").insert(data).select("id").maybeSingle(),
+    const row = await withTimeout(
+      api.createAnalysis(data as unknown as Record<string, unknown>),
       10000,
       "Сохранение разбора"
     );
-    if (error) return { id: null, error: error.message };
     // Инвалидируем кеш списка — при следующем открытии «Мои разборы» подтянется свежий
     try { localStorage.removeItem(LIST_CACHE_KEY); } catch {}
     return { id: row?.id || null, error: null };
@@ -87,23 +86,12 @@ export async function listAnalyses(
   userId: string
 ): Promise<{ data: SavedAnalysisSummary[]; error: string | null; fromCache?: boolean }> {
   try {
-    const { data, error } = await withTimeout(
-      supabase
-        .from("analyses")
-        // ВАЖНО: тянем только поля нужные для списка.
-        // input/result — это толстые JSON по сотням КБ, их грузим только в детальной странице.
-        .select("id, method_id, methodology, tier, title, created_at")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false }),
+    const data = await withTimeout(
+      api.listAnalyses(),
       10000,
       "Загрузка списка разборов"
     );
-    if (error) {
-      const cached = readCachedList(userId);
-      if (cached) return { data: cached, error: null, fromCache: true };
-      return { data: [], error: error.message };
-    }
-    const items = (data || []) as SavedAnalysisSummary[];
+    const items = (data || []) as unknown as SavedAnalysisSummary[];
     writeCachedList(userId, items);
     return { data: items, error: null };
   } catch (e) {
@@ -120,13 +108,12 @@ export function getCachedAnalysesList(userId: string): SavedAnalysisSummary[] | 
 
 export async function getAnalysis(id: string): Promise<{ data: SavedAnalysis | null; error: string | null }> {
   try {
-    const { data, error } = await withTimeout(
-      supabase.from("analyses").select("*").eq("id", id).maybeSingle(),
+    const data = await withTimeout(
+      api.getAnalysis(id),
       10000,
       "Загрузка разбора"
     );
-    if (error) return { data: null, error: error.message };
-    return { data: data as SavedAnalysis | null, error: null };
+    return { data: data as unknown as SavedAnalysis | null, error: null };
   } catch (e) {
     return { data: null, error: e instanceof Error ? e.message : "Ошибка загрузки" };
   }
@@ -134,12 +121,11 @@ export async function getAnalysis(id: string): Promise<{ data: SavedAnalysis | n
 
 export async function deleteAnalysis(id: string): Promise<{ error: string | null }> {
   try {
-    const { error } = await withTimeout(
-      supabase.from("analyses").delete().eq("id", id),
+    await withTimeout(
+      api.deleteAnalysis(id),
       10000,
       "Удаление разбора"
     );
-    if (error) return { error: error.message };
     return { error: null };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Ошибка удаления" };

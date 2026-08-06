@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 export default function ResetPassword() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { updatePassword } = useAuth();
+  const resetToken = new URLSearchParams(window.location.search).get("token");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -22,10 +21,8 @@ export default function ResetPassword() {
 
   // На странице сброса должна быть recovery-сессия из email-ссылки
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setHasRecoverySession(!!session);
-    });
-  }, []);
+    setHasRecoverySession(!!resetToken);
+  }, [resetToken]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,15 +31,15 @@ export default function ResetPassword() {
     if (password !== confirmPassword) return setError(t("auth.passwordMismatch"));
 
     setSubmitting(true);
-    const { error: updateError } = await updatePassword(password);
-    setSubmitting(false);
-
-    if (updateError) {
-      setError(updateError);
-      return;
+    try {
+      await api.resetPassword(resetToken || "", password);
+      setDone(true);
+      setTimeout(() => navigate("/"), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("reset.invalidLink"));
+    } finally {
+      setSubmitting(false);
     }
-    setDone(true);
-    setTimeout(() => navigate("/"), 2000);
   };
 
   return (
