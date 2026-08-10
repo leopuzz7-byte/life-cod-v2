@@ -294,8 +294,8 @@ async function handleMenu(ctx, label) {
     const kb = new InlineKeyboard()
       .url("Instagram · Таро", s.instaTaro).row()
       .url("Instagram · Нумерология", s.instaNumer).row()
-      .url("YouTube · Таро Надежда", s.youtubeTaro).row()
-      .url("YouTube · Сердце Пилигрима", s.youtubePiligrim).row()
+      .url("YouTube · Таро", s.youtubeTaro).row()
+      .url("YouTube · Нумерология", s.youtubeNumer).row()
       .url("TikTok", s.tiktok);
     await ctx.reply("🌐 <b>Официальные соцсети Надежды</b>\n\nТолько эти аккаунты настоящие. Будь внимателен, не ведись на фейки и страницы-двойники.", { parse_mode: "HTML", reply_markup: kb });
   } else return false;

@@ -19,8 +19,8 @@ const config = {
   social: {
     instaTaro: process.env.SOCIAL_INSTA_TARO || "https://www.instagram.com/taronadezhdi",
     instaNumer: process.env.SOCIAL_INSTA_NUMER || "https://www.instagram.com/lifecode.numerology",
-    youtubeTaro: process.env.SOCIAL_YT_TARO || "https://youtube.com/@taronadezhdy2351",
-    youtubePiligrim: process.env.SOCIAL_YT_PILIGRIM || "https://youtube.com/@piligrims_heart",
+    youtubeTaro: process.env.SOCIAL_YT_TARO || "https://www.youtube.com/@taronadezhdi",
+    youtubeNumer: process.env.SOCIAL_YT_NUMER || "https://www.youtube.com/@lifecod.numerology",
     tiktok: process.env.SOCIAL_TIKTOK || "https://tiktok.com/@taronadezhdi1235",
   },
   prices: {
