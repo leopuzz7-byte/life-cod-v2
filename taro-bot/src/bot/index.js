@@ -92,6 +92,44 @@ function subKeyboard() { return new InlineKeyboard().url("Подписаться
 let deckCache = null;
 async function deckImage() { if (!deckCache) deckCache = await renderDeckChoice(5, { title: "Выбери карту", subtitle: "ту, к которой тянет" }); return deckCache; }
 
+// ---------- цифровой расклад Таро (3 карты + уточняющие) ----------
+const SPREADS = {
+  love:   { label: "Любовь и отношения", emoji: "💞", positions: ["Ты", "Партнёр", "Куда идут отношения"] },
+  money:  { label: "Деньги и работа", emoji: "💰", positions: ["Где ты сейчас", "Что мешает или помогает", "Исход"] },
+  choice: { label: "Ситуация и выбор", emoji: "🧭", positions: ["Суть ситуации", "Что влияет", "Совет и исход"] },
+  future: { label: "Прогноз", emoji: "🌙", positions: ["Прошлое", "Настоящее", "Будущее"] },
+};
+function draw3() { const set = new Set(); while (set.size < 3) set.add(Math.floor(Math.random() * 22) + 1); return [...set]; }
+function drawOne() { return Math.floor(Math.random() * 22) + 1; }
+let deck3Cache = null;
+async function deck3Image() { if (!deck3Cache) deck3Cache = await renderDeckChoice(3, { title: "Выбери карту", subtitle: "ту, к которой тянет" }); return deck3Cache; }
+async function showSphereChoice(ctx) {
+  const kb = new InlineKeyboard();
+  Object.entries(SPREADS).forEach(([id, sp]) => kb.text(`${sp.emoji} ${sp.label}`, `sp:${id}`).row());
+  await ctx.reply("Выбери, о чём гадаем.", { reply_markup: kb });
+}
+async function startRitual(ctx) {
+  const u = getUser(ctx.from.id);
+  u.spread = u.spread || {}; u.spread.cards = draw3(); u.spread.revealed = 0; u.spread.extra = 0; u.step = "sp_reading"; saveUser(u);
+  try {
+    const m = await ctx.reply("Тасую колоду...");
+    await sleep(1200); await ctx.api.editMessageText(ctx.chat.id, m.message_id, "Карты ложатся под твой вопрос...");
+    await sleep(1200); await ctx.api.deleteMessage(ctx.chat.id, m.message_id);
+  } catch (_) {}
+  const img = await deck3Image();
+  await ctx.replyWithPhoto(new InputFile(img), { caption: "Перед тобой три карты рубашкой вверх. Выбери одну, ту, к которой тянет.", reply_markup: new InlineKeyboard().text("Карта 1", "sprev").text("Карта 2", "sprev").text("Карта 3", "sprev") });
+}
+async function showExtraPrompt(ctx) {
+  const u = getUser(ctx.from.id);
+  const left = 3 - ((u.spread && u.spread.extra) || 0);
+  if (left <= 0) { await finishSpread(ctx); return; }
+  await ctx.reply(`Хочешь копнуть глубже? Можно задать ещё до ${left} уточняющих вопросов, на каждый выпадет своя карта.`, { reply_markup: new InlineKeyboard().text("Задать вопрос", "spask").row().text("Готово", "spdone") });
+}
+async function finishSpread(ctx) {
+  const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u);
+  await ctx.reply("Если захочешь живой голосовой разбор лично от Надежды, это отдельная кнопка, Консультация. Береги себя.", { reply_markup: new InlineKeyboard().text("В меню", "to:menu") });
+}
+
 // ---------- /start ----------
 bot.command("start", async (ctx) => {
   const u = getUser(ctx.from.id);
@@ -278,9 +316,10 @@ async function handleMenu(ctx, label) {
   const u = getUser(ctx.from.id);
   track(ctx.from.id, "menu_click", { button: label });
   if (label === L.tarot) {
-    u.step = "menu"; saveUser(u);
     const t = config.taro;
-    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nЛичный разбор под твой вопрос: что в корне, что влияет и чем всё закончится. Его делает Надежда лично и присылает.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().text(`Оплатить ${t.price} руб`, "pay:tarot") });
+    u.step = "sp_sphere"; u.spread = { sphere: null, question: "", cards: [], revealed: 0, extra: 0 }; saveUser(u);
+    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nГлубокий разбор на трёх картах под твой конкретный вопрос, карта за картой, плюс до трёх уточняющих вопросов.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
+    await showSphereChoice(ctx);
   } else if (label === L.arkan) {
     await ctx.reply(ARKAN_DESC, { parse_mode: "HTML" });
     await ctx.reply(ARKAN_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
@@ -351,13 +390,28 @@ bot.callbackQuery("chk:sub", async (ctx) => {
     await ctx.reply("Оплату пока не вижу. Если только что оплатил, подожди минуту и нажми ещё раз.", { reply_markup: new InlineKeyboard().text("Проверить оплату", "chk:sub") });
   }
 });
-bot.callbackQuery("pay:tarot", async (ctx) => {
+bot.callbackQuery(/^sp:(love|money|choice|future)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  u.spread = u.spread || { cards: [], revealed: 0, extra: 0 };
+  u.spread.sphere = ctx.match[1]; u.step = "sp_question"; saveUser(u);
+  track(ctx.from.id, "spread_sphere", { sphere: ctx.match[1] });
+  await ctx.reply(`${SPREADS[ctx.match[1]].label}. Теперь напиши свой вопрос одним сообщением, конкретно и своими словами.`);
+});
+bot.callbackQuery("spno", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  u.step = "sp_sphere"; u.spread = { sphere: null, question: "", cards: [], revealed: 0, extra: 0 }; saveUser(u);
+  await showSphereChoice(ctx);
+});
+bot.callbackQuery("spok", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.sphere || !u.spread.question) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
   if ((u.taroFree || 0) > 0) {
-    u.taroFree = u.taroFree - 1; u.pay = null; u.step = "taro_brief"; saveUser(u);
+    u.taroFree = u.taroFree - 1; u.pay = null; saveUser(u);
     track(ctx.from.id, "paid", { product: config.taro.product, free: true });
-    await ctx.reply("Тебе открыт бесплатный расклад. Напиши одним сообщением имя, дату рождения и свой вопрос. Надежда сделает разбор и пришлёт, обычно в течение 12-48 часов.");
+    await startRitual(ctx);
     return;
   }
   const t = config.taro;
@@ -375,11 +429,52 @@ bot.callbackQuery("chk:taro", async (ctx) => {
   const r = await pay.checkBotPayment(ctx.from.id, u.pay.invId);
   if (r && r.status === "paid") {
     track(ctx.from.id, "paid", { product: u.pay.product });
-    u.pay = null; u.step = "taro_brief"; saveUser(u);
-    await ctx.reply("Оплата получена, спасибо. Напиши одним сообщением имя, дату рождения и свой вопрос. Надежда сделает разбор и пришлёт, обычно в течение 12-48 часов.");
+    u.pay = null; saveUser(u);
+    await startRitual(ctx);
   } else {
     await ctx.reply("Оплату пока не вижу. Если только что оплатил, подожди минуту и нажми ещё раз.", { reply_markup: new InlineKeyboard().text("Проверить оплату", "chk:taro") });
   }
+});
+bot.callbackQuery("sprev", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.cards || u.spread.cards.length !== 3) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
+  const idx = u.spread.revealed || 0;
+  if (idx >= 3) return;
+  const card = u.spread.cards[idx];
+  const sp = SPREADS[u.spread.sphere];
+  const pos = sp.positions[idx];
+  await waiting(ctx);
+  await ctx.replyWithChatAction("upload_photo");
+  try { await ctx.replyWithPhoto(new InputFile(path.join(ARCANA_DIR, `arcana-${card}.webp`))); } catch (_) {}
+  const prev = u.spread.cards.slice(0, idx);
+  const txt = await ai.generateSpreadCard(sp.label, u.spread.question, pos, idx, card, prev);
+  const name = getArcana(card).name;
+  const ordinal = ["Первая карта", "Вторая карта", "Третья карта"][idx];
+  await ctx.reply(`<b>${ordinal}, ${esc(pos.toLowerCase())}: ${esc(name)}</b>\n\n${esc(txt || (name + " говорит о многом. Прислушайся к первому чувству."))}`, { parse_mode: "HTML" });
+  u.spread.revealed = idx + 1; saveUser(u);
+  track(ctx.from.id, "spread_card", { idx: idx + 1 });
+  if (u.spread.revealed < 3) {
+    await sleep(1500);
+    await ctx.reply("Готова открыть следующую карту.", { reply_markup: new InlineKeyboard().text("Открыть ещё карту", "sprev") });
+  } else {
+    await sleep(700);
+    await ctx.replyWithChatAction("typing");
+    const fin = await ai.generateSpreadFinal(sp.label, u.spread.question, u.spread.cards, sp.positions);
+    if (fin) await ctx.reply(`<b>Свод</b>\n\n${esc(fin)}`, { parse_mode: "HTML" });
+    await sleep(600);
+    await showExtraPrompt(ctx);
+    track(ctx.from.id, "spread_done", {});
+  }
+});
+bot.callbackQuery("spask", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id); u.step = "sp_extra_q"; saveUser(u);
+  await ctx.reply("Напиши свой уточняющий вопрос одним сообщением.");
+});
+bot.callbackQuery("spdone", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  await finishSpread(ctx);
 });
 bot.callbackQuery("to:menu", async (ctx) => { await ctx.answerCallbackQuery(); const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); });
 
@@ -422,11 +517,28 @@ bot.on("message:text", async (ctx) => {
     await sendDeck(ctx);
     return;
   }
-  if (u.step === "taro_brief") {
-    const brief = text.trim().slice(0, 600);
-    u.step = "menu"; saveUser(u);
-    if (config.ownerId) { try { await bot.api.sendMessage(config.ownerId, `🃏 Оплачен таро-расклад.\nОт: ${u.name || ctx.from.first_name || ""} (id ${ctx.from.id})\nБриф: ${brief}`); } catch (_) {} }
-    await ctx.reply("Заявку приняла. Разбор придёт сюда в течение 12-48 часов. Спасибо, что доверяешь.");
+  if (u.step === "sp_question") {
+    const q = text.trim().slice(0, 300);
+    if (q.length < 3) { await ctx.reply("Напиши вопрос чуть подробнее, одним сообщением."); return; }
+    u.spread = u.spread || {}; u.spread.question = q; u.step = "sp_confirm"; saveUser(u);
+    const sp = SPREADS[u.spread.sphere];
+    await ctx.reply(`Проверим. Ниша: ${sp.label}. Вопрос: «${esc(q)}». Всё верно?`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().text("Да, всё верно", "spok").row().text("Нет, изменить", "spno") });
+    return;
+  }
+  if (u.step === "sp_extra_q") {
+    if (!u.spread || !u.spread.sphere) { u.step = "menu"; saveUser(u); await showMenu(ctx); return; }
+    const q = text.trim().slice(0, 300);
+    const card = drawOne();
+    await waiting(ctx);
+    await ctx.replyWithChatAction("upload_photo");
+    try { await ctx.replyWithPhoto(new InputFile(path.join(ARCANA_DIR, `arcana-${card}.webp`))); } catch (_) {}
+    const ans = await ai.generateSpreadExtra(SPREADS[u.spread.sphere].label, u.spread.question, card, q);
+    const name = getArcana(card).name;
+    await ctx.reply(`<b>${esc(name)}</b>\n\n${esc(ans || "Карта отвечает мягко, прислушайся к первому чувству.")}`, { parse_mode: "HTML" });
+    u.spread.extra = (u.spread.extra || 0) + 1; u.step = "sp_reading"; saveUser(u);
+    track(ctx.from.id, "spread_extra", { n: u.spread.extra });
+    await sleep(800);
+    await showExtraPrompt(ctx);
     return;
   }
 

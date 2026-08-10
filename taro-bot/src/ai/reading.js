@@ -106,4 +106,58 @@ ${hist ? "История:\n" + hist + "\n" : ""}Человек написал: "
   return callAI(prompt, 500, false);
 }
 
-module.exports = { generateTarotReveal, generateTarotDeep, generateSpheres, generateDeep, generateChatReply };
+// ---- ПЛАТНЫЙ ЦИФРОВОЙ РАСКЛАД (3 карты + уточняющие вопросы) ----
+// Глубокий разбор одной карты на её позиции. Возвращает живой текст без JSON.
+async function generateSpreadCard(sphereLabel, question, position, index, arcanaNum, prevNums) {
+  const ordinal = ["первая", "вторая", "третья"][index] || "следующая";
+  const prev = (prevNums && prevNums.length)
+    ? `Предыдущие карты расклада: ${prevNums.map(arcInfo).join("; ")}. Свяжи эту карту с ними.`
+    : "";
+  const hook = index < 2 ? "В самом конце добавь одну короткую фразу-крючок, лёгкую интригу к следующей карте." : "Это последняя, третья карта, крючок к следующей не нужен.";
+  const prompt = `${VOICE}
+
+Ты ведёшь платный расклад Таро на трёх картах. Тема: ${sphereLabel}. Вопрос человека: "${question}".
+Это ${ordinal} карта, позиция расклада: "${position}". Выпал аркан ${arcInfo(arcanaNum)}.
+${prev}
+
+Дай глубокий, конкретный и деликатный разбор именно этой карты на этой позиции по вопросу.
+Пиши цельным живым текстом, 4-6 небольших абзацев по 2-4 предложения, без списков и заголовков.
+Сначала попади в суть через эту карту, её планету и стихию, чтобы человек узнал себя.
+Потом раскрой, что стоит за этим глубже, психологично и правдоподобно, чтобы возникло чувство «откуда ты знаешь».
+Давай конкретику про поведение, чувства и динамику, а не общие слова.
+${hook}
+Без воды и банальностей, тепло и точно. Верни только текст разбора.`;
+  return callAI(prompt, 1300, false);
+}
+
+// Финальный свод по трём картам плюс конкретный совет и тёплое послание.
+async function generateSpreadFinal(sphereLabel, question, nums, positions) {
+  const list = nums.map((n, i) => `${positions[i]}: ${arcInfo(n)}`).join("; ");
+  const prompt = `${VOICE}
+
+Ты завершаешь платный расклад Таро на трёх картах. Тема: ${sphereLabel}. Вопрос: "${question}".
+Карты по позициям: ${list}.
+
+Собери три карты в одну ясную историю и дай финальный свод.
+Пиши цельным живым текстом, 3-4 абзаца, без списков.
+Сначала свяжи три карты в единую линию и дай прямой честный ответ на вопрос.
+Потом один конкретный совет, что сделать, по шагам, без размытости.
+В конце короткое тёплое послание, одна-две фразы.
+Без воды и общих фраз. Верни только текст.`;
+  return callAI(prompt, 1100, false);
+}
+
+// Ответ на уточняющий вопрос по одной карте.
+async function generateSpreadExtra(sphereLabel, mainQuestion, arcanaNum, userQuestion) {
+  const prompt = `${VOICE}
+
+Идёт платный расклад Таро. Тема: ${sphereLabel}. Основной вопрос был: "${mainQuestion}".
+Человек задал уточняющий вопрос: "${userQuestion}". На него выпала одна карта: ${arcInfo(arcanaNum)}.
+
+Дай подробный, деликатный и точный ответ строго на этот уточняющий вопрос через выпавшую карту.
+Пиши цельным живым текстом, 4-6 предложений, при необходимости с мягким конкретным советом.
+Отвечай прямо по сути вопроса, психологично, без воды. Верни только текст ответа.`;
+  return callAI(prompt, 900, false);
+}
+
+module.exports = { generateTarotReveal, generateTarotDeep, generateSpheres, generateDeep, generateChatReply, generateSpreadCard, generateSpreadFinal, generateSpreadExtra };
