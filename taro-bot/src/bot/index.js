@@ -126,6 +126,26 @@ bot.command("stats", async (ctx) => {
   const days = parseInt((ctx.match || "").trim(), 10) || 0;
   await ctx.reply(analytics.summary(days));
 });
+bot.command("give", async (ctx) => {
+  if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;
+  const parts = (ctx.match || "").trim().split(/\s+/);
+  const targetId = parts[0];
+  const plan = (parts[1] || "").toLowerCase();
+  if (!targetId || !plan) { await ctx.reply("Формат: /give ID план\nПланы: week, month, year, forever, taro\nСвой ID человек берёт командой /id."); return; }
+  const target = getUser(targetId);
+  const now = Date.now();
+  const base = (target.proUntil && target.proUntil > now) ? target.proUntil : now;
+  if (plan === "week") target.proUntil = base + 7 * 86400000;
+  else if (plan === "month") target.proUntil = base + 30 * 86400000;
+  else if (plan === "year") target.proUntil = base + 365 * 86400000;
+  else if (plan === "forever") target.proUntil = now + 100 * 365 * 86400000;
+  else if (plan === "taro") target.taroFree = (target.taroFree || 0) + 1;
+  else { await ctx.reply("Не понял план. Доступно: week, month, year, forever, taro."); return; }
+  saveUser(target);
+  const human = { week: "подписка на неделю", month: "подписка на месяц", year: "подписка на год", forever: "бессрочная подписка", taro: "бесплатный таро-расклад" }[plan];
+  await ctx.reply(`Готово. Выдал: ${human}, пользователю ${targetId}.`);
+  try { await bot.api.sendMessage(targetId, plan === "taro" ? "Надежда открыла тебе бесплатный таро-расклад. Загляни в меню, кнопка «Таро расклад»." : "Надежда открыла тебе подписку. Чат со мной теперь без ограничений."); } catch (_) {}
+});
 
 // ---------- ветка ТАРО ----------
 bot.callbackQuery("br:tarot", async (ctx) => {
@@ -333,10 +353,17 @@ bot.callbackQuery("chk:sub", async (ctx) => {
 });
 bot.callbackQuery("pay:tarot", async (ctx) => {
   await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if ((u.taroFree || 0) > 0) {
+    u.taroFree = u.taroFree - 1; u.pay = null; u.step = "taro_brief"; saveUser(u);
+    track(ctx.from.id, "paid", { product: config.taro.product, free: true });
+    await ctx.reply("Тебе открыт бесплатный расклад. Напиши одним сообщением имя, дату рождения и свой вопрос. Надежда сделает разбор и пришлёт, обычно в течение 12-48 часов.");
+    return;
+  }
   const t = config.taro;
   const r = await pay.createBotPayment(ctx.from.id, t.product);
   if (!r || !r.payment_url) { await ctx.reply("Не удалось создать оплату, попробуй ещё раз или напиши в техподдержку " + config.contacts.support); return; }
-  const u = getUser(ctx.from.id); u.pay = { kind: "taro", product: t.product, invId: r.inv_id }; saveUser(u);
+  u.pay = { kind: "taro", product: t.product, invId: r.inv_id }; saveUser(u);
   track(ctx.from.id, "pay_click", { what: t.product });
   const testNote = r.is_test ? "\n\n(тестовый режим оплаты)" : "";
   await ctx.reply(`Счёт на ${t.price} рублей за полный расклад.${testNote}\n\nОплати по кнопке, потом вернись и нажми «Проверить оплату».`, { reply_markup: new InlineKeyboard().url(`Оплатить ${t.price} руб`, r.payment_url).row().text("Проверить оплату", "chk:taro") });
