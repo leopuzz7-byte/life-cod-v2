@@ -39,10 +39,15 @@ function mainMenu() {
     .text(L.academy).text(L.consult).row()
     .text(L.chat).text(L.support).row()
     .text(L.social).text(L.club).row()
-    .resized();
+    .resized()
+    .placeholder("Меню с кнопками внизу 👇");
 }
 async function showMenu(ctx, text) {
   await ctx.reply(text || "Что откликается сейчас. Выбирай.", { reply_markup: mainMenu() });
+  try {
+    const u = getUser(ctx.from.id);
+    if (!u.menuHintShown) { u.menuHintShown = true; saveUser(u); await ctx.reply("Меню с кнопками открылось внизу. Если кнопок не видно, нажми на значок с квадратиками справа от поля ввода."); }
+  } catch (_) {}
 }
 const isPaid = (u) => !!(u.proUntil && u.proUntil > Date.now());
 async function showChatPaywall(ctx) {
@@ -56,6 +61,13 @@ async function showChatPaywall(ctx) {
         .text(`Месяц ${p.month.price} руб`, "buy:month").row()
         .text(`Год ${p.year.price} руб`, "buy:year") }
   );
+}
+
+function quickKb() {
+  return new InlineKeyboard()
+    .text("🔮 Таро расклад", "go:tarot").row()
+    .text("💬 Чат", "go:chat").text("🕊 Консультация", "go:consult").row()
+    .text("☰ Всё меню", "go:menu");
 }
 
 // ---- тексты методик ----
@@ -127,7 +139,7 @@ async function showExtraPrompt(ctx) {
 }
 async function finishSpread(ctx) {
   const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u);
-  await ctx.reply("Если захочешь живой голосовой разбор лично от Надежды, это отдельная кнопка, Консультация. Береги себя.", { reply_markup: new InlineKeyboard().text("В меню", "to:menu") });
+  await ctx.reply("Если захочешь живой голосовой разбор лично от Надежды, это отдельная кнопка, Консультация. Береги себя.", { reply_markup: quickKb() });
 }
 
 // ---------- /start ----------
@@ -184,6 +196,11 @@ bot.command("give", async (ctx) => {
   await ctx.reply(`Готово. Выдал: ${human}, пользователю ${targetId}.`);
   try { await bot.api.sendMessage(targetId, plan === "taro" ? "Надежда открыла тебе бесплатный таро-расклад. Загляни в меню, кнопка «Таро расклад»." : "Надежда открыла тебе подписку. Чат со мной теперь без ограничений."); } catch (_) {}
 });
+bot.command("help", async (ctx) => {
+  await ctx.reply("Я бот Надежды. Внизу есть меню с кнопками, если его не видно, нажми на значок с квадратиками справа от поля ввода.\n\nБыстрые команды: /menu меню, /taro расклад, /chat чат.\n\nЕсли что-то не работает, напиши в техподдержку " + config.contacts.support, { reply_markup: quickKb() });
+});
+bot.command("taro", async (ctx) => { await handleMenu(ctx, L.tarot); });
+bot.command("chat", async (ctx) => { await handleMenu(ctx, L.chat); });
 
 // ---------- ветка ТАРО ----------
 bot.callbackQuery("br:tarot", async (ctx) => {
@@ -477,6 +494,13 @@ bot.callbackQuery("spdone", async (ctx) => {
   await finishSpread(ctx);
 });
 bot.callbackQuery("to:menu", async (ctx) => { await ctx.answerCallbackQuery(); const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); });
+bot.callbackQuery(/^go:(tarot|chat|consult|menu)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const which = ctx.match[1];
+  if (which === "menu") { const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); return; }
+  const label = which === "tarot" ? L.tarot : which === "chat" ? L.chat : L.consult;
+  await handleMenu(ctx, label);
+});
 
 // ---------- текст: ввод и меню ----------
 bot.on("message:text", async (ctx) => {
@@ -566,7 +590,7 @@ bot.on("message:text", async (ctx) => {
     return;
   }
 
-  if (u.branch || u.birth) await showMenu(ctx, "Выбирай в меню, о чём поговорим.");
+  if (u.branch || u.birth) await ctx.reply("Не совсем поняла. Выбери кнопкой ниже или открой всё меню.", { reply_markup: quickKb() });
   else await ctx.reply("Чтобы начать, напиши /start.");
 });
 
@@ -574,6 +598,12 @@ bot.catch((err) => console.error("Ошибка бота:", err?.error?.message |
 
 async function setup() {
   try { await bot.api.setChatMenuButton({ menu_button: { type: "web_app", text: "Калькулятор", web_app: { url: config.calcUrl } } }); } catch (e) { console.error("menu button:", e?.message); }
+  try { await bot.api.setMyCommands([
+    { command: "menu", description: "Открыть меню" },
+    { command: "taro", description: "Таро расклад" },
+    { command: "chat", description: "Чат с Надеждой" },
+    { command: "help", description: "Как тут всё устроено" },
+  ]); } catch (_) {}
   try { await bot.api.setMyDescription("Бот Надежды: таро, нумерология и личные разборы. Вопросы и техподдержка: " + config.contacts.support); } catch (_) {}
   pay.startResultServer((invId) => console.log("Оплачен счёт", invId));
 }
