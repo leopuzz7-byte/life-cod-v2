@@ -288,7 +288,6 @@ bot.callbackQuery("br:numer", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id); u.branch = "numerology"; u.step = "await_name"; saveUser(u);
   track(ctx.from.id, "branch", { value: "numer" });
-  await sendCircle(ctx, "numer");
   await ctx.reply("Хорошо. Числа расскажут о тебе многое.\n\nКак мне к тебе обращаться?");
 });
 bot.callbackQuery(/^th:(love|money|path)$/, async (ctx) => {
@@ -369,6 +368,7 @@ async function handleMenu(ctx, label) {
     await ctx.reply(ARKAN_DESC, { parse_mode: "HTML" });
     await ctx.reply(ARKAN_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
   } else if (label === L.numer) {
+    await sendCircle(ctx, "numer");
     await ctx.reply(NUMER_DESC, { parse_mode: "HTML" });
     await ctx.reply(NUMER_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
   } else if (label === L.chat) {
