@@ -4,7 +4,7 @@
 const path = require("path");
 const { Bot, InlineKeyboard, Keyboard, InputFile } = require("grammy");
 const config = require("./config");
-const { getUser, saveUser } = require("./store");
+const { getUser, saveUser, getCircles, setCircle } = require("./store");
 const { calculatePersonalMatrix } = require("../engine/calculations");
 const { getArcana } = require("../engine/arcana");
 const { SPHERES, sphereCards, concernText } = require("../engine/spheres");
@@ -112,6 +112,9 @@ async function isSubscribed(ctx) {
   try { const mm = await ctx.api.getChatMember(config.channel, ctx.from.id); return ["member", "administrator", "creator"].includes(mm.status); } catch (_) { return false; }
 }
 function subKeyboard() { return new InlineKeyboard().url("Подписаться на канал", config.channelUrl).row().text("Я подписался, открой разбор", "check_sub"); }
+async function sendCircle(ctx, slot) {
+  try { const c = getCircles(); if (c && c[slot]) await ctx.replyWithVideoNote(c[slot]); } catch (_) {}
+}
 
 let deckCache = null;
 async function deckImage() { if (!deckCache) deckCache = await renderDeckChoice(5, { title: "Выбери карту", subtitle: "ту, к которой тянет" }); return deckCache; }
@@ -164,6 +167,7 @@ bot.command("start", async (ctx) => {
   if (u.onboarded) { u.step = "menu"; saveUser(u); await showMenu(ctx, "Ты уже со мной. Выбирай, что дальше."); return; }
   Object.assign(u, { step: "idle", branch: null, name: "", birth: null, tarotQuestion: "", tarotTheme: null, tarotCard: null, theme: null, concern: null, chatHistory: [] });
   saveUser(u);
+  await sendCircle(ctx, "welcome");
   const nm = ctx.from.first_name ? `, ${ctx.from.first_name}` : "";
   await ctx.reply(
     `Здравствуй${nm}.\n\n` +
@@ -213,6 +217,16 @@ bot.command("help", async (ctx) => {
 });
 bot.command("taro", async (ctx) => { await handleMenu(ctx, L.tarot); });
 bot.command("chat", async (ctx) => { await handleMenu(ctx, L.chat); });
+bot.command("circle", async (ctx) => {
+  if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;
+  const slot = (ctx.match || "").trim().toLowerCase();
+  const valid = ["welcome", "arkan", "numer"];
+  const vn = ctx.message.reply_to_message && ctx.message.reply_to_message.video_note;
+  if (!valid.includes(slot)) { await ctx.reply("Формат: ответь на кружок командой /circle welcome (или arkan, или numer)."); return; }
+  if (!vn) { await ctx.reply("Отправь /circle в ответ на сам кружок, видео-заметку."); return; }
+  setCircle(slot, vn.file_id);
+  await ctx.reply(`Кружок сохранён как «${slot}». Он будет играть в нужном месте.`);
+});
 
 // ---------- ветка ТАРО ----------
 bot.callbackQuery("br:tarot", async (ctx) => {
@@ -274,6 +288,7 @@ bot.callbackQuery("br:numer", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id); u.branch = "numerology"; u.step = "await_name"; saveUser(u);
   track(ctx.from.id, "branch", { value: "numer" });
+  await sendCircle(ctx, "numer");
   await ctx.reply("Хорошо. Числа расскажут о тебе многое.\n\nКак мне к тебе обращаться?");
 });
 bot.callbackQuery(/^th:(love|money|path)$/, async (ctx) => {
@@ -350,6 +365,7 @@ async function handleMenu(ctx, label) {
     await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nГлубокий разбор на трёх картах под твой конкретный вопрос, карта за картой, плюс до трёх уточняющих вопросов.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
     await showSphereChoice(ctx);
   } else if (label === L.arkan) {
+    await sendCircle(ctx, "arkan");
     await ctx.reply(ARKAN_DESC, { parse_mode: "HTML" });
     await ctx.reply(ARKAN_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
   } else if (label === L.numer) {

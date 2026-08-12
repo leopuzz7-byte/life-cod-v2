@@ -26,4 +26,10 @@ function getUser(id) {
 }
 function saveUser(u) { const all = readAll(); u.lastActive = Date.now(); all[u.id] = u; writeAll(all); return u; }
 function allUsers() { return Object.values(readAll()); }
-module.exports = { getUser, saveUser, allUsers, today };
+
+// ---- кружки (видео-заметки): file_id по слотам welcome/arkan/numer ----
+const CFILE = path.join(DIR, "circles.json");
+function getCircles() { ensure(); try { return JSON.parse(fs.readFileSync(CFILE, "utf8") || "{}"); } catch { return {}; } }
+function setCircle(slot, fileId) { const all = getCircles(); all[slot] = fileId; ensure(); fs.writeFileSync(CFILE, JSON.stringify(all, null, 2)); return all; }
+
+module.exports = { getUser, saveUser, allUsers, today, getCircles, setCircle };
