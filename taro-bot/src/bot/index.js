@@ -22,6 +22,7 @@ let botUsername = "taroiibbot";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const ARCANA_DIR = path.join(__dirname, "..", "..", "assets", "arcana");
+const LOADING = path.join(__dirname, "..", "..", "assets", "loading.mp4");
 
 // ---- меню (reply-клавиатура) ----
 const L = {
@@ -92,9 +93,20 @@ function parseDate(t) {
   return { day, month, year };
 }
 async function waiting(ctx) {
-  const steps = ["🔮 Считаю...", "✨ Смотрю на карты...", "🌙 Ещё немного..."];
-  let m;
-  try { m = await ctx.reply(steps[0]); for (let i = 1; i < steps.length; i++) { await sleep(1500); await ctx.api.editMessageText(ctx.chat.id, m.message_id, steps[i]); } await sleep(1100); await ctx.api.deleteMessage(ctx.chat.id, m.message_id); } catch (_) {}
+  // анимация загрузки, потом удаляем
+  try {
+    const m = await ctx.replyWithAnimation(new InputFile(LOADING));
+    await sleep(3800);
+    try { await ctx.api.deleteMessage(ctx.chat.id, m.message_id); } catch (_) {}
+    return;
+  } catch (_) {}
+  // запасной вариант текстом, если анимация не ушла
+  try {
+    const m = await ctx.reply("🔮 Считаю...");
+    await sleep(1500); await ctx.api.editMessageText(ctx.chat.id, m.message_id, "✨ Смотрю на карты...");
+    await sleep(1500); await ctx.api.editMessageText(ctx.chat.id, m.message_id, "🌙 Ещё немного...");
+    await sleep(1000); await ctx.api.deleteMessage(ctx.chat.id, m.message_id);
+  } catch (_) {}
 }
 async function isSubscribed(ctx) {
   try { const mm = await ctx.api.getChatMember(config.channel, ctx.from.id); return ["member", "administrator", "creator"].includes(mm.status); } catch (_) { return false; }
