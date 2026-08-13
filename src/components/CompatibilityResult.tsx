@@ -1291,9 +1291,10 @@ function RecommendationsBlock({ result, ai }: { result: CompatibilityResult; ai?
 
 // ─── Union Tab ─────────────────────────────────────────────────────────────────
 
-function UnionTab({ result, isPro, aiReading, aiLoading }: { result: CompatibilityResult; isPro: boolean; aiReading: AIReading | null; aiLoading: boolean }) {
+function UnionTab({ result, isPro, aiReading, aiLoading, panel }: { result: CompatibilityResult; isPro: boolean; aiReading: AIReading | null; aiLoading: boolean; panel: number }) {
   const unionArcana = getArcana(result.unionArcana);
   const matrix = result.unionMatrix;
+  const [sub, setSub] = useState<'conflict' | 'strength' | 'weakness' | 'harmonize'>('conflict');
   if (!matrix) return null;
   const p = matrix.positions;
 
@@ -1304,250 +1305,152 @@ function UnionTab({ result, isPro, aiReading, aiLoading }: { result: Compatibili
   return (
     <div className="space-y-8">
 
-      {/* Ключ союза */}
-      <KeyArcanaBlock matrix={matrix} />
-
-      {/* Визуальная матрица */}
-      <div className="gradient-card rounded-2xl border border-border p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <Compass className="w-5 h-5 text-primary" />
-          <span className="font-display font-semibold text-foreground">Матрица союза</span>
-        </div>
-        <div className="flex justify-center">
-          <MatrixGrid matrix={matrix} accentPos2 />
-        </div>
-        <p className="text-xs text-muted-foreground text-center mt-3">Нажмите на карту чтобы рассмотреть аркан</p>
-      </div>
-
-      {/* Общая энергия — вводный текст */}
-      <div className="gradient-card rounded-2xl border border-primary/20 p-5 bg-primary/3">
-        <div className="flex items-center gap-2 mb-3">
-          <Heart className="w-4 h-4 text-primary" />
-          <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Аркан союза · {unionArcana?.name}</span>
-        </div>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {aiReading?.union_arcana || getCompatPositionText('union', 2, result.unionArcana) || arcanaCompatibilityData[result.unionArcana]?.general || unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
-        </p>
-        {!aiReading && arcanaCompatibilityData[result.unionArcana] && (
-          <p className="text-xs text-muted-foreground/70 leading-relaxed mt-2 pt-2 border-t border-primary/10">
-            {arcanaCompatibilityData[result.unionArcana].conclusion}
-          </p>
-        )}
-      </div>
-
-      {/* ═══ СОВПАДАЮЩИЕ ЭНЕРГИИ ════════════════════════════════════════════════ */}
-      {result.matrix1 && result.matrix2 && (
-        <div className="space-y-4">
-          <SectionHeader
-            icon={Users}
-            title="Совпадающие энергии партнёров"
-            subtitle="Арканы, которые есть у обоих — они создают узнавание и общий язык между партнёрами."
-          />
-          <CommonArcanaBlock
-            matrix1={result.matrix1}
-            matrix2={result.matrix2}
-            name1={result.person1.name}
-            name2={result.person2.name}
-          />
-        </div>
-      )}
-
-      {/* ═══ ТРЕУГОЛЬНИКИ ══════════════════════════════════════════════════════ */}
-      <div className="space-y-6">
-        <SectionHeader
-          icon={Clock}
-          title="Три периода отношений"
-          subtitle="Матрица строится вокруг трёх треугольников. Каждый описывает отдельный слой отношений — от начала до глубинных задач."
-        />
-
-        {TRIANGLES.map((tri, idx) => (
-          <div key={tri.num} className="gradient-card rounded-2xl border border-border p-5 space-y-5">
-            <TriangleSection
-              triangleNum={tri.num}
-              label={tri.label}
-              intro={tri.intro}
-              positions={tri.positions}
-              matrix={matrix}
-              shownPositions={TRIANGLE_SHOWN_SETS[idx]}
-              aiReading={aiReading}
-              aiLoading={aiLoading}
-            />
+      {/* 3 — Основной треугольник и общая матрица */}
+      {panel === 3 && (<>
+        <KeyArcanaBlock matrix={matrix} />
+        <div className="gradient-card rounded-2xl border border-border p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Compass className="w-5 h-5 text-primary" />
+            <span className="font-display font-semibold text-foreground">Матрица союза</span>
           </div>
-        ))}
-      </div>
-
-      {/* ═══ ТОЧКА ОПОРЫ — позиция 6 ══════════════════════════════════════════ */}
-      <div className="space-y-4">
-        <SectionHeader
-          icon={Anchor}
-          title="Кармическая ось"
-          subtitle="Позиция 6 — в матрице совместимости здесь стоит кармический аркан. Ключевой вызов и скрытый ресурс пары."
-        />
-        <CompatCard position={6} value={p[5]} aiText={aiReading?.positions?.['6']} aiExpandable={aiReading?.positions_expanded?.['6']} aiLoading={aiLoading} />
-      </div>
-
-      {/* ═══ ЦЕЛИ В ОТНОШЕНИЯХ ════════════════════════════════════════════════ */}
-      <div className="space-y-4">
-        <SectionHeader
-          icon={Target}
-          title="Цели в отношениях"
-          subtitle="Позиции 7 · 8 · 9 — куда идёт пара, через что достигает и где восстанавливается."
-        />
-        {[7, 8, 9].map(pos => (
-          <CompatCard key={pos} position={pos} value={p[pos - 1]} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} aiLoading={aiLoading} />
-        ))}
-      </div>
-
-      {/* ═══ КАРМИЧЕСКИЕ ЗАДАЧИ ═══════════════════════════════════════════════ */}
-      <div className="space-y-4">
-        <SectionHeader
-          icon={ShieldAlert}
-          title="Кармические задачи союза"
-          subtitle="Позиции 10 · 11 · 12 — кармические паттерны, повторяющиеся сценарии и главная задача этого союза."
-        />
-        <div className="gradient-card rounded-2xl border border-border p-4 text-sm text-muted-foreground leading-relaxed bg-muted/20">
-          Кармические позиции — не приговор и не плохой знак. Это точки трансформации: то, что будет провоцировать конфликты, пока пара не осознает их вместе. Именно здесь — самый глубокий рост.
+          <div className="flex justify-center"><MatrixGrid matrix={matrix} accentPos2 /></div>
+          <p className="text-xs text-muted-foreground text-center mt-3">Нажмите на карту чтобы рассмотреть аркан</p>
         </div>
-        {[10, 11, 12].map(pos => (
-          <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} aiLoading={aiLoading} />
-        ))}
-      </div>
+        <div className="gradient-card rounded-2xl border border-primary/20 p-5 bg-primary/3">
+          <div className="flex items-center gap-2 mb-3">
+            <Heart className="w-4 h-4 text-primary" />
+            <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Аркан союза · {unionArcana?.name}</span>
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {aiReading?.union_arcana || getCompatPositionText('union', 2, result.unionArcana) || arcanaCompatibilityData[result.unionArcana]?.general || unionArcana?.compatibilityDescription || unionArcana?.personalDescription}
+          </p>
+        </div>
+        {result.matrix1 && result.matrix2 && (
+          <div className="space-y-4">
+            <SectionHeader icon={Users} title="Совпадающие энергии партнёров" subtitle="Арканы, которые есть у обоих, создают узнавание и общий язык." />
+            <CommonArcanaBlock matrix1={result.matrix1} matrix2={result.matrix2} name1={result.person1.name} name2={result.person2.name} />
+          </div>
+        )}
+        <div className="space-y-6">
+          <SectionHeader icon={Clock} title="Три периода отношений" subtitle="Матрица строится вокруг трёх треугольников, каждый описывает свой слой отношений." />
+          {TRIANGLES.map((tri, idx) => (
+            <div key={tri.num} className="gradient-card rounded-2xl border border-border p-5 space-y-5">
+              <TriangleSection triangleNum={tri.num} label={tri.label} intro={tri.intro} positions={tri.positions} matrix={matrix} shownPositions={TRIANGLE_SHOWN_SETS[idx]} aiReading={aiReading} aiLoading={aiLoading} />
+            </div>
+          ))}
+        </div>
+      </>)}
 
-
-      {/* ═══ ПЛЮС И МИНУС ГЛАВНЫХ ЭНЕРГИЙ ══════════════════════════════════════ */}
-      <div className="space-y-4">
-        <SectionHeader
-          icon={Star}
-          title="Плюс и минус главных энергий"
-          subtitle="Позиции 4 · 5 · 7 · 12 — ключевые арканы союза. Как они усиливают пару и где могут создавать конфликт."
-        />
-        <KeyEnergiesBlock matrix={matrix} />
-      </div>
-
-      {/* ═══ КОД УСПЕХА ПАРЫ ═════════════════════════════════════════════════ */}
-      {result.matrix1 && result.matrix2 && (
+      {/* 4 — Перевёрнутые арканы */}
+      {panel === 4 && result.matrix1 && result.matrix2 && (
         <div className="space-y-4">
-          <SectionHeader
-            icon={Key}
-            title="Код успеха пары"
-            subtitle="Жизненные программы партнёров — через что каждый идёт к результатам и насколько ваши пути совпадают."
-          />
-          <SuccessCodeCompare
-            matrix1={result.matrix1}
-            matrix2={result.matrix2}
-            name1={result.person1.name}
-            name2={result.person2.name}
-          />
+          <SectionHeader icon={ShieldAlert} title="Перевёрнутые арканы" subtitle="Перевёрнутые арканы и взаимные точки напряжения, что чаще всего провоцирует конфликты." />
+          <TriggersBlock matrix1={result.matrix1} matrix2={result.matrix2} name1={result.person1.name} name2={result.person2.name} />
         </div>
       )}
 
-      {/* ═══ ДЕНЬГИ И ДЕТИ ═══════════════════════════════════════════════════ */}
-      <div className="space-y-4">
-        <SectionHeader
-          icon={TrendingUp}
-          title="Деньги и дети"
-          subtitle="Денежные и детские арканы в матрицах — финансовый потенциал союза и тема семьи."
-        />
-        <MoneyAndChildrenBlock result={result} />
-      </div>
-
-      {/* ═══ КТО ГАРМОНИЗИРУЕТ ═══════════════════════════════════════════════ */}
-      {result.matrix1 && result.matrix2 && result.unionMatrix && (
+      {/* 5 — Зеркальные арканы */}
+      {panel === 5 && (
         <div className="space-y-4">
-          <SectionHeader
-            icon={Heart}
-            title="Кто гармонизирует отношения"
-            subtitle="Кто больше стабилизирует союз, кто двигает его вперёд — и аркан гармонии пары."
-          />
-          <HarmonizesBlock
-            matrix1={result.matrix1}
-            matrix2={result.matrix2}
-            unionMatrix={result.unionMatrix}
-            name1={result.person1.name}
-            name2={result.person2.name}
-          />
-        </div>
-      )}
-
-      {/* ═══ ГЛАВНЫЕ ТРИГГЕРЫ ════════════════════════════════════════════════ */}
-      {result.matrix1 && result.matrix2 && (
-        <div className="space-y-4">
-          <SectionHeader
-            icon={ShieldAlert}
-            title="Главные триггеры пары"
-            subtitle="Перевёрнутые арканы и взаимные точки напряжения — что чаще всего будет провоцировать конфликты."
-          />
-          <TriggersBlock
-            matrix1={result.matrix1}
-            matrix2={result.matrix2}
-            name1={result.person1.name}
-            name2={result.person2.name}
-          />
-        </div>
-      )}
-
-      {/* ═══ ТРОЙНЫЕ АРКАНЫ ══════════════════════════════════════════════════ */}
-      {matrix.reversedArcana.some(item => item.positions.length >= 3) && (
-        <div className="space-y-4">
-          <SectionHeader
-            icon={Layers}
-            title="Тройные арканы союза"
-            subtitle="Арканы, которые появляются три и более раз — усиленный акцент на конкретной теме союза."
-          />
+          <SectionHeader icon={Layers} title="Зеркальные и тройные арканы" subtitle="Усиленные арканы союза, появляющиеся несколько раз, акцент на конкретной теме." />
           <TriplesBlock matrix={matrix} />
         </div>
       )}
 
-      {/* ═══ АНАЛИЗ СОЮЗА ════════════════════════════════════════════════════ */}
-      {aiReading?.analysis && (
+      {/* 6 — Цели и задачи пары */}
+      {panel === 6 && (<>
         <div className="space-y-4">
-          <SectionHeader
-            icon={ShieldAlert}
-            title="Анализ союза"
-            subtitle="Главный конфликт, сила и уязвимость — три ключевых психологических слоя этих отношений."
-          />
-          <div className="grid grid-cols-1 gap-3">
-            <div className="gradient-card rounded-2xl border border-destructive/20 p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-destructive/80">Главный конфликт</span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{aiReading.analysis.conflict}</p>
-            </div>
-            <div className="gradient-card rounded-2xl border border-emerald-500/20 p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">Сила союза</span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{aiReading.analysis.strength}</p>
-            </div>
-            <div className="gradient-card rounded-2xl border border-amber-500/20 p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">Слабое место</span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{aiReading.analysis.weakness}</p>
-            </div>
+          <SectionHeader icon={Star} title="Плюс и минус главных энергий" subtitle="Позиции 4, 5, 7, 12, ключевые арканы союза." />
+          <KeyEnergiesBlock matrix={matrix} />
+        </div>
+        <div className="space-y-4">
+          <SectionHeader icon={Anchor} title="Основа отношений, позиция 6" subtitle="Кармический аркан, ключевой вызов и скрытый ресурс пары." />
+          <CompatCard position={6} value={p[5]} aiText={aiReading?.positions?.['6']} aiExpandable={aiReading?.positions_expanded?.['6']} aiLoading={aiLoading} />
+        </div>
+        <div className="space-y-4">
+          <SectionHeader icon={Target} title="Цели в отношениях" subtitle="Позиции 7, 8, 9, куда идёт пара, через что достигает и где восстанавливается." />
+          {[7, 8, 9].map(pos => (
+            <CompatCard key={pos} position={pos} value={p[pos - 1]} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} aiLoading={aiLoading} />
+          ))}
+        </div>
+        {result.matrix1 && result.matrix2 && (
+          <div className="space-y-4">
+            <SectionHeader icon={Key} title="Код успеха пары" subtitle="Через что каждый идёт к результатам и насколько ваши пути совпадают." />
+            <SuccessCodeCompare matrix1={result.matrix1} matrix2={result.matrix2} name1={result.person1.name} name2={result.person2.name} />
           </div>
+        )}
+      </>)}
+
+      {/* 7 — Кармические задачи пары */}
+      {panel === 7 && (
+        <div className="space-y-4">
+          <SectionHeader icon={ShieldAlert} title="Кармические задачи союза" subtitle="Позиции 10, 11, 12, кармические паттерны и главная задача союза." />
+          <div className="gradient-card rounded-2xl border border-border p-4 text-sm text-muted-foreground leading-relaxed bg-muted/20">
+            Кармические позиции, не приговор. Это точки трансформации, то, что провоцирует конфликты, пока пара не осознает их вместе. Здесь самый глубокий рост.
+          </div>
+          {[10, 11, 12].map(pos => (
+            <CompatCard key={pos} position={pos} value={p[pos - 1]} highlight={pos === 12} aiText={aiReading?.positions?.[String(pos)]} aiExpandable={aiReading?.positions_expanded?.[String(pos)]} aiLoading={aiLoading} />
+          ))}
         </div>
       )}
 
-      {/* ═══ ПЕРСПЕКТИВА СОЮЗА ═══════════════════════════════════════════════ */}
-      <div className="space-y-4">
-        <SectionHeader
-          icon={Sparkles}
-          title="Перспектива союза"
-          subtitle="Четыре ключевые точки, которые определяют будущее этих отношений."
-        />
-        <PerspectiveBlock result={result} ai={aiReading?.perspective} />
-      </div>
+      {/* 8 — Взаимодействие матриц партнёров (подплашки) */}
+      {panel === 8 && (
+        <div className="space-y-5">
+          <SectionHeader icon={Users} title="Взаимодействие матриц партнёров" subtitle="Как две матрицы проявляются друг к другу, главный и самый объёмный блок союза." />
+          <div className="flex gap-2 flex-wrap">
+            {([['conflict', 'Главный конфликт'], ['strength', 'Сила союза'], ['weakness', 'Слабое место'], ['harmonize', 'Кто гармонизирует']] as const).map(([id, label]) => (
+              <button key={id} onClick={() => setSub(id)} className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-all", sub === id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80")}>{label}</button>
+            ))}
+          </div>
+          {sub === 'conflict' && (
+            <div className="gradient-card rounded-2xl border border-destructive/20 p-5">
+              <span className="text-xs font-semibold uppercase tracking-wide text-destructive/80">Главный конфликт</span>
+              <p className="text-sm text-muted-foreground leading-relaxed mt-2">{aiReading?.analysis?.conflict || "Разбор готовится."}</p>
+            </div>
+          )}
+          {sub === 'strength' && (
+            <div className="gradient-card rounded-2xl border border-emerald-500/20 p-5">
+              <span className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">Сила союза</span>
+              <p className="text-sm text-muted-foreground leading-relaxed mt-2">{aiReading?.analysis?.strength || "Разбор готовится."}</p>
+            </div>
+          )}
+          {sub === 'weakness' && (
+            <div className="gradient-card rounded-2xl border border-amber-500/20 p-5">
+              <span className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">Слабое место</span>
+              <p className="text-sm text-muted-foreground leading-relaxed mt-2">{aiReading?.analysis?.weakness || "Разбор готовится."}</p>
+            </div>
+          )}
+          {sub === 'harmonize' && result.matrix1 && result.matrix2 && result.unionMatrix && (
+            <HarmonizesBlock matrix1={result.matrix1} matrix2={result.matrix2} unionMatrix={result.unionMatrix} name1={result.person1.name} name2={result.person2.name} />
+          )}
+          <p className="text-xs text-muted-foreground/70 border-t border-border pt-3">Подробный разбор каждого партнёра по трём треугольникам в отношении друг к другу смотрите во вкладках предназначения партнёров.</p>
+        </div>
+      )}
 
-      {/* ═══ РЕКОМЕНДАЦИИ ════════════════════════════════════════════════════ */}
-      <div className="space-y-4">
-        <SectionHeader
-          icon={CheckCircle}
-          title="Рекомендации"
-          subtitle="Ключевые зоны роста и практические советы — ему, ей и паре вместе."
-        />
-        <RecommendationsBlock result={result} ai={aiReading?.recommendations} />
-      </div>
+      {/* 9 — Рекомендации выхода из кризиса */}
+      {panel === 9 && (
+        <div className="space-y-4">
+          <SectionHeader icon={CheckCircle} title="Рекомендации выхода из кризиса" subtitle="Как перевести энергию в плюс, практические советы ему, ей и паре." />
+          <RecommendationsBlock result={result} ai={aiReading?.recommendations} />
+        </div>
+      )}
+
+      {/* 10 — Детские и финансовые арканы */}
+      {panel === 10 && (
+        <div className="space-y-4">
+          <SectionHeader icon={TrendingUp} title="Детские и финансовые арканы пары" subtitle="Финансовый потенциал союза и тема семьи, создание общего." />
+          <MoneyAndChildrenBlock result={result} />
+        </div>
+      )}
+
+      {/* 11 — Итог по совместимости */}
+      {panel === 11 && (
+        <div className="space-y-4">
+          <SectionHeader icon={Sparkles} title="Итог по совместимости" subtitle="Четыре ключевые точки и общий вывод по этим отношениям." />
+          <PerspectiveBlock result={result} ai={aiReading?.perspective} />
+        </div>
+      )}
 
     </div>
   );
@@ -1857,12 +1760,12 @@ interface CompatibilityResultProps {
   tier?: TierType;
 }
 
-type TabType = 'union' | 'person1' | 'person2' | 'matrices';
+type TabType = 'p1' | 'p2' | 'u3' | 'u4' | 'u5' | 'u6' | 'u7' | 'u8' | 'u9' | 'u10' | 'u11';
 
 export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }: CompatibilityResultProps) {
   const { t } = useTranslation();
   const isPro = tier === 'professional';
-  const [activeTab, setActiveTab] = useState<TabType>('union');
+  const [activeTab, setActiveTab] = useState<TabType>('p1');
   const { reading: aiReading, loading: aiLoading } = useAIReading(result, isPro);
   const { reading: aiReading1, loading: aiLoading1 } = usePersonalReading(result, 1, isPro);
   const { reading: aiReading2, loading: aiLoading2 } = usePersonalReading(result, 2, isPro);
@@ -1886,10 +1789,17 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
   };
 
   const tabs: { id: TabType; label: string }[] = isPro ? [
-    { id: 'union', label: 'Союз' },
-    { id: 'person1', label: result.person1.name || 'Партнёр А' },
-    { id: 'person2', label: result.person2.name || 'Партнёр Б' },
-    { id: 'matrices', label: 'Матрицы' },
+    { id: 'p1', label: `Предназначение ${result.person1.name || 'партнёр 1'}` },
+    { id: 'p2', label: `Предназначение ${result.person2.name || 'партнёр 2'}` },
+    { id: 'u3', label: 'Основной треугольник и общая матрица' },
+    { id: 'u4', label: 'Перевёрнутые арканы' },
+    { id: 'u5', label: 'Зеркальные арканы' },
+    { id: 'u6', label: 'Цели и задачи пары' },
+    { id: 'u7', label: 'Кармические задачи пары' },
+    { id: 'u8', label: 'Взаимодействие матриц' },
+    { id: 'u9', label: 'Рекомендации' },
+    { id: 'u10', label: 'Детские и финансовые арканы' },
+    { id: 'u11', label: 'Итог по совместимости' },
   ] : [];
 
   return (
@@ -2017,15 +1927,13 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 )}
               >
-                {tab.id === 'matrices' && <Layers className="w-3.5 h-3.5" />}
                 {tab.label}
               </button>
             ))}
           </div>
 
           {/* Tab content */}
-          {activeTab === 'union' && <UnionTab result={result} isPro={isPro} aiReading={aiReading ?? null} aiLoading={aiLoading} />}
-          {activeTab === 'person1' && result.matrix1 && (
+          {activeTab === 'p1' && result.matrix1 && (
             <PartnerTab
               matrix={result.matrix1}
               crossMatrix={result.cross1Matrix}
@@ -2036,7 +1944,7 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               aiLoading={aiLoading1}
             />
           )}
-          {activeTab === 'person2' && result.matrix2 && (
+          {activeTab === 'p2' && result.matrix2 && (
             <PartnerTab
               matrix={result.matrix2}
               crossMatrix={result.cross2Matrix}
@@ -2047,7 +1955,9 @@ export function CompatibilityResultComponent({ result, onReset, tier = 'basic' }
               aiLoading={aiLoading2}
             />
           )}
-          {activeTab === 'matrices' && <MatricesTab result={result} />}
+          {activeTab.startsWith('u') && (
+            <UnionTab result={result} isPro={isPro} aiReading={aiReading ?? null} aiLoading={aiLoading} panel={Number(activeTab.slice(1))} />
+          )}
         </>
       )}
 
