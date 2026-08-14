@@ -44,7 +44,7 @@ const config = {
     botSecret: process.env.BOT_SHARED_SECRET || "",
   },
   plans: {
-    week:  { product: "bot_sub_week",  price: 290,  old: 590,  discount: 50, days: 7,   label: "неделя, пробный" },
+    week:  { product: "bot_sub_week",  price: 20,   old: 290,  discount: 93, days: 7,   label: "неделя, тест" },
     month: { product: "bot_sub_month", price: 790,  old: 1590, discount: 50, days: 30,  label: "месяц" },
     year:  { product: "bot_sub_year",  price: 2990, old: 9990, discount: 70, days: 365, label: "год" },
   },
