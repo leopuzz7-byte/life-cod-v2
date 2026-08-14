@@ -304,7 +304,77 @@ app.get("/api/payment/status/:orderId", requireAuth, async (req, res) => {
   res.json(order);
 });
 
+// ============================================================
+// ОПЛАТА ДЛЯ TELEGRAM-БОТА (заказы без веб-аккаунта, по telegram_id)
+// Заказы падают в ту же таблицу orders, Робокасса подтверждает их
+// тем же /api/payment/robokassa-result. Защита общим секретом (опционально).
+// ============================================================
+const BOT_SECRET = process.env.BOT_SHARED_SECRET || "";
+const BOT_PRODUCTS = ["bot_sub_week", "bot_sub_month", "bot_sub_year", "bot_taro"];
+function botAuth(req, res, next) {
+  if (BOT_SECRET && (req.headers["x-bot-secret"] || "") !== BOT_SECRET) return res.status(403).json({ error: "forbidden" });
+  next();
+}
+async function seedBotProducts() {
+  const rows = [
+    ["bot_sub_week", "Подписка неделя (бот)", 20],
+    ["bot_sub_month", "Подписка месяц (бот)", 790],
+    ["bot_sub_year", "Подписка год (бот)", 2990],
+    ["bot_taro", "Таро расклад (бот)", 2990],
+  ];
+  for (const [mid, title, price] of rows) {
+    await q(
+      `INSERT INTO method_prices (method_id, title, price_rub, price_basic, price_pro, is_active)
+       VALUES (?, ?, ?, 0, ?, 1)
+       ON DUPLICATE KEY UPDATE title = VALUES(title), price_rub = VALUES(price_rub), price_pro = VALUES(price_pro), is_active = 1`,
+      [mid, title, price, price]
+    );
+  }
+}
+
+app.post("/api/bot/payment/create", botAuth, async (req, res) => {
+  try {
+    const { telegram_id, product } = req.body || {};
+    if (!telegram_id || !product) return res.status(400).json({ error: "telegram_id and product required" });
+    if (!BOT_PRODUCTS.includes(product)) return res.status(400).json({ error: "unknown product" });
+    const price = one(await q("SELECT title, price_pro, is_active FROM method_prices WHERE method_id = ?", [product]));
+    if (!price || !price.is_active) return res.status(404).json({ error: "product not found" });
+    const amount = Number(price.price_pro);
+    if (!(amount > 0)) return res.status(400).json({ error: "zero price" });
+    const isTest = (process.env.ROBOKASSA_IS_TEST ?? "true") === "true";
+    const id = uuid();
+    const [ins] = await pool.execute(
+      `INSERT INTO orders (id, user_id, method_id, tier, amount_rub, status, is_test, payment_provider, telegram_id)
+       VALUES (?, NULL, ?, 'professional', ?, 'pending', ?, 'robokassa', ?)`,
+      [id, product, amount, isTest ? 1 : 0, String(telegram_id)]
+    );
+    const invId = Number(ins.insertId);
+    const login = process.env.ROBOKASSA_LOGIN;
+    const pass1 = isTest ? process.env.ROBOKASSA_PASS1_TEST : process.env.ROBOKASSA_PASS1;
+    const outSum = amount.toFixed(2);
+    const signature = md5(`${login}:${outSum}:${invId}:${pass1}`);
+    const params = new URLSearchParams({
+      MerchantLogin: login, OutSum: outSum, InvId: String(invId),
+      Description: price.title, SignatureValue: signature, Culture: "ru", Encoding: "utf-8",
+    });
+    if (isTest) params.set("IsTest", "1");
+    res.json({ payment_url: "https://auth.robokassa.ru/Merchant/Index.aspx?" + params.toString(), inv_id: invId, is_test: isTest });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post("/api/bot/payment/status", botAuth, async (req, res) => {
+  try {
+    const { telegram_id, inv_id } = req.body || {};
+    if (!telegram_id || !inv_id) return res.status(400).json({ error: "telegram_id and inv_id required" });
+    const order = one(await q("SELECT status, method_id, amount_rub, telegram_id FROM orders WHERE inv_id = ?", [Number(inv_id)]));
+    if (!order) return res.status(404).json({ error: "order not found" });
+    if (String(order.telegram_id) !== String(telegram_id)) return res.status(403).json({ error: "foreign order" });
+    res.json({ status: order.status, method_id: order.method_id, amount_rub: order.amount_rub });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── здоровье ────────────────────────────────────────────
 app.get("/api/health", (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
+seedBotProducts().catch((e) => console.error("seedBotProducts:", e.message));
 app.listen(PORT, HOST, () => console.log(`Life COD server on http://${HOST}:${PORT}`));

@@ -43,6 +43,11 @@ const config = {
     anonKey: process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoanl2Y2p6dXJqYnVmdnRobHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTY1NzIsImV4cCI6MjA5NDczMjU3Mn0.pKNH-Z7N0t8EJeei08ZxU8bfkVMk10DD1ePLNHZu3j0",
     botSecret: process.env.BOT_SHARED_SECRET || "",
   },
+  // Оплата бота теперь через серверный бэкенд (MySQL, Робокасса на сервере).
+  server: {
+    baseUrl: process.env.SERVER_API_URL || "http://127.0.0.1:8080",
+    botSecret: process.env.BOT_SHARED_SECRET || "",
+  },
   plans: {
     week:  { product: "bot_sub_week",  price: 20,   old: 290,  discount: 93, days: 7,   label: "неделя, тест" },
     month: { product: "bot_sub_month", price: 790,  old: 1590, discount: 50, days: 30,  label: "месяц" },

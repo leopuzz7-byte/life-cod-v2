@@ -58,13 +58,11 @@ function startResultServer(onPaid) {
 // функция robokassa-result. Бот только просит создать счёт и спрашивает статус.
 async function botFetch(pathname, body) {
   try {
-    const res = await fetch(config.supabase.fnUrl + pathname, {
+    const res = await fetch(config.server.baseUrl + pathname, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "apikey": config.supabase.anonKey,
-        "Authorization": "Bearer " + config.supabase.anonKey,
-        "x-bot-secret": config.supabase.botSecret || "",
+        "x-bot-secret": config.server.botSecret || "",
       },
       body: JSON.stringify(body),
     });
@@ -74,10 +72,10 @@ async function botFetch(pathname, body) {
   }
 }
 function createBotPayment(telegramId, product) {
-  return botFetch("/bot-create-payment", { telegram_id: String(telegramId), product });
+  return botFetch("/api/bot/payment/create", { telegram_id: String(telegramId), product });
 }
 function checkBotPayment(telegramId, invId) {
-  return botFetch("/bot-payment-status", { telegram_id: String(telegramId), inv_id: invId });
+  return botFetch("/api/bot/payment/status", { telegram_id: String(telegramId), inv_id: invId });
 }
 
 module.exports = { createPaymentLink, verifyResult, startResultServer, createBotPayment, checkBotPayment };
