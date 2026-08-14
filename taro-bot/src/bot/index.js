@@ -9,6 +9,7 @@ const { calculatePersonalMatrix } = require("../engine/calculations");
 const { getArcana } = require("../engine/arcana");
 const { SPHERES, sphereCards, concernText } = require("../engine/spheres");
 const { THEMES, themeById, drawArcana, fallbackReveal, today } = require("../engine/tarot");
+const deck = require("../engine/deck78");
 const { renderThemeCards } = require("../render/theme");
 const { renderDeckChoice } = require("../render/deck");
 const ai = require("../ai/reading");
@@ -126,8 +127,8 @@ const SPREADS = {
   choice: { label: "Ситуация и выбор", emoji: "🧭", positions: ["Суть ситуации", "Что влияет", "Совет и исход"] },
   future: { label: "Прогноз", emoji: "🌙", positions: ["Прошлое", "Настоящее", "Будущее"] },
 };
-function draw3() { const set = new Set(); while (set.size < 3) set.add(Math.floor(Math.random() * 22) + 1); return [...set]; }
-function drawOne() { return Math.floor(Math.random() * 22) + 1; }
+function draw3() { return deck.drawCards(3); }
+function drawOne() { return deck.drawCard(); }
 let deck3Cache = null;
 async function deck3Image() { if (!deck3Cache) deck3Cache = await renderDeckChoice(3, { title: "Выбери карту", subtitle: "ту, к которой тянет" }); return deck3Cache; }
 async function showSphereChoice(ctx) {
@@ -264,18 +265,18 @@ bot.callbackQuery(/^pick:([1-5])$/, async (ctx) => {
   const u = getUser(ctx.from.id);
   if (!u.tarotQuestion) { await ctx.reply("Напиши /start, чтобы начать заново."); return; }
   const pos = +ctx.match[1];
-  const card = drawArcana(ctx.from.id, pos, today());
+  const card = deck.drawCard();
   u.tarotCard = card; u.step = "tarot_sub"; saveUser(u);
-  track(ctx.from.id, "pick", { branch: "tarot", card });
+  track(ctx.from.id, "pick", { branch: "tarot", card: card.key });
   await waiting(ctx);
   await ctx.replyWithChatAction("upload_photo");
   // сырая карта оригиналом, без эффектов
-  await ctx.replyWithPhoto(new InputFile(path.join(ARCANA_DIR, `arcana-${card}.webp`)));
-  let r = await ai.generateTarotReveal(card, u.tarotQuestion);
-  const name = getArcana(card).name;
+  const cf = deck.cardFile(card); if (cf) await ctx.replyWithPhoto(new InputFile(cf));
+  let r = await ai.generateTarotReveal(deck.cardInfo(card), u.tarotQuestion);
+  const name = deck.cardName(card);
   const text = r
     ? `Твоя карта: <b>${esc(name)}</b>.\n\n${esc(r.text)}\n\n<i>${esc(r.hook)}</i>`
-    : `Твоя карта: <b>${esc(name)}</b>.\n\n${esc(fallbackReveal(card))}\n\n<i>Но одна карта показывает лишь верхний слой. Что привело к этому и чем закончится, откроет полный расклад.</i>`;
+    : `Твоя карта: <b>${esc(name)}</b>.\n\n${esc(name + " пришла не случайно. В ней ключ к тому, о чём сейчас думаешь. Сила уже внутри, осталось разрешить себе её увидеть.")}\n\n<i>Но одна карта показывает лишь верхний слой. Что привело к этому и чем закончится, откроет полный расклад.</i>`;
   await ctx.reply(text, { parse_mode: "HTML" });
   track(ctx.from.id, "reveal", { branch: "tarot" });
   await sleep(400);
@@ -320,8 +321,8 @@ bot.callbackQuery("check_sub", async (ctx) => {
   await ctx.replyWithChatAction("typing");
   let fbBranch = null;
   if (u.branch === "tarot" && u.tarotCard) {
-    let d = await ai.generateTarotDeep(u.tarotCard, u.tarotQuestion, u.tarotTheme ? themeById(u.tarotTheme).label : "твой вопрос");
-    await sendDeep(ctx, d, getArcana(u.tarotCard).name);
+    let d = await ai.generateTarotDeep(deck.cardInfo(u.tarotCard), u.tarotQuestion, u.tarotTheme ? themeById(u.tarotTheme).label : "твой вопрос");
+    await sendDeep(ctx, d, deck.cardName(u.tarotCard));
     fbBranch = "tarot";
   } else if (u.branch === "numerology" && u.birth) {
     const matrix = calculatePersonalMatrix(u.birth.day, u.birth.month, u.birth.year);
@@ -491,10 +492,10 @@ bot.callbackQuery("sprev", async (ctx) => {
   const pos = sp.positions[idx];
   await waiting(ctx);
   await ctx.replyWithChatAction("upload_photo");
-  try { await ctx.replyWithPhoto(new InputFile(path.join(ARCANA_DIR, `arcana-${card}.webp`))); } catch (_) {}
+  try { const cf = deck.cardFile(card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
   const prev = u.spread.cards.slice(0, idx);
-  const txt = await ai.generateSpreadCard(sp.label, u.spread.question, pos, idx, card, prev);
-  const name = getArcana(card).name;
+  const txt = await ai.generateSpreadCard(sp.label, u.spread.question, pos, idx, deck.cardInfo(card), prev.map(deck.cardInfo));
+  const name = deck.cardName(card);
   const ordinal = ["Первая карта", "Вторая карта", "Третья карта"][idx];
   await ctx.reply(`<b>${ordinal}, ${esc(pos.toLowerCase())}: ${esc(name)}</b>\n\n${esc(txt || (name + " говорит о многом. Прислушайся к первому чувству."))}`, { parse_mode: "HTML" });
   u.spread.revealed = idx + 1; saveUser(u);
@@ -505,7 +506,7 @@ bot.callbackQuery("sprev", async (ctx) => {
   } else {
     await sleep(700);
     await ctx.replyWithChatAction("typing");
-    const fin = await ai.generateSpreadFinal(sp.label, u.spread.question, u.spread.cards, sp.positions);
+    const fin = await ai.generateSpreadFinal(sp.label, u.spread.question, u.spread.cards.map(deck.cardInfo), sp.positions);
     if (fin) await ctx.reply(`<b>Свод</b>\n\n${esc(fin)}`, { parse_mode: "HTML" });
     await sleep(600);
     await showExtraPrompt(ctx);
@@ -583,9 +584,9 @@ bot.on("message:text", async (ctx) => {
     const card = drawOne();
     await waiting(ctx);
     await ctx.replyWithChatAction("upload_photo");
-    try { await ctx.replyWithPhoto(new InputFile(path.join(ARCANA_DIR, `arcana-${card}.webp`))); } catch (_) {}
-    const ans = await ai.generateSpreadExtra(SPREADS[u.spread.sphere].label, u.spread.question, card, q);
-    const name = getArcana(card).name;
+    try { const cf = deck.cardFile(card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
+    const ans = await ai.generateSpreadExtra(SPREADS[u.spread.sphere].label, u.spread.question, deck.cardInfo(card), q);
+    const name = deck.cardName(card);
     await ctx.reply(`<b>${esc(name)}</b>\n\n${esc(ans || "Карта отвечает мягко, прислушайся к первому чувству.")}`, { parse_mode: "HTML" });
     u.spread.extra = (u.spread.extra || 0) + 1; u.step = "sp_reading"; saveUser(u);
     track(ctx.from.id, "spread_extra", { n: u.spread.extra });

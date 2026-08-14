@@ -18,7 +18,7 @@ const VOICE = `Ты Надежда, таролог и психолог с опы
 ВАЖНО про стиль: обращение на «ты» передавай через глаголы (видишь, чувствуешь, идёшь), а само местоимение «ты, тебя, твой» используй умеренно, не в каждом предложении. Текст должен звучать легко, без частокола местоимений.
 Голос загадочный, тонкий, психологичный, будто видишь человека насквозь, чтобы возникло чувство «откуда ты знаешь». Пиши так, чтобы попадало в сердце.
 Без воды и общих фраз. СТРОГО ЗАПРЕЩЕНЫ длинные тире (— и –) и стрелки, только запятые, точки, двоеточия, союзы. Без смайликов.
-Опирайся строго на указанные арканы, их планеты и стихии, ничего не выдумывай сверху.`;
+Опирайся строго на указанные карты, их масти, планеты и стихии, ничего не выдумывай сверху.`;
 
 async function callAI(prompt, maxTokens, json = true) {
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -41,11 +41,11 @@ async function callAI(prompt, maxTokens, json = true) {
 
 // ---- ТАРО ----
 // Короткое толкование вытянутой карты по вопросу (крючок).
-async function generateTarotReveal(arcanaNum, question) {
+async function generateTarotReveal(cardDesc, question) {
   const prompt = `${VOICE}
 
 Человек мысленно задал вопрос: "${question}".
-Ему выпала карта ${arcInfo(arcanaNum)}.
+Ему выпала карта: ${cardDesc}.
 
 Дай короткое толкование этой карты именно по его вопросу. 3-4 предложения, остро, лично, чтобы ёкнуло. Не давай советов на будущее, только точное попадание в момент. Верни строго JSON:
 { "text": "толкование 3-4 предложения", "hook": "1 фраза, что это лишь верхний слой, а причины и финал откроет полный расклад" }`;
@@ -53,10 +53,10 @@ async function generateTarotReveal(arcanaNum, question) {
 }
 
 // Глубокий разбор по теме после подписки (без матрицы).
-async function generateTarotDeep(arcanaNum, question, themeLabel) {
+async function generateTarotDeep(cardDesc, question, themeLabel) {
   const prompt = `${VOICE}
 
-Тема: ${themeLabel}. Вопрос человека: "${question}". Ведущая карта: ${arcInfo(arcanaNum)}.
+Тема: ${themeLabel}. Вопрос человека: "${question}". Ведущая карта: ${cardDesc}.
 Сделай глубокий тёплый разбор по этой теме, как таролог-психолог. Погрузи в тему, чтобы отозвалось, поддержи. Верни строго JSON:
 {
   "opening": "2-3 предложения, назови то, что человек сейчас чувствует по теме, чтобы узнал себя",
@@ -108,16 +108,16 @@ ${hist ? "История:\n" + hist + "\n" : ""}Человек написал: "
 
 // ---- ПЛАТНЫЙ ЦИФРОВОЙ РАСКЛАД (3 карты + уточняющие вопросы) ----
 // Глубокий разбор одной карты на её позиции. Возвращает живой текст без JSON.
-async function generateSpreadCard(sphereLabel, question, position, index, arcanaNum, prevNums) {
+async function generateSpreadCard(sphereLabel, question, position, index, cardDesc, prevDescs) {
   const ordinal = ["первая", "вторая", "третья"][index] || "следующая";
-  const prev = (prevNums && prevNums.length)
-    ? `Предыдущие карты расклада: ${prevNums.map(arcInfo).join("; ")}. Свяжи эту карту с ними.`
+  const prev = (prevDescs && prevDescs.length)
+    ? `Предыдущие карты расклада: ${prevDescs.join("; ")}. Свяжи эту карту с ними.`
     : "";
   const hook = index < 2 ? "В самом конце добавь одну короткую фразу-крючок, лёгкую интригу к следующей карте." : "Это последняя, третья карта, крючок к следующей не нужен.";
   const prompt = `${VOICE}
 
 Ты ведёшь платный расклад Таро на трёх картах. Тема: ${sphereLabel}. Вопрос человека: "${question}".
-Это ${ordinal} карта, позиция расклада: "${position}". Выпал аркан ${arcInfo(arcanaNum)}.
+Это ${ordinal} карта, позиция расклада: "${position}". Выпала карта: ${cardDesc}.
 ${prev}
 
 Дай глубокий, конкретный и деликатный разбор именно этой карты на этой позиции по вопросу.
@@ -131,8 +131,8 @@ ${hook}
 }
 
 // Финальный свод по трём картам плюс конкретный совет и тёплое послание.
-async function generateSpreadFinal(sphereLabel, question, nums, positions) {
-  const list = nums.map((n, i) => `${positions[i]}: ${arcInfo(n)}`).join("; ");
+async function generateSpreadFinal(sphereLabel, question, descs, positions) {
+  const list = descs.map((d, i) => `${positions[i]}: ${d}`).join("; ");
   const prompt = `${VOICE}
 
 Ты завершаешь платный расклад Таро на трёх картах. Тема: ${sphereLabel}. Вопрос: "${question}".
@@ -148,11 +148,11 @@ async function generateSpreadFinal(sphereLabel, question, nums, positions) {
 }
 
 // Ответ на уточняющий вопрос по одной карте.
-async function generateSpreadExtra(sphereLabel, mainQuestion, arcanaNum, userQuestion) {
+async function generateSpreadExtra(sphereLabel, mainQuestion, cardDesc, userQuestion) {
   const prompt = `${VOICE}
 
 Идёт платный расклад Таро. Тема: ${sphereLabel}. Основной вопрос был: "${mainQuestion}".
-Человек задал уточняющий вопрос: "${userQuestion}". На него выпала одна карта: ${arcInfo(arcanaNum)}.
+Человек задал уточняющий вопрос: "${userQuestion}". На него выпала одна карта: ${cardDesc}.
 
 Дай подробный, деликатный и точный ответ строго на этот уточняющий вопрос через выпавшую карту.
 Пиши цельным живым текстом, 4-6 предложений, при необходимости с мягким конкретным советом.

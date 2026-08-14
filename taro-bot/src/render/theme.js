@@ -2,6 +2,7 @@
 // Тёмный фон, металлическое золото, орнаментальная рамка, свечение.
 const path = require("path");
 const { createCanvas, loadImage, GlobalFonts } = require("@napi-rs/canvas");
+const deck = require("../engine/deck78");
 
 const FONTS = path.join(__dirname, "..", "..", "assets", "fonts");
 const ARCANA_DIR = path.join(__dirname, "..", "..", "assets", "arcana");
@@ -91,7 +92,8 @@ async function renderThemeCards(cards, opts = {}) {
 
   for (let i = 0; i < 3; i++) {
     const x = PAD_X + i * (CARD_W + GAP), y = TOP;
-    const img = await loadImage(path.join(ARCANA_DIR, `arcana-${cards[i].n}.webp`));
+    const mfile = deck.majorFileByMatrixNum(cards[i].n) || "arcana-00-shut.webp";
+    const img = await loadImage(path.join(deck.DECK_DIR, mfile));
 
     // тёплая тень
     ctx.save();
