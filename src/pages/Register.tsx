@@ -67,7 +67,7 @@ export default function Register() {
       <Header />
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-md mx-auto">
-          <div className="text-center mb-6">
+          <div className="text-center mb-6 rounded-2xl bg-background/70 backdrop-blur-md px-5 py-4 ring-1 ring-border/40 shadow-sm md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:ring-0 md:shadow-none">
             <h1 className="font-display text-3xl md:text-4xl text-primary mb-3 leading-tight">
               {t("auth.registerTitle1")}<br />{t("auth.registerTitle2")}
             </h1>
