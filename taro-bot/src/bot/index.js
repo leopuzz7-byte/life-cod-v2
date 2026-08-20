@@ -94,7 +94,7 @@ function parseDate(t) {
   return { day, month, year };
 }
 async function waiting(ctx) {
-  // анимация загрузки, потом удаляем
+  // анимация тасовки колоды, потом удаляем
   try {
     const m = await ctx.replyWithAnimation(new InputFile(LOADING));
     await sleep(3800);
@@ -139,11 +139,8 @@ async function showSphereChoice(ctx) {
 async function startRitual(ctx) {
   const u = getUser(ctx.from.id);
   u.spread = u.spread || {}; u.spread.cards = draw3(); u.spread.revealed = 0; u.spread.extra = 0; u.step = "sp_reading"; saveUser(u);
-  try {
-    const m = await ctx.reply("Тасую колоду...");
-    await sleep(1200); await ctx.api.editMessageText(ctx.chat.id, m.message_id, "Карты ложатся под твой вопрос...");
-    await sleep(1200); await ctx.api.deleteMessage(ctx.chat.id, m.message_id);
-  } catch (_) {}
+  // тасовка колоды, затем три карты рубашкой вверх
+  await waiting(ctx);
   const img = await deck3Image();
   await ctx.replyWithPhoto(new InputFile(img), { caption: "Перед тобой три карты рубашкой вверх. Выбери одну, ту, к которой тянет.", reply_markup: new InlineKeyboard().text("Карта 1", "sprev").text("Карта 2", "sprev").text("Карта 3", "sprev") });
 }
@@ -268,7 +265,6 @@ bot.callbackQuery(/^pick:([1-5])$/, async (ctx) => {
   const card = deck.drawCard();
   u.tarotCard = card; u.step = "tarot_sub"; saveUser(u);
   track(ctx.from.id, "pick", { branch: "tarot", card: card.key });
-  await waiting(ctx);
   await ctx.replyWithChatAction("upload_photo");
   // сырая карта оригиналом, без эффектов
   const cf = deck.cardFile(card); if (cf) await ctx.replyWithPhoto(new InputFile(cf));
@@ -490,7 +486,6 @@ bot.callbackQuery("sprev", async (ctx) => {
   const card = u.spread.cards[idx];
   const sp = SPREADS[u.spread.sphere];
   const pos = sp.positions[idx];
-  await waiting(ctx);
   await ctx.replyWithChatAction("upload_photo");
   try { const cf = deck.cardFile(card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
   const prev = u.spread.cards.slice(0, idx);
@@ -582,7 +577,6 @@ bot.on("message:text", async (ctx) => {
     if (!u.spread || !u.spread.sphere) { u.step = "menu"; saveUser(u); await showMenu(ctx); return; }
     const q = text.trim().slice(0, 300);
     const card = drawOne();
-    await waiting(ctx);
     await ctx.replyWithChatAction("upload_photo");
     try { const cf = deck.cardFile(card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
     const ans = await ai.generateSpreadExtra(SPREADS[u.spread.sphere].label, u.spread.question, deck.cardInfo(card), q);
