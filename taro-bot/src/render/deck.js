@@ -47,10 +47,8 @@ async function renderDeckChoice(n = 5, opts = {}) {
 
   ctx.textAlign = "center";
   ctx.save(); ctx.shadowColor = "rgba(217,180,90,0.5)"; ctx.shadowBlur = 22;
-  ctx.font = "58px PlayfairXB"; ctx.fillStyle = goldGrad(ctx, 60, 60);
-  ctx.fillText(opts.title || "Выбери карту", W / 2, 108); ctx.restore();
-  ctx.font = "italic 27px PlayfairI"; ctx.fillStyle = "#c9b788";
-  ctx.fillText(opts.subtitle || "ту, к которой тянет", W / 2, 150);
+  ctx.font = "58px PlayfairXB"; ctx.fillStyle = goldGrad(ctx, 78, 60);
+  ctx.fillText(opts.title || "Выбери карту", W / 2, 132); ctx.restore();
 
   const back = await loadImage(BACK);
   for (let i = 0; i < n; i++) {
@@ -62,12 +60,13 @@ async function renderDeckChoice(n = 5, opts = {}) {
     ctx.strokeStyle = GOLD; ctx.lineWidth = 2.5; roundRect(ctx, x, y, CW, CH, 16); ctx.stroke();
     ctx.strokeStyle = "rgba(247,228,168,0.45)"; ctx.lineWidth = 1; roundRect(ctx, x + 5, y + 5, CW - 10, CH - 10, 12); ctx.stroke();
     // номер под картой
-    ctx.beginPath(); ctx.arc(x + CW / 2, y + CH + 46, 26, 0, Math.PI * 2);
+    const ncy = y + CH + 56;
+    ctx.beginPath(); ctx.arc(x + CW / 2, ncy, 33, 0, Math.PI * 2);
     ctx.fillStyle = "rgba(217,180,90,0.16)"; ctx.fill();
-    ctx.strokeStyle = GOLD; ctx.lineWidth = 1.6; ctx.stroke();
-    ctx.font = "34px PlayfairXB"; ctx.fillStyle = goldGrad(ctx, y + CH + 28, 36);
+    ctx.strokeStyle = GOLD; ctx.lineWidth = 2.2; ctx.stroke();
+    ctx.font = "48px PlayfairXB"; ctx.fillStyle = goldGrad(ctx, ncy - 24, 48);
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(String(i + 1), x + CW / 2, y + CH + 48); ctx.textBaseline = "alphabetic";
+    ctx.fillText(String(i + 1), x + CW / 2, ncy + 3); ctx.textBaseline = "alphabetic";
   }
   return canvas.encode("png");
 }
