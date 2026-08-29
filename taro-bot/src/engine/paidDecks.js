@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+const { randomInt } = require("crypto");
+const authorDeck = require("./deck78");
 
 const ASSETS_DIR = path.join(__dirname, "..", "..", "assets", "decks");
 
@@ -79,6 +81,26 @@ function buildInterleavedClassic() {
     }
   }
   return cards;
+}
+
+function buildAuthorDeck() {
+  return authorDeck.DECK.map((card) => {
+    const major = card.group === "major" ? CLASSIC_MAJORS[card.n] : null;
+    const rank = card.group === "minor" ? RANKS[card.rank - 1] : null;
+    const suit = card.suit ? SUITS[card.suit] : null;
+    return {
+      key: `author-${card.key}`,
+      name: card.name,
+      group: card.group,
+      number: card.group === "major" ? card.n : undefined,
+      suit: card.suit,
+      rank: card.rank,
+      planet: card.planet,
+      element: card.element,
+      focus: [major && major[1], rank && rank[1], suit && suit.focus].filter(Boolean).join("; "),
+      file: card.file,
+    };
+  });
 }
 
 const THOTH_MAJORS = [
@@ -232,6 +254,13 @@ const LENORMAND_CARDS = LENORMAND_BASE.map(([name, playing, focus], index) => {
 });
 
 const DECKS = {
+  author: {
+    id: "author", label: "Авторская колода Надежды", short: "Авторская", cards: buildAuthorDeck(),
+    assetDir: authorDeck.DECK_DIR,
+    positions: ["Суть ситуации сейчас", "Что важно увидеть и учесть", "Совет и вероятное развитие"],
+    profile: "универсальный авторский разбор жизненной ситуации, отношений, выбора, внутренних ресурсов и ближайшего направления развития",
+    method: "Опирайся на классические значения арканов и авторский практический подход Надежды. Соединяй психологическую глубину с ясным ответом и применимым советом. Не копируй трактовку Тота и не усложняй ответ специальной терминологией.",
+  },
   thoth: {
     id: "thoth", label: "Таро Тота", short: "Тота", cards: buildThoth(),
     positions: ["Причина и корень ситуации", "Энергия процесса сейчас", "К чему ведёт текущий курс"],
@@ -330,7 +359,7 @@ function drawCards(deckId, count, excluded = []) {
   const pool = deck.cards.filter((card) => !denied.has(card.key));
   const result = [];
   while (result.length < count && pool.length) {
-    const index = Math.floor(Math.random() * pool.length);
+    const index = randomInt(pool.length);
     result.push(pool.splice(index, 1)[0].key);
   }
   return result;
@@ -349,6 +378,7 @@ function cardInfo(deckId, card) {
   if (resolved.number !== undefined) parts.push(`номер ${resolved.number}`);
   if (resolved.thothTitle) parts.push(`название в системе Тота «${resolved.thothTitle}»`);
   if (resolved.suit && SUITS[resolved.suit]) parts.push(`масть ${SUITS[resolved.suit].name}, стихия ${SUITS[resolved.suit].element}`);
+  if (resolved.planet) parts.push(`планета ${resolved.planet}`);
   if (resolved.symbol) parts.push(`символ ${resolved.symbol}`);
   if (resolved.playing) parts.push(`игральное соответствие ${resolved.playing}`);
   if (resolved.playingRank) parts.push(`достоинство ${resolved.playingRank}`);
@@ -358,14 +388,16 @@ function cardInfo(deckId, card) {
 }
 
 function cardPath(deckId, card) {
+  const deck = getDeck(deckId);
   const resolved = resolveCard(deckId, card);
-  return resolved ? path.join(ASSETS_DIR, getDeck(deckId).id, resolved.file) : null;
+  return resolved ? path.join(deck.assetDir || path.join(ASSETS_DIR, deck.id), resolved.file) : null;
 }
 
 function validateAssets() {
   const problems = [];
   for (const deck of Object.values(DECKS)) {
-    const files = new Set((fs.existsSync(path.join(ASSETS_DIR, deck.id)) ? fs.readdirSync(path.join(ASSETS_DIR, deck.id)) : []).filter((name) => name.endsWith(".webp")));
+    const deckDir = deck.assetDir || path.join(ASSETS_DIR, deck.id);
+    const files = new Set((fs.existsSync(deckDir) ? fs.readdirSync(deckDir) : []).filter((name) => name.endsWith(".webp")));
     for (const card of deck.cards) if (!files.has(card.file)) problems.push(`${deck.id}: нет ${card.file}`);
     if (files.size !== deck.cards.length) problems.push(`${deck.id}: файлов ${files.size}, карт ${deck.cards.length}`);
   }

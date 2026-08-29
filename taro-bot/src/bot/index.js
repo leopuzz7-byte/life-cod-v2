@@ -11,6 +11,7 @@ const { SPHERES, sphereCards, concernText } = require("../engine/spheres");
 const { THEMES, themeById, drawArcana, fallbackReveal, today } = require("../engine/tarot");
 const deck = require("../engine/deck78");
 const paidDecks = require("../engine/paidDecks");
+const taroCredits = require("../engine/taroCredits");
 const { renderThemeCards } = require("../render/theme");
 const { renderDeckChoice } = require("../render/deck");
 const ai = require("../ai/reading");
@@ -269,7 +270,7 @@ bot.command("give", async (ctx) => {
   const parts = (ctx.match || "").trim().split(/\s+/);
   const targetId = parts[0];
   const plan = (parts[1] || "").toLowerCase();
-  if (!targetId || !plan) { await ctx.reply("Формат: /give ID план\nПланы: week, month, year, forever, taro\nСвой ID человек берёт командой /id."); return; }
+  if (!targetId || !plan) { await ctx.reply("Формат: /give ID план\nПланы: week, month, year, forever, taro\nТаро: /give ID TARO 5 или /give ID TARO unlimited\nБез числа выдаётся 1 расклад. Свой ID человек берёт командой /id."); return; }
   const target = getUser(targetId);
   const now = Date.now();
   const base = (target.proUntil && target.proUntil > now) ? target.proUntil : now;
@@ -277,12 +278,15 @@ bot.command("give", async (ctx) => {
   else if (plan === "month") target.proUntil = base + 30 * 86400000;
   else if (plan === "year") target.proUntil = base + 365 * 86400000;
   else if (plan === "forever") target.proUntil = now + 100 * 365 * 86400000;
-  else if (plan === "taro") target.taroFree = (target.taroFree || 0) + 1;
+  else if (plan === "taro") {
+    const granted = taroCredits.grant(target, parts[2] || "1");
+    if (!granted) { await ctx.reply("Для TARO укажи целое число от 1 или unlimited. Например: /give ID TARO 5"); return; }
+  }
   else { await ctx.reply("Не понял план. Доступно: week, month, year, forever, taro."); return; }
   saveUser(target);
-  const human = { week: "подписка на неделю", month: "подписка на месяц", year: "подписка на год", forever: "бессрочная подписка", taro: "бесплатный таро-расклад" }[plan];
+  const human = plan === "taro" ? `таро-расклады, доступно: ${taroCredits.balance(target)}` : { week: "подписка на неделю", month: "подписка на месяц", year: "подписка на год", forever: "бессрочная подписка" }[plan];
   await ctx.reply(`Готово. Выдал: ${human}, пользователю ${targetId}.`);
-  try { await bot.api.sendMessage(targetId, plan === "taro" ? "Надежда открыла тебе бесплатный таро-расклад. Загляни в меню, кнопка «Таро расклад»." : "Надежда открыла тебе подписку. Чат со мной теперь без ограничений."); } catch (_) {}
+  try { await bot.api.sendMessage(targetId, plan === "taro" ? `Надежда открыла тебе доступ к таро-раскладам. Доступно: ${taroCredits.balance(target)}. Загляни в меню, кнопка «Таро расклад».` : "Надежда открыла тебе подписку. Чат со мной теперь без ограничений."); } catch (_) {}
 });
 bot.command("help", async (ctx) => {
   await ctx.reply("Я бот Надежды. Внизу есть меню с кнопками, если его не видно, нажми на значок с квадратиками справа от поля ввода.\n\nБыстрые команды: /menu меню, /taro расклад, /chat чат.\n\nЕсли что-то не работает, напиши в техподдержку " + config.contacts.support, { reply_markup: quickKb() });
@@ -434,7 +438,7 @@ async function handleMenu(ctx, label) {
     u.step = "sp_sphere";
     u.spread = { deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "", cards: [], revealed: 0, extra: 0, extraCards: [] };
     saveUser(u);
-    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nСначала определим точный запрос. Бот подберёт одну из пяти специализированных колод, затем откроет три карты по подходящим позициям. После итогового разбора можно задать до трёх уточняющих вопросов на той же колоде.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
+    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nСначала определим точный запрос. Бот предложит подходящую колоду, а при желании можно выбрать любую из шести, включая авторскую колоду Надежды. Затем откроются три карты по подходящим позициям. После итогового разбора можно задать до трёх уточняющих вопросов на той же колоде.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
     await showSphereChoice(ctx);
   } else if (label === L.arkan) {
     await sendCircle(ctx, "arkan");
@@ -561,7 +565,7 @@ bot.callbackQuery("spchange", async (ctx) => {
   await ctx.reply("Можно выбрать колоду вручную. Специализация изменится, но вопрос останется прежним.", { reply_markup: kb });
 });
 
-bot.callbackQuery(/^spdeck:(thoth|lenormand|ludy-lescot|deviant-moon|golden-taurus)$/, async (ctx) => {
+bot.callbackQuery(/^spdeck:(author|thoth|lenormand|ludy-lescot|deviant-moon|golden-taurus)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
   if (!u.spread || !u.spread.question) { await showSphereChoice(ctx); return; }
@@ -582,8 +586,8 @@ bot.callbackQuery("spok", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
   if (!u.spread || !u.spread.question || (!u.spread.deckId && !u.spread.sphere)) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
-  if ((u.taroFree || 0) > 0) {
-    u.taroFree = u.taroFree - 1; u.pay = null; saveUser(u);
+  if (taroCredits.hasCredit(u)) {
+    taroCredits.consume(u); u.pay = null; saveUser(u);
     track(ctx.from.id, "paid", { product: config.taro.product, free: true });
     await startRitual(ctx);
     return;

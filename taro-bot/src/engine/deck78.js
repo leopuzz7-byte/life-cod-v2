@@ -4,6 +4,7 @@
 // Нумерология-матрица нумерует арканы по своему (Шут = 22), для неё есть
 // отдельный маппер majorFileByMatrixNum. Строго без длинных тире и стрелок.
 const path = require("path");
+const { randomInt } = require("crypto");
 
 const DECK_DIR = path.join(__dirname, "..", "..", "assets", "deck");
 
@@ -83,11 +84,11 @@ function resolve(card) {
 }
 
 // Случайная карта из 78 (на каждое нажатие новая).
-function drawCard() { return DECK[Math.floor(Math.random() * DECK.length)]; }
+function drawCard() { return DECK[randomInt(DECK.length)]; }
 // n разных карт.
 function drawCards(n) {
   const idx = new Set();
-  while (idx.size < n) idx.add(Math.floor(Math.random() * DECK.length));
+  while (idx.size < n) idx.add(randomInt(DECK.length));
   return [...idx].map((i) => DECK[i]);
 }
 

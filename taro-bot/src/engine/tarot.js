@@ -1,5 +1,6 @@
 // Таро-ветка: темы вопроса и вытягивание карты.
 // Карта всегда случайная: любое из чисел 1-5 крутит рандом из 22 арканов.
+const { randomInt } = require("crypto");
 const { getArcana } = require("./arcana");
 
 const THEMES = [
@@ -12,7 +13,7 @@ function themeById(id) { return THEMES.find((t) => t.id === id); }
 function today() { return new Date().toISOString().slice(0, 10); }
 
 // Всегда случайный аркан 1..22 (на каждое нажатие новый).
-function drawArcana() { return Math.floor(Math.random() * 22) + 1; }
+function drawArcana() { return randomInt(1, 23); }
 
 function fallbackReveal(arcanaNum) {
   const a = getArcana(arcanaNum);
