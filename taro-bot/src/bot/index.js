@@ -10,6 +10,7 @@ const { getArcana } = require("../engine/arcana");
 const { SPHERES, sphereCards, concernText } = require("../engine/spheres");
 const { THEMES, themeById, drawArcana, fallbackReveal, today } = require("../engine/tarot");
 const deck = require("../engine/deck78");
+const paidDecks = require("../engine/paidDecks");
 const { renderThemeCards } = require("../render/theme");
 const { renderDeckChoice } = require("../render/deck");
 const ai = require("../ai/reading");
@@ -121,28 +122,101 @@ let deckCache = null;
 async function deckImage() { if (!deckCache) deckCache = await renderDeckChoice(5, { title: "Выбери карту", subtitle: "ту, к которой тянет" }); return deckCache; }
 
 // ---------- цифровой расклад Таро (3 карты + уточняющие) ----------
-const SPREADS = {
+// Оставлено только для безопасного завершения старых раскладов, начатых до обновления.
+const LEGACY_SPREADS = {
   love:   { label: "Любовь и отношения", emoji: "💞", positions: ["Ты", "Партнёр", "Куда идут отношения"] },
   money:  { label: "Деньги и работа", emoji: "💰", positions: ["Где ты сейчас", "Что мешает или помогает", "Исход"] },
   choice: { label: "Ситуация и выбор", emoji: "🧭", positions: ["Суть ситуации", "Что влияет", "Совет и исход"] },
   future: { label: "Прогноз", emoji: "🌙", positions: ["Прошлое", "Настоящее", "Будущее"] },
 };
-function draw3() { return deck.drawCards(3); }
-function drawOne() { return deck.drawCard(); }
+const LEGACY_DECK_PROFILE = {
+  id: "classic", label: "Классическая колода Таро",
+  profile: "универсальный расклад",
+  method: "Связывай классические значения арканов с вопросом и позициями расклада.",
+};
+
+function isNewPaidSpread(u) {
+  return !!(u && u.spread && u.spread.deckVersion === 2 && paidDecks.DECKS[u.spread.deckId]);
+}
+function spreadDeckProfile(u) {
+  return isNewPaidSpread(u) ? paidDecks.getDeck(u.spread.deckId) : LEGACY_DECK_PROFILE;
+}
+function spreadTopicLabel(u) {
+  if (isNewPaidSpread(u)) {
+    const category = paidDecks.getCategory(u.spread.category);
+    const intent = paidDecks.getIntent(u.spread.intentId);
+    return intent ? intent.label : category ? category.label : "Жизненная ситуация";
+  }
+  return (LEGACY_SPREADS[u.spread && u.spread.sphere] || LEGACY_SPREADS.choice).label;
+}
+function spreadPositions(u) {
+  if (isNewPaidSpread(u)) return paidDecks.getDeck(u.spread.deckId).positions;
+  return (LEGACY_SPREADS[u.spread && u.spread.sphere] || LEGACY_SPREADS.choice).positions;
+}
+function spreadCardName(u, card) {
+  return isNewPaidSpread(u) ? paidDecks.cardName(u.spread.deckId, card) : deck.cardName(card);
+}
+function spreadCardInfo(u, card) {
+  return isNewPaidSpread(u) ? paidDecks.cardInfo(u.spread.deckId, card) : deck.cardInfo(card);
+}
+function spreadCardFile(u, card) {
+  return isNewPaidSpread(u) ? paidDecks.cardPath(u.spread.deckId, card) : deck.cardFile(card);
+}
+function drawSpreadCards(u, count, excluded = []) {
+  return isNewPaidSpread(u) ? paidDecks.drawCards(u.spread.deckId, count, excluded) : (count === 1 ? [deck.drawCard()] : deck.drawCards(count));
+}
 let deck3Cache = null;
 async function deck3Image() { if (!deck3Cache) deck3Cache = await renderDeckChoice(3, { title: "Выбери карту", subtitle: "ту, к которой тянет" }); return deck3Cache; }
 async function showSphereChoice(ctx) {
   const kb = new InlineKeyboard();
-  Object.entries(SPREADS).forEach(([id, sp]) => kb.text(`${sp.emoji} ${sp.label}`, `sp:${id}`).row());
-  await ctx.reply("Выбери, о чём гадаем.", { reply_markup: kb });
+  paidDecks.CATEGORIES.forEach((category) => kb.text(`${category.emoji} ${category.label}`, `spcat:${category.id}`).row());
+  await ctx.reply("Выбери главную тему. Затем я уточню, что именно хочется узнать, и предложу подходящую колоду.", { reply_markup: kb });
+}
+async function showIntentChoice(ctx, categoryId) {
+  const category = paidDecks.getCategory(categoryId);
+  if (!category) { await showSphereChoice(ctx); return; }
+  if (categoryId === "custom") {
+    const u = getUser(ctx.from.id);
+    u.spread.category = "custom"; u.spread.intentId = "custom"; u.step = "sp_question"; saveUser(u);
+    await ctx.reply("Напиши свой вопрос одним сообщением. Я определю его суть и предложу колоду, которая лучше всего с ним работает.");
+    return;
+  }
+  const kb = new InlineKeyboard();
+  category.intents.forEach((intentId) => kb.text(paidDecks.getIntent(intentId).label, `spint:${intentId}`).row());
+  kb.text("← Другие темы", "spback");
+  await ctx.reply(`${category.emoji} <b>${category.label}</b>\n\nЧто именно хочется понять?`, { parse_mode: "HTML", reply_markup: kb });
+}
+function confirmKeyboard() {
+  return new InlineKeyboard()
+    .text("Продолжить", "spok").row()
+    .text("Выбрать другую колоду", "spchange").row()
+    .text("Изменить вопрос", "spedit").text("Сменить тему", "spback");
+}
+async function showSpreadConfirmation(ctx) {
+  const u = getUser(ctx.from.id);
+  const profile = paidDecks.getDeck(u.spread.deckId);
+  const category = paidDecks.getCategory(u.spread.category);
+  const intent = paidDecks.getIntent(u.spread.intentId);
+  const reason = u.spread.routeReason ? `\n\nПочему эта колода: ${esc(u.spread.routeReason)}` : "";
+  const healthQuestion = /здоров|самочув|болит|симптом|лечен|диагноз/i.test(u.spread.question || "");
+  const health = (intent && intent.healthDisclaimer) || healthQuestion ? "\n\nВажно: это разбор общего состояния и энергетического фона, не медицинская диагностика." : "";
+  await ctx.reply(
+    `<b>Проверим перед раскладом</b>\n\nТема: ${esc(category ? category.label : "Свой вопрос")}\nЗапрос: ${esc(intent ? intent.label : "Свой вопрос")}\nВопрос: «${esc(u.spread.question)}»\nКолода: <b>${esc(profile.label)}</b>${reason}${health}`,
+    { parse_mode: "HTML", reply_markup: confirmKeyboard() }
+  );
 }
 async function startRitual(ctx) {
   const u = getUser(ctx.from.id);
-  u.spread = u.spread || {}; u.spread.cards = draw3(); u.spread.revealed = 0; u.spread.extra = 0; u.step = "sp_reading"; saveUser(u);
+  u.spread = u.spread || {};
+  if (!u.spread.deckId || !paidDecks.DECKS[u.spread.deckId]) u.spread.deckId = "thoth";
+  u.spread.deckVersion = 2;
+  u.spread.cards = paidDecks.drawCards(u.spread.deckId, 3);
+  u.spread.revealed = 0; u.spread.extra = 0; u.spread.extraCards = []; u.spread.firstChosen = false; delete u.spread.revealingAt; u.step = "sp_reading"; saveUser(u);
   // тасовка колоды, затем три карты рубашкой вверх
   await waiting(ctx);
   const img = await deck3Image();
-  await ctx.replyWithPhoto(new InputFile(img), { caption: "Перед тобой три карты рубашкой вверх. Выбери одну, ту, к которой тянет.", reply_markup: new InlineKeyboard().text("Карта 1", "sprev").text("Карта 2", "sprev").text("Карта 3", "sprev") });
+  const profile = paidDecks.getDeck(u.spread.deckId);
+  await ctx.replyWithPhoto(new InputFile(img), { caption: `Колода «${profile.label}» перетасована. Перед тобой три карты рубашкой вверх. Выбери ту, к которой тянет. Выбранная карта откроется первой.`, reply_markup: new InlineKeyboard().text("Карта 1", "spfirst:0").text("Карта 2", "spfirst:1").text("Карта 3", "spfirst:2") });
 }
 async function showExtraPrompt(ctx) {
   const u = getUser(ctx.from.id);
@@ -357,8 +431,10 @@ async function handleMenu(ctx, label) {
   track(ctx.from.id, "menu_click", { button: label });
   if (label === L.tarot) {
     const t = config.taro;
-    u.step = "sp_sphere"; u.spread = { sphere: null, question: "", cards: [], revealed: 0, extra: 0 }; saveUser(u);
-    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nГлубокий разбор на трёх картах под твой конкретный вопрос, карта за картой, плюс до трёх уточняющих вопросов.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
+    u.step = "sp_sphere";
+    u.spread = { deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "", cards: [], revealed: 0, extra: 0, extraCards: [] };
+    saveUser(u);
+    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nСначала определим точный запрос. Бот подберёт одну из пяти специализированных колод, затем откроет три карты по подходящим позициям. После итогового разбора можно задать до трёх уточняющих вопросов на той же колоде.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
     await showSphereChoice(ctx);
   } else if (label === L.arkan) {
     await sendCircle(ctx, "arkan");
@@ -432,24 +508,80 @@ bot.callbackQuery("chk:sub", async (ctx) => {
     await ctx.reply("Оплату пока не вижу. Если только что оплатил, подожди минуту и нажми ещё раз.", { reply_markup: new InlineKeyboard().text("Проверить оплату", "chk:sub") });
   }
 });
-bot.callbackQuery(/^sp:(love|money|choice|future)$/, async (ctx) => {
+bot.callbackQuery(/^spcat:(love|person|money|events|choice|path|state|custom)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
-  u.spread = u.spread || { cards: [], revealed: 0, extra: 0 };
-  u.spread.sphere = ctx.match[1]; u.step = "sp_question"; saveUser(u);
-  track(ctx.from.id, "spread_sphere", { sphere: ctx.match[1] });
-  await ctx.reply(`${SPREADS[ctx.match[1]].label}. Теперь напиши свой вопрос одним сообщением, конкретно и своими словами.`);
+  u.spread = u.spread || { deckVersion: 2, cards: [], revealed: 0, extra: 0 };
+  u.spread.deckVersion = 2; u.spread.category = ctx.match[1]; u.spread.intentId = null; u.spread.deckId = null; u.step = "sp_intent"; saveUser(u);
+  track(ctx.from.id, "spread_category", { category: ctx.match[1] });
+  await showIntentChoice(ctx, ctx.match[1]);
 });
+
+bot.callbackQuery(/^spint:([a-z_]+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const intent = paidDecks.getIntent(ctx.match[1]);
+  if (!intent || !intent.deckId) { await ctx.reply("Не удалось определить запрос. Выбери тему ещё раз."); await showSphereChoice(ctx); return; }
+  const u = getUser(ctx.from.id);
+  u.spread = u.spread || { deckVersion: 2 };
+  u.spread.deckVersion = 2; u.spread.intentId = ctx.match[1]; u.spread.deckId = intent.deckId;
+  u.spread.routeReason = `Запрос «${intent.label}» точнее всего раскрывает специализация этой колоды.`;
+  u.step = "sp_question"; saveUser(u);
+  track(ctx.from.id, "spread_intent", { intent: ctx.match[1], deck: intent.deckId });
+  await ctx.reply(`${intent.label}. Теперь напиши конкретный вопрос одним сообщением. Чем яснее формулировка, тем точнее будет разбор.`);
+});
+
+bot.callbackQuery("spback", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  u.step = "sp_sphere"; u.spread = { deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "", cards: [], revealed: 0, extra: 0, extraCards: [] }; saveUser(u);
+  await showSphereChoice(ctx);
+});
+
+// Совместимость со старыми сообщениями подтверждения.
 bot.callbackQuery("spno", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
-  u.step = "sp_sphere"; u.spread = { sphere: null, question: "", cards: [], revealed: 0, extra: 0 }; saveUser(u);
+  u.step = "sp_sphere"; u.spread = { deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "", cards: [], revealed: 0, extra: 0, extraCards: [] }; saveUser(u);
   await showSphereChoice(ctx);
 });
+
+bot.callbackQuery("spedit", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread) { await showSphereChoice(ctx); return; }
+  u.step = "sp_question"; saveUser(u);
+  await ctx.reply("Напиши исправленный вопрос одним сообщением.");
+});
+
+bot.callbackQuery("spchange", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const kb = new InlineKeyboard();
+  Object.values(paidDecks.DECKS).forEach((profile) => kb.text(profile.label, `spdeck:${profile.id}`).row());
+  kb.text("← Оставить рекомендацию", "spconfirm");
+  await ctx.reply("Можно выбрать колоду вручную. Специализация изменится, но вопрос останется прежним.", { reply_markup: kb });
+});
+
+bot.callbackQuery(/^spdeck:(thoth|lenormand|ludy-lescot|deviant-moon|golden-taurus)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.question) { await showSphereChoice(ctx); return; }
+  u.spread.deckId = ctx.match[1]; u.spread.deckVersion = 2; u.spread.routeReason = "Колода выбрана вручную."; u.step = "sp_confirm"; saveUser(u);
+  track(ctx.from.id, "spread_deck_override", { deck: ctx.match[1] });
+  await showSpreadConfirmation(ctx);
+});
+
+bot.callbackQuery("spconfirm", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.question || !u.spread.deckId) { await showSphereChoice(ctx); return; }
+  u.step = "sp_confirm"; saveUser(u);
+  await showSpreadConfirmation(ctx);
+});
+
 bot.callbackQuery("spok", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
-  if (!u.spread || !u.spread.sphere || !u.spread.question) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
+  if (!u.spread || !u.spread.question || (!u.spread.deckId && !u.spread.sphere)) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
   if ((u.taroFree || 0) > 0) {
     u.taroFree = u.taroFree - 1; u.pay = null; saveUser(u);
     track(ctx.from.id, "paid", { product: config.taro.product, free: true });
@@ -477,36 +609,58 @@ bot.callbackQuery("chk:taro", async (ctx) => {
     await ctx.reply("Оплату пока не вижу. Если только что оплатил, подожди минуту и нажми ещё раз.", { reply_markup: new InlineKeyboard().text("Проверить оплату", "chk:taro") });
   }
 });
-bot.callbackQuery("sprev", async (ctx) => {
-  await ctx.answerCallbackQuery();
+async function revealNextSpreadCard(ctx) {
   const u = getUser(ctx.from.id);
   if (!u.spread || !u.spread.cards || u.spread.cards.length !== 3) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
+  if (u.spread.revealingAt && Date.now() - u.spread.revealingAt < 120000) return;
   const idx = u.spread.revealed || 0;
   if (idx >= 3) return;
+  u.spread.revealingAt = Date.now(); saveUser(u);
   const card = u.spread.cards[idx];
-  const sp = SPREADS[u.spread.sphere];
-  const pos = sp.positions[idx];
+  const positions = spreadPositions(u);
+  const pos = positions[idx];
+  const topicLabel = spreadTopicLabel(u);
+  const profile = spreadDeckProfile(u);
   await ctx.replyWithChatAction("upload_photo");
-  try { const cf = deck.cardFile(card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
+  try { const cf = spreadCardFile(u, card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
   const prev = u.spread.cards.slice(0, idx);
-  const txt = await ai.generateSpreadCard(sp.label, u.spread.question, pos, idx, deck.cardInfo(card), prev.map(deck.cardInfo));
-  const name = deck.cardName(card);
+  const txt = await ai.generateSpreadCard(profile, topicLabel, u.spread.question, pos, idx, spreadCardInfo(u, card), prev.map((item) => spreadCardInfo(u, item)));
+  const name = spreadCardName(u, card);
   const ordinal = ["Первая карта", "Вторая карта", "Третья карта"][idx];
-  await ctx.reply(`<b>${ordinal}, ${esc(pos.toLowerCase())}: ${esc(name)}</b>\n\n${esc(txt || (name + " говорит о многом. Прислушайся к первому чувству."))}`, { parse_mode: "HTML" });
-  u.spread.revealed = idx + 1; saveUser(u);
-  track(ctx.from.id, "spread_card", { idx: idx + 1 });
+  await ctx.reply(`<b>${ordinal}, ${esc(pos.toLowerCase())}: ${esc(name)}</b>\n\n${esc(txt || (name + " показывает важную часть ситуации. Сопоставь её с тем, что происходит в реальности."))}`, { parse_mode: "HTML" });
+  u.spread.revealed = idx + 1; delete u.spread.revealingAt; saveUser(u);
+  track(ctx.from.id, "spread_card", { idx: idx + 1, deck: u.spread.deckId || "classic" });
   if (u.spread.revealed < 3) {
     await sleep(1500);
     await ctx.reply("Готова открыть следующую карту.", { reply_markup: new InlineKeyboard().text("Открыть ещё карту", "sprev") });
   } else {
     await sleep(700);
     await ctx.replyWithChatAction("typing");
-    const fin = await ai.generateSpreadFinal(sp.label, u.spread.question, u.spread.cards.map(deck.cardInfo), sp.positions);
+    const fin = await ai.generateSpreadFinal(profile, topicLabel, u.spread.question, u.spread.cards.map((item) => spreadCardInfo(u, item)), positions);
     if (fin) await ctx.reply(`<b>Свод</b>\n\n${esc(fin)}`, { parse_mode: "HTML" });
     await sleep(600);
     await showExtraPrompt(ctx);
-    track(ctx.from.id, "spread_done", {});
+    track(ctx.from.id, "spread_done", { deck: u.spread.deckId || "classic" });
   }
+}
+
+bot.callbackQuery(/^spfirst:([0-2])$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.cards || u.spread.cards.length !== 3) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
+  if (u.spread.firstChosen || (u.spread.revealed || 0) > 0) return;
+  const selectedIndex = Number(ctx.match[1]);
+  const selected = u.spread.cards.splice(selectedIndex, 1)[0];
+  u.spread.cards.unshift(selected); u.spread.firstChosen = true; saveUser(u);
+  track(ctx.from.id, "spread_first_choice", { selected: selectedIndex + 1, deck: u.spread.deckId });
+  await revealNextSpreadCard(ctx);
+});
+
+bot.callbackQuery("sprev", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (isNewPaidSpread(u) && !u.spread.firstChosen) { await ctx.reply("Сначала выбери одну из трёх закрытых карт."); return; }
+  await revealNextSpreadCard(ctx);
 });
 bot.callbackQuery("spask", async (ctx) => {
   await ctx.answerCallbackQuery();
@@ -568,22 +722,39 @@ bot.on("message:text", async (ctx) => {
   if (u.step === "sp_question") {
     const q = text.trim().slice(0, 300);
     if (q.length < 3) { await ctx.reply("Напиши вопрос чуть подробнее, одним сообщением."); return; }
-    u.spread = u.spread || {}; u.spread.question = q; u.step = "sp_confirm"; saveUser(u);
-    const sp = SPREADS[u.spread.sphere];
-    await ctx.reply(`Проверим. Ниша: ${sp.label}. Вопрос: «${esc(q)}». Всё верно?`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().text("Да, всё верно", "spok").row().text("Нет, изменить", "spno") });
+    u.spread = u.spread || { deckVersion: 2, category: "custom", intentId: "custom" };
+    u.spread.question = q; u.spread.deckVersion = 2;
+    if (!u.spread.deckId || u.spread.intentId === "custom") {
+      await ctx.replyWithChatAction("typing");
+      const localDeckId = paidDecks.localRoute(q);
+      const routed = await ai.selectPaidDeck(q);
+      const acceptedRoute = routed && routed.confidence >= 0.62;
+      u.spread.deckId = acceptedRoute ? routed.deckId : localDeckId;
+      u.spread.routeReason = acceptedRoute && routed.reason
+        ? routed.reason
+        : `По смыслу вопроса лучше всего подходит специализация колоды «${paidDecks.getDeck(u.spread.deckId).label}».`;
+    }
+    if (!paidDecks.DECKS[u.spread.deckId]) u.spread.deckId = "thoth";
+    u.step = "sp_confirm"; saveUser(u);
+    track(ctx.from.id, "spread_deck_route", { deck: u.spread.deckId, intent: u.spread.intentId || "custom" });
+    await showSpreadConfirmation(ctx);
     return;
   }
   if (u.step === "sp_extra_q") {
-    if (!u.spread || !u.spread.sphere) { u.step = "menu"; saveUser(u); await showMenu(ctx); return; }
+    if (!u.spread || (!u.spread.deckId && !u.spread.sphere)) { u.step = "menu"; saveUser(u); await showMenu(ctx); return; }
     const q = text.trim().slice(0, 300);
-    const card = drawOne();
+    if (q.length < 3) { await ctx.reply("Напиши уточняющий вопрос чуть подробнее."); return; }
+    const excluded = [...(u.spread.cards || []), ...(u.spread.extraCards || [])];
+    const card = drawSpreadCards(u, 1, excluded)[0];
     await ctx.replyWithChatAction("upload_photo");
-    try { const cf = deck.cardFile(card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
-    const ans = await ai.generateSpreadExtra(SPREADS[u.spread.sphere].label, u.spread.question, deck.cardInfo(card), q);
-    const name = deck.cardName(card);
+    try { const cf = spreadCardFile(u, card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
+    const profile = spreadDeckProfile(u);
+    const ans = await ai.generateSpreadExtra(profile, spreadTopicLabel(u), u.spread.question, spreadCardInfo(u, card), q, (u.spread.cards || []).map((item) => spreadCardInfo(u, item)));
+    const name = spreadCardName(u, card);
     await ctx.reply(`<b>${esc(name)}</b>\n\n${esc(ans || "Карта отвечает мягко, прислушайся к первому чувству.")}`, { parse_mode: "HTML" });
+    u.spread.extraCards = (u.spread.extraCards || []).concat(card);
     u.spread.extra = (u.spread.extra || 0) + 1; u.step = "sp_reading"; saveUser(u);
-    track(ctx.from.id, "spread_extra", { n: u.spread.extra });
+    track(ctx.from.id, "spread_extra", { n: u.spread.extra, deck: u.spread.deckId || "classic" });
     await sleep(800);
     await showExtraPrompt(ctx);
     return;
