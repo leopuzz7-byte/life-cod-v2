@@ -68,7 +68,7 @@ export function Header() {
                 "h-10 px-3 sm:px-4 rounded-full flex items-center gap-1.5 transition-all duration-200 border text-sm font-medium",
                 isMyAnalysesActive
                   ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm dark:bg-[#D5A95B] dark:text-[#071326] dark:border-[#E6C77E]"
-                  : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/12"
+                  : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/10"
               )}
               aria-label={t("nav.myAnalyses")}
             >
@@ -86,7 +86,7 @@ export function Header() {
               "w-10 h-10 rounded-full hidden sm:flex items-center justify-center transition-all duration-200 border",
               location.pathname === "/support"
                 ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm dark:bg-[#D5A95B] dark:text-[#071326] dark:border-[#E6C77E]"
-                : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/12"
+                : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/10"
             )}
             aria-label={t("nav.support")}
           >
@@ -101,7 +101,7 @@ export function Header() {
                   "h-10 px-3 sm:px-4 rounded-full flex items-center gap-2 transition-all duration-200 border text-sm font-medium",
                   location.pathname === "/profile"
                     ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm dark:bg-[#D5A95B] dark:text-[#071326] dark:border-[#E6C77E]"
-                    : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/12"
+                    : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/10"
                 )}
               >
                 <User className="w-4 h-4" />
@@ -110,7 +110,7 @@ export function Header() {
             ) : (
               <Link
                 to="/login"
-                className="h-10 px-4 rounded-full flex items-center gap-2 transition-all duration-200 border bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] text-sm font-medium dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/12"
+                className="h-10 px-4 rounded-full flex items-center gap-2 transition-all duration-200 border bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] text-sm font-medium dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/10"
               >
                 <LogIn className="w-4 h-4" />
                 <span>{t("nav.login")}</span>
@@ -121,7 +121,7 @@ export function Header() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#0F2044] text-[#0F2044] transition-all active:scale-95 dark:border-[#D5A95B]/70 dark:text-[#E7C779] dark:bg-[#071326]/55"
+          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#0F2044] text-[#0F2044] transition-all active:scale-95 dark:border-[#D5A95B]/70 dark:text-[#E7C779] dark:bg-[#071326]/50"
           onClick={() => setMenuOpen(true)}
           aria-label="Меню"
         >
@@ -140,7 +140,7 @@ export function Header() {
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#0F2044]/15 dark:border-[#D5A95B]/20">
               <img src={logo} alt="logo" className="h-9 w-auto" />
-              <button onClick={closeMenu} className="w-9 h-9 flex items-center justify-center rounded-full border border-[#0F2044]/40 text-[#0F2044] transition-all active:scale-95 dark:border-[#D5A95B]/45 dark:text-[#E7C779]">
+              <button onClick={closeMenu} className="w-9 h-9 flex items-center justify-center rounded-full border border-[#0F2044]/40 text-[#0F2044] transition-all active:scale-95 dark:border-[#D5A95B]/50 dark:text-[#E7C779]">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -149,8 +149,8 @@ export function Header() {
                 <Link key={item.path} to={item.path} onClick={closeMenu}
                   className={cn("px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                     location.pathname === item.path
-                      ? "bg-[#0F2044]/10 text-[#0F2044] dark:bg-[#D5A95B]/14 dark:text-[#F1D9B0]"
-                      : "text-[#0F2044]/80 hover:text-[#0F2044] hover:bg-[#0F2044]/5 dark:text-[#D8C7AE]/80 dark:hover:text-[#F3DFC0] dark:hover:bg-[#D5A95B]/8"
+                      ? "bg-[#0F2044]/10 text-[#0F2044] dark:bg-[#D5A95B]/20 dark:text-[#F1D9B0]"
+                      : "text-[#0F2044]/80 hover:text-[#0F2044] hover:bg-[#0F2044]/5 dark:text-[#D8C7AE]/80 dark:hover:text-[#F3DFC0] dark:hover:bg-[#D5A95B]/10"
                   )}
                 >{item.label}</Link>
               ))}

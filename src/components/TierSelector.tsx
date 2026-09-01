@@ -41,16 +41,16 @@ export function TierSelector({
           type="button"
           onClick={() => onSelectTier("basic")}
           className={cn(
-            "relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
+            "tier-option relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
             selectedTier === "basic"
-              ? "bg-[#f5f1ec] border-[#0F2044] shadow-[0_4px_16px_rgba(30,8,0,0.12)] dark:bg-[#0B1A33]/88 dark:border-[#D5A95B] dark:shadow-[0_5px_20px_rgba(0,0,0,0.32)]"
-              : "bg-white border-[#1a3060] hover:border-[#8B5E1A] dark:bg-[#071326]/72 dark:border-[#D5A95B]/35 dark:hover:border-[#D5A95B]/70"
+              ? "tier-option-selected bg-[#f5f1ec] border-[#0F2044] shadow-[0_4px_16px_rgba(30,8,0,0.12)] dark:shadow-[0_5px_20px_rgba(0,0,0,0.32)]"
+              : "bg-white border-[#1a3060] hover:border-[#8B5E1A] dark:hover:border-[#D5A95B]/70"
           )}
         >
           <div className="flex items-start gap-3">
             <div className={cn(
               "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-              selectedTier === "basic" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#1a3060]/50 dark:border-[#D5A95B]/45"
+              selectedTier === "basic" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#1a3060]/50 dark:border-[#D5A95B]/50"
             )}>
               {selectedTier === "basic" && <Check className="w-3 h-3 text-[#FFF8E7] dark:text-[#071326]" />}
             </div>
@@ -65,7 +65,7 @@ export function TierSelector({
                     "text-[10px] px-2 py-0.5 rounded-full font-medium",
                     priceBasic === 0 || config.basic.isFree
                       ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                      : "bg-blue-100 text-blue-800 dark:bg-[#D5A95B]/18 dark:text-[#E7C779]"
+                      : "bg-blue-100 text-blue-800 dark:bg-[#D5A95B]/20 dark:text-[#E7C779]"
                   )}
                 >
                   {priceBasic != null
@@ -85,16 +85,16 @@ export function TierSelector({
         type="button"
         onClick={() => onSelectTier("professional")}
         className={cn(
-          "relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
+          "tier-option relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
           selectedTier === "professional"
-            ? "bg-[#f5f1ec] border-[#0F2044] shadow-[0_4px_16px_rgba(30,8,0,0.12)] dark:bg-[#0B1A33]/88 dark:border-[#D5A95B] dark:shadow-[0_5px_20px_rgba(0,0,0,0.32)]"
-            : "bg-white border-[#1a3060] hover:border-[#8B5E1A] dark:bg-[#071326]/72 dark:border-[#D5A95B]/35 dark:hover:border-[#D5A95B]/70"
+            ? "tier-option-selected bg-[#f5f1ec] border-[#0F2044] shadow-[0_4px_16px_rgba(30,8,0,0.12)] dark:shadow-[0_5px_20px_rgba(0,0,0,0.32)]"
+            : "bg-white border-[#1a3060] hover:border-[#8B5E1A] dark:hover:border-[#D5A95B]/70"
         )}
       >
         <div className="flex items-start gap-3">
           <div className={cn(
             "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-            selectedTier === "professional" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#1a3060]/50 dark:border-[#D5A95B]/45"
+            selectedTier === "professional" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#1a3060]/50 dark:border-[#D5A95B]/50"
           )}>
             {selectedTier === "professional" && <Check className="w-3 h-3 text-[#FFF8E7] dark:text-[#071326]" />}
           </div>

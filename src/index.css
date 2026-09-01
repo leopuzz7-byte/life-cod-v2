@@ -360,6 +360,66 @@
   border: 1px solid rgba(213, 169, 91, 0.18);
 }
 
+.dark .methodology-choice {
+  background: rgba(7, 19, 38, 0.84) !important;
+  border-color: rgba(213, 169, 91, 0.40) !important;
+}
+
+.dark .methodology-choice.is-selected {
+  background: rgba(11, 26, 51, 0.96) !important;
+  border-color: #D5A95B !important;
+}
+
+.dark .tier-option {
+  background: rgba(7, 19, 38, 0.86) !important;
+  border-color: rgba(213, 169, 91, 0.42) !important;
+}
+
+.dark .tier-option-selected {
+  background: linear-gradient(145deg, rgba(14, 32, 61, 0.98), rgba(6, 17, 37, 0.96)) !important;
+  border-color: #D5A95B !important;
+}
+
+.professional-info-panel {
+  background: rgba(255, 255, 255, 0.30);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  box-shadow: 0 2px 12px rgba(15, 32, 68, 0.08);
+}
+
+.professional-info-title {
+  color: #0F2044;
+}
+
+.professional-info-body {
+  color: rgba(15, 32, 68, 0.70);
+}
+
+.dark .professional-info-panel {
+  background: rgba(8, 23, 47, 0.78);
+  border-color: rgba(213, 169, 91, 0.42);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.24);
+}
+
+.dark .professional-info-title {
+  color: #F3DFC0;
+}
+
+.dark .professional-info-body {
+  color: #D8C7AE;
+}
+
+.name-energy-form {
+  background: #fdfaf5;
+  border: 1.5px solid #C4985A;
+}
+
+.dark .name-energy-form {
+  background: rgba(7, 19, 38, 0.88);
+  border-color: rgba(213, 169, 91, 0.58);
+}
+
 .method-card-liquid-glass {
   position: absolute;
   inset-inline: 0;

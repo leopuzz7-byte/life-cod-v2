@@ -646,7 +646,7 @@ const Index = () => {
                         "methodology-choice relative w-full h-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "1"
                           ? "is-selected bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)] dark:bg-[#0B1A33]/90 dark:border-[#D5A95B] dark:shadow-[0_4px_20px_rgba(0,0,0,0.30)]"
-                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044] dark:bg-[#071326]/72 dark:border-[#D5A95B]/35 dark:hover:border-[#D5A95B]/70"
+                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044] dark:hover:border-[#D5A95B]/70"
                       )}
                     >
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap rounded-full uppercase tracking-[0.08em] bg-[#fdfaf5] border border-[#0F2044] text-[#0F2044] dark:bg-[#071326] dark:border-[#D5A95B] dark:text-[#E7C779]">
@@ -655,7 +655,7 @@ const Index = () => {
                       <div className="flex items-start gap-2 md:gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-                          selectedMethodology === "1" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#0F2044]/40 dark:border-[#D5A95B]/45"
+                          selectedMethodology === "1" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#0F2044]/40 dark:border-[#D5A95B]/50"
                         )}>
                           {selectedMethodology === "1" && (<Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7] dark:text-[#071326]" />)}
                         </div>
@@ -681,13 +681,13 @@ const Index = () => {
                         "methodology-choice relative w-full h-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "2"
                           ? "is-selected bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)] dark:bg-[#0B1A33]/90 dark:border-[#D5A95B] dark:shadow-[0_4px_20px_rgba(0,0,0,0.30)]"
-                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044] dark:bg-[#071326]/72 dark:border-[#D5A95B]/35 dark:hover:border-[#D5A95B]/70"
+                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044] dark:hover:border-[#D5A95B]/70"
                       )}
                     >
                       <div className="flex items-start gap-2 md:gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-                          selectedMethodology === "2" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#0F2044]/40 dark:border-[#D5A95B]/45"
+                          selectedMethodology === "2" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#0F2044]/40 dark:border-[#D5A95B]/50"
                         )}>
                           {selectedMethodology === "2" && (<Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7] dark:text-[#071326]" />)}
                         </div>
@@ -723,7 +723,7 @@ const Index = () => {
                               "group method-image-card relative rounded-xl border-[1.5px] dark:border overflow-hidden text-left w-full h-[158px] md:h-[184px] transition-all duration-300",
                               selectedMethod === method.id
                                 ? "border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.55),0_0_16px_rgba(15,32,68,0.28)] md:shadow-[0_3px_12px_rgba(15,32,68,0.22)] dark:border-[#E2BD70] dark:shadow-[0_0_0_1px_rgba(226,189,112,0.45),0_0_18px_rgba(213,169,91,0.22)]"
-                                : "border-[#0F2044]/25 md:hover:border-[#0F2044] md:hover:shadow-[0_3px_14px_rgba(15,32,68,0.16)] dark:border-[#D5A95B]/38 dark:md:hover:border-[#D5A95B]/75 dark:md:hover:shadow-[0_4px_18px_rgba(0,0,0,0.32)]"
+                                : "border-[#0F2044]/25 md:hover:border-[#0F2044] md:hover:shadow-[0_3px_14px_rgba(15,32,68,0.16)] dark:border-[#D5A95B]/40 dark:md:hover:border-[#D5A95B]/75 dark:md:hover:shadow-[0_4px_18px_rgba(0,0,0,0.32)]"
                             )}
                           >
                             <img src={img} alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-105" style={{ objectPosition: "center 32%" }} />
@@ -789,9 +789,9 @@ const Index = () => {
                       />
                       {/* What's inside Professional extended analysis (per methodology) */}
                       {selectedTier === 'professional' && currentConfig.professional && (
-                        <div className="mt-1 mb-4 px-4 py-3 rounded-xl text-xs leading-relaxed" style={{background:'rgba(255,255,255,0.30)',border:'1px solid rgba(255,255,255,0.45)',backdropFilter:'blur(16px) saturate(1.1)',WebkitBackdropFilter:'blur(16px) saturate(1.1)',boxShadow:'0 2px 12px rgba(15,32,68,0.08)'}}>
-                          <p className="font-semibold mb-1 text-[#0F2044]">{t("res.proExtendedIncluded")}</p>
-                          <p className="text-[#0F2044]/70">{selectedMethod === 'lifecod-compatibility' ? 'Все 4 числа судьбы пары (Ума, Действия, Реализации, Итога) с подробными описаниями, раскладка «состоит из» каждого числа и Общий год пары.' : selectedMethod === 'business' ? 'Числа Ума, Действия и Реализации в деловом ключе, подходящие профессии, ключевые навыки и детальная матрица.' : proExtendedDescription(selectedMethodology)}</p>
+                        <div className="professional-info-panel mt-1 mb-4 px-4 py-3 rounded-xl text-xs leading-relaxed">
+                          <p className="professional-info-title font-semibold mb-1">{t("res.proExtendedIncluded")}</p>
+                          <p className="professional-info-body">{selectedMethod === 'lifecod-compatibility' ? 'Все 4 числа судьбы пары (Ума, Действия, Реализации, Итога) с подробными описаниями, раскладка «состоит из» каждого числа и Общий год пары.' : selectedMethod === 'business' ? 'Числа Ума, Действия и Реализации в деловом ключе, подходящие профессии, ключевые навыки и детальная матрица.' : proExtendedDescription(selectedMethodology)}</p>
                         </div>
                       )}
                     </div>
@@ -807,7 +807,7 @@ const Index = () => {
                   ) : selectedMethod === "name" ? (
                     /* Name energy input (text field, not date) */
                     <div className="w-full max-w-xl mx-auto">
-                      <div className="rounded-2xl p-5 sm:p-8" style={{background:'#fdfaf5',border:'1.5px solid #C4985A'}}>
+                      <div className="name-energy-form rounded-2xl p-5 sm:p-8">
                         <div className="space-y-5">
                           <div className="space-y-2">
                             <label className="text-sm font-medium text-foreground">{t("calculator.nameToCheck")}</label>

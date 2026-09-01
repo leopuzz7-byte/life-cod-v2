@@ -15,7 +15,7 @@ export function ThemeToggle({ variant = "icon" }: ThemeToggleProps) {
 
   if (variant === "menu") {
     return (
-      <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl border border-[#0F2044]/20 dark:border-[#D5A95B]/35 bg-white/35 dark:bg-[#071326]/60">
+      <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl border border-[#0F2044]/20 dark:border-[#D5A95B]/40 bg-white/30 dark:bg-[#071326]/60">
         <div className="flex items-center gap-3 min-w-0">
           {isDark ? <Moon className="w-4 h-4 text-[#D5A95B]" /> : <Sun className="w-4 h-4 text-[#0F2044]" />}
           <div>
@@ -47,7 +47,7 @@ export function ThemeToggle({ variant = "icon" }: ThemeToggleProps) {
     <button
       type="button"
       onClick={toggleTheme}
-      className="w-10 h-10 rounded-full flex items-center justify-center border border-[#0F2044] text-[#0F2044] hover:bg-[#0F2044]/8 transition-all duration-200 active:scale-95 dark:border-[#D5A95B]/70 dark:text-[#E7C779] dark:hover:bg-[#D5A95B]/12"
+      className="w-10 h-10 rounded-full flex items-center justify-center border border-[#0F2044] text-[#0F2044] hover:bg-[#0F2044]/10 transition-all duration-200 active:scale-95 dark:border-[#D5A95B]/70 dark:text-[#E7C779] dark:hover:bg-[#D5A95B]/10"
       aria-label={actionLabel}
       title={actionLabel}
     >
