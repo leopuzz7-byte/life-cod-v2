@@ -43,22 +43,21 @@ export function TierSelector({
           className={cn(
             "relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
             selectedTier === "basic"
-              ? "bg-[#f5f1ec] shadow-[0_4px_16px_rgba(30,8,0,0.12)]"
-              : "bg-white hover:border-[#8B5E1A]"
+              ? "bg-[#f5f1ec] border-[#0F2044] shadow-[0_4px_16px_rgba(30,8,0,0.12)] dark:bg-[#0B1A33]/88 dark:border-[#D5A95B] dark:shadow-[0_5px_20px_rgba(0,0,0,0.32)]"
+              : "bg-white border-[#1a3060] hover:border-[#8B5E1A] dark:bg-[#071326]/72 dark:border-[#D5A95B]/35 dark:hover:border-[#D5A95B]/70"
           )}
-          style={{borderColor: selectedTier === "basic" ? '#0F2044' : '#1a3060'}}
         >
           <div className="flex items-start gap-3">
             <div className={cn(
               "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-              selectedTier === "basic" ? "border-[#0F2044] bg-[#0F2044]" : "border-[#1a3060]/50"
+              selectedTier === "basic" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#1a3060]/50 dark:border-[#D5A95B]/45"
             )}>
-              {selectedTier === "basic" && <Check className="w-3 h-3 text-[#FFF8E7]" />}
+              {selectedTier === "basic" && <Check className="w-3 h-3 text-[#FFF8E7] dark:text-[#071326]" />}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <Zap className="w-4 h-4 flex-shrink-0" style={{color:'#0F2044'}} />
-                <span className="font-display font-semibold text-sm" style={{color:'#2D1A00'}}>
+                <Zap className="w-4 h-4 flex-shrink-0 text-[#0F2044] dark:text-[#E7C779]" />
+                <span className="font-display font-semibold text-sm text-[#2D1A00] dark:text-[#F3DFC0]">
                   {config.basic.label}
                 </span>
                 <span
@@ -66,16 +65,15 @@ export function TierSelector({
                     "text-[10px] px-2 py-0.5 rounded-full font-medium",
                     priceBasic === 0 || config.basic.isFree
                       ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                      : ""
+                      : "bg-blue-100 text-blue-800 dark:bg-[#D5A95B]/18 dark:text-[#E7C779]"
                   )}
-                  style={!(priceBasic === 0 || config.basic.isFree) ? {background:'#dbeafe',color:'#1e40af',fontWeight:600} : {}}
                 >
                   {priceBasic != null
                     ? formatPrice(priceBasic)
                     : config.basic.isFree ? t("cfg.free") : "..."}
                 </span>
               </div>
-              <p className="text-xs leading-relaxed" style={{color:'#4A2800'}}>
+              <p className="text-xs leading-relaxed text-[#4A2800] dark:text-[#D8C7AE]">
                 {config.basic.description}
               </p>
             </div>
@@ -89,29 +87,28 @@ export function TierSelector({
         className={cn(
           "relative p-4 rounded-xl border-2 transition-all duration-200 text-left",
           selectedTier === "professional"
-            ? "bg-[#f5f1ec] shadow-[0_4px_16px_rgba(30,8,0,0.12)]"
-            : "bg-white hover:border-[#8B5E1A]"
+            ? "bg-[#f5f1ec] border-[#0F2044] shadow-[0_4px_16px_rgba(30,8,0,0.12)] dark:bg-[#0B1A33]/88 dark:border-[#D5A95B] dark:shadow-[0_5px_20px_rgba(0,0,0,0.32)]"
+            : "bg-white border-[#1a3060] hover:border-[#8B5E1A] dark:bg-[#071326]/72 dark:border-[#D5A95B]/35 dark:hover:border-[#D5A95B]/70"
         )}
-        style={{borderColor: selectedTier === "professional" ? '#0F2044' : '#1a3060'}}
       >
         <div className="flex items-start gap-3">
           <div className={cn(
             "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-            selectedTier === "professional" ? "border-[#0F2044] bg-[#0F2044]" : "border-[#1a3060]/50"
+            selectedTier === "professional" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#1a3060]/50 dark:border-[#D5A95B]/45"
           )}>
-            {selectedTier === "professional" && <Check className="w-3 h-3 text-[#FFF8E7]" />}
+            {selectedTier === "professional" && <Check className="w-3 h-3 text-[#FFF8E7] dark:text-[#071326]" />}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <Crown className="w-4 h-4 flex-shrink-0" style={{color:'#0F2044'}} />
-              <span className="font-display font-semibold text-sm" style={{color:'#2D1A00'}}>
+              <Crown className="w-4 h-4 flex-shrink-0 text-[#0F2044] dark:text-[#E7C779]" />
+              <span className="font-display font-semibold text-sm text-[#2D1A00] dark:text-[#F3DFC0]">
                 {config.professional.label}
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{background:'#0F2044',color:'#ffffff',fontWeight:600}}>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-[#0F2044] text-white dark:bg-[#D5A95B] dark:text-[#071326]">
                 {pricePro != null ? formatPrice(pricePro) : "..."}
               </span>
             </div>
-            <p className="text-xs leading-relaxed" style={{color:'#4A2800'}}>
+            <p className="text-xs leading-relaxed text-[#4A2800] dark:text-[#D8C7AE]">
               {config.professional.description}
             </p>
           </div>

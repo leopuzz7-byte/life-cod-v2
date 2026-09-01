@@ -29,3 +29,35 @@ export const cardImagesM2: Record<string, string> = {
   finance: fn,
   "success-path": sp,
 };
+
+import purposeDark from "@/assets/cards-dark/purpose.webp";
+import compatibilityDark from "@/assets/cards-dark/compatibility.webp";
+import yearDark from "@/assets/cards-dark/year.webp";
+import monthDark from "@/assets/cards-dark/month.webp";
+import dayDark from "@/assets/cards-dark/day.webp";
+import ancestralDark from "@/assets/cards-dark/ancestral.webp";
+
+export const cardImagesDark: Record<string, string> = {
+  purpose: purposeDark,
+  compatibility: compatibilityDark,
+  year: yearDark,
+  month: monthDark,
+  day: dayDark,
+  ancestral: ancestralDark,
+};
+
+import cfDark from "@/assets/cards2-dark/classic-full.webp";
+import lcDark from "@/assets/cards2-dark/lifecod-compatibility.webp";
+import bzDark from "@/assets/cards2-dark/business.webp";
+import ctDark from "@/assets/cards2-dark/contract.webp";
+import nmDark from "@/assets/cards2-dark/name.webp";
+import fnDark from "@/assets/cards2-dark/finance.webp";
+
+export const cardImagesM2Dark: Record<string, string> = {
+  "classic-full": cfDark,
+  "lifecod-compatibility": lcDark,
+  business: bzDark,
+  contract: ctDark,
+  name: nmDark,
+  finance: fnDark,
+};

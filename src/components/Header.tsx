@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { HelpCircle, LogIn, User, FolderClock, Menu, X } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { LanguageSelector } from "./LanguageSelector";
+import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function Header() {
@@ -31,7 +32,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full pt-3 px-3 sm:px-10 bg-transparent">
-      <div className="glass-brown rounded-3xl sm:rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,3,0,0.38)]">
+      <div className="glass-brown rounded-3xl sm:rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,3,0,0.38)] dark:shadow-[0_8px_34px_rgba(0,0,0,0.48)]">
       <div className="container mx-auto px-4 h-[68px] flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
@@ -50,8 +51,8 @@ export function Header() {
                 "text-sm font-semibold relative py-1 transition-all duration-200",
                 "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:transition-transform after:duration-200 after:origin-center",
                 location.pathname === item.path
-                  ? "text-[#0F2044] after:bg-[#0F2044]/50 after:scale-x-100"
-                  : "text-[#0F2044]/80 hover:text-[#0F2044] after:bg-[#0F2044]/35 after:scale-x-0 hover:after:scale-x-100"
+                  ? "text-[#0F2044] after:bg-[#0F2044]/50 after:scale-x-100 dark:text-[#F1D9B0] dark:after:bg-[#D5A95B]"
+                  : "text-[#0F2044]/80 hover:text-[#0F2044] after:bg-[#0F2044]/35 after:scale-x-0 hover:after:scale-x-100 dark:text-[#D8C7AE]/80 dark:hover:text-[#F3DFC0] dark:after:bg-[#D5A95B]/60"
               )}
             >
               {item.label}
@@ -66,8 +67,8 @@ export function Header() {
               className={cn(
                 "h-10 px-3 sm:px-4 rounded-full flex items-center gap-1.5 transition-all duration-200 border text-sm font-medium",
                 isMyAnalysesActive
-                  ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm"
-                  : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044]"
+                  ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm dark:bg-[#D5A95B] dark:text-[#071326] dark:border-[#E6C77E]"
+                  : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/12"
               )}
               aria-label={t("nav.myAnalyses")}
             >
@@ -77,14 +78,15 @@ export function Header() {
           )}
 
           <LanguageSelector variant="header" />
+          <ThemeToggle />
 
           <Link
             to="/support"
             className={cn(
               "w-10 h-10 rounded-full hidden sm:flex items-center justify-center transition-all duration-200 border",
               location.pathname === "/support"
-                ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm"
-                : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044]"
+                ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm dark:bg-[#D5A95B] dark:text-[#071326] dark:border-[#E6C77E]"
+                : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/12"
             )}
             aria-label={t("nav.support")}
           >
@@ -98,8 +100,8 @@ export function Header() {
                 className={cn(
                   "h-10 px-3 sm:px-4 rounded-full flex items-center gap-2 transition-all duration-200 border text-sm font-medium",
                   location.pathname === "/profile"
-                    ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm"
-                    : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044]"
+                    ? "bg-[#0F2044] text-white border-[#0F2044] shadow-sm dark:bg-[#D5A95B] dark:text-[#071326] dark:border-[#E6C77E]"
+                    : "bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/12"
                 )}
               >
                 <User className="w-4 h-4" />
@@ -108,7 +110,7 @@ export function Header() {
             ) : (
               <Link
                 to="/login"
-                className="h-10 px-4 rounded-full flex items-center gap-2 transition-all duration-200 border bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] text-sm font-medium"
+                className="h-10 px-4 rounded-full flex items-center gap-2 transition-all duration-200 border bg-transparent hover:bg-[#0F2044]/8 hover:shadow-md active:scale-95 text-[#0F2044] border-[#0F2044] text-sm font-medium dark:text-[#E7C779] dark:border-[#D5A95B]/70 dark:hover:bg-[#D5A95B]/12"
               >
                 <LogIn className="w-4 h-4" />
                 <span>{t("nav.login")}</span>
@@ -119,7 +121,7 @@ export function Header() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#0F2044] text-[#0F2044] transition-all active:scale-95"
+          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#0F2044] text-[#0F2044] transition-all active:scale-95 dark:border-[#D5A95B]/70 dark:text-[#E7C779] dark:bg-[#071326]/55"
           onClick={() => setMenuOpen(true)}
           aria-label="Меню"
         >
@@ -136,9 +138,9 @@ export function Header() {
             className={`absolute top-0 right-0 h-full w-72 flex flex-col glass-brown shadow-2xl ${menuClosing ? 'animate-slide-right-out' : 'animate-slide-right'}`}
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#0F2044]/15">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#0F2044]/15 dark:border-[#D5A95B]/20">
               <img src={logo} alt="logo" className="h-9 w-auto" />
-              <button onClick={closeMenu} className="w-9 h-9 flex items-center justify-center rounded-full border border-[#0F2044]/40 text-[#0F2044] transition-all active:scale-95">
+              <button onClick={closeMenu} className="w-9 h-9 flex items-center justify-center rounded-full border border-[#0F2044]/40 text-[#0F2044] transition-all active:scale-95 dark:border-[#D5A95B]/45 dark:text-[#E7C779]">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -147,35 +149,38 @@ export function Header() {
                 <Link key={item.path} to={item.path} onClick={closeMenu}
                   className={cn("px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                     location.pathname === item.path
-                      ? "bg-[#0F2044]/10 text-[#0F2044]"
-                      : "text-[#0F2044]/80 hover:text-[#0F2044] hover:bg-[#0F2044]/5"
+                      ? "bg-[#0F2044]/10 text-[#0F2044] dark:bg-[#D5A95B]/14 dark:text-[#F1D9B0]"
+                      : "text-[#0F2044]/80 hover:text-[#0F2044] hover:bg-[#0F2044]/5 dark:text-[#D8C7AE]/80 dark:hover:text-[#F3DFC0] dark:hover:bg-[#D5A95B]/8"
                   )}
                 >{item.label}</Link>
               ))}
             </nav>
-            <div className="mx-4 my-2 border-t border-[#0F2044]/15" />
+            <div className="mx-4 my-2 border-t border-[#0F2044]/15 dark:border-[#D5A95B]/20" />
             <div className="flex flex-col px-4 gap-2">
               {user && (
                 <Link to="/my-analyses" onClick={closeMenu}
                   className={cn("flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors",
-                    isMyAnalysesActive ? "bg-[#0F2044] text-white border-[#0F2044]" : "border-[#0F2044] text-[#0F2044]"
+                    isMyAnalysesActive ? "bg-[#0F2044] text-white border-[#0F2044] dark:bg-[#D5A95B] dark:text-[#071326] dark:border-[#E6C77E]" : "border-[#0F2044] text-[#0F2044] dark:border-[#D5A95B]/60 dark:text-[#E7C779]"
                   )}
                 ><FolderClock className="w-4 h-4" />{t("nav.myAnalyses")}</Link>
               )}
               {!loading && (user ? (
-                <Link to="/profile" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0F2044] text-white text-sm font-medium">
+                <Link to="/profile" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0F2044] text-white text-sm font-medium dark:bg-[#D5A95B] dark:text-[#071326]">
                   <User className="w-4 h-4" />{t("nav.profile")}
                 </Link>
               ) : (
-                <Link to="/login" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0F2044] text-white text-sm font-medium">
+                <Link to="/login" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0F2044] text-white text-sm font-medium dark:bg-[#D5A95B] dark:text-[#071326]">
                   <LogIn className="w-4 h-4" />{t("nav.login")}
                 </Link>
               ))}
             </div>
-            <div className="mx-4 my-2 border-t border-[#0F2044]/15" />
+            <div className="mx-4 my-2 border-t border-[#0F2044]/15 dark:border-[#D5A95B]/20" />
+            <div className="px-4 py-1">
+              <ThemeToggle variant="menu" />
+            </div>
             <div className="flex items-center gap-4 px-5 py-3">
               <LanguageSelector variant="default" />
-              <Link to="/support" onClick={closeMenu} className="flex items-center gap-2 text-sm text-[#0F2044]/60 hover:text-[#0F2044] transition-colors">
+              <Link to="/support" onClick={closeMenu} className="flex items-center gap-2 text-sm text-[#0F2044]/60 hover:text-[#0F2044] transition-colors dark:text-[#D8C7AE]/70 dark:hover:text-[#F3DFC0]">
                 <HelpCircle className="w-4 h-4" />{t("nav.support")}
               </Link>
             </div>

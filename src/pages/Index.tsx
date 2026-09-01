@@ -50,7 +50,8 @@ import { BusinessResult } from "@/components/BusinessResult";
 import { SuccessPathResult } from "@/components/SuccessPathResult";
 import { KeyToSuccessPathResultComponent } from "@/components/KeyToSuccessPathResult";
 import { useMysticMode } from "@/lib/mysticMode";
-import { cardImages, cardImagesM2 } from "@/lib/cardImages";
+import { useTheme } from "@/lib/theme";
+import { cardImages, cardImagesM2, cardImagesDark, cardImagesM2Dark } from "@/lib/cardImages";
 
 // Карточки методики 1 с картинками. false — вернуть золотые значки (файлы/код не удалены).
 const SHOW_CARD_IMAGES = true;
@@ -75,6 +76,7 @@ const Index = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { theme } = useTheme();
 
   // Refs for tracking analysis save state
   const lastInputRef = useRef<Record<string, unknown>>({});
@@ -562,13 +564,13 @@ const Index = () => {
                 {/* ── MOBILE: text content only (bg is set on page root) ── */}
                 <div className="md:hidden">
                   <div className="pt-6 px-6 text-center">
-                    <h1 className="font-display text-4xl leading-tight mb-4" style={{color:'#0F2044'}}>
+                    <h1 className="font-display text-4xl leading-tight mb-4 text-[#0F2044] dark:text-[#F5DFC0]">
                       Life Cod: ключ к осознанной жизни
                     </h1>
-                    <p className="text-lg leading-relaxed mb-2" style={{color:'hsl(14,60%,20%)'}}>
+                    <p className="text-lg leading-relaxed mb-2 text-[hsl(14,60%,20%)] dark:text-[#D8C7AE]">
                       Вы чувствуете, что что-то идёт не так — но не понимаете почему?
                     </p>
-                    <p className="text-lg leading-relaxed" style={{color:'hsl(14,60%,20%)'}}>
+                    <p className="text-lg leading-relaxed text-[hsl(14,60%,20%)] dark:text-[#D8C7AE]">
                       Ответ уже записан в вашей дате рождения.
                     </p>
                   </div>
@@ -578,20 +580,14 @@ const Index = () => {
                 <div className="md:hidden flex flex-col items-center gap-3 px-6 pt-6 pb-12">
                   <Link to="/register" className="w-full max-w-xs">
                     <Button
-                      className="w-full h-14 rounded-full text-base font-medium text-white"
-                      style={{
-                        background: '#0F2044',
-                        border: '1px solid #0F2044',
-                        boxShadow: '0 4px 14px rgba(15,32,68,0.25)',
-                      }}
+                      className="hero-primary-button w-full h-14 rounded-full text-base font-medium text-white"
                     >
                       Начать разбор →
                     </Button>
                   </Link>
                   <Link
                     to="/login"
-                    className="text-sm font-medium underline transition-colors"
-                    style={{color:'#0F2044'}}
+                    className="text-sm font-medium underline transition-colors text-[#0F2044] dark:text-[#E7C779]"
                   >
                     Уже есть аккаунт? Войти
                   </Link>
@@ -612,7 +608,7 @@ const Index = () => {
                       </p>
                       <div className="flex flex-col items-center gap-3">
                         <Link to="/register">
-                          <Button className="h-14 px-8 rounded-full text-base font-medium text-white border-2" style={{ background: '#0F2044', borderColor: '#0F2044' }}>
+                          <Button className="hero-primary-button h-14 px-8 rounded-full text-base font-medium text-white border-2">
                             Начать разбор →
                           </Button>
                         </Link>
@@ -632,12 +628,12 @@ const Index = () => {
             <section className="py-8 md:py-12 lg:py-16">
               <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
-                  <h2 className="text-xl sm:text-2xl md:text-4xl font-display mb-6 md:mb-8 text-center flex items-center justify-center gap-2 whitespace-nowrap" style={{fontWeight:600,letterSpacing:'-0.02em',color:'#1a1a1a'}}>
+                  <h2 className="text-xl sm:text-2xl md:text-4xl font-display mb-6 md:mb-8 text-center flex items-center justify-center gap-2 whitespace-nowrap text-[#1a1a1a] dark:text-[#F5DFC0]" style={{fontWeight:600,letterSpacing:'-0.02em'}}>
                     {t("calculator.title")}
                     {(() => { const H = GOLDEN_ICONS['Heart']; return H ? <H className="!w-11 !h-11 inline-block flex-shrink-0" /> : null; })()}
                   </h2>
 
-                  <p className="text-base md:text-lg font-medium text-center mb-4 md:mb-6" style={{color:'#1a3060'}}>
+                  <p className="text-base md:text-lg font-medium text-center mb-4 md:mb-6 text-[#1a3060] dark:text-[#E7C779]">
                     {t("calculator.selectMethodology")}
                   </p>
 
@@ -647,31 +643,31 @@ const Index = () => {
                     <button
                       onClick={() => setSelectedMethodology("1")}
                       className={cn(
-                        "relative w-full h-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
+                        "methodology-choice relative w-full h-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "1"
-                          ? "bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
-                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044]"
+                          ? "is-selected bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)] dark:bg-[#0B1A33]/90 dark:border-[#D5A95B] dark:shadow-[0_4px_20px_rgba(0,0,0,0.30)]"
+                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044] dark:bg-[#071326]/72 dark:border-[#D5A95B]/35 dark:hover:border-[#D5A95B]/70"
                       )}
                     >
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap" style={{background:'#fdfaf5',border:'1px solid #0F2044',borderRadius:'20px',color:'#0F2044',letterSpacing:'0.08em',textTransform:'uppercase'}}>
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 text-[10px] font-medium flex items-center gap-1 whitespace-nowrap rounded-full uppercase tracking-[0.08em] bg-[#fdfaf5] border border-[#0F2044] text-[#0F2044] dark:bg-[#071326] dark:border-[#D5A95B] dark:text-[#E7C779]">
                         {t("methodology.moreAccurate")}
                       </div>
                       <div className="flex items-start gap-2 md:gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-                          selectedMethodology === "1" ? "border-[#0F2044] bg-[#0F2044]" : "border-[#0F2044]/40"
+                          selectedMethodology === "1" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#0F2044]/40 dark:border-[#D5A95B]/45"
                         )}>
-                          {selectedMethodology === "1" && (<Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />)}
+                          {selectedMethodology === "1" && (<Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7] dark:text-[#071326]" />)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <h3 className="font-display font-semibold text-foreground text-base md:text-lg">{t("methodology.methodology1")}</h3>
-                            <span className="text-xs px-2 py-0.5" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'5px',fontWeight:500}}>{t("methodology.arcana22")}</span>
+                            <span className="methodology-tag text-xs px-2 py-0.5 rounded-md font-medium">{t("methodology.arcana22")}</span>
                           </div>
-                          <p className="hidden md:block text-xs md:text-sm mb-3" style={{color:'#6b6b6b'}}>{t("methodology.arcanaDescription")}</p>
+                          <p className="hidden md:block text-xs md:text-sm mb-3 text-[#6b6b6b] dark:text-[#D8C7AE]/75">{t("methodology.arcanaDescription")}</p>
                           <div className="hidden md:flex flex-wrap gap-1">
                             {[t("methodology.features.purpose"), t("methodology.features.compatibility"), t("methodology.features.forecasts"), t("methodology.features.lifePeriods")].map((feature, i) => (
-                              <span key={i} className="text-xs px-2 py-1" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'6px',fontWeight:500}}>{feature}</span>
+                              <span key={i} className="methodology-tag text-xs px-2 py-1 rounded-md font-medium">{feature}</span>
                             ))}
                           </div>
                         </div>
@@ -682,28 +678,28 @@ const Index = () => {
                     <button
                       onClick={() => setSelectedMethodology("2")}
                       className={cn(
-                        "relative w-full h-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
+                        "methodology-choice relative w-full h-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left",
                         selectedMethodology === "2"
-                          ? "bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)]"
-                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044]"
+                          ? "is-selected bg-[#edebe4] border-[#0F2044] shadow-[0_2px_8px_rgba(15,32,68,0.18)] dark:bg-[#0B1A33]/90 dark:border-[#D5A95B] dark:shadow-[0_4px_20px_rgba(0,0,0,0.30)]"
+                          : "bg-white border-[#0F2044]/40 hover:border-[#0F2044] dark:bg-[#071326]/72 dark:border-[#D5A95B]/35 dark:hover:border-[#D5A95B]/70"
                       )}
                     >
                       <div className="flex items-start gap-2 md:gap-3">
                         <div className={cn(
                           "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-                          selectedMethodology === "2" ? "border-[#0F2044] bg-[#0F2044]" : "border-[#0F2044]/40"
+                          selectedMethodology === "2" ? "border-[#0F2044] bg-[#0F2044] dark:border-[#D5A95B] dark:bg-[#D5A95B]" : "border-[#0F2044]/40 dark:border-[#D5A95B]/45"
                         )}>
-                          {selectedMethodology === "2" && (<Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7]" />)}
+                          {selectedMethodology === "2" && (<Check className="w-3 h-3 md:w-4 md:h-4 text-[#FFF8E7] dark:text-[#071326]" />)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="font-display font-semibold text-base md:text-lg" style={{color:'#1a1a1a'}}>{t("methodology.methodology2")}</h3>
-                            <span className="text-xs px-2 py-0.5" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'5px',fontWeight:500}}>{t("methodology.classic")}</span>
+                            <h3 className="font-display font-semibold text-base md:text-lg text-[#1a1a1a] dark:text-[#F3DFC0]">{t("methodology.methodology2")}</h3>
+                            <span className="methodology-tag text-xs px-2 py-0.5 rounded-md font-medium">{t("methodology.classic")}</span>
                           </div>
-                          <p className="hidden md:block text-xs md:text-sm mb-3" style={{color:'#6b6b6b'}}>{t("methodology.classicDescription")}</p>
+                          <p className="hidden md:block text-xs md:text-sm mb-3 text-[#6b6b6b] dark:text-[#D8C7AE]/75">{t("methodology.classicDescription")}</p>
                           <div className="hidden md:flex flex-wrap gap-1">
                             {[t("methodology.features.mindNumber"), t("methodology.features.actionNumber"), t("methodology.features.realizationNumber"), t("methodology.features.outcomeNumber")].map((feature, i) => (
-                              <span key={i} className="text-xs px-2 py-1" style={{background:'rgba(0,0,0,0.06)',color:'#3d3929',borderRadius:'6px',fontWeight:500}}>{feature}</span>
+                              <span key={i} className="methodology-tag text-xs px-2 py-1 rounded-md font-medium">{feature}</span>
                             ))}
                           </div>
                         </div>
@@ -714,28 +710,29 @@ const Index = () => {
                   {/* Methods of selected methodology — full width below */}
                   <div className="mb-6 md:mb-8 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                     {(selectedMethodology === "1" ? methodology1Methods : methodology2Methods).map((method) => {
-                      const img = SHOW_CARD_IMAGES ? (selectedMethodology === "1" ? cardImages[method.id] : cardImagesM2[method.id]) : undefined;
+                      const activeCardImages = theme === "dark"
+                        ? (selectedMethodology === "1" ? cardImagesDark : cardImagesM2Dark)
+                        : (selectedMethodology === "1" ? cardImages : cardImagesM2);
+                      const img = SHOW_CARD_IMAGES ? activeCardImages[method.id] : undefined;
                       if (img) {
                         return (
                           <button
                             key={method.id}
                             onClick={() => handleMethodSelect(method.id)}
                             className={cn(
-                              "group relative rounded-xl border-[1.5px] overflow-hidden text-left w-full h-[158px] md:h-[184px] transition-all duration-300",
+                              "group method-image-card relative rounded-xl border-[1.5px] dark:border overflow-hidden text-left w-full h-[158px] md:h-[184px] transition-all duration-300",
                               selectedMethod === method.id
-                                ? "border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.55),0_0_16px_rgba(15,32,68,0.28)] md:shadow-[0_3px_12px_rgba(15,32,68,0.22)]"
-                                : "border-[#0F2044]/25 md:hover:border-[#0F2044] md:hover:shadow-[0_3px_14px_rgba(15,32,68,0.16)]"
+                                ? "border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.55),0_0_16px_rgba(15,32,68,0.28)] md:shadow-[0_3px_12px_rgba(15,32,68,0.22)] dark:border-[#E2BD70] dark:shadow-[0_0_0_1px_rgba(226,189,112,0.45),0_0_18px_rgba(213,169,91,0.22)]"
+                                : "border-[#0F2044]/25 md:hover:border-[#0F2044] md:hover:shadow-[0_3px_14px_rgba(15,32,68,0.16)] dark:border-[#D5A95B]/38 dark:md:hover:border-[#D5A95B]/75 dark:md:hover:shadow-[0_4px_18px_rgba(0,0,0,0.32)]"
                             )}
                           >
                             <img src={img} alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-105" style={{ objectPosition: "center 32%" }} />
                             {method.comingSoon && <span className="absolute top-2 left-2 z-10 text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.9)',color:'#3a2a10'}}>Скоро</span>}
-                            {/* мягкое стекло: лёгкий блюр, затухающий кверху */}
-                            <div className="absolute inset-x-0 bottom-0 h-[52%] pointer-events-none backdrop-blur-[2.5px]" style={{ WebkitMaskImage: "linear-gradient(to top, #000 40%, transparent)", maskImage: "linear-gradient(to top, #000 40%, transparent)" }} />
-                            {/* плавный светлый переход: у текста плотнее, выше почти прозрачно */}
-                            <div className="absolute inset-x-0 bottom-0 h-[58%] pointer-events-none" style={{ background: "linear-gradient(to top, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.6) 40%, rgba(255,255,255,0) 100%)" }} />
+                            <div className="method-card-liquid-glass" />
+                            <div className="method-card-fade" />
                             <div className="absolute inset-x-0 bottom-0 px-3 pb-2.5 md:px-3.5 md:pb-3">
-                              <h4 className="font-display font-semibold text-sm md:text-base leading-snug" style={{color:'#0F2044'}}>{method.name}</h4>
-                              <p className="text-[11px] md:text-xs mt-0.5 line-clamp-2 leading-snug" style={{color:'#243049'}}>{method.description}</p>
+                              <h4 className="method-card-title font-display font-semibold text-sm md:text-base leading-snug">{method.name}</h4>
+                              <p className="method-card-description text-[11px] md:text-xs mt-0.5 line-clamp-2 leading-snug">{method.description}</p>
                             </div>
                           </button>
                         );
@@ -780,7 +777,7 @@ const Index = () => {
                   {/* Tier Selector — hidden for coming-soon methods */}
                   {currentConfig && !currentConfig.comingSoon && (
                     <div className="max-w-xl mx-auto mb-2">
-                      <h3 className="text-sm font-medium text-center mb-3" style={{color:'#6b6b6b'}}>
+                      <h3 className="text-sm font-medium text-center mb-3 text-[#6b6b6b] dark:text-[#D8C7AE]">
                         {t("cfg.chooseTierFor", { title: currentConfig.title })}
                       </h3>
                       <TierSelector

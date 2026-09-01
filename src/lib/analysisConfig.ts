@@ -316,9 +316,11 @@ export function getConfigsForMethodology(methodology: '1' | '2'): AnalysisTypeCo
   const order1 = ['purpose', 'compatibility', 'year', 'month', 'day', 'ancestral', 'contract'];
   // Порядок для методики 2
   const order2 = ['classic-full', 'lifecod-compatibility', 'business', 'contract', 'name', 'finance', 'success-path'];
+  const hiddenMethods = methodology === '1' ? ['contract'] : ['success-path'];
 
   const order = methodology === '1' ? order1 : order2;
   return order
+    .filter(id => !hiddenMethods.includes(id))
     .map(id => analysisConfigs.find(c => c.id === id && c.methodologies.includes(methodology)))
     .filter((c): c is AnalysisTypeConfig => c !== undefined)
     .map(localizeConfig);

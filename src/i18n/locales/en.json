@@ -5,6 +5,13 @@
     "offerShort": "Offer",
     "privacy": "Privacy Policy"
   },
+  "theme": {
+    "appearance": "Appearance",
+    "light": "Light theme",
+    "dark": "Dark theme",
+    "enableLight": "Switch to light theme",
+    "enableDark": "Switch to dark theme"
+  },
   "cfg": {
     "tierBasic": "Basic",
     "tierPro": "Professional",

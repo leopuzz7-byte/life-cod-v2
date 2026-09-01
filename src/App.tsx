@@ -11,7 +11,10 @@ import { Footer } from "@/components/Footer";
 import { MysticBackground } from "@/components/MysticBackground";
 import pageBg from "@/assets/page-bg.png";
 import pageBgMobile from "@/assets/page-bg-mobile.webp";
+import pageBgDark from "@/assets/page-bg-dark.webp";
+import pageBgMobileDark from "@/assets/page-bg-mobile-dark.webp";
 import { MysticModeProvider } from "@/lib/mysticMode";
+import { ThemeProvider } from "@/lib/theme";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
 // Главная грузится сразу (первый экран), остальные страницы — лениво,
@@ -36,6 +39,7 @@ const PaymentFail = lazy(() => import("./pages/PaymentFail"));
 const queryClient = new QueryClient();
 
 const App = () => (
+  <ThemeProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter>
@@ -45,10 +49,11 @@ const App = () => (
             <Sonner />
             <MysticModeProvider>
             <div className="flex flex-col min-h-screen relative">
-            <div className="hidden md:block fixed inset-0 z-0 pointer-events-none bg-cover bg-center" style={{ backgroundImage: `url(${pageBg})` }} />
-            <div className="hidden md:block fixed inset-0 z-0 pointer-events-none" style={{ background: "rgba(245,244,239,0.12)" }} />
-            <div className="md:hidden fixed inset-0 z-0 pointer-events-none bg-cover bg-center" style={{ backgroundImage: `url(${pageBgMobile})` }} />
-            <div className="md:hidden fixed inset-0 z-0 pointer-events-none" style={{ background: "rgba(245,244,239,0.12)" }} />
+            <div className="page-bg page-bg-desktop page-bg-light" style={{ backgroundImage: `url(${pageBg})` }} />
+            <div className="page-bg page-bg-desktop page-bg-dark" style={{ backgroundImage: `url(${pageBgDark})` }} />
+            <div className="page-bg page-bg-mobile page-bg-light" style={{ backgroundImage: `url(${pageBgMobile})` }} />
+            <div className="page-bg page-bg-mobile page-bg-dark" style={{ backgroundImage: `url(${pageBgMobileDark})` }} />
+            <div className="page-bg-overlay" />
             <MysticBackground />
             <div className="relative z-10 flex flex-col flex-1">
             <Suspense fallback={<LoadingScreen />}>
@@ -88,6 +93,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;

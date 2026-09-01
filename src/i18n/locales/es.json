@@ -5,6 +5,13 @@
     "offerShort": "Oferta",
     "privacy": "Política de Privacidad"
   },
+  "theme": {
+    "appearance": "Apariencia",
+    "light": "Tema claro",
+    "dark": "Tema oscuro",
+    "enableLight": "Activar el tema claro",
+    "enableDark": "Activar el tema oscuro"
+  },
   "cfg": {
     "tierBasic": "Básico",
     "tierPro": "Profesional",
