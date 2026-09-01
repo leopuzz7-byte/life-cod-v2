@@ -19,7 +19,7 @@ console.log("out-of-range dates:", bad.length === 0 ? "НЕТ (ок)" : bad.join
 console.log("аркан 7 =", getArcana(7).name, "| позиция 7 =", positionTitles[7]);
 
 // Платные колоды: состав, файлы и базовая маршрутизация запросов.
-const expectedDeckSizes = { author: 78, thoth: 78, lenormand: 47, "ludy-lescot": 78, "deviant-moon": 78, "golden-taurus": 78 };
+const expectedDeckSizes = { author: 78, thoth: 78, lenormand: 47, "ludy-lescot": 78, "deviant-moon": 78, "golden-taurus": 78, decameron: 78 };
 for (const [deckId, expected] of Object.entries(expectedDeckSizes)) {
   const profile = paidDecks.getDeck(deckId);
   assert.strictEqual(profile.cards.length, expected, `${deckId}: неверное число карт`);
@@ -62,6 +62,10 @@ const routeCases = [
   ["Будет ли встреча и когда он мне напишет?", "lenormand"],
   ["Какие риски у моего бизнеса и как увеличить прибыль?", "golden-taurus"],
   ["Придут ли деньги до пятницы?", "lenormand"],
+  ["Есть ли между нами сексуальное притяжение и настоящая химия?", "decameron"],
+  ["Почему в нашей интимной жизни пропало желание?", "decameron"],
+  ["Что стоит за соблазном и тайной близостью с этим человеком?", "decameron"],
+  ["Есть ли третий человек и будет ли у них встреча?", "lenormand"],
   ["Какой вариант выбрать и какой урок я сейчас прохожу?", "thoth"],
 ];
 for (const [question, expected] of routeCases) assert.strictEqual(paidDecks.localRoute(question), expected, question);

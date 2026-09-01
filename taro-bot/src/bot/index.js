@@ -438,7 +438,7 @@ async function handleMenu(ctx, label) {
     u.step = "sp_sphere";
     u.spread = { deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "", cards: [], revealed: 0, extra: 0, extraCards: [] };
     saveUser(u);
-    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nСначала определим точный запрос. Бот предложит подходящую колоду, а при желании можно выбрать любую из шести, включая авторскую колоду Надежды. Затем откроются три карты по подходящим позициям. После итогового разбора можно задать до трёх уточняющих вопросов на той же колоде.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
+    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nСначала определим точный запрос. Бот предложит подходящую колоду, а при желании можно выбрать любую из семи, включая авторскую колоду Надежды и Таро Декамерон. Затем откроются три карты по подходящим позициям. После итогового разбора можно задать до трёх уточняющих вопросов на той же колоде.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
     await showSphereChoice(ctx);
   } else if (label === L.arkan) {
     await sendCircle(ctx, "arkan");
@@ -512,7 +512,7 @@ bot.callbackQuery("chk:sub", async (ctx) => {
     await ctx.reply("Оплату пока не вижу. Если только что оплатил, подожди минуту и нажми ещё раз.", { reply_markup: new InlineKeyboard().text("Проверить оплату", "chk:sub") });
   }
 });
-bot.callbackQuery(/^spcat:(love|person|money|events|choice|path|state|custom)$/, async (ctx) => {
+bot.callbackQuery(/^spcat:(love|intimacy|person|money|events|choice|path|state|custom)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
   u.spread = u.spread || { deckVersion: 2, cards: [], revealed: 0, extra: 0 };
@@ -565,7 +565,7 @@ bot.callbackQuery("spchange", async (ctx) => {
   await ctx.reply("Можно выбрать колоду вручную. Специализация изменится, но вопрос останется прежним.", { reply_markup: kb });
 });
 
-bot.callbackQuery(/^spdeck:(author|thoth|lenormand|ludy-lescot|deviant-moon|golden-taurus)$/, async (ctx) => {
+bot.callbackQuery(/^spdeck:(author|thoth|lenormand|ludy-lescot|deviant-moon|golden-taurus|decameron)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
   if (!u.spread || !u.spread.question) { await showSphereChoice(ctx); return; }
