@@ -136,6 +136,71 @@ const LEGACY_DECK_PROFILE = {
   method: "Связывай классические значения арканов с вопросом и позициями расклада.",
 };
 
+const SPREAD_RELATIONS = {
+  partner: "партнёр или человек, который нравится",
+  ex: "бывший партнёр",
+  family: "родственник",
+  friend: "друг или знакомый",
+  work: "коллега или руководитель",
+  other: "другой человек",
+};
+const SPREAD_GENDERS = { female: "женщина", male: "мужчина", unspecified: "не указан" };
+const SPREAD_COUNTERPARTS = {
+  boyfriend: "парень",
+  girlfriend: "девушка",
+  husband: "муж",
+  wife: "жена",
+  interest: "человек, который нравится",
+  ex: "бывший партнёр",
+  other: "другой человек",
+};
+
+function sanitizePersonName(value) {
+  const name = String(value || "").trim().replace(/\s+/g, " ").slice(0, 50);
+  return /^[\p{L}\p{M}'’ -]{2,50}$/u.test(name) ? name : "";
+}
+
+function newPaidSpread() {
+  return {
+    deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "",
+    subject: null, counterpart: null, cards: [], revealed: 0, extra: 0, extraCards: [],
+  };
+}
+function spreadSubjectSummary(u) {
+  const subject = u && u.spread && u.spread.subject;
+  if (!subject || subject.kind === "self") return "для себя";
+  const relation = SPREAD_RELATIONS[subject.relation] || SPREAD_RELATIONS.other;
+  const gender = SPREAD_GENDERS[subject.gender] || SPREAD_GENDERS.unspecified;
+  const name = subject.name ? `, имя ${subject.name}` : "";
+  return `для другого человека: ${relation}, ${gender}${name}`;
+}
+function spreadSubjectContext(u, includeNames = false) {
+  const subject = u && u.spread && u.spread.subject;
+  const counterpart = u && u.spread && u.spread.counterpart;
+  const counterpartContext = counterpart && counterpart.present
+    ? ` Второй участник ситуации: ${SPREAD_COUNTERPARTS[counterpart.relation] || SPREAD_COUNTERPARTS.other}, пол ${SPREAD_GENDERS[counterpart.gender] || SPREAD_GENDERS.unspecified}.${includeNames && counterpart.name ? ` Имя: ${counterpart.name}.` : ""}`
+    : " Конкретный второй участник ситуации не указан.";
+  const nameRule = includeNames
+    ? " Имя является только ориентиром. Упомяни каждое переданное имя не более одного раза в этом сообщении и не начинай каждый абзац с обращения."
+    : " Не используй имена в ответе.";
+  if (!subject || subject.kind === "self") {
+    const name = includeNames ? ((subject && subject.name) || u.name || "") : "";
+    return `Расклад делают для самого пользователя${name ? `, имя ${name}` : ""}. Не придумывай пол, если он не указан в вопросе.${counterpartContext}${nameRule}`;
+  }
+  const relation = SPREAD_RELATIONS[subject.relation] || SPREAD_RELATIONS.other;
+  const gender = SPREAD_GENDERS[subject.gender] || SPREAD_GENDERS.unspecified;
+  const name = includeNames && subject.name ? ` Имя главного человека расклада: ${subject.name}.` : "";
+  return `Расклад делают для другого человека. Его связь с пользователем: ${relation}. Пол: ${gender}.${name}${counterpartContext} Не смешивай чувства пользователя, главного человека расклада и второго участника, ясно указывай, о ком идёт речь.${nameRule}`;
+}
+
+function spreadCounterpartSummary(u) {
+  const counterpart = u && u.spread && u.spread.counterpart;
+  if (!counterpart || !counterpart.present) return "конкретный человек не указан";
+  const relation = SPREAD_COUNTERPARTS[counterpart.relation] || SPREAD_COUNTERPARTS.other;
+  const gender = SPREAD_GENDERS[counterpart.gender] || SPREAD_GENDERS.unspecified;
+  return `${relation}, ${gender}${counterpart.name ? `, имя ${counterpart.name}` : ""}`;
+}
+
 function isNewPaidSpread(u) {
   return !!(u && u.spread && u.spread.deckVersion === 2 && paidDecks.DECKS[u.spread.deckId]);
 }
@@ -173,13 +238,94 @@ async function showSphereChoice(ctx) {
   paidDecks.CATEGORIES.forEach((category) => kb.text(`${category.emoji} ${category.label}`, `spcat:${category.id}`).row());
   await ctx.reply("Выбери главную тему. Затем я уточню, что именно хочется узнать, и предложу подходящую колоду.", { reply_markup: kb });
 }
+async function askSpreadQuestion(ctx) {
+  const u = getUser(ctx.from.id);
+  const intent = paidDecks.getIntent(u.spread && u.spread.intentId);
+  u.step = "sp_question"; saveUser(u);
+  const lead = intent && u.spread.intentId !== "custom" ? `${intent.label}. ` : "";
+  await ctx.reply(`${lead}Теперь напиши конкретный вопрос одним сообщением. Чем яснее формулировка, тем точнее будет разбор.`);
+}
+async function showSpreadSubjectChoice(ctx) {
+  await ctx.reply("Для кого делаем расклад?", {
+    reply_markup: new InlineKeyboard()
+      .text("♡ Для себя", "spsub:self").row()
+      .text("✦ Для другого человека", "spsub:other"),
+  });
+}
+async function showSpreadRelationChoice(ctx) {
+  const kb = new InlineKeyboard()
+    .text("♡ Партнёр или симпатия", "sprel:partner").row()
+    .text("Бывший партнёр", "sprel:ex").row()
+    .text("Родственник", "sprel:family").row()
+    .text("Друг или знакомый", "sprel:friend").row()
+    .text("Коллега или руководитель", "sprel:work").row()
+    .text("Другой человек", "sprel:other");
+  await ctx.reply("Кем этот человек приходится тебе?", { reply_markup: kb });
+}
+async function showSpreadGenderChoice(ctx) {
+  await ctx.reply("Укажи пол человека. Это поможет ИИ писать естественно и не путать участников ситуации.", {
+    reply_markup: new InlineKeyboard()
+      .text("Женщина", "spgender:female").text("Мужчина", "spgender:male").row()
+      .text("Не указывать", "spgender:unspecified"),
+  });
+}
+function isRelationshipQuestion(u, question) {
+  if (u.spread && (u.spread.category === "love" || u.spread.category === "intimacy")) return true;
+  return /любов|отношен|совместим|чувств|парн|муж|жен|девуш|секс|интим|влечен|страст|близост|ревност|измен|бывш/i.test(question || "");
+}
+async function showCounterpartCheck(ctx) {
+  await ctx.reply("Я правильно понимаю, что вопрос связан ещё с конкретным человеком, например с парнем, девушкой, мужем, женой, бывшим партнёром или человеком, который нравится?", {
+    reply_markup: new InlineKeyboard()
+      .text("Да, есть конкретный человек", "spcp:yes").row()
+      .text("Нет, конкретного человека нет", "spcp:no"),
+  });
+}
+async function showCounterpartRelationChoice(ctx) {
+  const kb = new InlineKeyboard()
+    .text("Парень", "spcprel:boyfriend").text("Девушка", "spcprel:girlfriend").row()
+    .text("Муж", "spcprel:husband").text("Жена", "spcprel:wife").row()
+    .text("Симпатия", "spcprel:interest").text("Бывший партнёр", "spcprel:ex").row()
+    .text("Другой человек", "spcprel:other");
+  await ctx.reply("Кем этот человек приходится главному участнику расклада?", { reply_markup: kb });
+}
+async function showCounterpartGenderChoice(ctx) {
+  await ctx.reply("Укажи пол этого человека.", {
+    reply_markup: new InlineKeyboard()
+      .text("Женщина", "spcpgender:female").text("Мужчина", "spcpgender:male").row()
+      .text("Не указывать", "spcpgender:unspecified"),
+  });
+}
+async function finalizeSpreadQuestion(ctx) {
+  const u = getUser(ctx.from.id);
+  const q = u.spread && u.spread.question;
+  if (!q) { await showSphereChoice(ctx); return; }
+  if (!u.spread.deckId || u.spread.intentId === "custom") {
+    await ctx.replyWithChatAction("typing");
+    const localDeckId = paidDecks.localRoute(q);
+    const routed = await ai.selectPaidDeck(q, spreadSubjectContext(u, false));
+    const acceptedRoute = routed && routed.confidence >= 0.62;
+    u.spread.deckId = acceptedRoute ? routed.deckId : localDeckId;
+    u.spread.routeReason = acceptedRoute && routed.reason
+      ? routed.reason
+      : `По смыслу вопроса лучше всего подходит специализация колоды «${paidDecks.getDeck(u.spread.deckId).label}».`;
+  }
+  if (!paidDecks.DECKS[u.spread.deckId]) u.spread.deckId = "thoth";
+  u.step = "sp_confirm"; saveUser(u);
+  track(ctx.from.id, "spread_deck_route", { deck: u.spread.deckId, intent: u.spread.intentId || "custom" });
+  await showSpreadConfirmation(ctx);
+}
+function deckGuideText() {
+  return Object.values(paidDecks.DECKS)
+    .map((profile) => `<b>${esc(profile.label)}</b>\n${esc(profile.description)}`)
+    .join("\n\n");
+}
 async function showIntentChoice(ctx, categoryId) {
   const category = paidDecks.getCategory(categoryId);
   if (!category) { await showSphereChoice(ctx); return; }
   if (categoryId === "custom") {
     const u = getUser(ctx.from.id);
-    u.spread.category = "custom"; u.spread.intentId = "custom"; u.step = "sp_question"; saveUser(u);
-    await ctx.reply("Напиши свой вопрос одним сообщением. Я определю его суть и предложу колоду, которая лучше всего с ним работает.");
+    u.spread.category = "custom"; u.spread.intentId = "custom"; u.step = "sp_subject"; saveUser(u);
+    await showSpreadSubjectChoice(ctx);
     return;
   }
   const kb = new InlineKeyboard();
@@ -199,10 +345,13 @@ async function showSpreadConfirmation(ctx) {
   const category = paidDecks.getCategory(u.spread.category);
   const intent = paidDecks.getIntent(u.spread.intentId);
   const reason = u.spread.routeReason ? `\n\nПочему эта колода: ${esc(u.spread.routeReason)}` : "";
+  const counterpart = u.spread.counterpart && (u.spread.counterpart.present || isRelationshipQuestion(u, u.spread.question))
+    ? `\nВторой участник: ${esc(spreadCounterpartSummary(u))}`
+    : "";
   const healthQuestion = /здоров|самочув|болит|симптом|лечен|диагноз/i.test(u.spread.question || "");
   const health = (intent && intent.healthDisclaimer) || healthQuestion ? "\n\nВажно: это разбор общего состояния и энергетического фона, не медицинская диагностика." : "";
   await ctx.reply(
-    `<b>Проверим перед раскладом</b>\n\nТема: ${esc(category ? category.label : "Свой вопрос")}\nЗапрос: ${esc(intent ? intent.label : "Свой вопрос")}\nВопрос: «${esc(u.spread.question)}»\nКолода: <b>${esc(profile.label)}</b>${reason}${health}`,
+    `<b>Проверим перед раскладом</b>\n\nТема: ${esc(category ? category.label : "Свой вопрос")}\nЗапрос: ${esc(intent ? intent.label : "Свой вопрос")}\nДля кого: ${esc(spreadSubjectSummary(u))}${counterpart}\nВопрос: «${esc(u.spread.question)}»\n\nКолода: <b>${esc(profile.label)}</b>\n${esc(profile.description)}${reason}${health}`,
     { parse_mode: "HTML", reply_markup: confirmKeyboard() }
   );
 }
@@ -436,7 +585,7 @@ async function handleMenu(ctx, label) {
   if (label === L.tarot) {
     const t = config.taro;
     u.step = "sp_sphere";
-    u.spread = { deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "", cards: [], revealed: 0, extra: 0, extraCards: [] };
+    u.spread = newPaidSpread();
     saveUser(u);
     await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nСначала определим точный запрос. Бот предложит подходящую колоду, а при желании можно выбрать любую из семи, включая авторскую колоду Надежды и Таро Декамерон. Затем откроются три карты по подходящим позициям. После итогового разбора можно задать до трёх уточняющих вопросов на той же колоде.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
     await showSphereChoice(ctx);
@@ -515,8 +664,8 @@ bot.callbackQuery("chk:sub", async (ctx) => {
 bot.callbackQuery(/^spcat:(love|intimacy|person|money|events|choice|path|state|custom)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
-  u.spread = u.spread || { deckVersion: 2, cards: [], revealed: 0, extra: 0 };
-  u.spread.deckVersion = 2; u.spread.category = ctx.match[1]; u.spread.intentId = null; u.spread.deckId = null; u.step = "sp_intent"; saveUser(u);
+  u.spread = u.spread || newPaidSpread();
+  u.spread.deckVersion = 2; u.spread.category = ctx.match[1]; u.spread.intentId = null; u.spread.deckId = null; u.spread.subject = null; u.spread.counterpart = null; u.spread.question = ""; u.step = "sp_intent"; saveUser(u);
   track(ctx.from.id, "spread_category", { category: ctx.match[1] });
   await showIntentChoice(ctx, ctx.match[1]);
 });
@@ -529,15 +678,98 @@ bot.callbackQuery(/^spint:([a-z_]+)$/, async (ctx) => {
   u.spread = u.spread || { deckVersion: 2 };
   u.spread.deckVersion = 2; u.spread.intentId = ctx.match[1]; u.spread.deckId = intent.deckId;
   u.spread.routeReason = `Запрос «${intent.label}» точнее всего раскрывает специализация этой колоды.`;
-  u.step = "sp_question"; saveUser(u);
+  u.step = "sp_subject"; saveUser(u);
   track(ctx.from.id, "spread_intent", { intent: ctx.match[1], deck: intent.deckId });
-  await ctx.reply(`${intent.label}. Теперь напиши конкретный вопрос одним сообщением. Чем яснее формулировка, тем точнее будет разбор.`);
+  await showSpreadSubjectChoice(ctx);
+});
+
+bot.callbackQuery(/^spsub:(self|other)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.intentId) { await showSphereChoice(ctx); return; }
+  if (ctx.match[1] === "self") {
+    u.spread.subject = { kind: "self", relation: "self", gender: "unspecified", name: u.name || ctx.from.first_name || "" };
+    track(ctx.from.id, "spread_subject", { kind: "self" });
+    await askSpreadQuestion(ctx);
+    return;
+  }
+  u.spread.subject = { kind: "other", relation: null, gender: null, name: "" };
+  u.step = "sp_subject_relation"; saveUser(u);
+  track(ctx.from.id, "spread_subject", { kind: "other" });
+  await showSpreadRelationChoice(ctx);
+});
+
+bot.callbackQuery(/^sprel:(partner|ex|family|friend|work|other)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.subject || u.spread.subject.kind !== "other") { await showSpreadSubjectChoice(ctx); return; }
+  u.spread.subject.relation = ctx.match[1]; u.step = "sp_subject_gender"; saveUser(u);
+  await showSpreadGenderChoice(ctx);
+});
+
+bot.callbackQuery(/^spgender:(female|male|unspecified)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.subject || u.spread.subject.kind !== "other") { await showSpreadSubjectChoice(ctx); return; }
+  u.spread.subject.gender = ctx.match[1]; u.step = "sp_subject_name"; saveUser(u);
+  await ctx.reply("Как зовут этого человека? Напиши имя одним сообщением или выбери «Без имени».", {
+    reply_markup: new InlineKeyboard().text("Без имени", "spname:skip"),
+  });
+});
+
+bot.callbackQuery("spname:skip", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.subject || u.spread.subject.kind !== "other") { await showSpreadSubjectChoice(ctx); return; }
+  u.spread.subject.name = "";
+  await askSpreadQuestion(ctx);
+});
+
+bot.callbackQuery(/^spcp:(yes|no)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.question) { await showSphereChoice(ctx); return; }
+  if (ctx.match[1] === "no") {
+    u.spread.counterpart = { present: false, relation: null, gender: "unspecified", name: "" };
+    await finalizeSpreadQuestion(ctx);
+    return;
+  }
+  u.spread.counterpart = { present: true, relation: null, gender: null, name: "" };
+  u.step = "sp_counterpart_relation"; saveUser(u);
+  await showCounterpartRelationChoice(ctx);
+});
+
+bot.callbackQuery(/^spcprel:(boyfriend|girlfriend|husband|wife|interest|ex|other)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.counterpart || !u.spread.counterpart.present) { await showCounterpartCheck(ctx); return; }
+  u.spread.counterpart.relation = ctx.match[1];
+  u.step = "sp_counterpart_gender"; saveUser(u);
+  await showCounterpartGenderChoice(ctx);
+});
+
+bot.callbackQuery(/^spcpgender:(female|male|unspecified)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.counterpart || !u.spread.counterpart.present) { await showCounterpartCheck(ctx); return; }
+  u.spread.counterpart.gender = ctx.match[1]; u.step = "sp_counterpart_name"; saveUser(u);
+  await ctx.reply("Как зовут этого человека? Напиши имя одним сообщением или выбери «Без имени».", {
+    reply_markup: new InlineKeyboard().text("Без имени", "spcpname:skip"),
+  });
+});
+
+bot.callbackQuery("spcpname:skip", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!u.spread || !u.spread.counterpart || !u.spread.counterpart.present) { await showCounterpartCheck(ctx); return; }
+  u.spread.counterpart.name = "";
+  await finalizeSpreadQuestion(ctx);
 });
 
 bot.callbackQuery("spback", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
-  u.step = "sp_sphere"; u.spread = { deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "", cards: [], revealed: 0, extra: 0, extraCards: [] }; saveUser(u);
+  u.step = "sp_sphere"; u.spread = newPaidSpread(); saveUser(u);
   await showSphereChoice(ctx);
 });
 
@@ -545,7 +777,7 @@ bot.callbackQuery("spback", async (ctx) => {
 bot.callbackQuery("spno", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
-  u.step = "sp_sphere"; u.spread = { deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "", cards: [], revealed: 0, extra: 0, extraCards: [] }; saveUser(u);
+  u.step = "sp_sphere"; u.spread = newPaidSpread(); saveUser(u);
   await showSphereChoice(ctx);
 });
 
@@ -553,7 +785,7 @@ bot.callbackQuery("spedit", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
   if (!u.spread) { await showSphereChoice(ctx); return; }
-  u.step = "sp_question"; saveUser(u);
+  u.spread.question = ""; u.spread.counterpart = null; u.step = "sp_question"; saveUser(u);
   await ctx.reply("Напиши исправленный вопрос одним сообщением.");
 });
 
@@ -562,7 +794,7 @@ bot.callbackQuery("spchange", async (ctx) => {
   const kb = new InlineKeyboard();
   Object.values(paidDecks.DECKS).forEach((profile) => kb.text(profile.label, `spdeck:${profile.id}`).row());
   kb.text("← Оставить рекомендацию", "spconfirm");
-  await ctx.reply("Можно выбрать колоду вручную. Специализация изменится, но вопрос останется прежним.", { reply_markup: kb });
+  await ctx.reply(`<b>Выбери колоду вручную</b>\n\n${deckGuideText()}\n\nВопрос и данные человека останутся прежними.`, { parse_mode: "HTML", reply_markup: kb });
 });
 
 bot.callbackQuery(/^spdeck:(author|thoth|lenormand|ludy-lescot|deviant-moon|golden-taurus|decameron)$/, async (ctx) => {
@@ -628,7 +860,7 @@ async function revealNextSpreadCard(ctx) {
   await ctx.replyWithChatAction("upload_photo");
   try { const cf = spreadCardFile(u, card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
   const prev = u.spread.cards.slice(0, idx);
-  const txt = await ai.generateSpreadCard(profile, topicLabel, u.spread.question, pos, idx, spreadCardInfo(u, card), prev.map((item) => spreadCardInfo(u, item)));
+  const txt = await ai.generateSpreadCard(profile, topicLabel, u.spread.question, pos, idx, spreadCardInfo(u, card), prev.map((item) => spreadCardInfo(u, item)), spreadSubjectContext(u, idx === 0));
   const name = spreadCardName(u, card);
   const ordinal = ["Первая карта", "Вторая карта", "Третья карта"][idx];
   await ctx.reply(`<b>${ordinal}, ${esc(pos.toLowerCase())}: ${esc(name)}</b>\n\n${esc(txt || (name + " показывает важную часть ситуации. Сопоставь её с тем, что происходит в реальности."))}`, { parse_mode: "HTML" });
@@ -636,11 +868,18 @@ async function revealNextSpreadCard(ctx) {
   track(ctx.from.id, "spread_card", { idx: idx + 1, deck: u.spread.deckId || "classic" });
   if (u.spread.revealed < 3) {
     await sleep(1500);
-    await ctx.reply("Готова открыть следующую карту.", { reply_markup: new InlineKeyboard().text("Открыть ещё карту", "sprev") });
+    const nextPosition = positions[u.spread.revealed];
+    const nextNumber = u.spread.revealed === 1 ? "вторую" : "третью";
+    const transition = profile.id === "decameron"
+      ? (u.spread.revealed === 1
+        ? `Притяжение видно не всегда целиком. Вторая позиция, «${nextPosition}», покажет, что действительно хочется прожить, а что пока остаётся только фантазией.`
+        : `Желание само по себе ещё не определяет будущее связи. Третья позиция, «${nextPosition}», покажет, совпадают ли близость, намерения и реальные действия.`)
+      : `Следующая позиция: «${nextPosition}». Она уточнит то, что предыдущая карта оставила открытым.`;
+    await ctx.reply(transition, { reply_markup: new InlineKeyboard().text(`Открыть ${nextNumber} карту`, "sprev") });
   } else {
     await sleep(700);
     await ctx.replyWithChatAction("typing");
-    const fin = await ai.generateSpreadFinal(profile, topicLabel, u.spread.question, u.spread.cards.map((item) => spreadCardInfo(u, item)), positions);
+    const fin = await ai.generateSpreadFinal(profile, topicLabel, u.spread.question, u.spread.cards.map((item) => spreadCardInfo(u, item)), positions, spreadSubjectContext(u, true));
     if (fin) await ctx.reply(`<b>Свод</b>\n\n${esc(fin)}`, { parse_mode: "HTML" });
     await sleep(600);
     await showExtraPrompt(ctx);
@@ -723,25 +962,34 @@ bot.on("message:text", async (ctx) => {
     await sendDeck(ctx);
     return;
   }
+  if (u.step === "sp_subject_name") {
+    if (!u.spread || !u.spread.subject || u.spread.subject.kind !== "other") { u.step = "sp_sphere"; saveUser(u); await showSphereChoice(ctx); return; }
+    const personName = sanitizePersonName(text);
+    if (personName.length < 2) { await ctx.reply("Напиши имя чуть подробнее или нажми «Без имени»."); return; }
+    u.spread.subject.name = personName;
+    await askSpreadQuestion(ctx);
+    return;
+  }
+  if (u.step === "sp_counterpart_name") {
+    if (!u.spread || !u.spread.counterpart || !u.spread.counterpart.present) { u.step = "sp_sphere"; saveUser(u); await showSphereChoice(ctx); return; }
+    const counterpartName = sanitizePersonName(text);
+    if (counterpartName.length < 2) { await ctx.reply("Напиши имя чуть подробнее или нажми «Без имени»."); return; }
+    u.spread.counterpart.name = counterpartName;
+    await finalizeSpreadQuestion(ctx);
+    return;
+  }
   if (u.step === "sp_question") {
     const q = text.trim().slice(0, 300);
     if (q.length < 3) { await ctx.reply("Напиши вопрос чуть подробнее, одним сообщением."); return; }
     u.spread = u.spread || { deckVersion: 2, category: "custom", intentId: "custom" };
     u.spread.question = q; u.spread.deckVersion = 2;
-    if (!u.spread.deckId || u.spread.intentId === "custom") {
-      await ctx.replyWithChatAction("typing");
-      const localDeckId = paidDecks.localRoute(q);
-      const routed = await ai.selectPaidDeck(q);
-      const acceptedRoute = routed && routed.confidence >= 0.62;
-      u.spread.deckId = acceptedRoute ? routed.deckId : localDeckId;
-      u.spread.routeReason = acceptedRoute && routed.reason
-        ? routed.reason
-        : `По смыслу вопроса лучше всего подходит специализация колоды «${paidDecks.getDeck(u.spread.deckId).label}».`;
+    if (isRelationshipQuestion(u, q)) {
+      u.spread.counterpart = null; u.step = "sp_counterpart_check"; saveUser(u);
+      await showCounterpartCheck(ctx);
+      return;
     }
-    if (!paidDecks.DECKS[u.spread.deckId]) u.spread.deckId = "thoth";
-    u.step = "sp_confirm"; saveUser(u);
-    track(ctx.from.id, "spread_deck_route", { deck: u.spread.deckId, intent: u.spread.intentId || "custom" });
-    await showSpreadConfirmation(ctx);
+    u.spread.counterpart = { present: false, relation: null, gender: "unspecified", name: "" };
+    await finalizeSpreadQuestion(ctx);
     return;
   }
   if (u.step === "sp_extra_q") {
@@ -753,7 +1001,7 @@ bot.on("message:text", async (ctx) => {
     await ctx.replyWithChatAction("upload_photo");
     try { const cf = spreadCardFile(u, card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
     const profile = spreadDeckProfile(u);
-    const ans = await ai.generateSpreadExtra(profile, spreadTopicLabel(u), u.spread.question, spreadCardInfo(u, card), q, (u.spread.cards || []).map((item) => spreadCardInfo(u, item)));
+    const ans = await ai.generateSpreadExtra(profile, spreadTopicLabel(u), u.spread.question, spreadCardInfo(u, card), q, (u.spread.cards || []).map((item) => spreadCardInfo(u, item)), spreadSubjectContext(u, false));
     const name = spreadCardName(u, card);
     await ctx.reply(`<b>${esc(name)}</b>\n\n${esc(ans || "Карта отвечает мягко, прислушайся к первому чувству.")}`, { parse_mode: "HTML" });
     u.spread.extraCards = (u.spread.extraCards || []).concat(card);

@@ -23,6 +23,7 @@ const expectedDeckSizes = { author: 78, thoth: 78, lenormand: 47, "ludy-lescot":
 for (const [deckId, expected] of Object.entries(expectedDeckSizes)) {
   const profile = paidDecks.getDeck(deckId);
   assert.strictEqual(profile.cards.length, expected, `${deckId}: неверное число карт`);
+  assert.ok(profile.description && profile.description.length >= 60, `${deckId}: нет понятного описания колоды`);
   assert.strictEqual(new Set(profile.cards.map((card) => card.key)).size, expected, `${deckId}: повтор ключа карты`);
   assert.strictEqual(new Set(profile.cards.map((card) => card.file)).size, expected, `${deckId}: повтор имени файла`);
   const sample = paidDecks.drawCards(deckId, Math.min(10, expected));
@@ -47,6 +48,7 @@ taroCredits.grant(creditUser, "безлимит");
 assert.ok(taroCredits.consume(creditUser));
 assert.strictEqual(taroCredits.balance(creditUser), "безлимит");
 for (const category of paidDecks.CATEGORIES) {
+  assert.ok(["♡", "✦", "☾", "✧", "☽", "◇", "⋆", "♢", "✎"].includes(category.emoji), `${category.id}: пёстрый или неизвестный символ темы`);
   for (const intentId of category.intents) assert.ok(paidDecks.getIntent(intentId), `${category.id}: неизвестный intent ${intentId}`);
 }
 for (const card of paidDecks.getDeck("lenormand").cards) {
