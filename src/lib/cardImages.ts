@@ -62,10 +62,36 @@ export const cardImagesM2Dark: Record<string, string> = {
   finance: fnDark,
 };
 
-import methodology1MobileDark from "@/assets/cards-mobile-dark/methodology1.webp";
-import methodology2MobileDark from "@/assets/cards-mobile-dark/methodology2.webp";
+// Отдельные изображения для карточек на телефоне в темной теме.
+// Светлая тема и десктоп продолжают использовать наборы выше.
+import purposeMobileDark from "@/assets/cards-mobile-dark-v2/purpose.webp";
+import compatibilityMobileDark from "@/assets/cards-mobile-dark-v2/compatibility.webp";
+import yearMobileDark from "@/assets/cards-mobile-dark-v2/year.webp";
+import monthMobileDark from "@/assets/cards-mobile-dark-v2/month.webp";
+import dayMobileDark from "@/assets/cards-mobile-dark-v2/day.webp";
+import ancestralMobileDark from "@/assets/cards-mobile-dark-v2/ancestral.webp";
 
-export const cardSheetsMobileDark: Record<"1" | "2", string> = {
-  "1": methodology1MobileDark,
-  "2": methodology2MobileDark,
+export const cardImagesMobileDark: Record<string, string> = {
+  purpose: purposeMobileDark,
+  compatibility: compatibilityMobileDark,
+  year: yearMobileDark,
+  month: monthMobileDark,
+  day: dayMobileDark,
+  ancestral: ancestralMobileDark,
+};
+
+import cfMobileDark from "@/assets/cards2-mobile-dark-v2/classic-full.webp";
+import lcMobileDark from "@/assets/cards2-mobile-dark-v2/lifecod-compatibility.webp";
+import bzMobileDark from "@/assets/cards2-mobile-dark-v2/business.webp";
+import ctMobileDark from "@/assets/cards2-mobile-dark-v2/contract.webp";
+import nmMobileDark from "@/assets/cards2-mobile-dark-v2/name.webp";
+import fnMobileDark from "@/assets/cards2-mobile-dark-v2/finance.webp";
+
+export const cardImagesM2MobileDark: Record<string, string> = {
+  "classic-full": cfMobileDark,
+  "lifecod-compatibility": lcMobileDark,
+  business: bzMobileDark,
+  contract: ctMobileDark,
+  name: nmMobileDark,
+  finance: fnMobileDark,
 };

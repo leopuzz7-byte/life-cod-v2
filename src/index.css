@@ -473,6 +473,58 @@
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.72);
 }
 
+@media (max-width: 767px) {
+  .dark .dark-mobile-method-card .method-card-liquid-glass {
+    height: 66%;
+    background: linear-gradient(
+      to top,
+      rgba(2, 8, 21, 0.68) 0%,
+      rgba(5, 17, 38, 0.42) 48%,
+      rgba(7, 21, 45, 0.08) 82%,
+      rgba(7, 21, 45, 0) 100%
+    );
+    backdrop-filter: blur(6px) saturate(1.18);
+    -webkit-backdrop-filter: blur(6px) saturate(1.18);
+    -webkit-mask-image: linear-gradient(to top, #000 48%, rgba(0, 0, 0, 0.7) 76%, transparent 100%);
+    mask-image: linear-gradient(to top, #000 48%, rgba(0, 0, 0, 0.7) 76%, transparent 100%);
+  }
+
+  .dark .dark-mobile-method-card .method-card-fade {
+    height: 70%;
+    background: linear-gradient(
+      to top,
+      rgba(2, 8, 21, 0.79) 0%,
+      rgba(4, 13, 31, 0.48) 48%,
+      rgba(4, 13, 31, 0) 100%
+    );
+  }
+
+  .dark .dark-mobile-method-card .method-card-copy {
+    padding-inline: 0.7rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .dark .dark-mobile-method-card .method-card-title {
+    font-size: 0.8rem;
+    line-height: 1.08;
+  }
+
+  .dark .dark-mobile-method-card .method-card-description {
+    margin-top: 0.15rem;
+    font-size: 0.625rem;
+    line-height: 1.15;
+  }
+}
+
+@media (max-width: 390px) {
+  .dark .dark-mobile-method-card .method-card-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+  }
+}
+
 .dark .gradient-card::before {
   background: linear-gradient(145deg, rgba(10, 25, 51, 0.82), rgba(4, 13, 31, 0.70));
   border: 1px solid rgba(213, 169, 91, 0.16);
@@ -516,99 +568,4 @@
 .dark input::placeholder,
 .dark textarea::placeholder {
   color: rgba(216, 199, 174, 0.56);
-}
-
-.mobile-dark-card-sheet,
-.method-card-index {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .dark .method-cards-grid {
-    position: relative;
-    aspect-ratio: 2 / 3;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(3, minmax(0, 1fr));
-    gap: 0;
-    isolation: isolate;
-  }
-
-  .dark .mobile-dark-card-sheet {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-    pointer-events: none;
-  }
-
-  .dark .method-cards-grid .method-image-card {
-    z-index: 1;
-    width: 100%;
-    height: auto;
-    min-height: 0;
-    border: 0 !important;
-    border-radius: 0;
-    background: transparent !important;
-    box-shadow: none !important;
-    overflow: visible;
-  }
-
-  .dark .method-cards-grid .method-image-card.is-selected {
-    filter: brightness(1.08);
-  }
-
-  .dark .method-cards-grid .method-card-art,
-  .dark .method-cards-grid .method-card-liquid-glass,
-  .dark .method-cards-grid .method-card-fade {
-    display: none;
-  }
-
-  .dark .method-cards-grid .method-card-copy {
-    z-index: 3;
-    padding: 0 10% 5.5%;
-    text-align: center;
-  }
-
-  .dark .method-cards-grid .method-card-title {
-    color: #F5DFC0;
-    font-size: clamp(0.72rem, 3.45vw, 0.9rem);
-    line-height: 1.08;
-    white-space: nowrap;
-  }
-
-  .dark .method-cards-grid .method-card-description {
-    color: #D8C7AE;
-    margin-top: 0.22rem;
-    font-size: clamp(0.58rem, 2.5vw, 0.69rem);
-    line-height: 1.08;
-    -webkit-line-clamp: 2;
-  }
-
-  .dark .method-cards-grid .method-card-index {
-    display: flex;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    z-index: 4;
-    width: clamp(1.75rem, 8.2vw, 2.1rem);
-    height: clamp(1.75rem, 8.2vw, 2.1rem);
-    transform: translateX(-50%);
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #D5A95B;
-    border-radius: 999px;
-    background: #031127;
-    color: #E7C779;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(0.72rem, 3.4vw, 0.9rem);
-    line-height: 1;
-    box-shadow: 0 0 0 2px #031127, 0 0 0 3px rgba(213, 169, 91, 0.78);
-  }
-
-  .dark .method-cards-grid[data-methodology="1"] .method-image-card:nth-of-type(n + 3) .method-card-index {
-    top: 12%;
-  }
 }

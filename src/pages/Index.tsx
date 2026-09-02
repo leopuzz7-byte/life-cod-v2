@@ -51,11 +51,17 @@ import { SuccessPathResult } from "@/components/SuccessPathResult";
 import { KeyToSuccessPathResultComponent } from "@/components/KeyToSuccessPathResult";
 import { useMysticMode } from "@/lib/mysticMode";
 import { useTheme } from "@/lib/theme";
-import { cardImages, cardImagesM2, cardImagesDark, cardImagesM2Dark, cardSheetsMobileDark } from "@/lib/cardImages";
+import {
+  cardImages,
+  cardImagesM2,
+  cardImagesDark,
+  cardImagesM2Dark,
+  cardImagesMobileDark,
+  cardImagesM2MobileDark,
+} from "@/lib/cardImages";
 
 // Карточки методики 1 с картинками. false — вернуть золотые значки (файлы/код не удалены).
 const SHOW_CARD_IMAGES = true;
-const ROMAN_CARD_NUMERALS = ["I", "II", "III", "IV", "V", "VI"];
 import { calculateDailyForecast, DailyForecastResult as DailyForecastType } from "@/lib/dailyForecast";
 import { calculateFinancialCode, FinancialCodeResult as FinancialCodeType } from "@/lib/financialCode";
 import { calculateNameEnergy, NameEnergyResult as NameEnergyType } from "@/lib/nameEnergy";
@@ -709,38 +715,34 @@ const Index = () => {
                   </div>
 
                   {/* Methods of selected methodology — full width below */}
-                  <div
-                    className="method-cards-grid mb-6 md:mb-8 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3"
-                    data-methodology={selectedMethodology}
-                  >
-                    {theme === "dark" && (
-                      <img
-                        src={cardSheetsMobileDark[selectedMethodology]}
-                        alt=""
-                        aria-hidden="true"
-                        className="mobile-dark-card-sheet"
-                      />
-                    )}
-                    {(selectedMethodology === "1" ? methodology1Methods : methodology2Methods).map((method, methodIndex) => {
+                  <div className="mb-6 md:mb-8 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+                    {(selectedMethodology === "1" ? methodology1Methods : methodology2Methods).map((method) => {
                       const activeCardImages = theme === "dark"
                         ? (selectedMethodology === "1" ? cardImagesDark : cardImagesM2Dark)
                         : (selectedMethodology === "1" ? cardImages : cardImagesM2);
                       const img = SHOW_CARD_IMAGES ? activeCardImages[method.id] : undefined;
+                      const mobileDarkImg = theme === "dark"
+                        ? (selectedMethodology === "1" ? cardImagesMobileDark : cardImagesM2MobileDark)[method.id]
+                        : undefined;
                       if (img) {
                         return (
                           <button
                             key={method.id}
                             onClick={() => handleMethodSelect(method.id)}
                             className={cn(
-                              "group method-image-card relative rounded-xl border-[1.5px] dark:border overflow-hidden text-left w-full h-[158px] md:h-[184px] transition-all duration-300",
-                              selectedMethod === method.id && "is-selected",
+                              "group method-image-card relative rounded-xl border-[1.5px] dark:border overflow-hidden text-left w-full transition-all duration-300",
+                              theme === "dark"
+                                ? "dark-mobile-method-card aspect-[3/2] md:aspect-auto md:h-[184px]"
+                                : "h-[158px] md:h-[184px]",
                               selectedMethod === method.id
                                 ? "border-[#0F2044] shadow-[0_0_0_2px_rgba(15,32,68,0.55),0_0_16px_rgba(15,32,68,0.28)] md:shadow-[0_3px_12px_rgba(15,32,68,0.22)] dark:border-[#E2BD70] dark:shadow-[0_0_0_1px_rgba(226,189,112,0.45),0_0_18px_rgba(213,169,91,0.22)]"
                                 : "border-[#0F2044]/25 md:hover:border-[#0F2044] md:hover:shadow-[0_3px_14px_rgba(15,32,68,0.16)] dark:border-[#D5A95B]/40 dark:md:hover:border-[#D5A95B]/75 dark:md:hover:shadow-[0_4px_18px_rgba(0,0,0,0.32)]"
                             )}
                           >
-                            <img src={img} alt="" loading="lazy" decoding="async" className="method-card-art absolute inset-0 w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-105" style={{ objectPosition: "center 32%" }} />
-                            <span className="method-card-index" aria-hidden="true">{ROMAN_CARD_NUMERALS[methodIndex]}</span>
+                            <picture className="absolute inset-0 block h-full w-full">
+                              {mobileDarkImg && <source media="(max-width: 767px)" srcSet={mobileDarkImg} />}
+                              <img src={img} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-105" style={{ objectPosition: "center 32%" }} />
+                            </picture>
                             {method.comingSoon && <span className="absolute top-2 left-2 z-10 text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{background:'rgba(196,152,90,0.9)',color:'#3a2a10'}}>Скоро</span>}
                             <div className="method-card-liquid-glass" />
                             <div className="method-card-fade" />
