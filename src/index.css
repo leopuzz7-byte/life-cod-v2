@@ -318,6 +318,26 @@
   background: linear-gradient(180deg, rgba(2, 8, 20, 0.16), rgba(2, 8, 20, 0.34));
 }
 
+/* На телефонах адресная панель меняет высоту видимой области при скролле.
+   Стабильная высота lvh не дает fixed-фону заново масштабироваться и прыгать. */
+@media (max-width: 767px) {
+  .page-bg,
+  .page-bg-overlay {
+    inset: auto;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100lvh;
+  }
+
+  .page-bg {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+}
+
 @media (min-width: 768px) {
   .page-bg-mobile {
     display: none !important;
