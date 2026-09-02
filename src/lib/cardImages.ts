@@ -61,3 +61,11 @@ export const cardImagesM2Dark: Record<string, string> = {
   name: nmDark,
   finance: fnDark,
 };
+
+import methodology1MobileDark from "@/assets/cards-mobile-dark/methodology1.webp";
+import methodology2MobileDark from "@/assets/cards-mobile-dark/methodology2.webp";
+
+export const cardSheetsMobileDark: Record<"1" | "2", string> = {
+  "1": methodology1MobileDark,
+  "2": methodology2MobileDark,
+};
