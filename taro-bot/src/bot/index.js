@@ -251,6 +251,9 @@ function drawSpreadCards(u, count, excluded = []) {
 let deck3Cache = null;
 async function deck3Image() { if (!deck3Cache) deck3Cache = await renderDeckChoice(3, { title: "Выбери карту", subtitle: "ту, к которой тянет" }); return deck3Cache; }
 async function showSphereChoice(ctx) {
+  const u = getUser(ctx.from.id);
+  if (!u.spread || u.spread.cancelled) u.spread = newPaidSpread();
+  u.step = "sp_sphere"; saveUser(u);
   const kb = new InlineKeyboard();
   paidDecks.CATEGORIES.forEach((category) => kb.text(`${category.emoji} ${category.label}`, `spcat:${category.id}`).row());
   await ctx.reply("Выбери главную тему. Затем я уточню, что именно хочется узнать, и предложу подходящую колоду.", { reply_markup: kb });
@@ -724,6 +727,7 @@ bot.callbackQuery(/^spsub:(self|other)$/, async (ctx) => {
   if (!u.spread || !u.spread.intentId) { await showSphereChoice(ctx); return; }
   if (ctx.match[1] === "self") {
     u.spread.subject = { kind: "self", relation: "self", gender: "unspecified", name: u.name || ctx.from.first_name || "" };
+    saveUser(u);
     track(ctx.from.id, "spread_subject", { kind: "self" });
     await askSpreadQuestion(ctx);
     return;
@@ -759,7 +763,7 @@ bot.callbackQuery("spname:skip", async (ctx) => {
   const u = getUser(ctx.from.id);
   if (!isActivePaidStep(u, "sp_subject_name")) return;
   if (!u.spread || !u.spread.subject || u.spread.subject.kind !== "other") { await showSpreadSubjectChoice(ctx); return; }
-  u.spread.subject.name = "";
+  u.spread.subject.name = ""; saveUser(u);
   await askSpreadQuestion(ctx);
 });
 
@@ -770,6 +774,7 @@ bot.callbackQuery(/^spcp:(yes|no)$/, async (ctx) => {
   if (!u.spread || !u.spread.question) { await showSphereChoice(ctx); return; }
   if (ctx.match[1] === "no") {
     u.spread.counterpart = { present: false, relation: null, gender: "unspecified", name: "" };
+    saveUser(u);
     await finalizeSpreadQuestion(ctx);
     return;
   }
@@ -804,7 +809,7 @@ bot.callbackQuery("spcpname:skip", async (ctx) => {
   const u = getUser(ctx.from.id);
   if (!isActivePaidStep(u, "sp_counterpart_name")) return;
   if (!u.spread || !u.spread.counterpart || !u.spread.counterpart.present) { await showCounterpartCheck(ctx); return; }
-  u.spread.counterpart.name = "";
+  u.spread.counterpart.name = ""; saveUser(u);
   await finalizeSpreadQuestion(ctx);
 });
 
@@ -1054,7 +1059,7 @@ bot.on("message:text", async (ctx) => {
     if (!u.spread || !u.spread.subject || u.spread.subject.kind !== "other") { u.step = "sp_sphere"; saveUser(u); await showSphereChoice(ctx); return; }
     const personName = sanitizePersonName(text);
     if (personName.length < 2) { await ctx.reply("Напиши имя чуть подробнее или нажми «Без имени»."); return; }
-    u.spread.subject.name = personName;
+    u.spread.subject.name = personName; saveUser(u);
     await askSpreadQuestion(ctx);
     return;
   }
@@ -1062,7 +1067,7 @@ bot.on("message:text", async (ctx) => {
     if (!u.spread || !u.spread.counterpart || !u.spread.counterpart.present) { u.step = "sp_sphere"; saveUser(u); await showSphereChoice(ctx); return; }
     const counterpartName = sanitizePersonName(text);
     if (counterpartName.length < 2) { await ctx.reply("Напиши имя чуть подробнее или нажми «Без имени»."); return; }
-    u.spread.counterpart.name = counterpartName;
+    u.spread.counterpart.name = counterpartName; saveUser(u);
     await finalizeSpreadQuestion(ctx);
     return;
   }
@@ -1077,6 +1082,7 @@ bot.on("message:text", async (ctx) => {
       return;
     }
     u.spread.counterpart = { present: false, relation: null, gender: "unspecified", name: "" };
+    saveUser(u);
     await finalizeSpreadQuestion(ctx);
     return;
   }
