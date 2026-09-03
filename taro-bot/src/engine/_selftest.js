@@ -1,6 +1,8 @@
 const { calculatePersonalMatrix } = require("./calculations");
 const { getArcana, positionTitles } = require("./arcana");
 const assert = require("assert");
+const fs = require("fs");
+const path = require("path");
 const paidDecks = require("./paidDecks");
 const deck78 = require("./deck78");
 const taroCredits = require("./taroCredits");
@@ -71,4 +73,14 @@ const routeCases = [
   ["Какой вариант выбрать и какой урок я сейчас прохожу?", "thoth"],
 ];
 for (const [question, expected] of routeCases) assert.strictEqual(paidDecks.localRoute(question), expected, question);
+
+// Регрессия меню: подпись кнопки должна перехватываться раньше полей активной цепочки.
+const botSource = fs.readFileSync(path.join(__dirname, "..", "bot", "index.js"), "utf8");
+const textHandlerAt = botSource.indexOf('bot.on("message:text"');
+const menuPriorityAt = botSource.indexOf("if (Object.values(L).includes(text))", textHandlerAt);
+const paidInputAt = botSource.indexOf('if (u.step === "sp_subject_name")', textHandlerAt);
+assert.ok(textHandlerAt >= 0 && menuPriorityAt > textHandlerAt && menuPriorityAt < paidInputAt, "главное меню обрабатывается после полей расклада");
+assert.ok(botSource.includes("function cancelInteractiveFlow(u)"), "нет единого сброса активной цепочки");
+assert.ok(botSource.includes('if (!isActivePaidStep(u, "sp_sphere")) return;'), "старые кнопки тем не блокируются");
+assert.ok(botSource.includes('if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;'), "ответ ИИ может продолжить отменённый расклад");
 console.log("платные колоды:", Object.entries(expectedDeckSizes).map(([id, count]) => `${id}=${count}`).join(", "), "| файлы и маршрутизация: ОК");

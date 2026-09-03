@@ -2,6 +2,7 @@
 // подписочный гейт, глубокий разбор, меню reply-клавиатурой, мини-апп калькулятор,
 // оплата Robokassa (заглушка с готовой логикой). Тон: таролог-психолог, на «ты» умеренно.
 const path = require("path");
+const { randomUUID } = require("crypto");
 const { Bot, InlineKeyboard, Keyboard, InputFile } = require("grammy");
 const config = require("./config");
 const { getUser, saveUser, getCircles, setCircle } = require("./store");
@@ -163,8 +164,24 @@ function sanitizePersonName(value) {
 function newPaidSpread() {
   return {
     deckVersion: 2, category: null, intentId: null, deckId: null, routeReason: "", question: "",
+    flowId: randomUUID(), cancelled: false,
     subject: null, counterpart: null, cards: [], revealed: 0, extra: 0, extraCards: [],
   };
+}
+function isActivePaidStep(u, ...steps) {
+  return !!(u && u.spread && !u.spread.cancelled && steps.includes(u.step));
+}
+function isSamePaidFlow(userId, flowId, ...steps) {
+  const current = getUser(userId);
+  return !!(current.spread && current.spread.flowId === flowId && !current.spread.cancelled && steps.includes(current.step));
+}
+function cancelInteractiveFlow(u) {
+  if (u.spread && String(u.step || "").startsWith("sp_")) {
+    u.spread.cancelled = true;
+    delete u.spread.revealingAt;
+  }
+  u.step = "menu";
+  saveUser(u);
 }
 function spreadSubjectSummary(u) {
   const subject = u && u.spread && u.spread.subject;
@@ -299,16 +316,21 @@ async function finalizeSpreadQuestion(ctx) {
   const u = getUser(ctx.from.id);
   const q = u.spread && u.spread.question;
   if (!q) { await showSphereChoice(ctx); return; }
+  if (!u.spread.flowId) u.spread.flowId = randomUUID();
+  const flowId = u.spread.flowId;
+  u.step = "sp_routing"; saveUser(u);
   if (!u.spread.deckId || u.spread.intentId === "custom") {
     await ctx.replyWithChatAction("typing");
     const localDeckId = paidDecks.localRoute(q);
     const routed = await ai.selectPaidDeck(q, spreadSubjectContext(u, false));
+    if (!isSamePaidFlow(ctx.from.id, flowId, "sp_routing")) return;
     const acceptedRoute = routed && routed.confidence >= 0.62;
     u.spread.deckId = acceptedRoute ? routed.deckId : localDeckId;
     u.spread.routeReason = acceptedRoute && routed.reason
       ? routed.reason
       : `По смыслу вопроса лучше всего подходит специализация колоды «${paidDecks.getDeck(u.spread.deckId).label}».`;
   }
+  if (!isSamePaidFlow(ctx.from.id, flowId, "sp_routing")) return;
   if (!paidDecks.DECKS[u.spread.deckId]) u.spread.deckId = "thoth";
   u.step = "sp_confirm"; saveUser(u);
   track(ctx.from.id, "spread_deck_route", { deck: u.spread.deckId, intent: u.spread.intentId || "custom" });
@@ -320,6 +342,8 @@ function deckGuideText() {
     .join("\n\n");
 }
 async function showIntentChoice(ctx, categoryId) {
+  const current = getUser(ctx.from.id);
+  if (!isActivePaidStep(current, "sp_intent")) return;
   const category = paidDecks.getCategory(categoryId);
   if (!category) { await showSphereChoice(ctx); return; }
   if (categoryId === "custom") {
@@ -341,6 +365,7 @@ function confirmKeyboard() {
 }
 async function showSpreadConfirmation(ctx) {
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_confirm")) return;
   const profile = paidDecks.getDeck(u.spread.deckId);
   const category = paidDecks.getCategory(u.spread.category);
   const intent = paidDecks.getIntent(u.spread.intentId);
@@ -358,18 +383,24 @@ async function showSpreadConfirmation(ctx) {
 async function startRitual(ctx) {
   const u = getUser(ctx.from.id);
   u.spread = u.spread || {};
+  if (!u.spread.flowId) u.spread.flowId = randomUUID();
+  u.spread.cancelled = false;
+  const flowId = u.spread.flowId;
   if (!u.spread.deckId || !paidDecks.DECKS[u.spread.deckId]) u.spread.deckId = "thoth";
   u.spread.deckVersion = 2;
   u.spread.cards = paidDecks.drawCards(u.spread.deckId, 3);
   u.spread.revealed = 0; u.spread.extra = 0; u.spread.extraCards = []; u.spread.firstChosen = false; delete u.spread.revealingAt; u.step = "sp_reading"; saveUser(u);
   // тасовка колоды, затем три карты рубашкой вверх
   await waiting(ctx);
+  if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
   const img = await deck3Image();
+  if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
   const profile = paidDecks.getDeck(u.spread.deckId);
   await ctx.replyWithPhoto(new InputFile(img), { caption: `Колода «${profile.label}» перетасована. Перед тобой три карты рубашкой вверх. Выбери ту, к которой тянет. Выбранная карта откроется первой.`, reply_markup: new InlineKeyboard().text("Карта 1", "spfirst:0").text("Карта 2", "spfirst:1").text("Карта 3", "spfirst:2") });
 }
 async function showExtraPrompt(ctx) {
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_reading")) return;
   const left = 3 - ((u.spread && u.spread.extra) || 0);
   if (left <= 0) { await finishSpread(ctx); return; }
   await ctx.reply(`Хочешь копнуть глубже? Можно задать ещё до ${left} уточняющих вопросов, на каждый выпадет своя карта.`, { reply_markup: new InlineKeyboard().text("Задать вопрос", "spask").row().text("Готово", "spdone") });
@@ -399,7 +430,7 @@ bot.command("start", async (ctx) => {
     { parse_mode: "HTML", reply_markup: new InlineKeyboard().text("🔮 Таро", "br:tarot").text("🔢 Нумерология", "br:numer") }
   );
 });
-bot.command("menu", async (ctx) => { const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); });
+bot.command("menu", async (ctx) => { const u = getUser(ctx.from.id); cancelInteractiveFlow(u); await showMenu(ctx); });
 bot.command("id", async (ctx) => { await ctx.reply("Твой Telegram ID: " + ctx.from.id); });
 bot.command("notify", async (ctx) => {
   if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;
@@ -581,6 +612,7 @@ bot.callbackQuery(/^fb:(tarot|numer):(hit|part|miss)$/, async (ctx) => {
 // ---------- пункты меню (reply-клавиатура шлёт текст) ----------
 async function handleMenu(ctx, label) {
   const u = getUser(ctx.from.id);
+  cancelInteractiveFlow(u);
   track(ctx.from.id, "menu_click", { button: label });
   if (label === L.tarot) {
     const t = config.taro;
@@ -664,6 +696,7 @@ bot.callbackQuery("chk:sub", async (ctx) => {
 bot.callbackQuery(/^spcat:(love|intimacy|person|money|events|choice|path|state|custom)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_sphere")) return;
   u.spread = u.spread || newPaidSpread();
   u.spread.deckVersion = 2; u.spread.category = ctx.match[1]; u.spread.intentId = null; u.spread.deckId = null; u.spread.subject = null; u.spread.counterpart = null; u.spread.question = ""; u.step = "sp_intent"; saveUser(u);
   track(ctx.from.id, "spread_category", { category: ctx.match[1] });
@@ -673,8 +706,9 @@ bot.callbackQuery(/^spcat:(love|intimacy|person|money|events|choice|path|state|c
 bot.callbackQuery(/^spint:([a-z_]+)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const intent = paidDecks.getIntent(ctx.match[1]);
-  if (!intent || !intent.deckId) { await ctx.reply("Не удалось определить запрос. Выбери тему ещё раз."); await showSphereChoice(ctx); return; }
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_intent")) return;
+  if (!intent || !intent.deckId) { await ctx.reply("Не удалось определить запрос. Выбери тему ещё раз."); await showSphereChoice(ctx); return; }
   u.spread = u.spread || { deckVersion: 2 };
   u.spread.deckVersion = 2; u.spread.intentId = ctx.match[1]; u.spread.deckId = intent.deckId;
   u.spread.routeReason = `Запрос «${intent.label}» точнее всего раскрывает специализация этой колоды.`;
@@ -686,6 +720,7 @@ bot.callbackQuery(/^spint:([a-z_]+)$/, async (ctx) => {
 bot.callbackQuery(/^spsub:(self|other)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_subject")) return;
   if (!u.spread || !u.spread.intentId) { await showSphereChoice(ctx); return; }
   if (ctx.match[1] === "self") {
     u.spread.subject = { kind: "self", relation: "self", gender: "unspecified", name: u.name || ctx.from.first_name || "" };
@@ -702,6 +737,7 @@ bot.callbackQuery(/^spsub:(self|other)$/, async (ctx) => {
 bot.callbackQuery(/^sprel:(partner|ex|family|friend|work|other)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_subject_relation")) return;
   if (!u.spread || !u.spread.subject || u.spread.subject.kind !== "other") { await showSpreadSubjectChoice(ctx); return; }
   u.spread.subject.relation = ctx.match[1]; u.step = "sp_subject_gender"; saveUser(u);
   await showSpreadGenderChoice(ctx);
@@ -710,6 +746,7 @@ bot.callbackQuery(/^sprel:(partner|ex|family|friend|work|other)$/, async (ctx) =
 bot.callbackQuery(/^spgender:(female|male|unspecified)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_subject_gender")) return;
   if (!u.spread || !u.spread.subject || u.spread.subject.kind !== "other") { await showSpreadSubjectChoice(ctx); return; }
   u.spread.subject.gender = ctx.match[1]; u.step = "sp_subject_name"; saveUser(u);
   await ctx.reply("Как зовут этого человека? Напиши имя одним сообщением или выбери «Без имени».", {
@@ -720,6 +757,7 @@ bot.callbackQuery(/^spgender:(female|male|unspecified)$/, async (ctx) => {
 bot.callbackQuery("spname:skip", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_subject_name")) return;
   if (!u.spread || !u.spread.subject || u.spread.subject.kind !== "other") { await showSpreadSubjectChoice(ctx); return; }
   u.spread.subject.name = "";
   await askSpreadQuestion(ctx);
@@ -728,6 +766,7 @@ bot.callbackQuery("spname:skip", async (ctx) => {
 bot.callbackQuery(/^spcp:(yes|no)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_counterpart_check")) return;
   if (!u.spread || !u.spread.question) { await showSphereChoice(ctx); return; }
   if (ctx.match[1] === "no") {
     u.spread.counterpart = { present: false, relation: null, gender: "unspecified", name: "" };
@@ -742,6 +781,7 @@ bot.callbackQuery(/^spcp:(yes|no)$/, async (ctx) => {
 bot.callbackQuery(/^spcprel:(boyfriend|girlfriend|husband|wife|interest|ex|other)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_counterpart_relation")) return;
   if (!u.spread || !u.spread.counterpart || !u.spread.counterpart.present) { await showCounterpartCheck(ctx); return; }
   u.spread.counterpart.relation = ctx.match[1];
   u.step = "sp_counterpart_gender"; saveUser(u);
@@ -751,6 +791,7 @@ bot.callbackQuery(/^spcprel:(boyfriend|girlfriend|husband|wife|interest|ex|other
 bot.callbackQuery(/^spcpgender:(female|male|unspecified)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_counterpart_gender")) return;
   if (!u.spread || !u.spread.counterpart || !u.spread.counterpart.present) { await showCounterpartCheck(ctx); return; }
   u.spread.counterpart.gender = ctx.match[1]; u.step = "sp_counterpart_name"; saveUser(u);
   await ctx.reply("Как зовут этого человека? Напиши имя одним сообщением или выбери «Без имени».", {
@@ -761,6 +802,7 @@ bot.callbackQuery(/^spcpgender:(female|male|unspecified)$/, async (ctx) => {
 bot.callbackQuery("spcpname:skip", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_counterpart_name")) return;
   if (!u.spread || !u.spread.counterpart || !u.spread.counterpart.present) { await showCounterpartCheck(ctx); return; }
   u.spread.counterpart.name = "";
   await finalizeSpreadQuestion(ctx);
@@ -769,6 +811,7 @@ bot.callbackQuery("spcpname:skip", async (ctx) => {
 bot.callbackQuery("spback", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!u.spread || u.spread.cancelled || !String(u.step || "").startsWith("sp_")) return;
   u.step = "sp_sphere"; u.spread = newPaidSpread(); saveUser(u);
   await showSphereChoice(ctx);
 });
@@ -777,6 +820,7 @@ bot.callbackQuery("spback", async (ctx) => {
 bot.callbackQuery("spno", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!u.spread || u.spread.cancelled || !String(u.step || "").startsWith("sp_")) return;
   u.step = "sp_sphere"; u.spread = newPaidSpread(); saveUser(u);
   await showSphereChoice(ctx);
 });
@@ -784,6 +828,7 @@ bot.callbackQuery("spno", async (ctx) => {
 bot.callbackQuery("spedit", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_confirm")) return;
   if (!u.spread) { await showSphereChoice(ctx); return; }
   u.spread.question = ""; u.spread.counterpart = null; u.step = "sp_question"; saveUser(u);
   await ctx.reply("Напиши исправленный вопрос одним сообщением.");
@@ -791,6 +836,8 @@ bot.callbackQuery("spedit", async (ctx) => {
 
 bot.callbackQuery("spchange", async (ctx) => {
   await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_confirm")) return;
   const kb = new InlineKeyboard();
   Object.values(paidDecks.DECKS).forEach((profile) => kb.text(profile.label, `spdeck:${profile.id}`).row());
   kb.text("← Оставить рекомендацию", "spconfirm");
@@ -800,6 +847,7 @@ bot.callbackQuery("spchange", async (ctx) => {
 bot.callbackQuery(/^spdeck:(author|thoth|lenormand|ludy-lescot|deviant-moon|golden-taurus|decameron)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_confirm")) return;
   if (!u.spread || !u.spread.question) { await showSphereChoice(ctx); return; }
   u.spread.deckId = ctx.match[1]; u.spread.deckVersion = 2; u.spread.routeReason = "Колода выбрана вручную."; u.step = "sp_confirm"; saveUser(u);
   track(ctx.from.id, "spread_deck_override", { deck: ctx.match[1] });
@@ -809,6 +857,7 @@ bot.callbackQuery(/^spdeck:(author|thoth|lenormand|ludy-lescot|deviant-moon|gold
 bot.callbackQuery("spconfirm", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_confirm")) return;
   if (!u.spread || !u.spread.question || !u.spread.deckId) { await showSphereChoice(ctx); return; }
   u.step = "sp_confirm"; saveUser(u);
   await showSpreadConfirmation(ctx);
@@ -817,6 +866,7 @@ bot.callbackQuery("spconfirm", async (ctx) => {
 bot.callbackQuery("spok", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_confirm")) return;
   if (!u.spread || !u.spread.question || (!u.spread.deckId && !u.spread.sphere)) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
   if (taroCredits.hasCredit(u)) {
     taroCredits.consume(u); u.pay = null; saveUser(u);
@@ -825,8 +875,16 @@ bot.callbackQuery("spok", async (ctx) => {
     return;
   }
   const t = config.taro;
+  if (!u.spread.flowId) u.spread.flowId = randomUUID();
+  const flowId = u.spread.flowId;
+  u.step = "sp_payment"; saveUser(u);
   const r = await pay.createBotPayment(ctx.from.id, t.product);
-  if (!r || !r.payment_url) { await ctx.reply("Не удалось создать оплату, попробуй ещё раз или напиши в техподдержку " + config.contacts.support); return; }
+  if (!isSamePaidFlow(ctx.from.id, flowId, "sp_payment")) return;
+  if (!r || !r.payment_url) {
+    u.step = "sp_confirm"; saveUser(u);
+    await ctx.reply("Не удалось создать оплату, попробуй ещё раз или напиши в техподдержку " + config.contacts.support);
+    return;
+  }
   u.pay = { kind: "taro", product: t.product, invId: r.inv_id }; saveUser(u);
   track(ctx.from.id, "pay_click", { what: t.product });
   const testNote = r.is_test ? "\n\n(тестовый режим оплаты)" : "";
@@ -836,21 +894,34 @@ bot.callbackQuery("chk:taro", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
   if (!u.pay || u.pay.kind !== "taro") { await ctx.reply("Нет активного счёта. Начни оплату заново."); return; }
-  const r = await pay.checkBotPayment(ctx.from.id, u.pay.invId);
+  const invId = u.pay.invId;
+  const r = await pay.checkBotPayment(ctx.from.id, invId);
+  const current = getUser(ctx.from.id);
+  if (!current.pay || current.pay.kind !== "taro" || current.pay.invId !== invId) return;
   if (r && r.status === "paid") {
-    track(ctx.from.id, "paid", { product: u.pay.product });
-    u.pay = null; saveUser(u);
+    track(ctx.from.id, "paid", { product: current.pay.product });
+    current.pay = null;
+    if (!isActivePaidStep(current, "sp_payment")) {
+      taroCredits.grant(current, "1"); saveUser(current);
+      await ctx.reply("Оплата получена. Один расклад сохранён. Когда будешь готов, снова открой «Таро расклад» в меню.");
+      return;
+    }
+    if (current.spread) current.spread.cancelled = false;
+    saveUser(current);
     await startRitual(ctx);
-  } else {
+  } else if (isActivePaidStep(current, "sp_payment")) {
     await ctx.reply("Оплату пока не вижу. Если только что оплатил, подожди минуту и нажми ещё раз.", { reply_markup: new InlineKeyboard().text("Проверить оплату", "chk:taro") });
   }
 });
 async function revealNextSpreadCard(ctx) {
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_reading")) return;
   if (!u.spread || !u.spread.cards || u.spread.cards.length !== 3) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
   if (u.spread.revealingAt && Date.now() - u.spread.revealingAt < 120000) return;
   const idx = u.spread.revealed || 0;
   if (idx >= 3) return;
+  if (!u.spread.flowId) u.spread.flowId = randomUUID();
+  const flowId = u.spread.flowId;
   u.spread.revealingAt = Date.now(); saveUser(u);
   const card = u.spread.cards[idx];
   const positions = spreadPositions(u);
@@ -859,15 +930,19 @@ async function revealNextSpreadCard(ctx) {
   const profile = spreadDeckProfile(u);
   await ctx.replyWithChatAction("upload_photo");
   try { const cf = spreadCardFile(u, card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
+  if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
   const prev = u.spread.cards.slice(0, idx);
   const txt = await ai.generateSpreadCard(profile, topicLabel, u.spread.question, pos, idx, spreadCardInfo(u, card), prev.map((item) => spreadCardInfo(u, item)), spreadSubjectContext(u, idx === 0));
+  if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
   const name = spreadCardName(u, card);
   const ordinal = ["Первая карта", "Вторая карта", "Третья карта"][idx];
   await ctx.reply(`<b>${ordinal}, ${esc(pos.toLowerCase())}: ${esc(name)}</b>\n\n${esc(txt || (name + " показывает важную часть ситуации. Сопоставь её с тем, что происходит в реальности."))}`, { parse_mode: "HTML" });
+  if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
   u.spread.revealed = idx + 1; delete u.spread.revealingAt; saveUser(u);
   track(ctx.from.id, "spread_card", { idx: idx + 1, deck: u.spread.deckId || "classic" });
   if (u.spread.revealed < 3) {
     await sleep(1500);
+    if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
     const nextPosition = positions[u.spread.revealed];
     const nextNumber = u.spread.revealed === 1 ? "вторую" : "третью";
     const transition = profile.id === "decameron"
@@ -878,10 +953,13 @@ async function revealNextSpreadCard(ctx) {
     await ctx.reply(transition, { reply_markup: new InlineKeyboard().text(`Открыть ${nextNumber} карту`, "sprev") });
   } else {
     await sleep(700);
+    if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
     await ctx.replyWithChatAction("typing");
     const fin = await ai.generateSpreadFinal(profile, topicLabel, u.spread.question, u.spread.cards.map((item) => spreadCardInfo(u, item)), positions, spreadSubjectContext(u, true));
+    if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
     if (fin) await ctx.reply(`<b>Свод</b>\n\n${esc(fin)}`, { parse_mode: "HTML" });
     await sleep(600);
+    if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
     await showExtraPrompt(ctx);
     track(ctx.from.id, "spread_done", { deck: u.spread.deckId || "classic" });
   }
@@ -890,6 +968,7 @@ async function revealNextSpreadCard(ctx) {
 bot.callbackQuery(/^spfirst:([0-2])$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_reading")) return;
   if (!u.spread || !u.spread.cards || u.spread.cards.length !== 3) { await ctx.reply("Начни заново через кнопку «Таро расклад»."); return; }
   if (u.spread.firstChosen || (u.spread.revealed || 0) > 0) return;
   const selectedIndex = Number(ctx.match[1]);
@@ -902,23 +981,28 @@ bot.callbackQuery(/^spfirst:([0-2])$/, async (ctx) => {
 bot.callbackQuery("sprev", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_reading")) return;
   if (isNewPaidSpread(u) && !u.spread.firstChosen) { await ctx.reply("Сначала выбери одну из трёх закрытых карт."); return; }
   await revealNextSpreadCard(ctx);
 });
 bot.callbackQuery("spask", async (ctx) => {
   await ctx.answerCallbackQuery();
-  const u = getUser(ctx.from.id); u.step = "sp_extra_q"; saveUser(u);
+  const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_reading")) return;
+  u.step = "sp_extra_q"; saveUser(u);
   await ctx.reply("Напиши свой уточняющий вопрос одним сообщением.");
 });
 bot.callbackQuery("spdone", async (ctx) => {
   await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  if (!isActivePaidStep(u, "sp_reading")) return;
   await finishSpread(ctx);
 });
-bot.callbackQuery("to:menu", async (ctx) => { await ctx.answerCallbackQuery(); const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); });
+bot.callbackQuery("to:menu", async (ctx) => { await ctx.answerCallbackQuery(); const u = getUser(ctx.from.id); cancelInteractiveFlow(u); await showMenu(ctx); });
 bot.callbackQuery(/^go:(tarot|chat|consult|menu)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const which = ctx.match[1];
-  if (which === "menu") { const u = getUser(ctx.from.id); u.step = "menu"; saveUser(u); await showMenu(ctx); return; }
+  if (which === "menu") { const u = getUser(ctx.from.id); cancelInteractiveFlow(u); await showMenu(ctx); return; }
   const label = which === "tarot" ? L.tarot : which === "chat" ? L.chat : L.consult;
   await handleMenu(ctx, label);
 });
@@ -927,6 +1011,10 @@ bot.callbackQuery(/^go:(tarot|chat|consult|menu)$/, async (ctx) => {
 bot.on("message:text", async (ctx) => {
   const u = getUser(ctx.from.id);
   const text = ctx.message.text;
+
+  // Главное меню имеет приоритет над любым незавершённым сценарием.
+  // Иначе подпись кнопки могла быть принята за имя, вопрос или ответ расклада.
+  if (Object.values(L).includes(text)) { if (await handleMenu(ctx, text)) return; }
 
   if (u.step === "await_name") {
     u.name = text.trim().slice(0, 40).replace(/[<>]/g, ""); u.step = "await_date"; saveUser(u);
@@ -996,24 +1084,27 @@ bot.on("message:text", async (ctx) => {
     if (!u.spread || (!u.spread.deckId && !u.spread.sphere)) { u.step = "menu"; saveUser(u); await showMenu(ctx); return; }
     const q = text.trim().slice(0, 300);
     if (q.length < 3) { await ctx.reply("Напиши уточняющий вопрос чуть подробнее."); return; }
+    if (!u.spread.flowId) u.spread.flowId = randomUUID();
+    const flowId = u.spread.flowId;
     const excluded = [...(u.spread.cards || []), ...(u.spread.extraCards || [])];
     const card = drawSpreadCards(u, 1, excluded)[0];
     await ctx.replyWithChatAction("upload_photo");
     try { const cf = spreadCardFile(u, card); if (cf) await ctx.replyWithPhoto(new InputFile(cf)); } catch (_) {}
+    if (!isSamePaidFlow(ctx.from.id, flowId, "sp_extra_q")) return;
     const profile = spreadDeckProfile(u);
     const ans = await ai.generateSpreadExtra(profile, spreadTopicLabel(u), u.spread.question, spreadCardInfo(u, card), q, (u.spread.cards || []).map((item) => spreadCardInfo(u, item)), spreadSubjectContext(u, false));
+    if (!isSamePaidFlow(ctx.from.id, flowId, "sp_extra_q")) return;
     const name = spreadCardName(u, card);
     await ctx.reply(`<b>${esc(name)}</b>\n\n${esc(ans || "Карта отвечает мягко, прислушайся к первому чувству.")}`, { parse_mode: "HTML" });
+    if (!isSamePaidFlow(ctx.from.id, flowId, "sp_extra_q")) return;
     u.spread.extraCards = (u.spread.extraCards || []).concat(card);
     u.spread.extra = (u.spread.extra || 0) + 1; u.step = "sp_reading"; saveUser(u);
     track(ctx.from.id, "spread_extra", { n: u.spread.extra, deck: u.spread.deckId || "classic" });
     await sleep(800);
+    if (!isSamePaidFlow(ctx.from.id, flowId, "sp_reading")) return;
     await showExtraPrompt(ctx);
     return;
   }
-
-  // пункты меню (reply-клавиатура)
-  if (Object.values(L).includes(text)) { if (await handleMenu(ctx, text)) return; }
 
   if (u.step === "chat") {
     const FREE = config.limits.aiMessagesPerDay;
