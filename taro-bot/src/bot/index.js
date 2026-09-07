@@ -471,6 +471,19 @@ bot.command("give", async (ctx) => {
   await ctx.reply(`Готово. Выдал: ${human}, пользователю ${targetId}.`);
   try { await bot.api.sendMessage(targetId, plan === "taro" ? `Надежда открыла тебе доступ к таро-раскладам. Доступно: ${taroCredits.balance(target)}. Загляни в меню, кнопка «Таро расклад».` : "Надежда открыла тебе подписку. Чат со мной теперь без ограничений."); } catch (_) {}
 });
+bot.command("take", async (ctx) => {
+  if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;
+  const parts = (ctx.match || "").trim().split(/\s+/);
+  const targetId = parts[0];
+  if (!targetId) { await ctx.reply("Формат: /take ID [число|all]\nБез числа или all обнуляет все таро-расклады и снимает безлимит. С числом списывает столько раскладов. Пример: /take 12345 3 или /take 12345 all."); return; }
+  const target = getUser(targetId);
+  const res = taroCredits.revoke(target, parts[1]);
+  if (!res) { await ctx.reply("Второй аргумент: целое число от 1 или all. Пример: /take ID 3."); return; }
+  saveUser(target);
+  await ctx.reply(res.cleared
+    ? `Готово. Обнулил таро-расклады у ${targetId}. Доступно сейчас: ${taroCredits.balance(target)}.`
+    : `Готово. Списал ${res.count} у ${targetId}. Осталось: ${taroCredits.balance(target)}.`);
+});
 bot.command("help", async (ctx) => {
   await ctx.reply("Я бот Надежды. Внизу есть меню с кнопками, если его не видно, нажми на значок с квадратиками справа от поля ввода.\n\nБыстрые команды: /menu меню, /taro расклад, /chat чат.\n\nЕсли что-то не работает, напиши в техподдержку " + config.contacts.support, { reply_markup: quickKb() });
 });

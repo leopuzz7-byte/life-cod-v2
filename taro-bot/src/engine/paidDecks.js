@@ -332,15 +332,12 @@ const DECKS = {
 };
 
 const CATEGORIES = [
-  { id: "love", label: "Любовь и отношения", emoji: "♡", intents: ["love_future", "love_hidden", "love_person", "love_event"] },
-  { id: "intimacy", label: "Близость и притяжение", emoji: "✦", intents: ["intimacy_attraction", "intimacy_desire", "intimacy_compatibility", "intimacy_triangle"] },
-  { id: "person", label: "Человек и поведение", emoji: "☾", intents: ["person_profile", "person_trust", "person_hidden", "person_action"] },
-  { id: "money", label: "Работа, деньги, бизнес", emoji: "✧", intents: ["money_strategy", "money_job", "money_deal", "money_choice"] },
-  { id: "events", label: "События и будущее", emoji: "☽", intents: ["event_next", "event_timing", "event_move", "event_period"] },
-  { id: "choice", label: "Выбор, кризис, перемены", emoji: "◇", intents: ["choice_options", "choice_cause", "choice_crisis", "choice_change"] },
-  { id: "path", label: "Предназначение и путь", emoji: "⋆", intents: ["path_purpose", "path_resource", "path_block", "path_direction"] },
-  { id: "state", label: "Состояние и внутренний фон", emoji: "♢", intents: ["state_emotion", "state_shadow", "state_energy"] },
-  { id: "custom", label: "Свой вопрос", emoji: "✎", intents: ["custom"] },
+  { id: "love", label: "Любовь, отношения и секс", emoji: "♡", intents: ["love_future", "love_event", "love_person", "love_hidden", "intimacy_attraction", "intimacy_compatibility"] },
+  { id: "money", label: "Работа и деньги", emoji: "✧", intents: ["money_strategy", "money_job", "money_deal", "money_choice"] },
+  { id: "state", label: "Общее состояние, страхи и психотип", emoji: "☾", intents: ["person_profile", "person_trust", "state_shadow", "state_emotion", "state_energy"] },
+  { id: "path", label: "Предназначение, путь и выбор", emoji: "⋆", intents: ["path_purpose", "path_direction", "choice_options", "choice_cause", "path_block"] },
+  { id: "events", label: "Жизненные ситуации", emoji: "☽", intents: ["event_next", "event_timing", "event_move", "event_period"] },
+  { id: "custom", label: "Своя тема", emoji: "✎", intents: ["custom"] },
 ];
 
 const INTENTS = {

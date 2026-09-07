@@ -31,4 +31,20 @@ function balance(user) {
   return user && user.taroUnlimited ? "безлимит" : String(Math.max(0, Number(user && user.taroFree) || 0));
 }
 
-module.exports = { parseGrant, grant, hasCredit, consume, balance };
+// Снятие доступа. Без raw, "all" или "0" — полный сброс (снимает безлимит и обнуляет счёт).
+// Положительное целое N — списывает N раскладов, но не ниже нуля.
+function revoke(user, raw) {
+  const value = String(raw == null ? "all" : raw).trim().toLowerCase();
+  if (value === "" || value === "all" || value === "0" || UNLIMITED_ALIASES.has(value)) {
+    user.taroUnlimited = false;
+    user.taroFree = 0;
+    return { cleared: true };
+  }
+  if (!/^\d+$/.test(value)) return null;
+  const count = Number(value);
+  if (!Number.isSafeInteger(count) || count < 1) return null;
+  user.taroFree = Math.max(0, (Number(user.taroFree) || 0) - count);
+  return { cleared: false, count };
+}
+
+module.exports = { parseGrant, grant, revoke, hasCredit, consume, balance };
