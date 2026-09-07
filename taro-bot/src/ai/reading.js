@@ -253,4 +253,22 @@ ${context}
   return callAI(prompt, 850, false, 0.68);
 }
 
-module.exports = { generateTarotReveal, generateTarotDeep, generateSpheres, generateDeep, generateChatReply, selectPaidDeck, generateSpreadCard, generateSpreadFinal, generateSpreadExtra };
+// ---- КАРТА ДНЯ (ежедневная рассылка) ----
+async function generateCardOfDay(cardName) {
+  const prompt = `${VOICE}
+
+Ты пишешь короткий тёплый прогноз на день по одной карте Таро. Карта дня: «${cardName}».
+Пиши красивым, живым и грамотным русским языком, цельными предложениями, без канцелярита и без воды. Каждое поле короткое.
+Верни строго JSON:
+{
+  "wish": "тёплое утреннее пожелание на одно предложение, каждый раз другое, чтобы человеку хотелось заглядывать. Саму карту тут не упоминай.",
+  "work": "про дела и работу по смыслу этой карты, 1-2 предложения",
+  "love": "про отношения по смыслу этой карты, 1-2 предложения",
+  "inside": "про внутреннее состояние и интуицию по смыслу этой карты, 1-2 предложения",
+  "caution": "на что обратить внимание, честная теневая сторона именно этой карты, мягко, 1-2 предложения",
+  "advice": "совет дня, одна ясная тёплая мысль"
+}`;
+  return callAI(prompt, 800);
+}
+
+module.exports = { generateTarotReveal, generateTarotDeep, generateSpheres, generateDeep, generateChatReply, selectPaidDeck, generateSpreadCard, generateSpreadFinal, generateSpreadExtra, generateCardOfDay };

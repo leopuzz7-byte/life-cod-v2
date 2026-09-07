@@ -5,6 +5,10 @@
 
 const { allUsers, saveUser, getUser } = require("./store");
 const config = require("./config");
+const fs = require("fs");
+const path = require("path");
+const ai = require("../ai/reading");
+const deck = require("../engine/deck78");
 
 // Банк заботливых вопросов для неплативших (20-30 штук).
 const QUESTION_BANK = [
@@ -98,4 +102,60 @@ async function sendAll(bot, text) {
   return sent;
 }
 
-module.exports = { QUESTION_BANK, sendAll, sendDailyQuestion, sendWeekly, tomorrowHook, applyReferral, REFERRAL_BONUS };
+// ---- КАРТА ДНЯ: одна на всех, каждый день новая, утренняя рассылка ----
+const DAILY_FILE = path.join(__dirname, "..", "..", "data", "cardofday.json");
+const WEEKDAYS = ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"];
+const MONTHS = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+function mskNow() { return new Date(Date.now() + 3 * 3600 * 1000); }
+function mskDateKey() { const d = mskNow(); return d.getUTCFullYear() + "-" + String(d.getUTCMonth() + 1).padStart(2, "0") + "-" + String(d.getUTCDate()).padStart(2, "0"); }
+function ruDateLabel() { const d = mskNow(); const wd = WEEKDAYS[d.getUTCDay()]; return wd.charAt(0).toUpperCase() + wd.slice(1) + ", " + d.getUTCDate() + " " + MONTHS[d.getUTCMonth()]; }
+function readDaily() { try { return JSON.parse(fs.readFileSync(DAILY_FILE, "utf8")); } catch { return {}; } }
+function writeDaily(o) { try { fs.mkdirSync(path.dirname(DAILY_FILE), { recursive: true }); fs.writeFileSync(DAILY_FILE, JSON.stringify(o, null, 2)); } catch (_) {} }
+
+function buildCardText(cardName, p) {
+  const wish = (p && p.wish) ? String(p.wish).trim() : "Доброе утро. Пусть этот день будет к тебе добр.";
+  const head = `🔮 ${ruDateLabel()}. Твоя карта дня: ${cardName}`;
+  const block = (label, v, fallback) => `<b>${label}.</b> ${p && v ? String(v).trim() : fallback}`;
+  const body = [
+    block("В делах", p && p.work, "Сегодня стоит действовать спокойно и без спешки."),
+    block("В отношениях", p && p.love, "Хороший день для тёплого и честного разговора."),
+    block("Внутри", p && p.inside, "Прислушайся к себе, интуиция сейчас точнее логики."),
+    block("Осторожно", p && p.caution, "Не торопи события и не требуй от себя слишком многого."),
+    block("Совет дня", p && p.advice, "Позволь себе паузу, самые важные ответы приходят в тишине."),
+  ].join("\n\n");
+  return `${wish}\n\n${head}\n\n${body}`;
+}
+
+// Готовит карту дня: одну на всех, каждый день новую, не повторяя вчерашнюю. Текст кэшируется на сутки.
+async function ensureCardOfDay() {
+  const today = mskDateKey();
+  const state = readDaily();
+  if (state.date === today && state.text) return state;
+  let card = deck.drawCard();
+  for (let i = 0; i < 30 && state.cardKey && card && card.key === state.cardKey; i++) card = deck.drawCard();
+  let parts = null;
+  try { parts = await ai.generateCardOfDay(card.name); } catch (_) {}
+  const text = buildCardText(card.name, parts);
+  const next = { date: today, cardKey: card.key, cardName: card.name, text };
+  writeDaily(next);
+  return next;
+}
+
+// Рассылка карты дня всем пользователям.
+async function sendCardOfDay(bot) {
+  const state = await ensureCardOfDay();
+  let sent = 0;
+  for (const u of allUsers()) {
+    if (await safeSend(bot, u.id, state.text, { parse_mode: "HTML" })) sent++;
+  }
+  return sent;
+}
+
+// Превью карты дня в конкретный чат (для владельца, проверить до рассылки).
+async function previewCardOfDay(bot, chatId) {
+  const state = await ensureCardOfDay();
+  await bot.api.sendMessage(chatId, state.text, { parse_mode: "HTML" });
+  return state;
+}
+
+module.exports = { QUESTION_BANK, sendAll, sendDailyQuestion, sendWeekly, tomorrowHook, applyReferral, REFERRAL_BONUS, sendCardOfDay, previewCardOfDay, ensureCardOfDay };

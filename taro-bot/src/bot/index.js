@@ -5,7 +5,7 @@ const path = require("path");
 const { randomUUID } = require("crypto");
 const { Bot, InlineKeyboard, Keyboard, InputFile } = require("grammy");
 const config = require("./config");
-const { getUser, saveUser, getCircles, setCircle } = require("./store");
+const { getUser, saveUser, allUsers, getCircles, setCircle } = require("./store");
 const { calculatePersonalMatrix } = require("../engine/calculations");
 const { getArcana } = require("../engine/arcana");
 const { SPHERES, sphereCards, concernText } = require("../engine/spheres");
@@ -16,13 +16,26 @@ const taroCredits = require("../engine/taroCredits");
 const { renderThemeCards } = require("../render/theme");
 const { renderDeckChoice } = require("../render/deck");
 const ai = require("../ai/reading");
-const { applyReferral, sendAll } = require("./broadcasts");
+const { applyReferral, sendAll, previewCardOfDay } = require("./broadcasts");
 const pay = require("./payment");
 const analytics = require("./analytics");
 const track = analytics.track;
 
 const bot = new Bot(config.botToken);
 let botUsername = "taroiibbot";
+// Тихо запоминаем ник и имя из Telegram у каждого, кто пишет боту. Пишем в базу только при изменении.
+bot.use(async (ctx, next) => {
+  try {
+    const from = ctx.from;
+    if (from && !from.is_bot) {
+      const u = getUser(from.id);
+      const uname = from.username || "";
+      const fname = from.first_name || "";
+      if (u.username !== uname || u.firstName !== fname) { u.username = uname; u.firstName = fname; saveUser(u); }
+    }
+  } catch (_) {}
+  await next();
+});
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const ARCANA_DIR = path.join(__dirname, "..", "..", "assets", "arcana");
@@ -447,6 +460,21 @@ bot.command("stats", async (ctx) => {
   if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;
   const days = parseInt((ctx.match || "").trim(), 10) || 0;
   await ctx.reply(analytics.summary(days));
+});
+bot.command("export", async (ctx) => {
+  if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;
+  try {
+    const csv = "﻿" + analytics.buildExportCsv(allUsers());
+    const stamp = new Date().toISOString().slice(0, 10);
+    await ctx.replyWithDocument(new InputFile(Buffer.from(csv, "utf8"), `lifecod_users_${stamp}.csv`), { caption: "Полная выгрузка: каждый юзер, ID, ник, источник и путь по воронке. Открывается в Excel." });
+  } catch (e) {
+    await ctx.reply("Не удалось собрать выгрузку: " + (e && e.message ? e.message : "ошибка"));
+  }
+});
+bot.command("cardday", async (ctx) => {
+  if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;
+  try { await previewCardOfDay(bot, ctx.chat.id); }
+  catch (e) { await ctx.reply("Не удалось собрать карту дня: " + (e && e.message ? e.message : "ошибка")); }
 });
 bot.command("give", async (ctx) => {
   if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;

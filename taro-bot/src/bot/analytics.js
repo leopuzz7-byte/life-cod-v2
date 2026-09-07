@@ -150,4 +150,52 @@ function summary(days) {
   return out.join("\n");
 }
 
-module.exports = { track, readEvents, summary, sourceName, SOURCE_NAMES };
+// Полная выгрузка по каждому пользователю в CSV. users это массив из store.allUsers().
+function buildExportCsv(users) {
+  const ev = readEvents();
+  const byUser = {};
+  for (const e of ev) {
+    const id = String(e.userId || "");
+    if (!id) continue;
+    const b = byUser[id] || (byUser[id] = { count: 0, types: {}, first: e.ts, last: e.ts, source: null });
+    b.count++;
+    b.types[e.event] = (b.types[e.event] || 0) + 1;
+    if (e.ts < b.first) b.first = e.ts;
+    if (e.ts > b.last) b.last = e.ts;
+    if (e.event === "start" && e.source && !b.source) b.source = e.source;
+  }
+  const esc = (v) => { const s = v == null ? "" : String(v); return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const fmt = (ts) => ts ? new Date(ts).toISOString().slice(0, 16).replace("T", " ") : "";
+  const now = Date.now();
+  const header = ["telegram_id", "nik", "imya", "istochnik", "kod_istochnika", "privel_id", "onbording", "podpiska_do", "taro_balans", "vsego_sobytiy", "starty", "doshel_do_karty", "podpisalsya", "klik_oplaty", "oplatil", "pervyy_vizit", "posledniy_vizit"];
+  const rows = [header.join(",")];
+  for (const u of (users || [])) {
+    const id = String(u.id || "");
+    const b = byUser[id] || { count: 0, types: {}, first: null, last: null, source: null };
+    const code = u.source || b.source || "direct";
+    const sub = (u.proUntil && u.proUntil > now) ? fmt(u.proUntil) : "";
+    const taro = u.taroUnlimited ? "bezlimit" : String(Math.max(0, Number(u.taroFree) || 0));
+    rows.push([
+      esc(id),
+      esc(u.username ? "@" + u.username : ""),
+      esc(u.firstName || u.name || ""),
+      esc(sourceName(code)),
+      esc(code),
+      esc(u.referredBy || ""),
+      u.onboarded ? "da" : "",
+      esc(sub),
+      esc(taro),
+      b.count,
+      (b.types.start || 0),
+      b.types.pick ? "da" : "",
+      b.types.subscribed ? "da" : "",
+      (b.types.pay_click || 0),
+      b.types.paid ? "da" : "",
+      esc(fmt(b.first || u.createdAt)),
+      esc(fmt(b.last || u.lastActive)),
+    ].join(","));
+  }
+  return rows.join("\n");
+}
+
+module.exports = { track, readEvents, summary, sourceName, SOURCE_NAMES, buildExportCsv };
