@@ -9,6 +9,7 @@ const fs = require("fs");
 const path = require("path");
 const ai = require("../ai/reading");
 const deck = require("../engine/deck78");
+const { InputFile } = require("grammy");
 
 // Банк заботливых вопросов для неплативших (20-30 штук).
 const QUESTION_BANK = [
@@ -112,9 +113,9 @@ function ruDateLabel() { const d = mskNow(); const wd = WEEKDAYS[d.getUTCDay()];
 function readDaily() { try { return JSON.parse(fs.readFileSync(DAILY_FILE, "utf8")); } catch { return {}; } }
 function writeDaily(o) { try { fs.mkdirSync(path.dirname(DAILY_FILE), { recursive: true }); fs.writeFileSync(DAILY_FILE, JSON.stringify(o, null, 2)); } catch (_) {} }
 
-function buildCardText(cardName, p) {
+function buildCardParts(cardName, p) {
   const wish = (p && p.wish) ? String(p.wish).trim() : "Доброе утро. Пусть этот день будет к тебе добр.";
-  const head = `🔮 ${ruDateLabel()}. Твоя карта дня: ${cardName}`;
+  const caption = `${wish}\n\n🔮 ${ruDateLabel()}. Твоя карта дня: ${cardName}`;
   const block = (label, v, fallback) => `<b>${label}.</b> ${p && v ? String(v).trim() : fallback}`;
   const body = [
     block("В делах", p && p.work, "Сегодня стоит действовать спокойно и без спешки."),
@@ -123,30 +124,50 @@ function buildCardText(cardName, p) {
     block("Осторожно", p && p.caution, "Не торопи события и не требуй от себя слишком многого."),
     block("Совет дня", p && p.advice, "Позволь себе паузу, самые важные ответы приходят в тишине."),
   ].join("\n\n");
-  return `${wish}\n\n${head}\n\n${body}`;
+  return { caption, body };
 }
 
-// Готовит карту дня: одну на всех, каждый день новую, не повторяя вчерашнюю. Текст кэшируется на сутки.
+// Готовит карту дня: одну на всех, каждый день новую, не повторяя вчерашнюю. Кэшируется на сутки.
 async function ensureCardOfDay() {
   const today = mskDateKey();
   const state = readDaily();
-  if (state.date === today && state.text) return state;
-  let card = deck.drawCard();
-  for (let i = 0; i < 30 && state.cardKey && card && card.key === state.cardKey; i++) card = deck.drawCard();
+  if (state.date === today && state.caption && state.body && state.cardKey) return state;
+  let cardKey, cardName;
+  if (state.date === today && state.cardKey) {
+    cardKey = state.cardKey; cardName = state.cardName;
+  } else {
+    let card = deck.drawCard();
+    for (let i = 0; i < 30 && state.cardKey && card && card.key === state.cardKey; i++) card = deck.drawCard();
+    cardKey = card.key; cardName = card.name;
+  }
   let parts = null;
-  try { parts = await ai.generateCardOfDay(card.name); } catch (_) {}
-  const text = buildCardText(card.name, parts);
-  const next = { date: today, cardKey: card.key, cardName: card.name, text };
+  try { parts = await ai.generateCardOfDay(cardName); } catch (_) {}
+  const built = buildCardParts(cardName, parts);
+  const next = { date: today, cardKey, cardName, caption: built.caption, body: built.body };
   writeDaily(next);
   return next;
+}
+
+// Отправка карты дня одному человеку: картинка карты с подписью, затем разбор.
+async function safeSendCard(bot, id, imgPath, caption, body) {
+  try {
+    if (imgPath) await bot.api.sendPhoto(id, new InputFile(imgPath), { caption, parse_mode: "HTML" });
+    else await bot.api.sendMessage(id, caption, { parse_mode: "HTML" });
+    if (body) await bot.api.sendMessage(id, body, { parse_mode: "HTML" });
+    return true;
+  } catch (e) {
+    try { const code = e && (e.error_code || (e.parameters && e.parameters.error_code)); if (code === 403 || String(e).includes("403")) require("./analytics").track(id, "blocked", {}); } catch (_) {}
+    return false;
+  }
 }
 
 // Рассылка карты дня всем пользователям.
 async function sendCardOfDay(bot) {
   const state = await ensureCardOfDay();
+  const imgPath = deck.cardFile(state.cardKey);
   let sent = 0;
   for (const u of allUsers()) {
-    if (await safeSend(bot, u.id, state.text, { parse_mode: "HTML" })) sent++;
+    if (await safeSendCard(bot, u.id, imgPath, state.caption, state.body)) sent++;
   }
   return sent;
 }
@@ -154,7 +175,8 @@ async function sendCardOfDay(bot) {
 // Превью карты дня в конкретный чат (для владельца, проверить до рассылки).
 async function previewCardOfDay(bot, chatId) {
   const state = await ensureCardOfDay();
-  await bot.api.sendMessage(chatId, state.text, { parse_mode: "HTML" });
+  const imgPath = deck.cardFile(state.cardKey);
+  await safeSendCard(bot, chatId, imgPath, state.caption, state.body);
   return state;
 }
 
