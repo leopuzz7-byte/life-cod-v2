@@ -50,22 +50,22 @@ const L = {
   chat: "💬 Чат с Надеждой (ИИ)", support: "🛟 Техподдержка",
   social: "🌐 Соцсети Надежды", club: "🔒 Закрытый клуб",
 };
-function mainMenu() {
+function mainMenu(lang) {
   return new Keyboard()
-    .text(L.arkan).text(L.numer).row()
-    .text(L.tarot).webApp("🧮 Калькулятор", config.calcUrl).row()
-    .text(L.shop).text(L.invite).row()
-    .text(L.academy).text(L.consult).row()
-    .text(L.chat).text(L.support).row()
-    .text(L.social).text(L.club).row()
+    .text(t(lang, "menu_arkan")).text(t(lang, "menu_numer")).row()
+    .text(t(lang, "menu_tarot")).webApp(t(lang, "btn_calc"), config.calcUrl).row()
+    .text(t(lang, "menu_shop")).text(t(lang, "menu_invite")).row()
+    .text(t(lang, "menu_academy")).text(t(lang, "menu_consult")).row()
+    .text(t(lang, "menu_chat")).text(t(lang, "menu_support")).row()
+    .text(t(lang, "menu_social")).text(t(lang, "menu_club")).row()
     .resized()
-    .placeholder("Меню с кнопками внизу 👇");
+    .placeholder(t(lang, "menu_placeholder"));
 }
 async function showMenu(ctx, text) {
-  await ctx.reply(text || "Что откликается сейчас. Выбирай.", { reply_markup: mainMenu() });
+  const u = getUser(ctx.from.id);
+  await ctx.reply(text || t(u.lang, "menu_open"), { reply_markup: mainMenu(u.lang) });
   try {
-    const u = getUser(ctx.from.id);
-    if (!u.menuHintShown) { u.menuHintShown = true; saveUser(u); await ctx.reply("Меню с кнопками открылось внизу. Если кнопок не видно, нажми на значок с квадратиками справа от поля ввода."); }
+    if (!u.menuHintShown) { u.menuHintShown = true; saveUser(u); await ctx.reply(t(u.lang, "menu_hint")); }
   } catch (_) {}
 }
 const isPaid = (u) => !!(u.proUntil && u.proUntil > Date.now());
@@ -102,6 +102,14 @@ const NUMER_DESC =
   "Такой анализ помогает понять себя, увидеть сильные стороны, осознать, какие сценарии влияют на жизнь, и выбрать направление, где реализуешься сильнее всего.";
 const NUMER_SELL =
   "Полный разбор по нумерологии тоже в интерактивном калькуляторе. Скажу честно: доступ платный, потому что это глубокий персональный разбор по авторской методике, а не общие описания. На выходе полная карта личности: сильные стороны, таланты, задачи, что влияет на жизнь и куда двигаться, чтобы раскрыть потенциал и жить осознаннее.";
+const ARKAN_DESC_EN =
+  "🃏 <b>The Arcanum Code method</b>\n\nA deep system of personality analysis based on the 22 Major Arcana of the Tarot. Each arcanum reflects a personality type: character, behavior patterns, innate talents, strengths and life tasks.\n\nFrom your birth date a unique set of arcana is calculated, showing how these qualities appear in your decisions, relationships, money, profession and self realization. The result is not abstract advice but a clear map of yourself: who you are at the core, where your main resource is, which scenarios shape your life and where to move next.";
+const ARKAN_SELL_EN =
+  "The full Arcanum Code reading is built in an interactive calculator. Honestly, access is paid, because it is not a template but a deep personal reading by the author's method. The result is a full personality map: strengths, talents, tasks, what shapes your life and where to move to unlock your potential and choose more consciously.";
+const NUMER_DESC_EN =
+  "🔢 <b>The Numerology method</b>\n\nAn author's system based on classic numerology. Your birth date is a personal code: each digit reflects character traits, behavior patterns, talents and life tasks.\n\nThis analysis helps you understand yourself, see your strengths, realize which scenarios shape your life, and choose the direction where you realize yourself best.";
+const NUMER_SELL_EN =
+  "The full numerology reading is also in the interactive calculator. Honestly, access is paid, because it is a deep personal reading by the author's method, not generic descriptions. The result is a full personality map: strengths, talents, tasks, what shapes your life and where to move to unlock your potential and live more consciously.";
 
 function parseDate(t) {
   const m = String(t).trim().match(/^(\d{1,2})[.\/\s-](\d{1,2})[.\/\s-](\d{4})$/);
@@ -130,6 +138,16 @@ async function isSubscribed(ctx) {
   try { const mm = await ctx.api.getChatMember(config.channel, ctx.from.id); return ["member", "administrator", "creator"].includes(mm.status); } catch (_) { return false; }
 }
 function subKeyboard(lang) { return new InlineKeyboard().url(t(lang, "sub_btn"), config.channelUrl).row().text(t(lang, "sub_check_btn"), "check_sub"); }
+const pick = (u, en, ru) => (u && u.lang === "en" ? en : ru);
+const LANG_PROMPT = "Выберите язык.\nPlease choose your language.";
+async function showLanguageChoice(ctx) {
+  await ctx.reply(LANG_PROMPT, { reply_markup: new InlineKeyboard().text("🇷🇺 Русский", "lang:ru").text("🇬🇧 English", "lang:en") });
+}
+async function sendGreeting(ctx, u) {
+  await sendCircle(ctx, "welcome");
+  const nm = ctx.from.first_name ? `, ${ctx.from.first_name}` : "";
+  await ctx.reply(t(u.lang, "greeting", { name: nm }), { parse_mode: "HTML", reply_markup: new InlineKeyboard().text(t(u.lang, "btn_tarot"), "br:tarot").text(t(u.lang, "btn_numer"), "br:numer") });
+}
 async function sendCircle(ctx, slot) {
   try { const c = getCircles(); if (c && c[slot]) await ctx.replyWithVideoNote(c[slot]); } catch (_) {}
 }
@@ -433,7 +451,7 @@ bot.command("start", async (ctx) => {
   const ref = (ctx.match || "").trim();
   if (ref) {
     const lm = ref.match(/^(en|ru)(?:[-_](.+))?$/i);
-    if (lm) { u.lang = lm[1].toLowerCase(); if (lm[2] && !u.source) u.source = lm[2].slice(0, 64); }
+    if (lm) { u.lang = lm[1].toLowerCase(); u.langChosen = true; if (lm[2] && !u.source) u.source = lm[2].slice(0, 64); }
     else if (/^\d+$/.test(ref)) { if (!u.referredBy) applyReferral(ctx.from.id, ref); }
     else if (!u.source) { u.source = ref.slice(0, 64); }
   }
@@ -441,10 +459,17 @@ bot.command("start", async (ctx) => {
   if (u.onboarded) { u.step = "menu"; saveUser(u); await showMenu(ctx, t(u.lang, "welcome_back")); return; }
   Object.assign(u, { step: "idle", branch: null, name: "", birth: null, tarotQuestion: "", tarotTheme: null, tarotCard: null, theme: null, concern: null, chatHistory: [] });
   saveUser(u);
-  await sendCircle(ctx, "welcome");
-  const nm = ctx.from.first_name ? `, ${ctx.from.first_name}` : "";
-  await ctx.reply(t(u.lang, "greeting", { name: nm }), { parse_mode: "HTML", reply_markup: new InlineKeyboard().text(t(u.lang, "btn_tarot"), "br:tarot").text(t(u.lang, "btn_numer"), "br:numer") });
+  if (!u.langChosen) { await showLanguageChoice(ctx); return; }
+  await sendGreeting(ctx, u);
 });
+bot.callbackQuery(/^lang:(ru|en)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const u = getUser(ctx.from.id);
+  u.lang = ctx.match[1]; u.langChosen = true; saveUser(u);
+  if (u.onboarded) { await ctx.reply(t(u.lang, "lang_changed")); await showMenu(ctx); }
+  else { await sendGreeting(ctx, u); }
+});
+bot.command("language", async (ctx) => { await showLanguageChoice(ctx); });
 bot.command("menu", async (ctx) => { const u = getUser(ctx.from.id); cancelInteractiveFlow(u); await showMenu(ctx); });
 bot.command("id", async (ctx) => { await ctx.reply("Твой Telegram ID: " + ctx.from.id); });
 bot.command("notify", async (ctx) => {
@@ -514,8 +539,8 @@ bot.command("take", async (ctx) => {
 bot.command("help", async (ctx) => {
   await ctx.reply("Я бот Надежды. Внизу есть меню с кнопками, если его не видно, нажми на значок с квадратиками справа от поля ввода.\n\nБыстрые команды: /menu меню, /taro расклад, /chat чат.\n\nЕсли что-то не работает, напиши в техподдержку " + config.contacts.support, { reply_markup: quickKb() });
 });
-bot.command("taro", async (ctx) => { await handleMenu(ctx, L.tarot); });
-bot.command("chat", async (ctx) => { await handleMenu(ctx, L.chat); });
+bot.command("taro", async (ctx) => { await handleMenu(ctx, "tarot"); });
+bot.command("chat", async (ctx) => { await handleMenu(ctx, "chat"); });
 bot.command("circle", async (ctx) => {
   if (!config.ownerId || String(ctx.from.id) !== String(config.ownerId)) return;
   const slot = (ctx.match || "").trim().toLowerCase();
@@ -655,56 +680,74 @@ bot.callbackQuery(/^fb:(tarot|numer):(hit|part|miss)$/, async (ctx) => {
 });
 
 // ---------- пункты меню (reply-клавиатура шлёт текст) ----------
-async function handleMenu(ctx, label) {
+async function handleMenu(ctx, key) {
   const u = getUser(ctx.from.id);
   cancelInteractiveFlow(u);
-  track(ctx.from.id, "menu_click", { button: label });
-  if (label === L.tarot) {
-    const t = config.taro;
+  track(ctx.from.id, "menu_click", { button: t("ru", "menu_" + key) });
+  if (key === "tarot") {
+    const tp = config.taro;
     u.step = "sp_sphere";
     u.spread = newPaidSpread();
     saveUser(u);
-    await ctx.reply(`🔮 <b>Полный расклад Таро</b>\n\nСначала определим точный запрос. Бот предложит подходящую колоду, а при желании можно выбрать любую из семи, включая авторскую колоду Надежды и Таро Декамерон. Затем откроются три карты по подходящим позициям. После итогового разбора можно задать до трёх уточняющих вопросов на той же колоде.\n\nСтоимость ${t.price} рублей, было ${t.old}, скидка ${t.discount}%.`, { parse_mode: "HTML" });
+    await ctx.reply(pick(u,
+      `🔮 <b>Full Tarot reading</b>\n\nFirst we define your exact request. The bot will suggest a fitting deck, and if you wish you can choose any of the seven. Then three cards open on the right positions. After the final reading you can ask up to three follow-up questions on the same deck.\n\nPrice ${tp.price} rubles, was ${tp.old}, discount ${tp.discount}%.`,
+      `🔮 <b>Полный расклад Таро</b>\n\nСначала определим точный запрос. Бот предложит подходящую колоду, а при желании можно выбрать любую из семи. Затем откроются три карты по подходящим позициям. После итогового разбора можно задать до трёх уточняющих вопросов на той же колоде.\n\nСтоимость ${tp.price} рублей, было ${tp.old}, скидка ${tp.discount}%.`), { parse_mode: "HTML" });
     await showSphereChoice(ctx);
-  } else if (label === L.arkan) {
+  } else if (key === "arkan") {
     await sendCircle(ctx, "arkan");
-    await ctx.reply(ARKAN_DESC, { parse_mode: "HTML" });
-    await ctx.reply(ARKAN_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
-  } else if (label === L.numer) {
+    await ctx.reply(pick(u, ARKAN_DESC_EN, ARKAN_DESC), { parse_mode: "HTML" });
+    await ctx.reply(pick(u, ARKAN_SELL_EN, ARKAN_SELL), { reply_markup: new InlineKeyboard().webApp(t(u.lang, "btn_calc"), config.calcUrl) });
+  } else if (key === "numer") {
     await sendCircle(ctx, "numer");
-    await ctx.reply(NUMER_DESC, { parse_mode: "HTML" });
-    await ctx.reply(NUMER_SELL, { reply_markup: new InlineKeyboard().webApp("🔮 Открыть калькулятор", config.calcUrl) });
-  } else if (label === L.chat) {
+    await ctx.reply(pick(u, NUMER_DESC_EN, NUMER_DESC), { parse_mode: "HTML" });
+    await ctx.reply(pick(u, NUMER_SELL_EN, NUMER_SELL), { reply_markup: new InlineKeyboard().webApp(t(u.lang, "btn_calc"), config.calcUrl) });
+  } else if (key === "chat") {
     u.step = "chat"; saveUser(u);
     const paid = isPaid(u);
     const left = Math.max(0, config.limits.aiMessagesPerDay - (u.chatFree || 0));
-    await ctx.reply("💬 <b>Чат с Надеждой (ИИ)</b>\n\nЭто моя цифровая версия, отвечает искусственный интеллект, обученный на моих методиках. Живо и по делу. Живая встреча со мной это отдельная кнопка, Консультация.", { parse_mode: "HTML" });
-    if (paid) await ctx.reply("У тебя активна подписка. Спрашивай о чём угодно, отвечаю без ограничений.");
-    else if (left > 0) await ctx.reply(`Спроси о чём угодно, что тревожит или радует. Есть ${left} бесплатных сообщения, дальше по подписке.`);
+    await ctx.reply(pick(u,
+      "💬 <b>Chat with Nadezhda (AI)</b>\n\nThis is my digital version, an AI trained on my methods. Warm and to the point. A live session with me in person is a separate button, Consultation.",
+      "💬 <b>Чат с Надеждой (ИИ)</b>\n\nЭто моя цифровая версия, отвечает искусственный интеллект, обученный на моих методиках. Живо и по делу. Живая встреча со мной это отдельная кнопка, Консультация."), { parse_mode: "HTML" });
+    if (paid) await ctx.reply(pick(u, "Your subscription is active. Ask me anything, I answer without limits.", "У тебя активна подписка. Спрашивай о чём угодно, отвечаю без ограничений."));
+    else if (left > 0) await ctx.reply(pick(u, `Ask me anything that worries or delights you. You have ${left} free messages, then by subscription.`, `Спроси о чём угодно, что тревожит или радует. Есть ${left} бесплатных сообщения, дальше по подписке.`));
     else await showChatPaywall(ctx);
-  } else if (label === L.consult) {
+  } else if (key === "consult") {
     const phone = config.contacts.consultPhone;
-    await ctx.reply(`🕊 <b>Консультация с Надеждой</b>\n\nЭто личная встреча один на один, не с ботом, а со мной вживую. Час работы: отношения, выбор, деньги, реализация, повторяющиеся сценарии. На выходе ясность и конкретные шаги.\n\nМинимум час, ${config.prices.consult} рублей.\n\nДля записи напиши мне в Telegram.`, { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Написать для записи", "tg://resolve?phone=" + phone) });
-  } else if (label === L.academy) {
-    await ctx.reply("🎓 <b>Лайф Код Академия</b>\n\nСкоро здесь появится академия с обучением. Следи за анонсами в канале.", { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Канал Надежды", config.channelUrl) });
-  } else if (label === L.club) {
-    await ctx.reply("🔒 <b>Закрытый клуб</b>\n\nСкоро откроется закрытый клуб Надежды: личные разборы, живые эфиры и разборы знаменитостей. Следи за анонсами в канале.", { parse_mode: "HTML", reply_markup: new InlineKeyboard().url("Канал Надежды", config.channelUrl) });
-  } else if (label === L.shop) {
-    await ctx.reply(`🛍 <b>Магазин</b>\n\nУ нас можно приобрести: уникальные авторские карты Таро, фирменную одежду в тематике нумерологии и Таро, полотенца, постельное бельё.\n\nДля покупки напиши: ${config.contacts.buyCards}`, { parse_mode: "HTML" });
-  } else if (label === L.invite) {
+    await ctx.reply(pick(u,
+      `🕊 <b>Consultation with Nadezhda</b>\n\nThis is a personal one on one session, not with the bot but with me live. One hour of work: relationships, choices, money, self realization, repeating patterns. You leave with clarity and concrete steps.\n\nMinimum one hour, ${config.prices.consult} rubles.\n\nTo book, write to me on Telegram.`,
+      `🕊 <b>Консультация с Надеждой</b>\n\nЭто личная встреча один на один, не с ботом, а со мной вживую. Час работы: отношения, выбор, деньги, реализация, повторяющиеся сценарии. На выходе ясность и конкретные шаги.\n\nМинимум час, ${config.prices.consult} рублей.\n\nДля записи напиши мне в Telegram.`), { parse_mode: "HTML", reply_markup: new InlineKeyboard().url(pick(u, "Write to book", "Написать для записи"), "tg://resolve?phone=" + phone) });
+  } else if (key === "academy") {
+    await ctx.reply(pick(u,
+      "🎓 <b>Life Code Academy</b>\n\nAn academy with courses is coming here soon. Follow the announcements in the channel.",
+      "🎓 <b>Лайф Код Академия</b>\n\nСкоро здесь появится академия с обучением. Следи за анонсами в канале."), { parse_mode: "HTML", reply_markup: new InlineKeyboard().url(pick(u, "Nadezhda's channel", "Канал Надежды"), config.channelUrl) });
+  } else if (key === "club") {
+    await ctx.reply(pick(u,
+      "🔒 <b>Private club</b>\n\nNadezhda's private club is opening soon: personal readings, live streams and celebrity readings. Follow the announcements in the channel.",
+      "🔒 <b>Закрытый клуб</b>\n\nСкоро откроется закрытый клуб Надежды: личные разборы, живые эфиры и разборы знаменитостей. Следи за анонсами в канале."), { parse_mode: "HTML", reply_markup: new InlineKeyboard().url(pick(u, "Nadezhda's channel", "Канал Надежды"), config.channelUrl) });
+  } else if (key === "shop") {
+    await ctx.reply(pick(u,
+      `🛍 <b>Shop</b>\n\nHere you can buy unique author Tarot cards, branded clothing in the numerology and Tarot theme, towels and bed linen.\n\nTo order, write: ${config.contacts.buyCards}`,
+      `🛍 <b>Магазин</b>\n\nУ нас можно приобрести: уникальные авторские карты Таро, фирменную одежду в тематике нумерологии и Таро, полотенца, постельное бельё.\n\nДля покупки напиши: ${config.contacts.buyCards}`), { parse_mode: "HTML" });
+  } else if (key === "invite") {
     const link = `https://t.me/${botUsername}?start=${ctx.from.id}`;
-    await ctx.reply(`👥 <b>Пригласить друга</b>\n\nОтправь эту ссылку другу. Когда он зайдёт по ней и запустит бота, вы оба получите бонусное сообщение в чате со мной.\n\n${link}`, { parse_mode: "HTML" });
-  } else if (label === L.support) {
-    await ctx.reply(`🛟 <b>Техподдержка</b>\n\nЕсли что-то не работает или есть вопрос, напиши нам: ${config.contacts.support}`, { parse_mode: "HTML" });
-  } else if (label === L.social) {
-    const s = config.social;
+    await ctx.reply(pick(u,
+      `👥 <b>Invite a friend</b>\n\nSend this link to a friend. When they open it and start the bot, you both get a bonus message in the chat with me.\n\n${link}`,
+      `👥 <b>Пригласить друга</b>\n\nОтправь эту ссылку другу. Когда он зайдёт по ней и запустит бота, вы оба получите бонусное сообщение в чате со мной.\n\n${link}`), { parse_mode: "HTML" });
+  } else if (key === "support") {
+    await ctx.reply(pick(u,
+      `🛟 <b>Support</b>\n\nIf something is not working or you have a question, write to us: ${config.contacts.support}`,
+      `🛟 <b>Техподдержка</b>\n\nЕсли что-то не работает или есть вопрос, напиши нам: ${config.contacts.support}`), { parse_mode: "HTML" });
+  } else if (key === "social") {
+    const soc = config.social;
     const kb = new InlineKeyboard()
-      .url("Instagram · Таро", s.instaTaro).row()
-      .url("Instagram · Нумерология", s.instaNumer).row()
-      .url("YouTube · Таро", s.youtubeTaro).row()
-      .url("YouTube · Нумерология", s.youtubeNumer).row()
-      .url("TikTok", s.tiktok);
-    await ctx.reply("🌐 <b>Официальные соцсети Надежды</b>\n\nТолько эти аккаунты настоящие. Будь внимателен, не ведись на фейки и страницы-двойники.", { parse_mode: "HTML", reply_markup: kb });
+      .url("Instagram · " + pick(u, "Tarot", "Таро"), soc.instaTaro).row()
+      .url("Instagram · " + pick(u, "Numerology", "Нумерология"), soc.instaNumer).row()
+      .url("YouTube · " + pick(u, "Tarot", "Таро"), soc.youtubeTaro).row()
+      .url("YouTube · " + pick(u, "Numerology", "Нумерология"), soc.youtubeNumer).row()
+      .url("TikTok", soc.tiktok);
+    await ctx.reply(pick(u,
+      "🌐 <b>Nadezhda's official socials</b>\n\nOnly these accounts are real. Be careful, do not fall for fakes and copycat pages.",
+      "🌐 <b>Официальные соцсети Надежды</b>\n\nТолько эти аккаунты настоящие. Будь внимателен, не ведись на фейки и страницы-двойники."), { parse_mode: "HTML", reply_markup: kb });
   } else return false;
   return true;
 }
@@ -1050,8 +1093,7 @@ bot.callbackQuery(/^go:(tarot|chat|consult|menu)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const which = ctx.match[1];
   if (which === "menu") { const u = getUser(ctx.from.id); cancelInteractiveFlow(u); await showMenu(ctx); return; }
-  const label = which === "tarot" ? L.tarot : which === "chat" ? L.chat : L.consult;
-  await handleMenu(ctx, label);
+  await handleMenu(ctx, which);
 });
 
 // ---------- текст: ввод и меню ----------
@@ -1061,7 +1103,7 @@ bot.on("message:text", async (ctx) => {
 
   // Главное меню имеет приоритет над любым незавершённым сценарием.
   // Иначе подпись кнопки могла быть принята за имя, вопрос или ответ расклада.
-  if (Object.values(L).includes(text)) { if (await handleMenu(ctx, text)) return; }
+  const mk = menuKey(text); if (mk) { if (await handleMenu(ctx, mk)) return; }
 
   if (u.step === "await_name") {
     u.name = text.trim().slice(0, 40).replace(/[<>]/g, ""); u.step = "await_date"; saveUser(u);
@@ -1188,6 +1230,7 @@ async function setup() {
     { command: "taro", description: "Таро расклад" },
     { command: "chat", description: "Чат с Надеждой" },
     { command: "help", description: "Как тут всё устроено" },
+    { command: "language", description: "Язык / Language" },
   ]); } catch (_) {}
   try { await bot.api.setMyDescription("Бот Надежды: таро, нумерология и личные разборы. Вопросы и техподдержка: " + config.contacts.support); } catch (_) {}
   pay.startResultServer((invId) => console.log("Оплачен счёт", invId));

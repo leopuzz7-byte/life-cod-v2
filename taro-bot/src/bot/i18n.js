@@ -54,6 +54,7 @@ const STR = {
     question_accepted: "Приняла вопрос. Теперь сосредоточься на нём.",
     numer_concern_prompt: "{sphere}. А что именно сейчас откликается?",
     numer_subgate: "Услышала. По теме «{sphere}» в твоих картах есть глубокий узор.\n\nЧтобы раскрыть его целиком, загляни в канал. Подпишись, и разбор откроется.",
+    lang_changed: "Готово, язык переключён.",
   },
   en: {
     greeting: "Hello{name}.\n\nMy name is Nadezhda. I am a digital psychologist and numerologist. Here you will find tools to understand yourself more deeply, to see the hidden reasons behind what is happening, and to make decisions that change your life.\n\nSometimes the answers come through cards. Sometimes through the language of numbers.\n\n<i>Choose where you would like to begin.</i>",
@@ -108,6 +109,7 @@ const STR = {
     question_accepted: "Got your question. Now focus on it.",
     numer_concern_prompt: "And what exactly resonates right now?",
     numer_subgate: "I hear you. On this theme your cards hold a deep pattern.\n\nTo reveal it fully, look into the channel. Subscribe, and the reading will open.",
+    lang_changed: "Done, the language is switched.",
   },
 };
 
