@@ -19,6 +19,7 @@ const ai = require("../ai/reading");
 const { applyReferral, sendAll, previewCardOfDay } = require("./broadcasts");
 const pay = require("./payment");
 const analytics = require("./analytics");
+const { t, menuKey } = require("./i18n");
 const track = analytics.track;
 
 const bot = new Bot(config.botToken);
@@ -128,7 +129,7 @@ async function waiting(ctx) {
 async function isSubscribed(ctx) {
   try { const mm = await ctx.api.getChatMember(config.channel, ctx.from.id); return ["member", "administrator", "creator"].includes(mm.status); } catch (_) { return false; }
 }
-function subKeyboard() { return new InlineKeyboard().url("Подписаться на канал", config.channelUrl).row().text("Я подписался, открой разбор", "check_sub"); }
+function subKeyboard(lang) { return new InlineKeyboard().url(t(lang, "sub_btn"), config.channelUrl).row().text(t(lang, "sub_check_btn"), "check_sub"); }
 async function sendCircle(ctx, slot) {
   try { const c = getCircles(); if (c && c[slot]) await ctx.replyWithVideoNote(c[slot]); } catch (_) {}
 }
@@ -430,21 +431,19 @@ async function finishSpread(ctx) {
 bot.command("start", async (ctx) => {
   const u = getUser(ctx.from.id);
   const ref = (ctx.match || "").trim();
-  if (ref && /^\d+$/.test(ref) && !u.referredBy) applyReferral(ctx.from.id, ref);
-  if (ref && !/^\d+$/.test(ref) && !u.source) u.source = ref.slice(0, 64);
+  if (ref) {
+    const lm = ref.match(/^(en|ru)(?:[-_](.+))?$/i);
+    if (lm) { u.lang = lm[1].toLowerCase(); if (lm[2] && !u.source) u.source = lm[2].slice(0, 64); }
+    else if (/^\d+$/.test(ref)) { if (!u.referredBy) applyReferral(ctx.from.id, ref); }
+    else if (!u.source) { u.source = ref.slice(0, 64); }
+  }
   track(ctx.from.id, "start", { source: u.source || "direct", returning: !!u.onboarded });
-  if (u.onboarded) { u.step = "menu"; saveUser(u); await showMenu(ctx, "Ты уже со мной. Выбирай, что дальше."); return; }
+  if (u.onboarded) { u.step = "menu"; saveUser(u); await showMenu(ctx, t(u.lang, "welcome_back")); return; }
   Object.assign(u, { step: "idle", branch: null, name: "", birth: null, tarotQuestion: "", tarotTheme: null, tarotCard: null, theme: null, concern: null, chatHistory: [] });
   saveUser(u);
   await sendCircle(ctx, "welcome");
   const nm = ctx.from.first_name ? `, ${ctx.from.first_name}` : "";
-  await ctx.reply(
-    `Здравствуй${nm}.\n\n` +
-    "Меня зовут Надежда. Я цифровой психолог и нумеролог. Здесь можно найти инструменты, которые помогут глубже понять себя, увидеть скрытые причины происходящего и принять решения, меняющие жизнь.\n\n" +
-    "Иногда ответы приходят через карты. Иногда через язык чисел.\n\n" +
-    "<i>Выбери, с чего хочешь начать.</i>",
-    { parse_mode: "HTML", reply_markup: new InlineKeyboard().text("🔮 Таро", "br:tarot").text("🔢 Нумерология", "br:numer") }
-  );
+  await ctx.reply(t(u.lang, "greeting", { name: nm }), { parse_mode: "HTML", reply_markup: new InlineKeyboard().text(t(u.lang, "btn_tarot"), "br:tarot").text(t(u.lang, "btn_numer"), "br:numer") });
 });
 bot.command("menu", async (ctx) => { const u = getUser(ctx.from.id); cancelInteractiveFlow(u); await showMenu(ctx); });
 bot.command("id", async (ctx) => { await ctx.reply("Твой Telegram ID: " + ctx.from.id); });
@@ -533,11 +532,11 @@ bot.callbackQuery("br:tarot", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id); u.branch = "tarot"; u.step = "tarot_theme"; saveUser(u);
   track(ctx.from.id, "branch", { value: "tarot" });
-  await ctx.reply("<i>В картах нет случайностей.</i> Сегодня выпадет именно та карта, которую важно увидеть.\n\nНо карты отвечают точнее, когда есть настоящий вопрос, тот, что правда не отпускает.", { parse_mode: "HTML" });
+  await ctx.reply(t(u.lang, "tarot_intro"), { parse_mode: "HTML" });
   const kb = new InlineKeyboard();
-  THEMES.forEach((t) => kb.text(`${t.emoji} ${t.label}`, `tt:${t.id}`).row());
-  kb.text("✍️ Написать свой вопрос", "tt:custom");
-  await ctx.reply("Выбери, что откликается, или напиши свой вопрос колоде. 🌙", { reply_markup: kb });
+  THEMES.forEach((th) => kb.text(t(u.lang, "theme_" + th.id), `tt:${th.id}`).row());
+  kb.text(t(u.lang, "tarot_custom_btn"), "tt:custom");
+  await ctx.reply(t(u.lang, "tarot_pick_theme"), { reply_markup: kb });
 });
 bot.callbackQuery(/^tt:(love|money|choice|future)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
@@ -550,19 +549,20 @@ bot.callbackQuery("tt:custom", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id); u.step = "await_custom_q"; saveUser(u);
   track(ctx.from.id, "theme", { branch: "tarot", value: "custom" });
-  await ctx.reply("Напиши вопрос одним сообщением, своими словами. Спрашивай как есть.");
+  await ctx.reply(t(u.lang, "tarot_custom_prompt"));
 });
 async function sendDeck(ctx) {
+  const u = getUser(ctx.from.id);
   const img = await deckImage();
   await ctx.replyWithPhoto(new InputFile(img), {
-    caption: "Держи вопрос в сердце и не отпускай. Перед тобой пять карт. Выбери одну, ту, к которой тянет.",
+    caption: t(u.lang, "tarot_deck_caption"),
     reply_markup: new InlineKeyboard().text("1", "pick:1").text("2", "pick:2").text("3", "pick:3").text("4", "pick:4").text("5", "pick:5"),
   });
 }
 bot.callbackQuery(/^pick:([1-5])$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
-  if (!u.tarotQuestion) { await ctx.reply("Напиши /start, чтобы начать заново."); return; }
+  if (!u.tarotQuestion) { await ctx.reply(t(u.lang, "restart_hint")); return; }
   const pos = +ctx.match[1];
   const card = deck.drawCard();
   u.tarotCard = card; u.step = "tarot_sub"; saveUser(u);
@@ -570,15 +570,16 @@ bot.callbackQuery(/^pick:([1-5])$/, async (ctx) => {
   await ctx.replyWithChatAction("upload_photo");
   // сырая карта оригиналом, без эффектов
   const cf = deck.cardFile(card); if (cf) await ctx.replyWithPhoto(new InputFile(cf));
-  let r = await ai.generateTarotReveal(deck.cardInfo(card), u.tarotQuestion);
+  let r = await ai.generateTarotReveal(deck.cardInfo(card), u.tarotQuestion, u.lang);
   const name = deck.cardName(card);
+  const label = t(u.lang, "tarot_card_label");
   const text = r
-    ? `Твоя карта: <b>${esc(name)}</b>.\n\n${esc(r.text)}\n\n<i>${esc(r.hook)}</i>`
-    : `Твоя карта: <b>${esc(name)}</b>.\n\n${esc(name + " пришла не случайно. В ней ключ к тому, о чём сейчас думаешь. Сила уже внутри, осталось разрешить себе её увидеть.")}\n\n<i>Но одна карта показывает лишь верхний слой. Что привело к этому и чем закончится, откроет полный расклад.</i>`;
+    ? `${label}: <b>${esc(name)}</b>.\n\n${esc(r.text)}\n\n<i>${esc(r.hook)}</i>`
+    : `${label}: <b>${esc(name)}</b>.\n\n${esc(t(u.lang, "tarot_reveal_fallback", { name }))}\n\n<i>${esc(t(u.lang, "tarot_reveal_hook_fallback"))}</i>`;
   await ctx.reply(text, { parse_mode: "HTML" });
   track(ctx.from.id, "reveal", { branch: "tarot" });
   await sleep(400);
-  await ctx.reply("Чтобы раскрыть глубже, что стоит за этим и чем всё закончится, загляни в мой канал. 🌙\n\nПодпишись, и полный разбор откроется.", { reply_markup: subKeyboard() });
+  await ctx.reply(t(u.lang, "tarot_subgate"), { reply_markup: subKeyboard(u.lang) });
   track(ctx.from.id, "subgate", { branch: "tarot" });
 });
 
@@ -587,7 +588,7 @@ bot.callbackQuery("br:numer", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id); u.branch = "numerology"; u.step = "await_name"; saveUser(u);
   track(ctx.from.id, "branch", { value: "numer" });
-  await ctx.reply("Хорошо. Числа расскажут о тебе многое.\n\nКак мне к тебе обращаться?");
+  await ctx.reply(t(u.lang, "numer_ask_name"));
 });
 bot.callbackQuery(/^th:(love|money|path)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
@@ -597,13 +598,13 @@ bot.callbackQuery(/^th:(love|money|path)$/, async (ctx) => {
   const s = SPHERES[key];
   const kb = new InlineKeyboard();
   s.concerns.forEach((c) => kb.text(c.text, `co:${key}:${c.id}`).row());
-  await ctx.reply(`${s.emoji} ${s.label}. А что именно сейчас откликается?`, { reply_markup: kb });
+  await ctx.reply(t(u.lang, "numer_concern_prompt", { sphere: `${s.emoji} ${s.label}` }), { reply_markup: kb });
 });
 bot.callbackQuery(/^co:(love|money|path):([a-z]+)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id); u.theme = ctx.match[1]; u.concern = ctx.match[2]; u.step = "num_sub"; saveUser(u);
   track(ctx.from.id, "subgate", { branch: "numer", concern: ctx.match[2] });
-  await ctx.reply(`Услышала. По теме «${SPHERES[u.theme].label}» в твоих картах есть глубокий узор.\n\nЧтобы раскрыть его целиком, загляни в канал. Подпишись, и разбор откроется.`, { reply_markup: subKeyboard() });
+  await ctx.reply(t(u.lang, "numer_subgate", { sphere: SPHERES[u.theme].label }), { reply_markup: subKeyboard(u.lang) });
 });
 
 // ---------- подписка -> глубокий разбор -> меню ----------
@@ -611,7 +612,7 @@ bot.callbackQuery("check_sub", async (ctx) => {
   await ctx.answerCallbackQuery();
   const u = getUser(ctx.from.id);
   if (!(await isSubscribed(ctx))) {
-    await ctx.reply("Пока не вижу тебя в канале. Загляни, и разбор откроется.", { reply_markup: subKeyboard() });
+    await ctx.reply(t(u.lang, "check_sub_notyet"), { reply_markup: subKeyboard(u.lang) });
     return;
   }
   u.subscribed = true; saveUser(u);
@@ -619,12 +620,12 @@ bot.callbackQuery("check_sub", async (ctx) => {
   await ctx.replyWithChatAction("typing");
   let fbBranch = null;
   if (u.branch === "tarot" && u.tarotCard) {
-    let d = await ai.generateTarotDeep(deck.cardInfo(u.tarotCard), u.tarotQuestion, u.tarotTheme ? themeById(u.tarotTheme).label : "твой вопрос");
+    let d = await ai.generateTarotDeep(deck.cardInfo(u.tarotCard), u.tarotQuestion, u.tarotTheme ? themeById(u.tarotTheme).label : "твой вопрос", u.lang);
     await sendDeep(ctx, d, deck.cardName(u.tarotCard));
     fbBranch = "tarot";
   } else if (u.branch === "numerology" && u.birth) {
     const matrix = calculatePersonalMatrix(u.birth.day, u.birth.month, u.birth.year);
-    let d = await ai.generateDeep(matrix, u.name, SPHERES[u.theme].label, concernText(u.theme, u.concern));
+    let d = await ai.generateDeep(matrix, u.name, SPHERES[u.theme].label, concernText(u.theme, u.concern), u.lang);
     await sendDeep(ctx, d, SPHERES[u.theme].label);
     fbBranch = "numer";
   } else { await ctx.reply("Напиши /start, чтобы начать."); return; }
@@ -632,7 +633,7 @@ bot.callbackQuery("check_sub", async (ctx) => {
   if (fbBranch) track(ctx.from.id, "deep", { branch: fbBranch });
   if (fbBranch) { await sleep(1000); await askFeedback(ctx, fbBranch); }
   await sleep(400);
-  await showMenu(ctx, "А теперь идём дальше. Спроси о чём угодно в чате со мной, или выбери в меню.");
+  await showMenu(ctx, t(u.lang, "deep_menu_intro"));
 });
 async function sendDeep(ctx, d, fallbackName) {
   if (!d) { await ctx.reply(`Карта ${fallbackName} говорит о многом. В ней и сила, и то, что пока в тени. Не торопи себя, один честный шаг здесь дороже десяти суетливых. Глубже можно пойти со мной, в разборах и на консультации.`); return; }
@@ -1064,35 +1065,35 @@ bot.on("message:text", async (ctx) => {
 
   if (u.step === "await_name") {
     u.name = text.trim().slice(0, 40).replace(/[<>]/g, ""); u.step = "await_date"; saveUser(u);
-    await ctx.reply(`Приятно познакомиться, ${u.name}. А когда ты родился(-ась)?\n\nВведи дату в формате ДД.ММ.ГГГГ, например 01.02.1991.`);
+    await ctx.reply(t(u.lang, "numer_ask_date", { name: u.name }));
     return;
   }
   if (u.step === "await_date") {
     const d = parseDate(text);
-    if (!d) { await ctx.reply("Что-то не так с датой. Напиши в формате ДД.ММ.ГГГГ, например 01.02.1991."); return; }
+    if (!d) { await ctx.reply(t(u.lang, "numer_date_error")); return; }
     u.birth = d; saveUser(u);
     await waiting(ctx);
     const matrix = calculatePersonalMatrix(d.day, d.month, d.year);
     const cards = sphereCards(matrix);
     const png = await renderThemeCards(cards.map((c) => ({ n: c.n, label: c.label, sub: c.name })), { title: "Твои три карты", subtitle: "три сферы, где решается твоя судьба" });
-    await ctx.replyWithPhoto(new InputFile(png), { caption: "Вот они, три твои карты. Смотри." });
+    await ctx.replyWithPhoto(new InputFile(png), { caption: t(u.lang, "numer_cards_caption") });
     track(ctx.from.id, "reveal", { branch: "numer" });
-    let t = await ai.generateSpheres(matrix, u.name);
-    if (t) {
-      const msg = `${esc(t.preface)}\n\n${SPHERES.love.emoji} <b>Отношения</b>\n${esc(t.love_lead)} ${esc(t.love)}\n\n${SPHERES.money.emoji} <b>Деньги и дело</b>\n${esc(t.money_lead)} ${esc(t.money)}\n\n${SPHERES.path.emoji} <b>Путь и сила</b>\n${esc(t.path_lead)} ${esc(t.path)}`;
+    let sph = await ai.generateSpheres(matrix, u.name, u.lang);
+    if (sph) {
+      const msg = `${esc(sph.preface)}\n\n<b>${t(u.lang, "sphere_love")}</b>\n${esc(sph.love_lead)} ${esc(sph.love)}\n\n<b>${t(u.lang, "sphere_money")}</b>\n${esc(sph.money_lead)} ${esc(sph.money)}\n\n<b>${t(u.lang, "sphere_path")}</b>\n${esc(sph.path_lead)} ${esc(sph.path)}`;
       await ctx.reply(msg, { parse_mode: "HTML" });
     } else {
       await ctx.reply(`Карты легли. В отношениях ведёт ${cards[0].name}, в деле ${cards[1].name}, а путь освещает ${cards[2].name}. За этими тремя картами скрыто гораздо больше.`);
     }
     await sleep(500);
-    const kb = new InlineKeyboard().text(`${SPHERES.love.emoji} Отношения`, "th:love").row().text(`${SPHERES.money.emoji} Деньги и дело`, "th:money").row().text(`${SPHERES.path.emoji} Путь и сила`, "th:path");
-    await ctx.reply("Скажи, что откликается сильнее. С чего начнём?", { reply_markup: kb });
+    const kb = new InlineKeyboard().text(t(u.lang, "sphere_love"), "th:love").row().text(t(u.lang, "sphere_money"), "th:money").row().text(t(u.lang, "sphere_path"), "th:path");
+    await ctx.reply(t(u.lang, "numer_theme_prompt"), { reply_markup: kb });
     u.step = "await_theme"; saveUser(u);
     return;
   }
   if (u.step === "await_custom_q") {
     u.tarotQuestion = text.trim().slice(0, 300); u.step = "tarot_pick"; saveUser(u);
-    await ctx.reply("Приняла вопрос. Теперь сосредоточься на нём.");
+    await ctx.reply(t(u.lang, "question_accepted"));
     await sendDeck(ctx);
     return;
   }
@@ -1162,7 +1163,7 @@ bot.on("message:text", async (ctx) => {
     u.chatHistory = (u.chatHistory || []).concat({ role: "user", content: text }).slice(-12); saveUser(u);
     await ctx.replyWithChatAction("typing");
     const matrix = u.birth ? calculatePersonalMatrix(u.birth.day, u.birth.month, u.birth.year) : null;
-    let reply = await ai.generateChatReply(u.chatHistory, text, matrix, u.name);
+    let reply = await ai.generateChatReply(u.chatHistory, text, matrix, u.name, u.lang);
     if (!reply) reply = "Карты сейчас молчат, но я рядом. Спроси иначе, и я всмотрюсь ещё раз.";
     u.chatHistory = u.chatHistory.concat({ role: "assistant", content: reply }).slice(-12); saveUser(u);
     await ctx.reply(reply);

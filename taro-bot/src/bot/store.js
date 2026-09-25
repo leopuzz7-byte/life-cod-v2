@@ -22,6 +22,7 @@ function getUser(id) {
   };
   if (!u.counters) u.counters = { date: today(), aiMessages: 0 };
   if (u.counters.date !== today()) u.counters = { date: today(), aiMessages: 0 };
+  if (!u.lang) u.lang = "ru";
   return u;
 }
 function saveUser(u) { const all = readAll(); u.lastActive = Date.now(); all[u.id] = u; writeAll(all); return u; }

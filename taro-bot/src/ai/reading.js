@@ -39,21 +39,25 @@ async function callAI(prompt, maxTokens, json = true, temperature = 0.92) {
   return null;
 }
 
+function langDir(lang) {
+  return lang === "en" ? "\n\nLANGUAGE: Write every text value in your reply in natural, warm English, in the same caring voice. Keep the JSON keys exactly as given. Do not use em dashes." : "";
+}
+
 // ---- ТАРО ----
 // Короткое толкование вытянутой карты по вопросу (крючок).
-async function generateTarotReveal(cardDesc, question) {
+async function generateTarotReveal(cardDesc, question, lang) {
   const prompt = `${VOICE}
 
 Человек мысленно задал вопрос: "${question}".
 Ему выпала карта: ${cardDesc}.
 
 Дай короткое толкование этой карты именно по его вопросу. 3-4 предложения, остро, лично, чтобы ёкнуло. Не давай советов на будущее, только точное попадание в момент. Верни строго JSON:
-{ "text": "толкование 3-4 предложения", "hook": "1 фраза, что это лишь верхний слой, а причины и финал откроет полный расклад" }`;
+{ "text": "толкование 3-4 предложения", "hook": "1 фраза, что это лишь верхний слой, а причины и финал откроет полный расклад" }${langDir(lang)}`;
   return callAI(prompt, 600);
 }
 
 // Глубокий разбор по теме после подписки (без матрицы).
-async function generateTarotDeep(cardDesc, question, themeLabel) {
+async function generateTarotDeep(cardDesc, question, themeLabel, lang) {
   const prompt = `${VOICE}
 
 Тема: ${themeLabel}. Вопрос человека: "${question}". Ведущая карта: ${cardDesc}.
@@ -63,12 +67,12 @@ async function generateTarotDeep(cardDesc, question, themeLabel) {
   "insight": "4-5 предложений, глубокий разбор через карту, психологично и образно",
   "advice": "2-3 предложения мягкой поддержки и подсказки, что делать",
   "closing": "2 предложения, тепло закрой и намекни, что глубже можно пойти в полном раскладе, у методик в калькуляторе и на консультации"
-}`;
+}${langDir(lang)}`;
   return callAI(prompt, 1600);
 }
 
 // ---- НУМЕРОЛОГИЯ ----
-async function generateSpheres(matrix, name) {
+async function generateSpheres(matrix, name, lang) {
   const cards = sphereCards(matrix);
   const list = cards.map((c) => `${c.label}: ${arcInfo(c.n)}`).join("; ");
   const prompt = `${VOICE}
@@ -76,11 +80,11 @@ async function generateSpheres(matrix, name) {
 Человек${name ? ` по имени ${name}` : ""}, дата рождения ${matrix.birthDate.day}.${matrix.birthDate.month}.${matrix.birthDate.year}.
 Три карты по сферам: ${list}.
 Сделай короткий живой разбор по трём сферам. К каждой дай разный человечный заход, будто только всмотрелась в карту. Верни строго JSON:
-{ "preface": "1 тёплая фраза вступления", "love_lead": "живой заход к отношениям", "love": "2-3 предложения про отношения по аркану", "money_lead": "заход к деньгам", "money": "2-3 предложения про деньги", "path_lead": "заход к пути", "path": "2-3 предложения про путь" }`;
+{ "preface": "1 тёплая фраза вступления", "love_lead": "живой заход к отношениям", "love": "2-3 предложения про отношения по аркану", "money_lead": "заход к деньгам", "money": "2-3 предложения про деньги", "path_lead": "заход к пути", "path": "2-3 предложения про путь" }${langDir(lang)}`;
   return callAI(prompt, 1100);
 }
 
-async function generateDeep(matrix, name, sphereLabel, concern) {
+async function generateDeep(matrix, name, sphereLabel, concern, lang) {
   const p = matrix.positions;
   const focus = concern && concern !== "Просто интересно"
     ? `Особенно волнует: «${concern}». Мягко попади в это, поддерживая.`
@@ -89,12 +93,12 @@ async function generateDeep(matrix, name, sphereLabel, concern) {
 
 Человек${name ? ` по имени ${name}` : ""}. Тема: ${sphereLabel}. Суть ${arcInfo(p[1])}, цель ${arcInfo(p[6])}. ${focus}
 Сделай глубокий тёплый разбор по теме, без полной матрицы. Верни строго JSON:
-{ "opening": "2-3 предложения узнавания", "insight": "4-5 предложений глубокого разбора", "advice": "2-3 предложения поддержки", "closing": "2 предложения, намёк идти глубже со мной" }`;
+{ "opening": "2-3 предложения узнавания", "insight": "4-5 предложений глубокого разбора", "advice": "2-3 предложения поддержки", "closing": "2 предложения, намёк идти глубже со мной" }${langDir(lang)}`;
   return callAI(prompt, 1600);
 }
 
 // ---- ЧАТ ----
-async function generateChatReply(history, userMsg, matrix, name) {
+async function generateChatReply(history, userMsg, matrix, name, lang) {
   const p = matrix ? matrix.positions : null;
   const ctx = matrix ? `Контекст: человек${name ? ` по имени ${name}` : ""}. Суть ${arcInfo(p[1])}, цель ${arcInfo(p[6])}.` : "";
   const hist = (history || []).slice(-6).map((m) => `${m.role === "user" ? "Человек" : "Ты"}: ${m.content}`).join("\n");
@@ -102,7 +106,7 @@ async function generateChatReply(history, userMsg, matrix, name) {
 Ведёшь живой диалог как таролог Надежда. Отвечай коротко, 2-4 предложения, тепло и точно.
 ${ctx}
 ${hist ? "История:\n" + hist + "\n" : ""}Человек написал: "${userMsg}"
-Ответь одним живым сообщением, без JSON, просто текст.`;
+Ответь одним живым сообщением, без JSON, просто текст.${langDir(lang)}`;
   return callAI(prompt, 500, false);
 }
 
